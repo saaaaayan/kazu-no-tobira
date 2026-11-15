@@ -41,7 +41,7 @@ const levels: Record<string, number> = { e1: 1, e2: 2, e3: 3, e4: 4, e5: 5, e6: 
 
 export function checkMathAnswer(problem: MathQuestion, typed: string): boolean {
   const normalized = typed.normalize('NFKC').trim().replaceAll('−', '-');
-  if (problem.type === 'choice') return normalized === problem.answer;
+  if (problem.type === 'choice') return typed.trim() === problem.answer || normalized === problem.answer.normalize('NFKC');
   if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(normalized)) return false;
   const actual = Number(normalized);
   const expected = Number(problem.answer);
@@ -50,7 +50,7 @@ export function checkMathAnswer(problem: MathQuestion, typed: string): boolean {
 
 export function isValidMathAnswer(problem: MathQuestion, typed: string): boolean {
   const normalized = typed.normalize('NFKC').trim().replaceAll('−', '-');
-  if (problem.type === 'choice') return problem.choices?.includes(normalized) ?? false;
+  if (problem.type === 'choice') return problem.choices?.includes(typed.trim()) ?? false;
   return /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(normalized) && Number.isFinite(Number(normalized));
 }
 
