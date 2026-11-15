@@ -8,6 +8,8 @@ import { canPlayWorldStage, type PlayMode } from '../domain/playMode';
 import WorldAtlasArt from './WorldAtlasArt';
 import { islandRouteByKind, islandStageLayout, routeThrough, worldMapLayout } from '../domain/worldMapLayout';
 import { hasStageBank } from '../domain/questionBank';
+import type { UserPlan } from '../domain/access';
+import { canAccessStage } from '../domain/access';
 import type { Progress } from '../domain/progress';
 
 const palette = [
@@ -198,8 +200,8 @@ function stageText(stage:WorldStage):string {
   return '秘'+String(stage.order-59);
 }
 
-export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
-  grade:WorldGrade;progress:Progress;mode:PlayMode;onBack:()=>void;onStart:(stage:WorldStage)=>void;onTitles:()=>void;
+export function IslandStageMap({grade,progress,mode,plan,onBack,onStart,onTitles}: {
+  grade:WorldGrade;progress:Progress;mode:PlayMode;plan:UserPlan;onBack:()=>void;onStart:(stage:WorldStage)=>void;onTitles:()=>void;
 }) {
   const [width,setWidth]=useState(0);
   const actual=measuredWidth(width);
@@ -207,7 +209,7 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
   const stats=gradeProgress(progress,grade.id);
   const gradeIndex=worldIslands.findIndex(g=>g.id===grade.id);
   const testing = mode === 'test';
-  const next = testing ? undefined : grade.stages.find(stage => canPlayWorldStage(mode, progress, stage) && !progress.stages[stage.id]);
+  const next = testing ? undefined : grade.stages.find(stage => canPlayWorldStage(mode, progress, stage, plan) && !progress.stages[stage.id]);
   const marker=Math.max(46,Math.min(57,Math.floor(actual/5)-9));
   return (
     <View style={styles.screen}>
@@ -260,14 +262,15 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
         {grade.stages.map((stage,index)=>{
           const position=geometry.positions[index];
           const record=(testing ? undefined : progress.stages[stage.id]) as {clearedAt?:string;perfectAt?:string}|undefined;
-          const unlocked=canPlayWorldStage(mode,progress,stage);
+          const unlocked=canPlayWorldStage(mode,progress,stage,plan);
+          const premiumLocked=!canAccessStage(plan,stage);
           const cleared=Boolean(record?.clearedAt);
           const perfect=Boolean(record?.perfectAt||(legacy.has(stage.id)&&cleared));
           const current=stage.id===next?.id;
           return (
             <Pressable key={stage.id} accessibilityRole="button" disabled={!unlocked}
               accessibilityState={{disabled:!unlocked}}
-              accessibilityLabel={stage.title+'、'+(perfect?'パーフェクト':cleared?'クリア済み':unlocked?'挑戦できる':stage.gradeId === 'sage' && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
+              accessibilityLabel={stage.title+'、'+(perfect?'パーフェクト':cleared?'クリア済み':unlocked?'挑戦できる':stage.gradeId === 'sage' && !hasStageBank(stage.id) ? '問題を準備中' : premiumLocked ? 'プレミアム限定' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
                 styles.stagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
@@ -280,14 +283,14 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
               </Text>
               {perfect&&<Text style={styles.pinStar}>★</Text>}
               {cleared&&!perfect&&<Text style={styles.pinCheck}>✓</Text>}
-              {!unlocked&&<Text style={styles.pinLock}>●</Text>}
+              {!unlocked&&<Text style={styles.pinLock}>{premiumLocked?'🔒':'●'}</Text>}
             </Pressable>
           );
         })}
       </View>
       {!testing && <View style={styles.footer}>
         <Text style={styles.footerTitle}>✦ この島には 65のステージ</Text>
-        <Text style={styles.footerInfo}>通常ステージ 50こ → EX 10こ → ひみつ 5こ。ひみつの道は通常とEXの60ステージをぜんぶパーフェクトにすると開くよ。</Text>
+        <Text style={styles.footerInfo}>通常ステージ50こは無料。EX10こ・ひみつ5こはプレミアム限定。ひみつの道は通常とEXの60ステージをぜんぶパーフェクトにすると開くよ。</Text>
         <Text style={styles.footerInfo}>ひみつの道まで パーフェクト：{grade.stages.slice(0,60).filter(stage=>{
           const r=progress.stages[stage.id] as {perfectAt?:string;clearedAt?:string}|undefined;
           return Boolean(r?.perfectAt||(legacy.has(stage.id)&&r?.clearedAt));
