@@ -36,11 +36,11 @@ jobs:
           node -e "const fs=require('node:fs');const p=JSON.parse(fs.readFileSync('app.json','utf8'));p.expo.experiments={...p.expo.experiments,baseUrl:'/kazu-no-tobira'};fs.writeFileSync('app.json',JSON.stringify(p,null,2));"
       - name: Embed the source commit in the browser app
         run: |
-          printf "export const BUILD_VERSION = '%s';\\n" "$GITHUB_SHA" > src/buildVersion.ts
+          printf "export const BUILD_VERSION = '%s';\n" "$GITHUB_SHA" > src/buildVersion.ts
       - run: pnpm build:web
       - name: Publish the version manifest for update checks
         run: |
-          printf '{"version":"%s"}\\n' "$GITHUB_SHA" > dist/version.json
+          printf '{"version":"%s"}\n' "$GITHUB_SHA" > dist/version.json
       - run: touch dist/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
