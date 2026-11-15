@@ -1,3 +1,4 @@
+import type { StudyRecords } from './studyPlans.ts';
 import { expectedLessonAnswer, lessonCheckStart, lessonEnd, unitLessons, type LessonProgress } from './unitLessons.ts';
 import type { SkillId, StageId } from './curriculum.ts';
 
@@ -25,6 +26,7 @@ export interface Progress {
   stages: Partial<Record<StageId, StageProgress>>;
   skills: Partial<Record<SkillId, SkillProgress>>;
   lessons?: Partial<Record<string, LessonProgress>>;
+  study?: StudyRecords;
 }
 
 export const emptyProgress: Progress = { version: 1, attempts: [], stages: {}, skills: {} };
