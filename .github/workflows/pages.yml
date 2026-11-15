@@ -15,6 +15,7 @@ concurrency:
 
 jobs:
   build-and-deploy:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -48,3 +49,29 @@ jobs:
           path: dist
       - uses: actions/deploy-pages@v4
         id: deployment
+
+  verify-production:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Confirm the public site is serving the deployed commit
+        env:
+          SITE: https://saaaaayan.github.io/kazu-no-tobira/
+        run: |
+          for attempt in {1..18}; do
+            query="?release=${GITHUB_SHA}-${GITHUB_RUN_ATTEMPT}-${attempt}"
+            if curl --fail --silent --show-error --max-time 5 "${SITE}version.json${query}" -o version.json \
+              && node --input-type=module -e 'import { readFileSync } from "node:fs"; if (JSON.parse(readFileSync("version.json", "utf8")).version !== process.env.GITHUB_SHA) process.exit(1)' \
+              && curl --fail --silent --show-error --max-time 5 "${SITE}${query}" -o index.html \
+              && grep -Fq '<title>数のトビラ</title>' index.html; then
+              echo "Public site verified at ${GITHUB_SHA}"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::The public site did not serve ${GITHUB_SHA} within the verification window."
+          exit 1
