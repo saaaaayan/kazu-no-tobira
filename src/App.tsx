@@ -75,7 +75,9 @@ function Adventure() {
   async function submit() {
     if (!round || !progress || round.feedback || submitting.current || (mode === 'handwriting' && (blockedRef.current || drawing))) return;
     const problem = round.problems[round.index];
-    const result = gradeInteger(problem.answer, input);
+    // Grade the exact operands shown on screen, even if cached problem metadata is inconsistent.
+    const expected = problem.left + problem.right;
+    const result = gradeInteger(expected, input);
     if (result.status === 'invalid') {
       setMessage('こたえを すうじで いれてね。');
       if (mode === 'keyboard') answerInput.current?.focus();
@@ -174,7 +176,7 @@ function Adventure() {
                     <QuestionTrail stage={round.stage.title} results={round.results} index={round.index} total={round.problems.length} />
                     <Text style={styles.prompt}>あわせると いくつ？</Text>
                     <Text style={[styles.formula, wide && styles.wideFormula]}>
-                      {problem.left} ＋ {problem.right} ＝ {round.feedback ? problem.answer : '？'}
+                      {problem.left} ＋ {problem.right} ＝ {round.feedback ? problem.left + problem.right : '？'}
                     </Text>
                   </View>
                   <View style={[styles.practice, wide && styles.practiceWide]}>
