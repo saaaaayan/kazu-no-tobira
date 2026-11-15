@@ -12,5 +12,5 @@ export type RecognitionResult =
 
 export interface DigitRecognizer {
   available: boolean;
-  recognize(cells: readonly DigitInk[]): Promise<RecognitionResult>;
+  recognize(ink: DigitInk): Promise<RecognitionResult>;
 }

@@ -182,7 +182,7 @@ function Adventure() {
                     </Text>
                   </View>
                   <View style={[styles.practice, wide && styles.practiceWide]}>
-                    <View style={[styles.answerPanel, wide && styles.answerWide]}>
+                    <View style={[styles.answerPanel, wide && (mode === 'handwriting' && !round.feedback ? styles.handwritingWide : styles.answerWide)]}>
                       {round.feedback ? (
                         <>
                           <View accessibilityLiveRegion="polite" style={[styles.feedback, round.feedback === 'incorrect' && styles.incorrect]}>
@@ -294,6 +294,7 @@ const styles = StyleSheet.create({
   practiceWide: { flexDirection: 'row-reverse', alignItems: 'stretch' },
   answerPanel: { minWidth: 0, gap: 8, backgroundColor: '#f4f6fd', borderRadius: 18, padding: 14 },
   answerWide: { width: 300 },
+  handwritingWide: { flex: 1.4 },
   modeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
   mode: { flexGrow: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center',
     paddingHorizontal: 6, borderRadius: 8, backgroundColor: '#e8ecfa' },

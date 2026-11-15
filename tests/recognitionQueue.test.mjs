@@ -4,8 +4,8 @@ import { createRecognitionQueue, recognitionDelayMs } from '../src/recognition/r
 
 test('次の筆画で待機時間をリセットし、最後の筆画だけを認識する', async t => {
   t.mock.timers.enable({ apis: ['setTimeout'] });
-  const oldInk = [];
-  const latestInk = [{ drawing: [], size: { width: 90, height: 90 } }];
+  const oldInk = { drawing: [], size: { width: 90, height: 90 } };
+  const latestInk = { drawing: [], size: { width: 180, height: 90 } };
   const calls = [];
   const results = [];
   const queue = createRecognitionQueue(async ink => {
@@ -28,15 +28,15 @@ test('新しい筆画や手動修正の後に遅着した候補を破棄する',
   const completions = [];
   const results = [];
   const queue = createRecognitionQueue(() => new Promise(resolve => completions.push(resolve)), result => results.push(result));
-  queue.schedule([]);
+  queue.schedule({ drawing: [], size: { width: 90, height: 90 } });
   t.mock.timers.tick(recognitionDelayMs);
-  queue.schedule([]);
+  queue.schedule({ drawing: [], size: { width: 90, height: 90 } });
   t.mock.timers.tick(recognitionDelayMs);
   completions[1]({ status: 'recognized', value: '100' });
   completions[0]({ status: 'recognized', value: '10' });
   await Promise.resolve();
   assert.deepEqual(results.map(result => result.value), ['100']);
-  queue.schedule([]);
+  queue.schedule({ drawing: [], size: { width: 90, height: 90 } });
   t.mock.timers.tick(recognitionDelayMs);
   queue.cancel();
   completions[2]({ status: 'recognized', value: '7' });

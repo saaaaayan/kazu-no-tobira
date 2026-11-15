@@ -17,13 +17,13 @@ export function createRecognitionQueue(
 
   return {
     cancel,
-    schedule(cells: readonly DigitInk[]) {
+    schedule(ink: DigitInk) {
       cancel();
       const scheduledRevision = revision;
       timer = setTimeout(async () => {
         let result: RecognitionResult;
         try {
-          result = await recognize(cells);
+          result = await recognize(ink);
         } catch {
           result = { status: 'uncertain' };
         }
