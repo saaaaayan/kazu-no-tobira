@@ -24,6 +24,7 @@ import { ClockFace } from './components/ClockFace';
 import { MathText } from './components/MathText';
 import NumberPad from './components/NumberPad';
 import AdventureHome, { ModeBadge, ModeControls } from './components/AdventureHome';
+import { StudyPlanner } from './components/StudyPlanner';
 import { StudyWorkshop } from './components/StudyWorkshop';
 import { savePracticeAnswer, type PracticeItem } from './domain/studyPractice';
 import { UnitLearning } from './components/UnitLearning';
@@ -31,7 +32,7 @@ import { lessonForStage, newLessonProgress, type LessonProgress, type UnitLesson
 
 type Feedback = 'correct' | 'incorrect';
 type AnswerMode = 'keyboard' | 'panel' | 'handwriting';
-type Screen = 'home' | 'world' | 'island' | 'titles' | 'lesson' | 'study';
+type Screen = 'home' | 'world' | 'island' | 'titles' | 'lesson' | 'study' | 'study-plan';
 type Learning = { lesson: UnitLesson; progress: LessonProgress; target?: WorldStage; practice: boolean };
 type Round = {
   stage: WorldStage;
@@ -152,9 +153,13 @@ function AdventureWorld() {
     }
   }
 
-  async function answerPractice(item: PracticeItem, value: number) {
+  function answerPractice(item: PracticeItem, value: number) {
+    return updateStudy(previous=>savePracticeAnswer(access,previous,item,value,new Date().toISOString()));
+  }
+
+  async function updateStudy(update: (previous: Progress)=>Progress) {
     if (!progress || testing || submitting.current) return false;
-    const next = savePracticeAnswer(access,progress,item,value,new Date().toISOString());
+    const next = update(progress);
     if (next === progress) return false;
     submitting.current = true;
     setSaving(true);
@@ -325,13 +330,17 @@ function AdventureWorld() {
                 )}
                 <ModeBadge mode={playMode} />
               </View>
-              {!round && screen !== 'titles' && screen !== 'lesson' && screen !== 'study' && <ModeControls mode={playMode} onChange={setPlayMode} />}
+              {!round && screen !== 'titles' && screen !== 'lesson' && screen !== 'study' && screen !== 'study-plan' && <ModeControls mode={playMode} onChange={setPlayMode} />}
             </View>
           )}
           {!progress && (
             <Text style={styles.loading}>{loadError ? 'きろくを よみこめなかったよ。アプリを ひらきなおしてね。' : 'ぼうけんの じゅんびを しているよ…'}</Text>
           )}
-          {progress && !round && !testing && screen === 'world' && <GameButton label="苦手分析と克服練習" onPress={()=>{ setStudyError(''); setScreen('study'); }}/>}
+          {progress && !round && !testing && screen === 'world' && <GameButton label="まなびの広場" onPress={()=>{ setStudyError(''); setScreen('study'); }}/>}
+          {progress && !round && screen === 'study' && <GameButton label="個別学習・復習・成長レポート"
+            disabled={saving} onPress={()=>{setStudyError('');setScreen('study-plan');}}/>}
+          {progress && !round && screen === 'study-plan' && <StudyPlanner access={access} progress={progress} busy={saving}
+            error={studyError} onUpdate={updateStudy} onBack={()=>setScreen('study')}/>}
           {progress && !round && screen === 'study' && <StudyWorkshop access={access} progress={progress} busy={saving}
             error={studyError} onAnswer={answerPractice} onBack={()=>setScreen('world')}/>}
           {progress && !round && screen === 'world' &&
