@@ -5,7 +5,7 @@ import { BUILD_VERSION } from '../buildVersion';
 type PublishedVersion = { version?: unknown };
 
 export default function VersionNotice() {
-  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [publishedVersion, setPublishedVersion] = useState<string>();
 
   useEffect(() => {
     let active = true;
@@ -18,7 +18,7 @@ export default function VersionNotice() {
         if (!response.ok) return;
         const published = await response.json() as PublishedVersion;
         if (active && typeof published.version === 'string' && published.version !== BUILD_VERSION) {
-          setUpdateAvailable(true);
+          setPublishedVersion(published.version);
         }
       } catch {
         // A transient connection error should never block children's math practice.
@@ -44,9 +44,13 @@ export default function VersionNotice() {
       <Text style={styles.version} accessibilityLabel={`アプリのバージョン ${BUILD_VERSION.slice(0, 7)}`}>
         バージョン {BUILD_VERSION.slice(0, 7)}
       </Text>
-      {updateAvailable && (
+      {publishedVersion && (
         <Pressable accessibilityRole="button" accessibilityLabel="新しいバージョンに更新"
-          onPress={() => window.location.reload()} style={styles.updateButton}>
+          onPress={() => {
+            const fresh = new URL(window.location.href);
+            fresh.searchParams.set('release', publishedVersion.slice(0, 10));
+            window.location.assign(fresh.toString());
+          }} style={styles.updateButton}>
           <Text style={styles.updateText}>あたらしい バージョンが あるよ！ こうしんする</Text>
         </Pressable>
       )}
