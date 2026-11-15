@@ -4,6 +4,7 @@ import Svg, { Path } from 'react-native-svg';
 import { firstGradeStages, type AdditionStage } from '../domain/curriculum';
 import type { Progress } from '../domain/progress';
 import IslandScene, { islandHeight, islandSites, islandWidth } from './IslandScene';
+import { CompanionAvatar } from './AdventureCompanion';
 
 export default function AdventureMap({ progress, onStart }: { progress: Progress; onStart: (stage: AdditionStage) => void }) {
   const [width, setWidth] = useState(0);
@@ -13,6 +14,8 @@ export default function AdventureMap({ progress, onStart }: { progress: Progress
   const pinWidth = compact ? 146 : 180;
   const nextIndex = firstGradeStages.findIndex(stage => !progress.stages[stage.id]);
   const clearedCount = firstGradeStages.filter(stage => progress.stages[stage.id]).length;
+  const companionSite = positions[nextIndex < 0 ? firstGradeStages.length - 1 : nextIndex];
+  const companionLeft = Math.min(Math.max(0, width - 58), Math.max(2, companionSite.x * width / worldWidth - 27));
 
   return (
     <View style={styles.frame}>
@@ -29,6 +32,13 @@ export default function AdventureMap({ progress, onStart }: { progress: Progress
           pointerEvents="none" style={StyleSheet.absoluteFill}>
           <IslandScene compact={compact} nextIndex={nextIndex} />
         </View>
+        {width > 0 && (
+          <View accessible={false} importantForAccessibility="no-hide-descendants" pointerEvents="none"
+            style={[styles.companion, { left: companionLeft,
+              top: `${Math.max(1, (companionSite.y - 49) / islandHeight * 100)}%` }]}>
+            <CompanionAvatar size={54} />
+          </View>
+        )}
         {width > 0 && firstGradeStages.map((stage, index) => {
           const previous = firstGradeStages[index - 1];
           const cleared = Boolean(progress.stages[stage.id]);
@@ -89,5 +99,6 @@ const styles = StyleSheet.create({
   name: { color: '#20284b', fontWeight: '800', fontSize: 14, lineHeight: 18 },
   state: { color: '#465275', fontWeight: '700', fontSize: 12 },
   detail: { color: '#544a67', fontSize: 10, lineHeight: 14 },
+  companion: { position: 'absolute', width: 54, height: 54, zIndex: 1 },
   pressed: { opacity: 0.8 },
 });
