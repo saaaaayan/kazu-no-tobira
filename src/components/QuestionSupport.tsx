@@ -3,7 +3,7 @@ import { type BankDiagram, type BankQuestion, mistakenReason } from '../domain/q
 import { MathText } from './MathText';
 
 export function QuestionDiagram({ diagram, phase }: { diagram: BankDiagram; phase: 'question' | 'hint' | 'solution' }) {
-  if (diagram.kind === 'tenFrame') return <TenFrame first={diagram.first} second={diagram.second ?? 0}/>;
+  if (diagram.kind === 'tenFrame') return <TenFrame first={diagram.first} second={diagram.second ?? 0} third={diagram.third}/>;
 
   const solved = phase === 'solution';
   const moved = solved ? 10 - diagram.inside : 0;
@@ -25,9 +25,10 @@ export function QuestionDiagram({ diagram, phase }: { diagram: BankDiagram; phas
   );
 }
 
-function TenFrame({ first, second }: { first: number; second: number }) {
-  const count = first + second;
-  const label = second > 0
+function TenFrame({ first, second, third = 0 }: { first: number; second: number; third?: number }) {
+  const count = first + second + third;
+  const label = third > 0 ? `あかの たま ${first}こ、あおの たま ${second}こ、きいろの たま ${third}こ。`
+    : second > 0
     ? 'あおの まる ' + first + 'こ、きいろの まる ' + second + 'こ。1つの わくは 10こ。'
     : 'あおの まる ' + first + 'こ。1つの わくは 10こ。';
   return (
@@ -40,7 +41,9 @@ function TenFrame({ first, second }: { first: number; second: number }) {
                 const index = frame * 10 + row * 5 + col;
                 return <View key={col} style={[
                   styles.cell,
-                  index < first ? styles.blue : index < count ? styles.gold : undefined,
+                  index < first ? (third ? styles.red : styles.blue)
+                    : index < first + second ? (third ? styles.blue : styles.gold)
+                      : index < count ? styles.gold : undefined,
                 ]}/>;
               })}
             </View>
@@ -77,6 +80,7 @@ const styles = StyleSheet.create({
   frameRow: { flexDirection: 'row', gap: 3 },
   cell: { width: 17, height: 17, borderWidth: 1, borderColor: '#8e9abc', borderRadius: 9 },
   blue: { backgroundColor: '#244b97', borderColor: '#244b97' },
+  red: { backgroundColor: '#c54a40', borderColor: '#78261e' },
   gold: { backgroundColor: '#efb857', borderColor: '#885517' },
   details: { gap: 12, paddingTop: 8 },
   step: { gap: 4, borderTopWidth: 1, borderColor: '#c5cbd8', paddingTop: 8 },
