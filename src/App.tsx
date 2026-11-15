@@ -12,6 +12,7 @@ import NumberPad from './components/NumberPad';
 import HandwritingAnswer from './components/HandwritingAnswer';
 import AdventureMap from './components/AdventureMap';
 import { ClearScene, CorrectSpark, QuestionTrail, type AnswerFeedback } from './components/AdventureEffects';
+import { CompanionMoment, TreasureChest } from './components/AdventureCompanion';
 
 const answerModes = [
   { id: 'keyboard', label: 'キーボード' },
@@ -157,6 +158,8 @@ function Adventure() {
                       <Text accessibilityRole="header" style={styles.equation}>おつかれさま！</Text>
                     </>
                   )}
+                  <CompanionMoment mood={perfectRound ? 'clear' : 'encourage'} />
+                  <TreasureChest open={Boolean(perfectRound)} />
                   <Text style={styles.resultSummary}>{round.problems.length}もんのうち {round.correct}もん せいかい</Text>
                   {canContinue ? (
                     <>
@@ -174,6 +177,7 @@ function Adventure() {
                 <>
                   <View style={styles.question}>
                     <QuestionTrail stage={round.stage.title} results={round.results} index={round.index} total={round.problems.length} />
+                    <CompanionMoment mood={round.feedback === 'correct' ? 'correct' : round.feedback === 'incorrect' ? 'incorrect' : 'ready'} onDark compact />
                     <Text style={styles.prompt}>あわせると いくつ？</Text>
                     <Text style={[styles.formula, wide && styles.wideFormula]}>
                       {problem.left} ＋ {problem.right} ＝ {round.feedback ? problem.left + problem.right : '？'}
