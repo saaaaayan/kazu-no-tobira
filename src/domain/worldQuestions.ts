@@ -90,7 +90,7 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
     return numeric(`${a} ＋ ${b} ＝ ？`, a + b, `${a}と${b}を あわせると${a + b}。`);
   }
   if (stage.id === 'e1.bridge') {
-    const a = n(1, 9), b = 10 - a;
+    const a = n(0, 10), b = 10 - a;
     return numeric(`${a} ＋ ${b} ＝ ？`, 10, `${a}に${b}を たすと 10だよ。`);
   }
   if (stage.id === 'e1.tower') {
@@ -143,8 +143,18 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
       return numeric(`${a} ＋ ${b} ＝ ？`, a + b, `小数点を そろえて たすと ${answerString(a + b)}。`);
     }
     case 'fraction': {
-      const d1 = n(2, grade >= 5 ? 8 : 6), a = n(1, d1 - 1);
-      if (grade <= 3) return choice(`1/${d1} を ${d1}こ集めると？`, '1', ['1/2', `1/${d1}`, String(d1), '0'], 'もとと同じ 大きさの 1になるよ。', r);
+      const d1 = n(2, grade >= 5 ? 8 : 12), a = n(1, d1 - 1);
+      if (grade <= 3) {
+        if (index % 2 === 0) return choice(`1/${d1} を ${d1}こ集めると？`, '1',
+          ['0', `1/${d1}`, String(d1), '1/2', '2'],
+          '同じ大きさの分数を分母の数だけ集めると、全体の1になるよ。', r);
+        const pieces = n(1, d1);
+        const ans = fraction(pieces, d1);
+        return choice(`1/${d1} を ${pieces}こ集めると？`, ans,
+          [fraction(pieces + 1, d1), fraction(Math.max(1, pieces - 1), d1),
+            fraction(pieces, d1 + 1), String(pieces), '0'],
+          `分子が${pieces}、分母が${d1}なので、${ans}だよ。`, r);
+      }
       if (grade === 4) {
         const b = n(1, d1);
         const ans = fraction(a + b, d1);
@@ -228,7 +238,7 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
       if (stage.subtitle.includes('円周角')) return numeric(`中心角${angle * 2}° に対する 円周角は何度？`, angle,
         '同じ弧の円周角は中心角の半分だよ。');
       if (stage.subtitle.includes('多角形')) {
-        const sides = n(3, 8);
+        const sides = n(3, 18);
         return numeric(`${sides}角形の 内角の和は何度？`, (sides - 2) * 180,
           `(${sides}-2)×180=${(sides - 2) * 180}°。`);
       }
@@ -266,7 +276,7 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         a*b*c, '縦×横×高さで体積を計算するよ。');
     }
     case 'circle': {
-      const rads = n(2, 9);
+      const rads = n(1, 24);
       const area = stage.subtitle.includes('面積');
       return numeric(`半径${rads}cmの円の${area?'面積（cm²）':'円周（cm）'}は？（πは3.14）`,
         area ? 3.14*rads*rads : 2*3.14*rads,
@@ -322,9 +332,10 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         ['面積だけが等しい', '周りの長さだけが等しい', '1組の角だけが等しい'], r);
     }
     case 'probability': {
-      const count = n(1, 4);
-      return choice(`袋に赤玉${count}個、青玉${6-count}個。1個取り出して赤玉の確率は？`,
-        fraction(count, 6), [fraction(6-count,6), fraction(count,5), fraction(count,7), '1', '0', fraction(count+1,6)],
+      const total = n(4,16), count = n(1,total-1);
+      return choice(`袋に赤玉${count}個、青玉${total-count}個。1個取り出して赤玉の確率は？`,
+        fraction(count,total), [fraction(total-count,total), fraction(count,total+1),
+          fraction(count,total-1), '1', '0', fraction(count+1,total)],
         '赤玉の数÷玉の総数で求めるよ。', r);
     }
     case 'radical': {
@@ -371,7 +382,7 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         '直角三角形の基本的な三角比を使おう。', r);
     }
     case 'combinatorics': {
-      const a = n(4,8), b = n(2,3);
+      const a = n(4,11), b = n(2,4);
       let result = 1;
       for(let k = 0; k<b; k++) result *= a-k;
       return numeric(`${a}人から順番に${b}人選ぶ並べ方は何通り？`, result,
@@ -478,12 +489,26 @@ function discovery(stage: WorldStage, index: number, r: Random): Omit<MathQuesti
 export function generateWorldQuestions(stage: WorldStage, attemptSeed = 0): MathQuestion[] {
   if(!Number.isSafeInteger(attemptSeed) || attemptSeed < 0) throw new RangeError('Invalid attempt seed');
   const r = seeded(hash(stage.id + ':' + attemptSeed));
-  return Array.from({ length: stage.questions }, (_, index) => {
-    const generated = generateCore(stage, index, r);
-    return {
-      ...generated,
-      id: stage.id + ':' + attemptSeed + ':' + (index+1),
+  const seen = new Set<string>();
+  const questions: MathQuestion[] = [];
+  for (let index = 0; index < stage.questions; index++) {
+    let unique: Omit<MathQuestion, 'id' | 'skillId'> | undefined;
+    // Retrying uses the same seed stream, so the round remains reproducible.
+    // The check is on the visible problem, not on its always-unique database ID.
+    for (let tries = 0; tries < 600; tries++) {
+      const candidate = generateCore(stage, index, r);
+      const key = candidate.question.normalize('NFKC').replace(/\\s+/g, ' ').trim();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      unique = candidate;
+      break;
+    }
+    if (!unique) throw new Error('Not enough unique problems for ' + stage.id);
+    questions.push({
+      ...unique,
+      id: stage.id + ':' + attemptSeed + ':' + (index + 1),
       skillId: (stage.gradeId + '.' + stage.family) as SkillId,
-    };
-  });
+    });
+  }
+  return questions;
 }
