@@ -31,7 +31,9 @@ export function isIslandUnlocked(progress: Progress, islandId: string): boolean 
   const index = worldIslands.findIndex(island => island.id === islandId);
   if (index < 1) return index === 0;
   const previous = gradeProgress(progress, worldIslands[index - 1].id);
-  return previous.extrasCleared === 10 && (islandId !== 'sage' || previous.regularCleared === 50);
+  // Each grade's regular fifty stages remain fully accessible to free players.
+  // Premium EX stages must never be a prerequisite for the next free island.
+  return previous.regularCleared === 50 && (islandId !== 'sage' || previous.extrasCleared === 10);
 }
 
 export function isWorldStageUnlocked(progress: Progress, stage: WorldStage): boolean {
