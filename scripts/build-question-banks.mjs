@@ -1,15 +1,19 @@
+import bridgeSlots from './bridge-bank-slots.json' with { type: 'json' };
+import { addNumberOrderQuestions } from './number-order-questions.mjs';
 import { mkdir, writeFile } from 'node:fs/promises';
-import { worldStageById } from '../src/domain/worldCatalog.ts';
+import { worldStages, worldStageById } from '../src/domain/worldCatalog.ts';
 
 const directory = new URL('../public/question-banks/', import.meta.url);
 const definitions = [
   ['e1.forest', '9までの たしざん', 'あわせた かずが 9までの たしざんを かんがえる。'],
   ['e1.bridge', '10を つくる たしざん', 'いくつと いくつで 10に なるかを かんがえる。'],
   ['e1.tower', '10を こえる たしざん', '10の まとまりを つくって、のこりを たす。'],
+  ['e1.n04', 'かずの じゅんばん', '1から10までの ならびを つかって、まえ・あと・あいだの かずを みつける。'],
+  ['e1.n05', 'かずの じゅんばん', 'かずの ならびから、ばしょと あいだの かずの こすうを かんがえる。'],
 ];
 
 const titles = ['なにを もとめる？', 'つかう かんがえかた', 'やってみよう', 'たしかめよう', 'まちがえやすい ところ'];
-const turn = (a, b) => [a, b].map(Number);
+
 
 export function makeBank([stageId, unit, objective]) {
   const stage = worldStageById.get(stageId);
@@ -37,7 +41,8 @@ export function makeBank([stageId, unit, objective]) {
     pools.get(format).push(problem);
   }
 
-  for (let a = 0; a <= 9; a++) for (let b = 0; b <= 10; b++) {
+  if (stageId === 'e1.n04' || stageId === 'e1.n05') addNumberOrderQuestions(stageId, add);
+  else for (let a = 0; a <= 9; a++) for (let b = 0; b <= 10; b++) {
     const total = a + b;
     const forest = stageId === 'e1.forest';
     const bridge = stageId === 'e1.bridge';
@@ -129,12 +134,27 @@ export function makeBank([stageId, unit, objective]) {
   }
 
   if (stageId === 'e1.bridge') {
-    for (let have = 2; have <= 10; have++) for (let offered = 1; offered <= 9; offered++) {
+    for (let have = 3; have <= 8; have++) {
+      const left = 2;
+      const moved = 10 - have;
+      add('reverseTransfer', 'before-move-' + have,
+        `はこの なかに たまが ${have}こ ありました。そとから たまを いれると、なかは 10こ、そとは ${left}こに なりました。はじめに そとに なんこ ありましたか？`,
+        moved + left,
+        ['はこに うつした たまと、そとに のこった たまに わけて かんがえよう。',
+          'はじめに そとに あった たまは、うつした ぶんと のこりを あわせた かずだよ。',
+          `10−${have}で うつした かずを もとめよう。そこに ${left}こを たそう。`],
+        ['はじめに そとに あった かずを もとめるよ。', 'うつしても、たまが ふえたり へったり する わけでは ないよ。',
+          `10−${have}＝${moved}こを うつしたね。 ${moved}＋${left}＝${moved + left}。`,
+          `そとに ${moved + left}こ あって ${moved}こを うつすと ${moved + left}−${moved}＝${left}。なかは ${have}＋${moved}＝10。`,
+          'そとに のこった たまも、はじめは そとに あったよ。'],
+        [moved, 'うつした ぶんだけを かぞえたかも。そとに のこった たまも あわせよう。'], undefined, 3);
+    }
+    for (let have = 2; have < 10; have++) for (let offered = 1; offered <= 9; offered++) {
       const needed = 10 - have;
       const left = offered - needed;
       if (left <= 0) continue;
       add('story', 'spare-' + have + '-' + offered,
-        'はこに たまが ' + have + 'こ あります。そとに ' + offered + 'こ あります。はこの なかを 10こに したら、そとに なんこ のこりますか？',
+        'はこに たまが ' + have + 'こ あります。そとに ' + offered + 'こ あります。そとから たまを いれて、はこの なかを 10こに します。そとに なんこ のこりますか？',
         left,
         ['はこに あと いくつ はいるかを さきに しらべよう。',
           '10から はこの なかの かずを ひくと、あいて いる ぶんが わかるよ。',
@@ -145,7 +165,7 @@ export function makeBank([stageId, unit, objective]) {
           'はこの なかは ' + have + '＋' + needed + '＝10。そとの たまは ' + needed + '＋' + left + '＝' + offered + 'に わけられたね。',
           'はこに 入れた かずと、そとに のこった かずを とりちがえないよ。'],
         [needed, 'それは はこに 入れた かずかも。そとの たまから、はこに 入れた ぶんを ひこう。'],
-        { kind: 'tenFrame', first: have }, 3);
+        { kind: 'transferToTen', inside: have, outside: offered }, 3);
     }
   }
 
@@ -161,19 +181,41 @@ export function makeBank([stageId, unit, objective]) {
     }
     return queue;
   });
-  const questions = [];
+  let questions = [];
   while (questions.length < 100 && queues.some(queue => queue.length)) {
     for (const queue of queues) {
       if (questions.length < 100 && queue.length) questions.push(queue.pop());
     }
+  }
+  if (stageId === 'e1.bridge') {
+    // Keep saved draws and past attempt IDs valid. Replace only the retired slots.
+    const bySlot = new Map([...pools.values()].flat().map(q => [q.id.split(':').at(-1), q]));
+    const oldSlots = new Set(bridgeSlots);
+    const replacements = [...bySlot.entries()].filter(([key]) => key.startsWith('before-move-') && !oldSlots.has(key));
+    questions = bridgeSlots.map(slot => {
+      if (!slot.startsWith('spare-10-')) return bySlot.get(slot);
+      const replacement = replacements.shift()?.[1];
+      if (!replacement) throw new Error('No valid replacement for ' + slot);
+      return { ...replacement, id: stageId + ':bank1:' + slot };
+    });
+    if (questions.some(question => !question)) throw new Error('Bridge bank slot is missing');
   }
   if (questions.length !== 100) throw new Error(stageId + ' has only ' + questions.length + ' questions');
   return { version: 1, stageId, gradeId: stage.gradeId, islandId: stage.gradeId, unit, objective, questions };
 }
 
 await mkdir(directory, { recursive: true });
-for (const definition of definitions) {
-  const bank = makeBank(definition);
+const banks = definitions.map(makeBank);
+for (const bank of banks) {
   const json = JSON.stringify(bank, null, 2) + '\n';
   await writeFile(new URL(bank.stageId + '.v1.json', directory), json);
 }
+const byStage = new Map(banks.map(bank => [bank.stageId, bank]));
+const entries = worldStages.map(stage => {
+  const bank = byStage.get(stage.id);
+  const review = bank ? ['自動検証', '自動検証', '代表例確認', '対象図の数値を照合', '3段階と代表例を確認', '構成・途中式と代表例を確認']
+    : ['未実施', '未実施', '未実施', '未実施', '未実施', '未実施'];
+  return [stage.id, stage.title, bank?.questions.length ?? 0, ...review, bank ? '完成' : '未着手'].join('\t');
+});
+const columns = 'ステージID\tステージ名\t制作済み\t重複\t正答\t問題文\t図解\tヒント\t解説\t状態';
+await writeFile(new URL('../docs/question-bank-progress.tsv', import.meta.url), [columns, ...entries].join('\n') + '\n');

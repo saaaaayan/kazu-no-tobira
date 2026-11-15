@@ -95,7 +95,9 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
     return numeric(`${a} ＋ ${b} ＝ ？`, a + b, `${a}と${b}を あわせると${a + b}。`);
   }
   if (stage.id === 'e1.bridge') {
-    const a = n(0, 10), b = 10 - a;
+    const a = n(1, 9), b = 10 - a;
+    if (index % 2) return numeric(`${a}＋□＝10。□に はいる かずは？`, b,
+      `10から ${a}を ひくと ${b}。 ${a}＋${b}＝10。`);
     return numeric(`${a} ＋ ${b} ＝ ？`, 10, `${a}に${b}を たすと 10だよ。`);
   }
   if (stage.id === 'e1.tower') {

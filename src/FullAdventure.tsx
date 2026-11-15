@@ -5,7 +5,7 @@ import { worldGrades, type WorldGrade, type WorldStage } from './domain/worldCat
 import { checkMathAnswer, isValidMathAnswer, type MathQuestion } from './domain/worldQuestions';
 import { isBankQuestion } from './domain/questionBank';
 import { prepareStageRound } from './stageRounds';
-import { TenFrame, WorkedSolution } from './components/QuestionSupport';
+import { QuestionDiagram, WorkedSolution } from './components/QuestionSupport';
 import type { Progress } from './domain/progress';
 import { canPlayWorldStage, progressAfterWorldAnswer, type PlayMode } from './domain/playMode';
 import { adventureTitles } from './domain/titles';
@@ -258,9 +258,12 @@ function AdventureWorld() {
                     <CompanionMoment compact onDark
                       mood={round.feedback === 'correct' ? 'correct' : round.feedback === 'incorrect' ? 'incorrect' : 'ready'}
                       variation={round.dialogueOffset + round.index}/>
-                    <Text style={styles.difficulty}>{round.stage.kind==='secret'?'✦ ひみつの なぞ':round.stage.kind==='extra'?'★ EXチャレンジ':round.index<3?'● きほん':round.index<8?'● ひょうじゅん':'★ おうよう'}</Text>
+                    <Text style={styles.difficulty}>{round.stage.kind==='secret'?'✦ ひみつの なぞ':round.stage.kind==='extra'?'★ EXチャレンジ':bankQuestion ? ['● きほん', '● ひょうじゅん', '★ おうよう'][bankQuestion.difficulty - 1]
+                      : round.index<3?'● きほん':round.index<8?'● ひょうじゅん':'★ おうよう'}</Text>
                     <MathText style={styles.questionText} value={question.question}/>
-                    {bankQuestion?.diagram && <TenFrame diagram={bankQuestion.diagram} revealSecond={!round.feedback} />}
+                    {bankQuestion?.diagram && !round.feedback && (
+                      <QuestionDiagram diagram={bankQuestion.diagram} phase={round.hintLevel ? 'hint' : 'question'} />
+                    )}
                     <MathText style={styles.prompt} value={question.prompt}/>
                   </View>
                   <View style={[styles.workArea,wide&&styles.workWide]}>
