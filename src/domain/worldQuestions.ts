@@ -607,7 +607,7 @@ export function generateWorldQuestions(stage: WorldStage, attemptSeed = 0): Math
     // The check is on the visible problem, not on its always-unique database ID.
     for (let tries = 0; tries < 600; tries++) {
       const candidate = generateCore(stage, index, r);
-      const key = candidate.question.normalize('NFKC').replace(/\\s+/g, ' ').trim();
+      const key = candidate.question.normalize('NFKC').replace(/\s+/g, ' ').trim();
       if (seen.has(key)) continue;
       seen.add(key);
       unique = candidate;
