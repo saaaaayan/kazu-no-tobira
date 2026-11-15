@@ -22,12 +22,19 @@ import { ClockFace } from './components/ClockFace';
 import { MathText } from './components/MathText';
 import NumberPad from './components/NumberPad';
 import AdventureHome, { ModeBadge, ModeControls } from './components/AdventureHome';
+import LearningExperience from './components/LearningExperience';
+import StudyDashboard, { PlanSwitcher, type StudyPurpose } from './components/StudyDashboard';
+import { guideForStage, isLessonComplete } from './domain/learningLibrary';
+import { recommendedStages } from './domain/studyIntelligence';
+import type { UserPlan } from './domain/access';
 
 type Feedback = 'correct' | 'incorrect';
 type AnswerMode = 'keyboard' | 'panel' | 'handwriting';
-type Screen = 'home' | 'world' | 'island' | 'titles';
+type Screen = 'home' | 'world' | 'island' | 'titles' | 'study';
 type Round = {
   stage: WorldStage;
+  activity?: StudyPurpose;
+  startedAt?: number;
   problems: MathQuestion[];
   index: number;
   correct: number;
@@ -44,6 +51,10 @@ function AdventureWorld() {
   const [loadError, setLoadError] = useState(false);
   const [screen, setScreen] = useState<Screen>('home');
   const [playMode, setPlayMode] = useState<PlayMode>('normal');
+  // Entitlement simulation is never enabled by default in release builds.
+  const canTogglePlans = __DEV__ || process.env.EXPO_PUBLIC_ENABLE_TEST_PLANS === 'true';
+  const [plan, setPlan] = useState<UserPlan>('free');
+  const [learningStage, setLearningStage] = useState<WorldStage>();
   const starting = useRef(false);
   const [loadingRound, setLoadingRound] = useState(false);
   const [startError, setStartError] = useState('');
@@ -51,6 +62,16 @@ function AdventureWorld() {
   const testing = playMode === 'test';
   const [grade, setGrade] = useState<WorldGrade>(worldIslands[0]);
   const [round, setRound] = useState<Round>();
+  const [clockTime, setClockTime] = useState(Date.now());
+  useEffect(() => {
+    if (!round?.activity || round.complete) return;
+    const interval = setInterval(() => setClockTime(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, [round?.activity, round?.complete]);
+  useEffect(() => {
+    if (!round?.activity || !round.startedAt || round.complete || clockTime - round.startedAt < 15*60*1000) return;
+    setRound(previous => previous?.activity && !previous.complete ? { ...previous, complete: true } : previous);
+  }, [clockTime, round?.activity, round?.complete, round?.startedAt]);
   const [answer, setAnswer] = useState('');
   const [mode, setMode] = useState<AnswerMode>('keyboard');
   const [message, setMessage] = useState('');
@@ -84,7 +105,7 @@ function AdventureWorld() {
     scroll.current?.scrollTo({ y: 0, animated: false });
   }
   async function start(stage: WorldStage) {
-    if (!progress || starting.current || submitting.current || !canPlayWorldStage(playMode, progress, stage)) return;
+    if (!progress || starting.current || submitting.current || !canPlayWorldStage(playMode, progress, stage, plan)) return;
     starting.current = true;
     setLoadingRound(true);
     setStartError('');
@@ -104,6 +125,55 @@ function AdventureWorld() {
       });
     } catch {
       setStartError('もんだいを ひらけなかったよ。もういちど えらんでね。');
+    } finally {
+      starting.current = false;
+      setLoadingRound(false);
+    }
+  }
+
+  function openLearning(stage: WorldStage) {
+    if (starting.current || submitting.current) return;
+    setLearningStage(stage);
+    setScreen('island');
+    resetAnswer();
+  }
+  function chooseStage(stage: WorldStage) {
+    if (!progress || !canPlayWorldStage(playMode, progress, stage, plan)) return;
+    openLearning(stage);
+  }
+  async function finishLesson(stage: WorldStage) {
+    if (!progress) return;
+    const id = guideForStage(stage).id;
+    if (isLessonComplete(progress, id)) return;
+    const next: Progress = { ...progress, lessons: { ...progress.lessons, [id]: { completedAt: new Date().toISOString() } } };
+    try {
+      if (!testing) await saveProgress(next);
+      setProgress(next);
+    } catch {
+      setStartError('学習の記録を保存できませんでした。もういちど試してね。');
+    }
+  }
+  async function startPractice(activity: StudyPurpose) {
+    if (!progress || plan !== 'premium' || starting.current || submitting.current) return;
+    starting.current = true;
+    setLoadingRound(true);
+    setStartError('');
+    try {
+      const suggested = recommendedStages(progress, plan, activity);
+      const stages = [0,1,2].map(i => suggested[i % suggested.length]);
+      const banks = await Promise.all(stages.map((stage, i) =>
+        prepareStageRound(stage, playMode, (testing ? testRoundSeed.current++ : progress.attempts.length) + i)));
+      const problems = banks.flat();
+      if (!problems.length) throw new Error('No practice problems');
+      setLearningStage(undefined);
+      resetAnswer();
+      setRound({
+        activity, startedAt: Date.now(), stage: stages[0], problems,
+        index: 0, correct: 0, results: [], dialogueOffset: 0,
+        usedHint: false, hintLevel: 0,
+      });
+    } catch {
+      setStartError('個別学習の問題を用意できませんでした。別のステージを試してね。');
     } finally {
       starting.current = false;
       setLoadingRound(false);
@@ -141,7 +211,7 @@ function AdventureWorld() {
       submitted,
       correct: correctAnswer,
       answeredAt: now,
-    }, round.index === round.problems.length - 1
+    }, !round.activity && round.index === round.problems.length - 1
       ? { stage: round.stage, correct: newCorrect, usedHint: round.usedHint }
       : undefined);
     try {
@@ -173,18 +243,20 @@ function AdventureWorld() {
     setStartError('');
     resetAnswer();
     setRound(undefined);
-    setScreen('island');
+    setLearningStage(undefined);
+    setScreen(round?.activity ? 'study' : 'island');
   }
   function openGrade(next: WorldGrade) {
     resetAnswer();
     setGrade(next);
+    setLearningStage(undefined);
     setScreen('island');
   }
 
-  const perfect = Boolean(round && round.correct === round.problems.length && !round.usedHint);
-  const cleared = Boolean(round && round.correct >= Math.ceil(round.stage.questions * 0.8));
+  const perfect = Boolean(round && !round.activity && round.correct === round.problems.length && !round.usedHint);
+  const cleared = Boolean(round && !round.activity && round.correct >= Math.ceil(round.stage.questions * 0.8));
   const nextStage = round && worldIslands.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
-  const canContinue = nextStage && progress && canPlayWorldStage(playMode, progress, nextStage);
+  const canContinue = !round?.activity && nextStage && progress && canPlayWorldStage(playMode, progress, nextStage, plan);
   const newlyEarnedTitles = round && progress && !testing ? adventureTitles(progress).filter(t=>t.unlocked).length : 0;
 
   return (
