@@ -3,10 +3,12 @@ export { bankStageIds };
 import type { MathQuestion } from './worldQuestions.ts';
 
 export type BankDiagram = { kind: 'tenFrame'; first: number; second?: number; third?: number }
-  | { kind: 'transferToTen'; inside: number; outside: number };
+  | { kind: 'transferToTen'; inside: number; outside: number }
+  | { kind: 'takeAway'; total: number; used: number };
 export type BankQuestion = MathQuestion & {
   format: 'calculation' | 'missingPart' | 'story' | 'decomposition' | 'comparison' | 'position' | 'interval' | 'sequence' | 'line' | 'reverseTransfer'
-    | 'joinThree' | 'target' | 'splitTotal' | 'compareGroups' | 'returnSome' | 'refill' | 'twoCollections';
+    | 'joinThree' | 'target' | 'splitTotal' | 'compareGroups' | 'returnSome' | 'refill' | 'twoCollections'
+    | 'takeAway' | 'takeTwice' | 'startAmount' | 'unknownLast' | 'compareAfter' | 'moveAway' | 'equalize' | 'comparedStart';
   difficulty: 1 | 2 | 3;
   hints: readonly [string, string, string];
   steps: readonly { title: string; body: string }[];

@@ -1,3 +1,5 @@
+import { earlySubtractionPools, earlySubtractionStages } from './early-subtraction-unit.mjs';
+import { validateEarlySubtractionBatch } from './validate-early-subtraction.mjs';
 import { earlyAdditionPools, earlyAdditionStages } from './early-addition-unit.mjs';
 import { validateEarlyAdditionBatch } from './validate-early-addition.mjs';
 import bridgeSlots from './bridge-bank-slots.json' with { type: 'json' };
@@ -218,8 +220,8 @@ async function output(path, contents) {
   }
 }
 const banks = definitions.map(makeBank);
-const pools = earlyAdditionPools();
-for (const [stageId, quotas] of earlyAdditionStages) {
+function buildUnit(stages, pools, objective) {
+  return stages.map(([stageId, quotas]) => {
   const stage = worldStageById.get(stageId);
   const questions = Object.entries(quotas).flatMap(([kind, count]) => {
     const pool = pools.get(kind);
@@ -242,10 +244,15 @@ for (const [stageId, quotas] of earlyAdditionStages) {
     }));
   });
   if (!stage || questions.length !== 100) throw new Error(stageId + ': invalid stage batch');
-  banks.push({ version: 1, stageId, gradeId: stage.gradeId, islandId: stage.gradeId,
-    unit: stage.subtitle, objective: 'まとまりを あわせて、9までの かずの かわりかたを かんがえる。', questions });
+  return { version: 1, stageId, gradeId: stage.gradeId, islandId: stage.gradeId,
+    unit: stage.subtitle, objective, questions };
+  });
 }
-validateEarlyAdditionBatch(banks.filter(bank => earlyAdditionStages.some(([id]) => id === bank.stageId)));
+const addition = buildUnit(earlyAdditionStages, earlyAdditionPools(), 'まとまりを あわせて、9までの かずの かわりかたを かんがえる。');
+const subtraction = buildUnit(earlySubtractionStages, earlySubtractionPools(), '9までの かずで、のこりや ちがいを かんがえる。');
+validateEarlyAdditionBatch(addition);
+validateEarlySubtractionBatch(subtraction);
+banks.push(...addition, ...subtraction);
 for (const bank of banks) {
   const json = JSON.stringify(bank, null, 2) + '\n';
   await output(new URL(bank.stageId + '.v1.json', directory), json);
