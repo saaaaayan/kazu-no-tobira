@@ -26,9 +26,10 @@ export function QuestionTrail({ stage, results, index, total }: {
           const result = results[position];
           return (
             <View key={position} style={[styles.starNode, !result && position === index && styles.currentNode]}>
-              <Star fill={result === 'correct' ? '#f2ce83' : result ? '#d5c9ea' : 'transparent'}
-                stroke={result === 'correct' ? '#ffe5a4' : '#aeb7db'} size={20} />
-              {result === 'incorrect' && <View style={styles.usedDot} />}
+              {result === 'incorrect'
+                ? <Text accessibilityLabel="不正解" style={styles.wrongMark}>✕</Text>
+                : <Star fill={result === 'correct' ? '#f2ce83' : 'transparent'}
+                    stroke={result === 'correct' ? '#ffe5a4' : '#aeb7db'} size={20} />}
             </View>
           );
         })}
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
   starNode: { width: 28, height: 30, borderRadius: 8, borderColor: 'transparent', borderWidth: 1,
     alignItems: 'center', justifyContent: 'center', position: 'relative' },
   currentNode: { borderColor: '#f4dfa1', backgroundColor: '#4c4c72' },
-  usedDot: { position: 'absolute', width: 4, height: 4, borderRadius: 2, backgroundColor: '#555079' },
+  wrongMark: { color: '#ff8b99', fontSize: 25, fontWeight: '900', lineHeight: 29, textAlign: 'center' },
   celebration: { padding: 16, paddingBottom: 22, backgroundColor: '#292e58', alignItems: 'center', borderRadius: 19, gap: 4 },
   clearLocation: { color: '#f5d998', fontSize: 16, fontWeight: '700', textAlign: 'center' },
   clearTitle: { color: '#fffceb', fontSize: 28, lineHeight: 36, fontWeight: '800', textAlign: 'center' },
