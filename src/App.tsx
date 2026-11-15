@@ -11,6 +11,7 @@ import CalculationMemo from './components/CalculationMemo';
 import NumberPad from './components/NumberPad';
 import HandwritingAnswer from './components/HandwritingAnswer';
 import AdventureMap from './components/AdventureMap';
+import WorldOverview from './components/WorldOverview';
 import { ClearScene, CorrectSpark, QuestionTrail, type AnswerFeedback } from './components/AdventureEffects';
 import { CompanionMoment, TreasureChest } from './components/AdventureCompanion';
 import VersionNotice from './components/VersionNotice';
@@ -40,6 +41,7 @@ type Round = {
 
 function Adventure() {
   const [progress, setProgress] = useState<Progress>();
+  const [mapView, setMapView] = useState<'first' | 'world'>('first');
   const [round, setRound] = useState<Round>();
   const [input, setInput] = useState('');
   const [mode, setMode] = useState<AnswerMode>('keyboard');
@@ -147,7 +149,21 @@ function Adventure() {
             </Text>
           )}
           {progress && !round && (
-            <AdventureMap progress={progress} onStart={start} />
+            <View style={styles.overview}>
+              <View style={styles.worldSwitch}>
+                <Pressable accessibilityRole="button" accessibilityState={{ selected: mapView === 'first' }}
+                  onPress={() => setMapView('first')} style={[styles.worldSwitchButton, mapView === 'first' && styles.worldSwitchActive]}>
+                  <Text style={[styles.worldSwitchText, mapView === 'first' && styles.worldSwitchActiveText]}>たしざんの島</Text>
+                </Pressable>
+                <Pressable accessibilityRole="button" accessibilityState={{ selected: mapView === 'world' }}
+                  onPress={() => setMapView('world')} style={[styles.worldSwitchButton, mapView === 'world' && styles.worldSwitchActive]}>
+                  <Text style={[styles.worldSwitchText, mapView === 'world' && styles.worldSwitchActiveText]}>12の島・称号図鑑</Text>
+                </Pressable>
+              </View>
+              {mapView === 'world'
+                ? <WorldOverview progress={progress} onPlay={start} />
+                : <AdventureMap progress={progress} onStart={start} />}
+            </View>
           )}
           {round && problem && (
             <View style={[styles.panel, !round.complete && styles.practicePanel]}>
@@ -289,6 +305,13 @@ export default function App() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#f0eef4' },
+  overview: { gap: 12 },
+  worldSwitch: { flexDirection: 'row', gap: 8 },
+  worldSwitchButton: { flex: 1, minHeight: 48, justifyContent: 'center', alignItems: 'center',
+    backgroundColor: '#e4e2ee', borderRadius: 12, paddingHorizontal: 4 },
+  worldSwitchActive: { backgroundColor: '#36488c' },
+  worldSwitchText: { color: '#32375b', fontWeight: '800', fontSize: 13 },
+  worldSwitchActiveText: { color: '#fff' },
   scroll: { flexGrow: 1, padding: 16, paddingBottom: 40 },
   shell: { width: '100%', maxWidth: 952, alignSelf: 'center', gap: 20 },
   hero: { backgroundColor: navy, overflow: 'hidden', paddingHorizontal: 24, paddingVertical: 20, borderRadius: 24, gap: 8 },
