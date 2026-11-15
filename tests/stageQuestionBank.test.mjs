@@ -1,3 +1,5 @@
+import { countToHundredStages } from '../scripts/count-to-hundred-unit.mjs';
+import { validateCountToHundredBatch } from '../scripts/validate-count-to-hundred.mjs';
 import { borrowSubtractionStages } from '../scripts/borrow-subtraction-unit.mjs';
 import { validateBorrowSubtractionBatch } from '../scripts/validate-borrow-subtraction.mjs';
 import { carryAdditionStages } from '../scripts/carry-addition-unit.mjs';
@@ -82,13 +84,19 @@ test('くりさがりの引き算の正答、10のまとまり、図を独立に
   validateBorrowSubtractionBatch(borrowSubtractionBatch);
 });
 
-test('保存済み3,500問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
+const countToHundredBatch = banks.filter(bank => countToHundredStages.some(([id]) => id === bank.stageId));
+test('100までの数の正答、十のまとまり、図を問題文から検証する', () => {
+  assert.equal(countToHundredBatch.length, 5);
+  validateCountToHundredBatch(countToHundredBatch);
+});
+
+test('保存済み4,000問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
   const allIds = new Set();
   const equations = new Set();
   for (const bank of banks) {
     assert.equal(bank.questions.length, 100);
     assert.equal(new Set(bank.questions.map(q => q.question)).size, 100);
-    assert.ok(new Set(bank.questions.map(q => q.format)).size >= (unitBatch.includes(bank) || carryAdditionBatch.includes(bank) ? 3 : 4));
+    assert.ok(new Set(bank.questions.map(q => q.format)).size >= (unitBatch.includes(bank) || carryAdditionBatch.includes(bank) || countToHundredBatch.includes(bank) ? 3 : 4));
     const mathematicalTasks = new Set();
     for (const question of bank.questions) {
       assert.ok(question.id.startsWith(bank.stageId + ':bank' + bank.version + ':'));
@@ -100,7 +108,7 @@ test('保存済み3,500問の問題文から独立して再計算し、途中式
       const signature = JSON.stringify([question.format, task]);
       assert.ok(!mathematicalTasks.has(signature), question.id);
       mathematicalTasks.add(signature);
-      if (!unitBatch.includes(bank) && !subtractionBatch.includes(bank) && !makeTenBatch.includes(bank) && !countToTwentyBatch.includes(bank) && !carryAdditionBatch.includes(bank) && !borrowSubtractionBatch.includes(bank)) {
+      if (!unitBatch.includes(bank) && !subtractionBatch.includes(bank) && !makeTenBatch.includes(bank) && !countToTwentyBatch.includes(bank) && !carryAdditionBatch.includes(bank) && !borrowSubtractionBatch.includes(bank) && !countToHundredBatch.includes(bank)) {
         assert.ok(checkMathAnswer(question, String(solveFromStem(question))), question.id);
       }
       assert.equal(question.hints.length, 3);
@@ -143,7 +151,7 @@ test('保存済み3,500問の問題文から独立して再計算し、途中式
       }
     }
   }
-  assert.equal(allIds.size, 3500);
+  assert.equal(allIds.size, 4000);
   assert.ok(equations.size > 100);
 });
 
