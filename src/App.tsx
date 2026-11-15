@@ -13,6 +13,7 @@ import HandwritingAnswer from './components/HandwritingAnswer';
 import AdventureMap from './components/AdventureMap';
 import { ClearScene, CorrectSpark, QuestionTrail, type AnswerFeedback } from './components/AdventureEffects';
 import { CompanionMoment, TreasureChest } from './components/AdventureCompanion';
+import VersionNotice from './components/VersionNotice';
 
 const answerModes = [
   { id: 'keyboard', label: 'キーボード' },
@@ -136,6 +137,7 @@ function Adventure() {
           <View style={[styles.hero, round && styles.compactHero]}>
             <View style={styles.moon} />
             <Text accessibilityRole="header" style={round ? styles.brand : styles.title}>数のトビラ</Text>
+            <VersionNotice />
             {!round && <Text style={styles.subtitle}>ひとつ解くたび、世界がひらく。</Text>}
           </View>
           {!progress && (
