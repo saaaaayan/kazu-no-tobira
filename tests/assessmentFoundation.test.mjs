@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { sageIsland, worldIslands } from '../src/domain/worldCatalog.ts';
 import { emptyProgress } from '../src/domain/progress.ts';
-import { canPlayWorldStage } from '../src/domain/playMode.ts';
+import { canPlayWorldStage, progressAfterWorldAnswer } from '../src/domain/playMode.ts';
 import { isIslandUnlocked, isWorldStageUnlocked } from '../src/domain/worldProgress.ts';
 import { assessmentIslands } from '../src/domain/assessmentPlan.ts';
 import { dealAssessmentCycle } from '../src/domain/balancedAssessment.ts';
@@ -48,7 +48,23 @@ test('賢者の島は高3の通常・EX60地点が必要で、未配信地点は
   assert.equal(isIslandUnlocked(incomplete, 'sage'), false);
   assert.equal(isIslandUnlocked(complete, 'sage'), true);
   assert.equal(isWorldStageUnlocked(complete, sageIsland.stages[0]), true);
-  assert.ok(sageIsland.stages.every(stage => !canPlayWorldStage('test', complete, stage)));
+  assert.equal(sageIsland.stages.filter(stage => canPlayWorldStage('test', complete, stage)).length, 3);
+  assert.equal(canPlayWorldStage('normal', incomplete, sageIsland.stages[0]), false);
+  assert.equal(canPlayWorldStage('normal', complete, sageIsland.stages[0]), true);
+});
+
+test('賢者の島の成績は通常モードで保存形式に入り、テストモードの成績は混ざらない', () => {
+  const stage = sageIsland.stages[0];
+  const attempt = { problemId:'sage.n01:bank1:algebra:5-6', stageId:stage.id, skillId:'sage.algebra',
+    submitted:13, correct:true, answeredAt:'2026-11-16T07:00:00.000Z' };
+  assert.equal(progressAfterWorldAnswer('test',emptyProgress,attempt),undefined);
+  const next = progressAfterWorldAnswer('normal',emptyProgress,attempt,{stage,correct:10,usedHint:true});
+  const restored = JSON.parse(JSON.stringify(next));
+  assert.equal(restored.attempts[0].skillId,'sage.algebra');
+  assert.equal(restored.stages[stage.id].bestCorrect,10);
+  assert.ok(restored.stages[stage.id].clearedAt);
+  assert.equal(restored.stages[stage.id].perfectAt,undefined);
+  assert.equal(canPlayWorldStage('test',restored,sageIsland.stages[1]),true);
 });
 
 test('分野別に10回へ均等に配分し、保存・復元しても一巡と次周の非重複を維持する', () => {

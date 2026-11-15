@@ -18,6 +18,7 @@ import { MagicMeter, ComboBadge, SparkleBurst } from './components/AdventureJuic
 import { CorrectSpark } from './components/AdventureEffects';
 import CalculationMemo from './components/CalculationMemo';
 import HandwritingAnswer from './components/HandwritingAnswer';
+import { ClockFace } from './components/ClockFace';
 import { MathText } from './components/MathText';
 import NumberPad from './components/NumberPad';
 import AdventureHome, { ModeBadge, ModeControls } from './components/AdventureHome';
@@ -261,6 +262,7 @@ function AdventureWorld() {
                     <Text style={styles.difficulty}>{round.stage.kind==='secret'?'✦ ひみつの なぞ':round.stage.kind==='extra'?'★ EXチャレンジ':bankQuestion ? ['● きほん', '● ひょうじゅん', '★ おうよう'][bankQuestion.difficulty - 1]
                       : round.index<3?'● きほん':round.index<8?'● ひょうじゅん':'★ おうよう'}</Text>
                     <MathText style={styles.questionText} value={question.question}/>
+                    {question.clock && !round.feedback && <ClockFace time={question.clock.start} read={question.clock.read}/>}
                     {bankQuestion?.diagram && !round.feedback && (
                       <QuestionDiagram diagram={bankQuestion.diagram} phase={round.hintLevel ? 'hint' : 'question'} />
                     )}
@@ -283,6 +285,10 @@ function AdventureWorld() {
                             </View>
                             <MathText style={styles.yourAnswer} prefix="きみの こたえ：" value={answer} format={question.type === 'choice'}/>
                             {round.feedback==='incorrect'&&<MathText style={styles.answerHint} prefix="ただしい こたえ：" value={question.answer}/>}
+                            {question.clock && <View style={{flexDirection:'row', flexWrap:'wrap', gap:8}}>
+                              <ClockFace time={question.clock.start} caption={question.clock.read ? 'よみとった じこく' : 'はじめ'}/>
+                              {!question.clock.read && <ClockFace time={question.clock.end} caption="はりを うごかした あと"/>}
+                            </View>}
                             {bankQuestion
                               ? <WorkedSolution question={bankQuestion} wrongAnswer={round.feedback === 'incorrect' ? answer : undefined}/>
                               : <MathText style={styles.explanation} value={question.explanation}/>}

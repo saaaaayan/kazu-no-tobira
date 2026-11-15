@@ -32,7 +32,7 @@ test('すべての780ステージに実際に解ける問題・答え・解説�
       const problems = generateWorldQuestions(stage,seed);
       assert.equal(problems.length,stage.questions,stage.id);
       assert.equal(new Set(problems.map(p=>p.id)).size,stage.questions,stage.id);
-      assert.equal(new Set(problems.map(p=>p.question.normalize('NFKC').trim())).size,
+      assert.equal(new Set(problems.map(p=>(p.clock?.read ? p.question + p.clock.start : p.question).normalize('NFKC').trim())).size,
         stage.questions,stage.id+' duplicate visible question with seed '+seed);
       for(const p of problems) {
         assert.ok(p.question.trim().length>0,stage.id);
@@ -113,7 +113,7 @@ test('すべての780ステージで10問中に同じ問題が出ない（再挑
   for (const stage of worldStages) {
     for (const seed of [0, 1, 2, 7, 42, 91, 1217, 100000]) {
       const questions = generateWorldQuestions(stage,seed);
-      const stems = questions.map(item => item.question.normalize('NFKC').trim());
+      const stems = questions.map(item => (item.clock?.read ? item.question + item.clock.start : item.question).normalize('NFKC').trim());
       assert.equal(stems.length, new Set(stems).size,
         '同じ問題が出ています: ' + stage.id + ' seed=' + seed +
         ' ' + stems.join(' | '));

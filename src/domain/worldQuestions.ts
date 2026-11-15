@@ -1,3 +1,4 @@
+import { clockLabel } from './clockFace.ts';
 import type { WorldStage } from './worldCatalog.ts';
 import type { SkillId } from './curriculum.ts';
 
@@ -10,6 +11,7 @@ export type MathQuestion = {
   choices?: readonly string[];
   explanation: string;
   hint: string;
+  clock?: { start: number; end: number; read: boolean };
   skillId: SkillId;
 };
 
@@ -182,12 +184,23 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         '分子どうし、分母どうしを かけると ' + ans, r);
     }
     case 'time': {
-      const h = n(1, 10), minute = n(0, 5) * 10, after = n(1, 5) * 10;
-      const result = (h * 60 + minute + after) % (12 * 60);
-      return choice(`${h}時${minute}分の ${after}分後は？`,
-        `${Math.floor(result / 60) || 12}時${result % 60}分`,
-        [`${h}時${minute}分`, `${h}時${(minute + 10) % 60}分`, `${h + 1}時${minute}分`, `${h}時${(minute + 20) % 60}分`, '12時0分'],
-        '時間を 分に 直して たすと 計算しやすいよ。', r);
+      const read = index % 3 === 0;
+      const start = n(1, 12) * 60 + n(0, 11) * 5;
+      const change = read ? 0 : n(1, 10) * 5 * (index % 3 === 2 && grade > 1 ? -1 : 1);
+      const end = start + change;
+      const direction = change < 0 ? 'まえ' : 'あと';
+      const minute = start % 60;
+      const crossesHour = Math.floor(start / 60) !== Math.floor(end / 60);
+      const explanation = read
+        ? `長い はりは 12から ${minute}めもり。短い はりは ${Math.floor(start / 60)}${minute ? 'を すぎて、つぎの 数字へ むかっている' : 'を さしている'}よ。だから ${clockLabel(start)}。`
+        : `長い はりを ${Math.abs(change)}めもり ${change < 0 ? 'もどす' : 'すすむ'}よ。 ${crossesHour ? '長い はりが 12に とどくか、とおるので、「時」も かわるよ。' : 'こんどは 「時」は そのままだよ。'} つく ところは ${clockLabel(end)}。`;
+      return {
+        ...choice(read ? 'この とけいは なんじ なんぷん？' : `${clockLabel(start)}の ${Math.abs(change)}分${direction}は？`,
+          clockLabel(end), [5, -5, 60, -60].map(offset => clockLabel(end + offset)), explanation, r,
+          read ? '長い はりは 分。12から 小さな めもりを かぞえよう。短い はりは 時を あらわすよ。'
+            : `長い はりの 小さな めもりは 1つで 1分。 ${direction}だから、長い はりを ${change < 0 ? 'はんたいむきに もどそう' : 'いつもの むきに すすめよう'}。`),
+        clock: { start, end, read },
+      };
     }
     case 'unit': {
       const choiceType = index % 3;
@@ -655,7 +668,7 @@ export function generateWorldQuestions(stage: WorldStage, attemptSeed = 0): Math
     // The check is on the visible problem, not on its always-unique database ID.
     for (let tries = 0; tries < 600; tries++) {
       const candidate = generateCore(stage, index, r);
-      const key = candidate.question.normalize('NFKC').replace(/\s+/g, ' ').trim();
+      const key = (candidate.clock?.read ? candidate.question + clockLabel(candidate.clock.start) : candidate.question).normalize('NFKC').replace(/\s+/g, ' ').trim();
       if (seen.has(key)) continue;
       seen.add(key);
       unique = candidate;

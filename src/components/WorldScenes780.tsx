@@ -7,6 +7,7 @@ import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldP
 import { canPlayWorldStage, type PlayMode } from '../domain/playMode';
 import WorldAtlasArt from './WorldAtlasArt';
 import { islandRouteByKind, islandStageLayout, routeThrough, worldMapLayout } from '../domain/worldMapLayout';
+import { hasStageBank } from '../domain/questionBank';
 import type { Progress } from '../domain/progress';
 
 const palette = [
@@ -75,7 +76,7 @@ export function WorldMap780({ progress, mode, onGrade, onTitles }: {
             </View>
             {worldIslands.map((grade, index) => {
               const point = layout.positions[index];
-              const label = grade.id === 'sage' && available[index] ? '地図をみる' : testing ? '自由にプレイ' : index === current ? 'つぎの目的地' : available[index] ? 'ぼうけんへ' : '未解放・地図をみる';
+              const label = grade.id === 'sage' && available[index] ? '出題中の地点へ' : testing ? '自由にプレイ' : index === current ? 'つぎの目的地' : available[index] ? 'ぼうけんへ' : '未解放・地図をみる';
               return (
                 <Pressable key={grade.id} accessibilityRole="button"
                   accessibilityLabel={`${grade.title}、${grade.island}、${grade.stages.length}ステージ、${label}`}
@@ -219,7 +220,7 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
           <Text style={styles.bannerHeading}>{grade.island}</Text>
           <Text style={styles.bannerDescription}>{grade.theme}</Text>
           <Text style={styles.islandBannerCount}>{grade.id === 'sage' ? (testing || isIslandUnlocked(progress, grade.id)
-            ? '全65地点・専用問題を準備中' : '高校3年生の通常50・EX10をクリアすると解放') : testing ? "65ステージ すべてプレイできるよ" : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
+            ? `${grade.stages.filter(stage => hasStageBank(stage.id)).length} / 65 地点で出題中` : '高校3年生の通常50・EX10をクリアすると解放') : testing ? "65ステージ すべてプレイできるよ" : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
         </View>
         <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
       </View>
@@ -266,7 +267,7 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
           return (
             <Pressable key={stage.id} accessibilityRole="button" disabled={!unlocked}
               accessibilityState={{disabled:!unlocked}}
-              accessibilityLabel={stage.title+'、'+(perfect?'パーフェクト':cleared?'クリア済み':unlocked?'挑戦できる':stage.gradeId === 'sage' ? '問題を準備中' : '未解放')}
+              accessibilityLabel={stage.title+'、'+(perfect?'パーフェクト':cleared?'クリア済み':unlocked?'挑戦できる':stage.gradeId === 'sage' && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
                 styles.stagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
