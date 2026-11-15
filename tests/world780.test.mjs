@@ -34,6 +34,8 @@ test('すべての780ステージに実際に解ける問題・答え・解説�
       const problems = generateWorldQuestions(stage,seed);
       assert.equal(problems.length,stage.questions,stage.id);
       assert.equal(new Set(problems.map(p=>p.id)).size,stage.questions,stage.id);
+      assert.equal(new Set(problems.map(p=>p.question.normalize('NFKC').trim())).size,
+        stage.questions,stage.id+' duplicate visible question with seed '+seed);
       for(const p of problems) {
         assert.ok(p.question.trim().length>0,stage.id);
         assert.ok(p.explanation.trim().length>0,stage.id);
@@ -107,4 +109,16 @@ test('数字の問題は全角、符号と小数点を採点できる',()=>{
   assert.ok(isValidMathAnswer(q,q.answer));
   assert.ok(checkMathAnswer(q,q.answer));
   assert.ok(checkMathAnswer(q,q.answer.replace(/\d/g,c=>String.fromCharCode(c.charCodeAt(0)+0xFEE0))));
+});
+
+test('すべての780ステージで10問中に同じ問題が出ない（再挑戦を含む）', () => {
+  for (const stage of worldStages) {
+    for (const seed of [0, 1, 2, 7, 42, 91, 1217, 100000]) {
+      const questions = generateWorldQuestions(stage,seed);
+      const stems = questions.map(item => item.question.normalize('NFKC').trim());
+      assert.equal(stems.length, new Set(stems).size,
+        '同じ問題が出ています: ' + stage.id + ' seed=' + seed +
+        ' ' + stems.join(' | '));
+    }
+  }
 });

@@ -90,7 +90,7 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
     return numeric(`${a} ＋ ${b} ＝ ？`, a + b, `${a}と${b}を あわせると${a + b}。`);
   }
   if (stage.id === 'e1.bridge') {
-    const a = n(1, 9), b = 10 - a;
+    const a = n(0, 10), b = 10 - a;
     return numeric(`${a} ＋ ${b} ＝ ？`, 10, `${a}に${b}を たすと 10だよ。`);
   }
   if (stage.id === 'e1.tower') {
@@ -143,8 +143,18 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
       return numeric(`${a} ＋ ${b} ＝ ？`, a + b, `小数点を そろえて たすと ${answerString(a + b)}。`);
     }
     case 'fraction': {
-      const d1 = n(2, grade >= 5 ? 8 : 6), a = n(1, d1 - 1);
-      if (grade <= 3) return choice(`1/${d1} を ${d1}こ集めると？`, '1', ['1/2', `1/${d1}`, String(d1), '0'], 'もとと同じ 大きさの 1になるよ。', r);
+      const d1 = n(2, grade >= 5 ? 8 : 12), a = n(1, d1 - 1);
+      if (grade <= 3) {
+        if (index % 2 === 0) return choice(`1/${d1} を ${d1}こ集めると？`, '1',
+          ['0', `1/${d1}`, String(d1), '1/2', '2'],
+          '同じ大きさの分数を分母の数だけ集めると、全体の1になるよ。', r);
+        const pieces = n(1, d1);
+        const ans = fraction(pieces, d1);
+        return choice(`1/${d1} を ${pieces}こ集めると？`, ans,
+          [fraction(pieces + 1, d1), fraction(Math.max(1, pieces - 1), d1),
+            fraction(pieces, d1 + 1), String(pieces), '0'],
+          `分子が${pieces}、分母が${d1}なので、${ans}だよ。`, r);
+      }
       if (grade === 4) {
         const b = n(1, d1);
         const ans = fraction(a + b, d1);
@@ -184,10 +194,17 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
       return numeric(question, ans, `${explanation}。だから ${ans}。`);
     }
     case 'shape': {
-      const topics = ['三角形', '四角形', '五角形', '六角形'];
-      const sides = [3, 4, 5, 6];
-      const at = n(0, grade <= 2 ? 1 : 3);
-      return numeric(`${topics[at]}の 辺は何本？`, sides[at], `${topics[at]}には${sides[at]}本の 辺があるよ。`);
+      const topics = ['三角形', '四角形', '正方形', '長方形', 'ひし形'];
+      const edges = [3, 4, 4, 4, 4];
+      const at = n(0, topics.length - 1);
+      const count = edges[at];
+      const format = n(0, 2);
+      if (format === 0) return numeric(`${topics[at]}の まっすぐな辺は何本？`, count,
+        `${topics[at]}の 辺は${count}本だよ。`);
+      if (format === 1) return numeric(`${topics[at]}の かどは何こ？`, count,
+        `${topics[at]}には${count}この かどがあるよ。`);
+      return numeric(`${topics[at]}を2つ べつべつに おくと、辺は あわせて何本？`,
+        count * 2, `${count}＋${count}＝${count * 2}本だよ。`);
     }
     case 'geometry': {
       if (stage.subtitle.includes('円と')) {
@@ -200,13 +217,41 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
           `${a}×${scale}＝${a * scale}cm。`);
       }
       if (stage.subtitle.includes('合同')) {
-        return concept('合同な三角形の 対応する辺の長さは？', '等しい', ['すべて異なる', '必ず2倍', '必ず0になる'], r);
+        const length = n(2, 36), mode = index % 3;
+        if (mode === 0) return numeric(
+          `合同な三角形ABCとDEFで AB＝${length}cm。対応するDEの長さは？（cm）`,
+          length, '合同な図形では対応する辺の長さが等しいよ。');
+        if (mode === 1) return numeric(
+          `合同な2つの図形の一方の周りは${length}cm。もう一方の周りは？（cm）`,
+          length, '合同なら周りの長さも等しいよ。');
+        return numeric(
+          `合同な三角形の対応する角Aが${length}°。角Dは何度？`,
+          length, '合同な図形の対応する角は等しいよ。');
       }
       if (stage.subtitle.includes('対称')) {
-        return concept('線対称な図形を 対称の軸で折ると？', 'ぴったり重なる', ['必ず2倍になる', '必ずずれる', '辺が消える'], r);
+        const distance = n(2, 35);
+        return numeric(`線対称な図形で 点Aは対称の軸から${distance}cm。対応する点Bは軸から何cm？`,
+          distance, '線対称の対応する点は軸から同じ距離にあるよ。');
       }
       if (stage.subtitle.includes('立方体')) {
-        return numeric('立方体の 頂点はいくつ？', 8, '立方体には 頂点が8個あるよ。');
+        const shapeQuestions: readonly [string, number, string][] = [
+          ['立方体の 頂点はいくつ？', 8, '頂点は8こだよ。'],
+          ['直方体の 頂点はいくつ？', 8, '頂点は8こだよ。'],
+          ['立方体の 面はいくつ？', 6, '面は6つだよ。'],
+          ['直方体の 面はいくつ？', 6, '面は6つだよ。'],
+          ['立方体の 辺は何本？', 12, '辺は12本だよ。'],
+          ['直方体の 辺は何本？', 12, '辺は12本だよ。'],
+          ['立方体の 1つの頂点に集まる辺は何本？', 3, '3本の辺が集まるよ。'],
+          ['直方体の 1つの頂点に集まる辺は何本？', 3, '3本の辺が集まるよ。'],
+          ['立方体の 隣り合う辺の角度は何度？', 90, '直角の90°だよ。'],
+          ['直方体の 隣り合う辺の角度は何度？', 90, '直角の90°だよ。'],
+          ['立方体の 3つの面が集まる頂点は何こ？', 8, '8この頂点があるよ。'],
+          ['直方体の 3つの面が集まる頂点は何こ？', 8, '8この頂点があるよ。'],
+          ['立方体には 向かい合う面の組が何組ある？', 3, '面は6つで3組になるよ。'],
+          ['直方体には 向かい合う面の組が何組ある？', 3, '面は6つで3組になるよ。'],
+        ];
+        const [question, answer, explanation] = r.pick(shapeQuestions);
+        return numeric(question, answer, explanation);
       }
       const a = n(2, 10), b = n(2, 10);
       return numeric(`たて ${a}cm、よこ ${b}cm の長方形の周りの長さは？（cm）`, 2 * (a + b),
@@ -228,7 +273,7 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
       if (stage.subtitle.includes('円周角')) return numeric(`中心角${angle * 2}° に対する 円周角は何度？`, angle,
         '同じ弧の円周角は中心角の半分だよ。');
       if (stage.subtitle.includes('多角形')) {
-        const sides = n(3, 8);
+        const sides = n(3, 18);
         return numeric(`${sides}角形の 内角の和は何度？`, (sides - 2) * 180,
           `(${sides}-2)×180=${(sides - 2) * 180}°。`);
       }
@@ -266,7 +311,7 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         a*b*c, '縦×横×高さで体積を計算するよ。');
     }
     case 'circle': {
-      const rads = n(2, 9);
+      const rads = n(1, 24);
       const area = stage.subtitle.includes('面積');
       return numeric(`半径${rads}cmの円の${area?'面積（cm²）':'円周（cm）'}は？（πは3.14）`,
         area ? 3.14*rads*rads : 2*3.14*rads,
@@ -318,13 +363,48 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         `x=${x}を代入するよ。答えは${a*x+b}。`);
     }
     case 'proof': {
-      return concept('三角形の合同条件として正しいのは？', '3組の辺がそれぞれ等しい',
-        ['面積だけが等しい', '周りの長さだけが等しい', '1組の角だけが等しい'], r);
+      const facts: readonly [string, string, readonly string[]][] = [
+        ['3組の辺がそれぞれ等しい三角形の関係は？', '合同である',
+          ['相似だが合同とは限らない', '必ず直角三角形である', '必ず正三角形である']],
+        ['2組の辺とその間の角がそれぞれ等しい三角形は？', '合同である',
+          ['必ず二等辺三角形', '形が定まらない', '必ず正三角形']],
+        ['1組の辺とその両端の角がそれぞれ等しい三角形は？', '合同である',
+          ['面積だけ等しい', '周りだけ等しい', '必ず直角三角形']],
+        ['合同な2つの三角形の対応する辺の長さは？', '等しい',
+          ['2倍になる', '半分になる', '必ず異なる']],
+        ['合同な2つの三角形の対応する角の大きさは？', '等しい',
+          ['2倍になる', '半分になる', '必ず異なる']],
+        ['二等辺三角形の底角の関係は？', '2つの底角が等しい',
+          ['2つの底角の和が90°', '2つの底角が直角', '底角は必ず30°']],
+        ['平行な2直線に1本の直線が交わるときの錯角は？', '等しい',
+          ['和が90°', '必ず直角', '必ず異なる']],
+        ['平行な2直線に1本の直線が交わるときの同位角は？', '等しい',
+          ['必ず直角', '和が90°', '必ず異なる']],
+        ['平行四辺形の向かい合う2組の辺は？', 'それぞれ等しい',
+          ['必ず2倍', '必ず直角', '必ず異なる']],
+        ['平行四辺形の向かい合う角は？', '等しい',
+          ['必ず45°', '必ず直角', '必ず異なる']],
+        ['平行四辺形の対角線は互いにどうなる？', '中点で交わる',
+          ['必ず垂直に交わる', '長さが必ず等しい', '交わらない']],
+        ['三角形の1つの外角はどんな角の和に等しい？', '隣り合わない2つの内角',
+          ['3つの内角すべて', '隣り合う内角1つ', 'どの2つの外角でもよい']],
+        ['三角形の内角の和は何度？', '180°',
+          ['90°', '270°', '360°']],
+        ['二等辺三角形の同じ長さの2辺に向かい合う角は？', '等しい',
+          ['1つが必ず直角', '和が必ず90°', '必ず異なる']],
+        ['長方形の対角線の長さはどうなる？', '2本とも等しい',
+          ['一方が必ず2倍', '必ず異なる', '片方は0']],
+        ['ひし形の4辺の長さは？', 'すべて等しい',
+          ['向かい合う2辺だけ等しい', '隣り合う辺は必ず異なる', '必ず直角を作る長さ']],
+      ];
+      const [question, answer, alternatives] = r.pick(facts);
+      return concept(question, answer, alternatives, r);
     }
     case 'probability': {
-      const count = n(1, 4);
-      return choice(`袋に赤玉${count}個、青玉${6-count}個。1個取り出して赤玉の確率は？`,
-        fraction(count, 6), [fraction(6-count,6), fraction(count,5), fraction(count,7), '1', '0', fraction(count+1,6)],
+      const total = n(4,16), count = n(1,total-1);
+      return choice(`袋に赤玉${count}個、青玉${total-count}個。1個取り出して赤玉の確率は？`,
+        fraction(count,total), [fraction(total-count,total), fraction(count,total+1),
+          fraction(count,total-1), '1', '0', fraction(count+1,total)],
         '赤玉の数÷玉の総数で求めるよ。', r);
     }
     case 'radical': {
@@ -349,29 +429,69 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         `頂点は (${b},${c}) だよ。`);
     }
     case 'pythagoras': {
-      const scale = n(1, 6);
-      return numeric(`直角三角形の2辺が ${3*scale}cm と ${4*scale}cm。斜辺は？（cm）`, 5*scale,
-        '三平方の定理で ' + (3*scale)**2 + '＋' + (4*scale)**2 + '＝' + (5*scale)**2 + '。');
+      const triple = r.pick([[3, 4, 5], [5, 12, 13], [8, 15, 17], [7, 24, 25]] as const);
+      const scale = n(1, 7);
+      const a = triple[0] * scale, b = triple[1] * scale, c = triple[2] * scale;
+      return numeric(`直角三角形の直角をはさむ2辺が ${a}cm と ${b}cm。斜辺は？（cm）`,
+        c, `三平方の定理で √(${a}²＋${b}²)＝${c}。`);
     }
     case 'logic': {
-      return concept('「偶数なら2で割り切れる」の逆の命題は？', '2で割り切れるなら偶数',
-        ['奇数なら2で割り切れる','2で割り切れないなら偶数','偶数でなくても2で割り切れる'], r);
+      const logicFacts: readonly [string, string, readonly string[]][] = [
+        ['「偶数なら2で割り切れる」の逆の命題は？', '2で割り切れるなら偶数',
+          ['偶数でないなら2で割り切れない', '奇数なら2で割り切れる', '2で割り切れないなら偶数']],
+        ['「3の倍数なら3で割り切れる」の逆は？', '3で割り切れるなら3の倍数',
+          ['3の倍数でなければ3で割り切れない', '3の倍数なら偶数', '3で割り切れないなら3の倍数']],
+        ['「x>2ならx>1」の逆は？', 'x>1ならx>2',
+          ['x≤2ならx≤1', 'x≤1ならx≤2', 'x>2ならx≤1']],
+        ['「x>2ならx>1」の対偶は？', 'x≤1ならx≤2',
+          ['x>1ならx>2', 'x≤2ならx≤1', 'x≤1ならx>2']],
+        ['命題「pならばq」の逆は？', 'qならばp',
+          ['pでなければqでない', 'qでなければpでない', 'pならばqでない']],
+        ['命題「pならばq」の対偶は？', 'qでなければpでない',
+          ['qならばp', 'pでなければqでない', 'pでなければq']],
+        ['「5の倍数なら末尾は0か5」の逆は？', '末尾が0か5なら5の倍数',
+          ['末尾が0か5でなければ5の倍数', '5の倍数でなければ末尾は0', '末尾が0なら必ず10の倍数']],
+        ['「aが偶数ならa²も偶数」の対偶は？', 'a²が偶数でないならaは偶数でない',
+          ['a²が偶数ならaは偶数', 'aが偶数でないならa²は偶数でない', 'a²が偶数でないならaは偶数']],
+        ['集合A∩Bが表すものは？', 'AとBの共通部分',
+          ['AまたはBのすべて', 'AとB以外', 'Aだけの補集合']],
+        ['集合A∪Bが表すものは？', 'AまたはBに入る部分',
+          ['AとBの共通部分だけ', 'AにもBにも入らない部分', 'Aの補集合だけ']],
+        ['空集合の要素の数はいくつ？', '0',
+          ['1', '無限個', '2']],
+        ['すべての要素を含む全体集合の補集合は？', '空集合',
+          ['全体集合そのもの', '1要素の集合', 'A∩B']],
+        ['必要条件と十分条件が両方成り立つ関係は？', '必要十分条件',
+          ['矛盾', '否定', '排反']],
+        ['「x=3ならx²=9」の逆は？', 'x²=9ならx=3',
+          ['x≠3ならx²≠9', 'x²≠9ならx≠3', 'x²=9ならx≠3']],
+        ['「x=3ならx²=9」の対偶は？', 'x²≠9ならx≠3',
+          ['x²=9ならx=3', 'x≠3ならx²≠9', 'x²≠9ならx=3']],
+      ];
+      const [question, answer, alternatives] = r.pick(logicFacts);
+      return concept(question, answer, alternatives, r);
     }
     case 'inequality': {
-      const a = n(1, 7);
+      const a = n(1, 24);
       return choice(`x²−${a*a}<0 の解は？`, `−${a}<x<${a}`,
         [`x<−${a} または x>${a}`, `x>${a}`, `x<−${a}`, `−${a}≤x≤${a}`],
         `x²<${a*a} は −${a}<x<${a} を表す。`, r);
     }
     case 'trig': {
-      const angle = r.pick([30,45,60]);
-      const ans = angle===30 ? '1/2' : angle===45 ? '√2/2' : '√3/2';
-      return choice(`sin ${angle}° の値は？`, ans,
-        ['0', '1/2', '√2/2', '√3/2', '1'].filter(x=>x!==ans),
-        '直角三角形の基本的な三角比を使おう。', r);
+      const identities: readonly [string, string][] = [
+        ['sin 0°','0'], ['sin 30°','1/2'], ['sin 45°','√2/2'],
+        ['sin 60°','√3/2'], ['sin 90°','1'],
+        ['cos 0°','1'], ['cos 30°','√3/2'], ['cos 45°','√2/2'],
+        ['cos 60°','1/2'], ['cos 90°','0'],
+        ['tan 0°','0'], ['tan 30°','√3/3'], ['tan 45°','1'], ['tan 60°','√3'],
+      ];
+      const [expression, ans] = r.pick(identities);
+      return choice(`${expression} の値は？`, ans,
+        ['0', '1/2', '√2/2', '√3/2', '√3/3', '1', '√3', '2'].filter(x=>x!==ans),
+        '基本的な角度の三角比を確認しよう。', r);
     }
     case 'combinatorics': {
-      const a = n(4,8), b = n(2,3);
+      const a = n(4,11), b = n(2,4);
       let result = 1;
       for(let k = 0; k<b; k++) result *= a-k;
       return numeric(`${a}人から順番に${b}人選ぶ並べ方は何通り？`, result,
@@ -417,10 +537,11 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         a*c+b*d,'対応する成分どうしをかけてたそう。');
     }
     case 'limit': {
-      const a=n(1,6),b=n(1,7);
-      if(index%3===0) return choice('lim[n→∞] 1/n の値は？','0',['1','∞','−1','1/2'],
-        '分母がどこまでも大きくなると0に近づくよ。',r);
-      return numeric(`lim[x→${a}] (x²＋${b}) は？`,a*a+b,
+      const a=n(1,12), b=n(1,15);
+      if (index % 3 === 0) return choice(`lim[n→∞] ${a}/(n＋${b}) の値は？`, '0',
+        ['1', '∞', String(a), '1/2', '−1'],
+        '分子は一定で、分母は無限に大きくなるから0に近づくよ。', r);
+      return numeric(`lim[x→${a}] (x²＋${b}) は？`, a*a+b,
         `連続な多項式だからx=${a}を代入して${a*a+b}。`);
     }
     case 'mixed': {
@@ -478,12 +599,26 @@ function discovery(stage: WorldStage, index: number, r: Random): Omit<MathQuesti
 export function generateWorldQuestions(stage: WorldStage, attemptSeed = 0): MathQuestion[] {
   if(!Number.isSafeInteger(attemptSeed) || attemptSeed < 0) throw new RangeError('Invalid attempt seed');
   const r = seeded(hash(stage.id + ':' + attemptSeed));
-  return Array.from({ length: stage.questions }, (_, index) => {
-    const generated = generateCore(stage, index, r);
-    return {
-      ...generated,
-      id: stage.id + ':' + attemptSeed + ':' + (index+1),
+  const seen = new Set<string>();
+  const questions: MathQuestion[] = [];
+  for (let index = 0; index < stage.questions; index++) {
+    let unique: Omit<MathQuestion, 'id' | 'skillId'> | undefined;
+    // Retrying uses the same seed stream, so the round remains reproducible.
+    // The check is on the visible problem, not on its always-unique database ID.
+    for (let tries = 0; tries < 600; tries++) {
+      const candidate = generateCore(stage, index, r);
+      const key = candidate.question.normalize('NFKC').replace(/\s+/g, ' ').trim();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      unique = candidate;
+      break;
+    }
+    if (!unique) throw new Error('Not enough unique problems for ' + stage.id);
+    questions.push({
+      ...unique,
+      id: stage.id + ':' + attemptSeed + ':' + (index + 1),
       skillId: (stage.gradeId + '.' + stage.family) as SkillId,
-    };
-  });
+    });
+  }
+  return questions;
 }
