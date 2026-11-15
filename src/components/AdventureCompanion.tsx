@@ -3,6 +3,9 @@ import { AccessibilityInfo, Animated, StyleSheet, Text, View } from 'react-nativ
 import Svg, { Circle, Ellipse, G, Path, Rect } from 'react-native-svg';
 
 import { companionSpeech, type CompanionMood } from '../domain/companionSpeech';
+import { firstGradeStages, type AdditionStage } from '../domain/curriculum';
+import { earnedRewards, rewardForStage } from '../domain/rewards';
+import type { Progress } from '../domain/progress';
 export type { CompanionMood } from '../domain/companionSpeech';
 
 // Original character: Lumi, a small star-bearing explorer of the math islands.
@@ -12,6 +15,7 @@ export function CompanionAvatar({ mood = 'ready', size = 88 }: {
   size?: number;
 }) {
   const jump = useRef(new Animated.Value(0)).current;
+  const tilt = jump.interpolate({ inputRange: [-20, -10, 0], outputRange: ['-9deg', '6deg', '0deg'] });
 
   useEffect(() => {
     let active = true;
@@ -42,7 +46,7 @@ export function CompanionAvatar({ mood = 'ready', size = 88 }: {
   return (
     <Animated.View
       accessible={false} importantForAccessibility="no-hide-descendants"
-      style={{ width: size, height: size, transform: [{ translateY: jump }] }}>
+      style={{ width: size, height: size, transform: [{ translateY: jump }, { rotate: tilt }] }}>
       <Svg width={size} height={size} viewBox="0 0 140 140" accessible={false}>
         <Circle cx={70} cy={69} r={61} fill="#fff1b9" opacity={mood === 'clear' ? 0.22 : 0.11} />
         <Ellipse cx={70} cy={126} rx={39} ry={8} fill="#1d345f" opacity={0.16} />
@@ -103,11 +107,28 @@ export function CompanionMoment({ mood, variation = 0, onDark = false, compact =
 }
 
 // A visual celebration, not a claimed persistent inventory reward.
-export function TreasureChest({ open }: { open: boolean }) {
+export function TreasureChest({ open, stageId }: { open: boolean; stageId: AdditionStage['id'] }) {
+  const reward = rewardForStage(stageId);
+  const arrival = useRef(new Animated.Value(open ? 0 : 1)).current;
+
+  useEffect(() => {
+    let mounted = true;
+    let animation: Animated.CompositeAnimation | undefined;
+    AccessibilityInfo.isReduceMotionEnabled().then(reduced => {
+      if (!mounted) return;
+      if (!open || reduced) { arrival.setValue(1); return; }
+      arrival.setValue(0);
+      animation = Animated.spring(arrival, { toValue: 1, friction: 7, tension: 46, useNativeDriver: true });
+      animation.start();
+    }).catch(() => arrival.setValue(1));
+    return () => { mounted = false; animation?.stop(); };
+  }, [arrival, open]);
+
   return (
     <View style={styles.treasure} accessible accessibilityLabel={open
       ? 'たからばこがひらいた。キラキラのほうせきをみつけたよ'
       : 'まだひらいていないたからばこ'}>
+      <Animated.View style={{ opacity: arrival, transform: [{ scale: arrival.interpolate({ inputRange: [0, 1], outputRange: [0.82, 1] }) }] }}>
       <Svg width={170} height={130} viewBox="0 0 200 150" accessible={false}>
         <Ellipse cx={100} cy={139} rx={73} ry={8} fill="#3b325b" opacity={0.19} />
         {open && (
@@ -115,8 +136,8 @@ export function TreasureChest({ open }: { open: boolean }) {
             <Circle cx={100} cy={58} r={48} fill="#ffde8d" opacity={0.28} />
             <Path d="M53 30L57 39 66 43 57 47 53 56 49 47 40 43 49 39Z" fill="#f7ca60" />
             <Path d="M143 16L146 22 152 25 146 28 143 34 140 28 134 25 140 22Z" fill="#f7ca60" />
-            <Path d="M100 21L118 48 100 75 82 48Z" fill="#86e9dc" stroke="#399aaf" strokeWidth={3} />
-            <Path d="M100 25L109 48H91Z" fill="#effffc" />
+            <Path d="M100 21L118 48 100 75 82 48Z" fill={reward.color} stroke="#51668e" strokeWidth={3} />
+            <Path d="M100 25L109 48H91Z" fill={reward.highlight} />
           </G>
         )}
         {open ? (
@@ -140,9 +161,40 @@ export function TreasureChest({ open }: { open: boolean }) {
         <Rect x={87} y={81} width={26} height={26} rx={6} fill="#ffe0a2" stroke="#9a6c4a" strokeWidth={3} />
         <Circle cx={100} cy={94} r={4} fill="#825b65" />
       </Svg>
+      </Animated.View>
       <Text style={styles.treasureLabel}>
-        {open ? 'たからばこが ひらいた！' : 'ぜんもん せいかいで ひらくよ'}
+        {open ? `${reward.name}を みつけた！` : 'ぜんもん せいかいで ひらくよ'}
       </Text>
+    </View>
+  );
+}
+
+// The collectible book is a view of previously cleared stages, not a second save file.
+export function TreasureCollection({ progress }: { progress: Progress }) {
+  const collected = earnedRewards(progress);
+  return (
+    <View style={styles.collection}>
+      <View style={styles.collectionHeader}>
+        <Text style={styles.collectionTitle}>たからもの ずかん</Text>
+        <Text style={styles.collectionCount}>{collected.length} / {firstGradeStages.length} こ</Text>
+      </View>
+      <View style={styles.collectionRow}>
+        {firstGradeStages.map(stage => {
+          const reward = rewardForStage(stage.id);
+          const owned = Boolean(progress.stages[stage.id]);
+          return (
+            <View key={stage.id} accessible accessibilityLabel={owned ? reward.name + 'を はっけんずみ' : stage.title + 'の たからものは まだ みつけていない'}
+              style={[styles.collectionSlot, owned && styles.collectionOwned]}>
+              <Text style={[styles.collectionGem, owned && { color: reward.color }]}>
+                {owned ? '◆' : '？'}
+              </Text>
+              <Text style={[styles.collectionName, !owned && styles.collectionUnknown]}>
+                {owned ? reward.name : '？？？'}
+              </Text>
+            </View>
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -159,4 +211,14 @@ const styles = StyleSheet.create({
   messageDark: { color: '#fff9e7' },
   treasure: { alignItems: 'center', gap: 0, paddingVertical: 2 },
   treasureLabel: { color: '#51436b', fontSize: 17, fontWeight: '800', textAlign: 'center' },
+  collection: { borderWidth: 1, borderColor: '#dfd4a6', backgroundColor: '#fff8df', borderRadius: 18, padding: 12, gap: 9 },
+  collectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  collectionTitle: { fontSize: 17, color: '#473c65', fontWeight: '900' },
+  collectionCount: { color: '#796743', fontWeight: '800', fontSize: 13 },
+  collectionRow: { flexDirection: 'row', gap: 7 },
+  collectionSlot: { flex: 1, minWidth: 0, alignItems: 'center', justifyContent: 'center', backgroundColor: '#e9e7ec', borderRadius: 12, paddingVertical: 9, paddingHorizontal: 3, gap: 2 },
+  collectionOwned: { backgroundColor: '#fffdf7', borderColor: '#e5c681', borderWidth: 1 },
+  collectionGem: { fontSize: 28, fontWeight: '900', color: '#a1a0b0' },
+  collectionName: { fontSize: 12, color: '#584575', fontWeight: '800', textAlign: 'center' },
+  collectionUnknown: { color: '#918ca0' },
 });
