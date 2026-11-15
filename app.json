@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "数のトビラ",
+    "slug": "kazu-no-tobira",
+    "version": "0.1.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "userInterfaceStyle": "light",
+    "web": {
+      "bundler": "metro",
+      "name": "数のトビラ",
+      "shortName": "数のトビラ"
+    }
+  }
+}
