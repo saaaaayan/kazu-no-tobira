@@ -23,5 +23,10 @@ export async function loadStageBank(stageId: BankStageId): Promise<StageBank> {
     case 'e1.n18': return require('../public/question-banks/e1.n18.v1.json') as StageBank;
     case 'e1.n19': return require('../public/question-banks/e1.n19.v1.json') as StageBank;
     case 'e1.n20': return require('../public/question-banks/e1.n20.v1.json') as StageBank;
+    case 'e1.n21': return require('../public/question-banks/e1.n21.v1.json') as StageBank;
+    case 'e1.n22': return require('../public/question-banks/e1.n22.v1.json') as StageBank;
+    case 'e1.n23': return require('../public/question-banks/e1.n23.v1.json') as StageBank;
+    case 'e1.n24': return require('../public/question-banks/e1.n24.v1.json') as StageBank;
+    case 'e1.n25': return require('../public/question-banks/e1.n25.v1.json') as StageBank;
   }
 }

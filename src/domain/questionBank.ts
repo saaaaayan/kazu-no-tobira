@@ -9,7 +9,8 @@ export type BankQuestion = MathQuestion & {
   format: 'calculation' | 'missingPart' | 'story' | 'decomposition' | 'comparison' | 'position' | 'interval' | 'sequence' | 'line' | 'reverseTransfer'
     | 'joinThree' | 'target' | 'splitTotal' | 'compareGroups' | 'returnSome' | 'refill' | 'twoCollections'
     | 'takeAway' | 'takeTwice' | 'startAmount' | 'unknownLast' | 'compareAfter' | 'moveAway' | 'equalize' | 'comparedStart'
-    | 'tenCompareGaps' | 'tenAfterRemoval' | 'tenSecondSource' | 'tenReserved' | 'tenEqualShare' | 'tenTrimAfterTwo' | 'tenShift';
+    | 'tenCompareGaps' | 'tenAfterRemoval' | 'tenSecondSource' | 'tenReserved' | 'tenEqualShare' | 'tenTrimAfterTwo' | 'tenShift'
+    | 'twentyBundle' | 'twentyOnes' | 'twentyPosition' | 'twentyInner' | 'twentyMiddle' | 'twentyNearest' | 'twentyTwoMoves' | 'twentyOrder';
   difficulty: 1 | 2 | 3;
   hints: readonly [string, string, string];
   steps: readonly { title: string; body: string }[];
