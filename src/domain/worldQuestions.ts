@@ -228,7 +228,7 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
       }
       const other = n(10, Math.min(70, 175 - angle));
       return numeric(`三角形の2つの角が ${angle}° と ${other}°。残りは？（角度）`, 180 - angle - other,
-        '三角形の角の和は180°。` + angle + '＋' + other + 'を引くと' + (180 - angle - other) + '°。');
+        '三角形の角の和は180°。' + angle + '＋' + other + 'を引くと' + (180 - angle - other) + '°。');
     }
     case 'pattern': {
       const first = n(2, 15), step = n(2, 6), term = n(4, 8);
