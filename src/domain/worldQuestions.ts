@@ -1,4 +1,5 @@
 import type { WorldStage } from './worldCatalog.ts';
+import type { SkillId } from './curriculum.ts';
 
 export type MathQuestion = {
   id: string;
@@ -9,7 +10,7 @@ export type MathQuestion = {
   choices?: readonly string[];
   explanation: string;
   hint: string;
-  skillId: `${string}.${string}`;
+  skillId: SkillId;
 };
 
 type Random = { next: () => number; int: (min: number, max: number) => number; pick: <T>(values: readonly T[]) => T };
@@ -225,8 +226,9 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         return numeric(`${sides}角形の 内角の和は何度？`, (sides - 2) * 180,
           `(${sides}-2)×180=${(sides - 2) * 180}°。`);
       }
-      return numeric(`三角形の2つの角が ${angle}° と ${n(10, Math.min(70, 175 - angle))}°。残りは？（角度）`, 0,
-        '三角形の角の和は180°だよ。');
+      const other = n(10, Math.min(70, 175 - angle));
+      return numeric(`三角形の2つの角が ${angle}° と ${other}°。残りは？（角度）`, 180 - angle - other,
+        '三角形の角の和は180°。` + angle + '＋' + other + 'を引くと' + (180 - angle - other) + '°。');
     }
     case 'pattern': {
       const first = n(2, 15), step = n(2, 6), term = n(4, 8);
@@ -248,8 +250,9 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
       return numeric(`A:B = ${a}:${b}。Aが${a * base}なら Bは？`, b * base, `1あたりが${base}、Bは${b}×${base}。`);
     }
     case 'average': {
-      const a = n(3, 20), b = n(3, 20), c = n(3, 20);
-      return numeric(`${a}, ${b}, ${c} の平均は？`, (a+b+c)/3, '3つをたして3で割るよ。');
+      const mid = n(5, 18), spread = n(1, 4);
+      const a = mid - spread, b = mid, c = mid + spread;
+      return numeric(`${a}, ${b}, ${c} の平均は？`, mid, '3つをたして3で割るよ。');
     }
     case 'volume': {
       const a = n(2, 8), b = n(2, 8), c = n(2, 8);
@@ -264,10 +267,11 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         area ? '円の面積は半径×半径×3.14。' : '円周は直径×3.14。');
     }
     case 'data': {
-      const a = n(2, 18), b = n(2, 18), c = n(2, 18);
-      if (grade >= 8 && index % 2) return numeric(`${a}, ${a+b}, ${a+b+c} の中央値は？`, a+b,
+      const mid = n(6, 18), spread = n(1, 5);
+      const a = mid - spread, b = mid, c = mid + spread;
+      if (grade >= 8 && index % 2) return numeric(`${a}, ${b}, ${c} の中央値は？`, b,
         '小さい順にならべて、真ん中の値をとるよ。');
-      return numeric(`${a}, ${b}, ${c} の平均は？`, (a+b+c)/3,
+      return numeric(`${a}, ${b}, ${c} の平均は？`, mid,
         '合計をデータの個数で割るよ。');
     }
     case 'speed': {
@@ -374,9 +378,9 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         'i²=−1で、4乗ごとに同じ値へ戻るよ。',r);
     }
     case 'coordinateGeometry': {
-      const a = n(-5,5), b = n(-5,5);
-      return numeric(`点(${a},${b}) と(${a+3},${b+4})の距離は？`,5,
-        '2点間の距離は √(3²+4²)=5。');
+      const a = n(-5,5), b = n(-5,5), scale = n(1, 4);
+      return numeric(`点(${a},${b}) と(${a+3*scale},${b+4*scale})の距離は？`,5*scale,
+        `2点間の距離は √(${3*scale}²＋${4*scale}²)＝${5*scale}。`);
     }
     case 'exponential': {
       const a = n(2,5), p = n(2,5);
@@ -473,7 +477,7 @@ export function generateWorldQuestions(stage: WorldStage, attemptSeed = 0): Math
     return {
       ...generated,
       id: stage.id + ':' + attemptSeed + ':' + (index+1),
-      skillId: (stage.gradeId + '.' + stage.family) as MathQuestion['skillId'],
+      skillId: (stage.gradeId + '.' + stage.family) as SkillId,
     };
   });
 }
