@@ -1,3 +1,5 @@
+import { borrowSubtractionStages } from '../scripts/borrow-subtraction-unit.mjs';
+import { validateBorrowSubtractionBatch } from '../scripts/validate-borrow-subtraction.mjs';
 import { carryAdditionStages } from '../scripts/carry-addition-unit.mjs';
 import { validateCarryAdditionBatch } from '../scripts/validate-carry-addition.mjs';
 import { countToTwentyStages } from '../scripts/count-to-twenty-unit.mjs';
@@ -74,7 +76,13 @@ test('くりあがりの足し算で10のまとまり、正答、図、解説を
   validateCarryAdditionBatch(carryAdditionBatch);
 });
 
-test('保存済み3,000問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
+const borrowSubtractionBatch = banks.filter(bank => borrowSubtractionStages.some(([id]) => id === bank.stageId));
+test('くりさがりの引き算の正答、10のまとまり、図を独立に検証する', () => {
+  assert.equal(borrowSubtractionBatch.length, 5);
+  validateBorrowSubtractionBatch(borrowSubtractionBatch);
+});
+
+test('保存済み3,500問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
   const allIds = new Set();
   const equations = new Set();
   for (const bank of banks) {
@@ -92,7 +100,7 @@ test('保存済み3,000問の問題文から独立して再計算し、途中式
       const signature = JSON.stringify([question.format, task]);
       assert.ok(!mathematicalTasks.has(signature), question.id);
       mathematicalTasks.add(signature);
-      if (!unitBatch.includes(bank) && !subtractionBatch.includes(bank) && !makeTenBatch.includes(bank) && !countToTwentyBatch.includes(bank) && !carryAdditionBatch.includes(bank)) {
+      if (!unitBatch.includes(bank) && !subtractionBatch.includes(bank) && !makeTenBatch.includes(bank) && !countToTwentyBatch.includes(bank) && !carryAdditionBatch.includes(bank) && !borrowSubtractionBatch.includes(bank)) {
         assert.ok(checkMathAnswer(question, String(solveFromStem(question))), question.id);
       }
       assert.equal(question.hints.length, 3);
@@ -135,7 +143,7 @@ test('保存済み3,000問の問題文から独立して再計算し、途中式
       }
     }
   }
-  assert.equal(allIds.size, 3000);
+  assert.equal(allIds.size, 3500);
   assert.ok(equations.size > 100);
 });
 

@@ -6,6 +6,20 @@ export function QuestionDiagram({ diagram, phase }: { diagram: BankDiagram; phas
   if (diagram.kind === 'tenFrame') return <TenFrame first={diagram.first} second={diagram.second ?? 0} third={diagram.third}/>;
 
   const solved = phase === 'solution';
+  if (diagram.kind === 'borrowTen') {
+    return (
+      <View style={styles.transfer}>
+        <View style={styles.group}>
+          <Text style={styles.groupLabel}>{solved ? '10から とりだす（きいろ）' : '10の まとまり'}</Text>
+          <TenFrame first={solved ? 10-diagram.used : 10} second={solved ? diagram.used : 0}/>
+        </View>
+        <View style={styles.group}>
+          <Text style={styles.groupLabel}>はじめの ばら</Text>
+          <TenFrame first={diagram.total-10} second={0}/>
+        </View>
+      </View>
+    );
+  }
   if (diagram.kind === 'takeAway') {
     return solved ? (
       <View style={styles.group}>
