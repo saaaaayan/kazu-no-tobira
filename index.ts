@@ -1,5 +1,5 @@
 import { registerRootComponent } from 'expo';
-import App from './src/App';
+import App from './src/FullAdventure';
 
 // This product is written in Japanese. Browser auto-translation can replace
 // React-managed text nodes, corrupt labels, and interfere with button events.
