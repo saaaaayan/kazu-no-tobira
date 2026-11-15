@@ -472,7 +472,7 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
       return concept(question, answer, alternatives, r);
     }
     case 'inequality': {
-      const a = n(1, 7);
+      const a = n(1, 24);
       return choice(`x²−${a*a}<0 の解は？`, `−${a}<x<${a}`,
         [`x<−${a} または x>${a}`, `x>${a}`, `x<−${a}`, `−${a}≤x≤${a}`],
         `x²<${a*a} は −${a}<x<${a} を表す。`, r);
