@@ -1,3 +1,4 @@
+import { canAccessStage, type Entitlement } from './domain/accessPlan';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { dealAssessmentCycle } from './domain/balancedAssessment';
 import type { PlayMode } from './domain/playMode';
@@ -9,7 +10,8 @@ import { loadStageBank } from './stageBankLoader';
 
 const pending = new Map<string, Promise<unknown>>();
 
-export async function prepareStageRound(stage: WorldStage, mode: PlayMode, legacySeed: number) {
+export async function prepareStageRound(stage: WorldStage, mode: PlayMode, legacySeed: number, access: Entitlement) {
+  if (!canAccessStage(access, stage)) throw new Error('Stage requires premium access');
   if (!hasStageBank(stage.id)) {
     if (stage.gradeId === 'sage') throw new Error('Sage stage bank is not published');
     return generateWorldQuestions(stage, legacySeed);

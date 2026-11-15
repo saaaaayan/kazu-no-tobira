@@ -6,6 +6,7 @@ import { canPlayWorldStage, progressAfterWorldAnswer } from '../src/domain/playM
 import { isIslandUnlocked, isWorldStageUnlocked } from '../src/domain/worldProgress.ts';
 import { assessmentIslands } from '../src/domain/assessmentPlan.ts';
 import { dealAssessmentCycle } from '../src/domain/balancedAssessment.ts';
+const premium = { plan:'premium', verifiedUntil:Infinity };
 import { drawStageRound, decodeStageDeck } from '../src/domain/stageDeck.ts';
 
 test('13島の845ステージに、規定どおりの試験位置と出題範囲を割り当てる', () => {
@@ -48,9 +49,9 @@ test('賢者の島は高3の通常・EX60地点が必要で、未配信地点は
   assert.equal(isIslandUnlocked(incomplete, 'sage'), false);
   assert.equal(isIslandUnlocked(complete, 'sage'), true);
   assert.equal(isWorldStageUnlocked(complete, sageIsland.stages[0]), true);
-  assert.equal(sageIsland.stages.filter(stage => canPlayWorldStage('test', complete, stage)).length, 3);
+  assert.equal(sageIsland.stages.filter(stage => canPlayWorldStage('test', complete, stage, premium)).length, 3);
   assert.equal(canPlayWorldStage('normal', incomplete, sageIsland.stages[0]), false);
-  assert.equal(canPlayWorldStage('normal', complete, sageIsland.stages[0]), true);
+  assert.equal(canPlayWorldStage('normal', complete, sageIsland.stages[0], premium), true);
 });
 
 test('賢者の島の成績は通常モードで保存形式に入り、テストモードの成績は混ざらない', () => {
@@ -64,7 +65,7 @@ test('賢者の島の成績は通常モードで保存形式に入り、テス�
   assert.equal(restored.stages[stage.id].bestCorrect,10);
   assert.ok(restored.stages[stage.id].clearedAt);
   assert.equal(restored.stages[stage.id].perfectAt,undefined);
-  assert.equal(canPlayWorldStage('test',restored,sageIsland.stages[1]),true);
+  assert.equal(canPlayWorldStage('test',restored,sageIsland.stages[1],premium),true);
 });
 
 test('分野別に10回へ均等に配分し、保存・復元しても一巡と次周の非重複を維持する', () => {
