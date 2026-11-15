@@ -2,15 +2,8 @@ import { useEffect, useRef } from 'react';
 import { AccessibilityInfo, Animated, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Ellipse, G, Path, Rect } from 'react-native-svg';
 
-export type CompanionMood = 'ready' | 'correct' | 'incorrect' | 'clear' | 'encourage';
-
-const messages: Record<CompanionMood, string> = {
-  ready: 'いっしょに かんがえよう！',
-  correct: 'やったね！ そのちょうし！',
-  incorrect: 'だいじょうぶ。つぎも いっしょに！',
-  clear: 'ぜんもん せいかい！ やったー！',
-  encourage: 'また いっしょに ちょうせんしよう！',
-};
+import { companionSpeech, type CompanionMood } from '../domain/companionSpeech';
+export type { CompanionMood } from '../domain/companionSpeech';
 
 // Original character: Lumi, a small star-bearing explorer of the math islands.
 // The SVG is deliberately self-contained so it works on Web, Android and iOS.
@@ -90,8 +83,9 @@ export function CompanionAvatar({ mood = 'ready', size = 88 }: {
   );
 }
 
-export function CompanionMoment({ mood, onDark = false, compact = false }: {
+export function CompanionMoment({ mood, variation = 0, onDark = false, compact = false }: {
   mood: CompanionMood;
+  variation?: number;
   onDark?: boolean;
   compact?: boolean;
 }) {
@@ -101,7 +95,7 @@ export function CompanionMoment({ mood, onDark = false, compact = false }: {
       <View style={[styles.speech, onDark ? styles.speechDark : styles.speechLight]}>
         <Text style={[styles.name, onDark && styles.nameDark]}>ルミ</Text>
         <Text accessibilityLiveRegion="polite" style={[styles.message, onDark && styles.messageDark]}>
-          {messages[mood]}
+          {companionSpeech(mood, variation)}
         </Text>
       </View>
     </View>
