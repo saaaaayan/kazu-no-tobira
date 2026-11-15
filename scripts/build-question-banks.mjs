@@ -1,3 +1,5 @@
+import { carryAdditionPools, carryAdditionStages } from './carry-addition-unit.mjs';
+import { validateCarryAdditionBatch } from './validate-carry-addition.mjs';
 import { countToTwentyPools, countToTwentyStages } from './count-to-twenty-unit.mjs';
 import { validateCountToTwentyBatch } from './validate-count-to-twenty.mjs';
 import { makeTenObjective, makeTenPools, makeTenStages } from './make-ten-unit.mjs';
@@ -260,7 +262,9 @@ const makeTen = buildUnit(makeTenStages, makeTenPools(), makeTenObjective);
 validateMakeTenBatch(makeTen);
 const counting = buildUnit(countToTwentyStages, countToTwentyPools(), '20までの かずを、まとまりと ならびで かんがえる。');
 validateCountToTwentyBatch(counting);
-banks.push(...addition, ...subtraction, ...makeTen, ...counting);
+const carry = buildUnit(carryAdditionStages, carryAdditionPools(), '10の まとまりを つくって、くりあがる たしざんを かんがえる。');
+validateCarryAdditionBatch(carry);
+banks.push(...addition, ...subtraction, ...makeTen, ...counting, ...carry);
 for (const bank of banks) {
   const json = JSON.stringify(bank, null, 2) + '\n';
   await output(new URL(bank.stageId + '.v1.json', directory), json);
