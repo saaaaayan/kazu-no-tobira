@@ -261,10 +261,10 @@ function AdventureWorld() {
                             <>
                               <View style={styles.modes}>
                                 {([
-                                  ['keyboard','キーボード'],
-                                  ['panel','すうじパネル'],
-                                  ...(handwritingAllowed ? [['handwriting','てがき']] : []),
-                                ] as readonly (readonly [AnswerMode,string])[]).map(([id,label])=>(
+                                  ['keyboard','キーボード'] as const,
+                                  ['panel','すうじパネル'] as const,
+                                  ...(handwritingAllowed ? [['handwriting','てがき'] as const] : []),
+                                ]).map(([id,label])=>(
                                   <Pressable key={id} accessibilityRole="button"
                                     disabled={saving||drawing} accessibilityState={{selected:shownMode===id}}
                                     onPress={()=>{setMode(id);setMessage('');blockHandwriting(false);}}
