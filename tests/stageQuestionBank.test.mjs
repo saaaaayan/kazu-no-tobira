@@ -16,6 +16,11 @@ const banks = await Promise.all(bankStageIds.map(async id => JSON.parse(await re
 function solveFromStem(problem) {
   const values = [...problem.question.matchAll(/\d+/g)].map(token => Number(token[0]));
   switch (problem.format) {
+    case 'position': return problem.question.includes('もどる') ? values[0] - values[1] : values[0] + values[1];
+    case 'interval': return values[1] - values[0] + (problem.question.includes('りょうはしも') ? 1 : -1);
+    case 'sequence': return (values[0] + values[1]) / 2 - Number(problem.question.includes('ひとつ まえ'));
+    case 'line': return values[1] - values[0] - (values[2] ?? 0);
+    case 'reverseTransfer': return values[1] + values[2] - values[0];
     case 'calculation': return values[0] + values[1];
     case 'missingPart': return values[1] - values[0];
     case 'decomposition': return values[0] - (values[1] + values[2]);
@@ -28,7 +33,7 @@ function solveFromStem(problem) {
   }
 }
 
-test('保存済み300問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
+test('保存済み500問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
   const allIds = new Set();
   const equations = new Set();
   for (const bank of banks) {
@@ -51,7 +56,17 @@ test('保存済み300問の問題文から独立して再計算し、途中式�
       assert.equal(new Set(question.hints).size, 3);
       assert.ok(question.hints.every(text => text.trim()));
       assert.equal(question.steps.length, 5);
-      if (question.diagram) {
+      if (question.diagram?.kind === 'transferToTen') {
+        const moved = c - a;
+        const remaining = b - moved;
+        assert.equal(c, 10);
+        assert.ok(a > 0 && a < c && moved > 0 && remaining > 0, question.question);
+        assert.equal(question.diagram.inside, a);
+        assert.equal(question.diagram.outside, b);
+        assert.equal(c + remaining, a + b);
+        assert.equal(Number(question.answer), remaining);
+      }
+      if (question.diagram?.kind === 'tenFrame') {
         assert.equal(question.diagram.first, question.format === 'decomposition' ? b : a);
         if (question.diagram.second !== undefined) {
           assert.equal(question.diagram.second, question.format === 'decomposition' ? c : b);
@@ -77,8 +92,22 @@ test('保存済み300問の問題文から独立して再計算し、途中式�
       }
     }
   }
-  assert.equal(allIds.size, 300);
+  assert.equal(allIds.size, 500);
   assert.ok(equations.size > 100);
+});
+
+test('既存の6つの出題枠では、すでに満杯の箱を使う問題を出さない', () => {
+  const bridge = banks.find(bank => bank.stageId === 'e1.bridge');
+  const replaced = bridge.questions.filter(q => q.id.includes(':spare-10-'));
+  assert.equal(replaced.length, 6);
+  for (const problem of replaced) {
+    assert.equal(problem.format, 'reverseTransfer');
+    assert.match(problem.question, /なかに たまが [3-8]こ/);
+  }
+  for (const problem of bridge.questions.filter(q => q.format === 'story')) {
+    assert.equal(problem.diagram?.kind, 'transferToTen', problem.id);
+    assert.ok(problem.diagram.inside < 10, problem.id);
+  }
 });
 
 test('各バンクは保存からの復元をはさんで10回で一巡し、11回目は直前と重複しない', () => {

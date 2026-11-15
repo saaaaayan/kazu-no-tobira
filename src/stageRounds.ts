@@ -25,7 +25,7 @@ export async function prepareStageRound(stage: WorldStage, mode: PlayMode, legac
       const saved = decodeStageDeck(await AsyncStorage.getItem(key), ids, bank.version);
       const deck = drawStageRound(ids, stage.questions, bank.version, saved);
       await AsyncStorage.setItem(key, JSON.stringify(deck));
-      return deck.lastRound.map(id => questions.get(id)!);
+      return deck.lastRound.map(id => questions.get(id)!).sort((a, b) => a.difficulty - b.difficulty);
     });
 
   pending.set(key, prepared);

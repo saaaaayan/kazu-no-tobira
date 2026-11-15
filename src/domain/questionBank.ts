@@ -1,13 +1,14 @@
 import type { MathQuestion } from './worldQuestions.ts';
 
-export type AdditionDiagram = { kind: 'tenFrame'; first: number; second?: number };
+export type BankDiagram = { kind: 'tenFrame'; first: number; second?: number }
+  | { kind: 'transferToTen'; inside: number; outside: number };
 export type BankQuestion = MathQuestion & {
-  format: 'calculation' | 'missingPart' | 'story' | 'decomposition' | 'comparison';
+  format: 'calculation' | 'missingPart' | 'story' | 'decomposition' | 'comparison' | 'position' | 'interval' | 'sequence' | 'line' | 'reverseTransfer';
   difficulty: 1 | 2 | 3;
   hints: readonly [string, string, string];
   steps: readonly { title: string; body: string }[];
   mistakes: readonly { answer?: string; explanation: string }[];
-  diagram?: AdditionDiagram;
+  diagram?: BankDiagram;
 };
 
 export type StageBank = {
@@ -20,7 +21,7 @@ export type StageBank = {
   questions: readonly BankQuestion[];
 };
 
-export const bankStageIds = ['e1.forest', 'e1.bridge', 'e1.tower'] as const;
+export const bankStageIds = ['e1.forest', 'e1.bridge', 'e1.tower', 'e1.n04', 'e1.n05'] as const;
 export type BankStageId = typeof bankStageIds[number];
 
 export function hasStageBank(id: string): id is BankStageId {
