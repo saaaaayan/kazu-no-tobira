@@ -4,12 +4,14 @@ import { canAccessFeature, canAccessStage, freeAccess } from '../src/domain/acce
 import { readServerEntitlement } from '../src/domain/serverEntitlement.ts';
 import { worldStageAction } from '../src/domain/playMode.ts';
 import { emptyProgress } from '../src/domain/progress.ts';
+import { unitLessons } from '../src/domain/unitLessons.ts';
 import { worldIslands, worldGrades } from '../src/domain/worldCatalog.ts';
 
 const premium = { plan: 'premium', verifiedUntil: Infinity };
 
 test('通常の600地点は全学年でEXを攻略せずに進める', () => {
-  const progress = { ...emptyProgress, stages:{}, lessons:{ 'e1.number-order':{ completedAt:'2026-11-16', page:10, checks:{} } } };
+  const progress = { ...emptyProgress, stages:{}, lessons:Object.fromEntries(unitLessons.map(lesson =>
+    [lesson.id,{ completedAt:'2026-11-16', page:0, checks:{} }])) };
   let count = 0;
   for (const island of worldGrades) {
     for (const stage of island.stages.filter(stage => stage.kind === 'normal')) {

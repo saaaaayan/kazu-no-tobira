@@ -1,3 +1,4 @@
+import { gradeStarterLessons } from './gradeStarterLessons.ts';
 import type { GradeId } from './curriculum.ts';
 import type { StageId780 } from './worldCatalog.ts';
 
@@ -5,8 +6,10 @@ export type PictureName = 'bell' | 'berry' | 'star';
 export type LessonDiagram =
   | { kind: 'objects'; picture: PictureName; count: number }
   | { kind: 'pairs'; left: number; right: number }
-  | { kind: 'path'; first: number; last: number; hidden?: number; start?: number; end?: number };
-export type LessonCheck = { id: string; prompt: string; diagram: LessonDiagram; choices: readonly number[]; retryHint: string; explanation: string };
+  | { kind: 'path'; first: number; last: number; hidden?: number; start?: number; end?: number }
+  | { kind: 'table'; cells: readonly (readonly string[])[] };
+export type LessonCheck = { id: string; prompt: string; choices: readonly number[]; retryHint: string; explanation: string } &
+  ({ diagram: LessonDiagram; answer?: never } | { diagram?: LessonDiagram; answer: number });
 type LessonPage = { title: string; text: string; diagram?: LessonDiagram; action?: 'count' | 'pair' };
 type WorkedExample = { title: string; text: string; diagram: LessonDiagram; reveal: readonly string[] };
 export type UnitId = `${GradeId}.${string}`;
@@ -63,7 +66,7 @@ export const countToTen: UnitLesson = {
   linkedStageIds: ['e1.n04','e1.n05'],
 };
 
-export const unitLessons: readonly UnitLesson[] = [countToTen];
+export const unitLessons: readonly UnitLesson[] = [countToTen, ...gradeStarterLessons];
 export const lessonForStage = (id: string) => unitLessons.find(lesson => lesson.linkedStageIds.some(stageId => stageId === id));
 
 // Planned dependencies are curriculum metadata, not locks on unimplemented lessons.
@@ -86,6 +89,7 @@ export type LessonProgress = {
 };
 
 export function expectedLessonAnswer(question: LessonCheck): number {
+  if (question.answer !== undefined) return question.answer;
   const diagram = question.diagram;
   switch (diagram.kind) {
     case 'objects': return diagram.count;
