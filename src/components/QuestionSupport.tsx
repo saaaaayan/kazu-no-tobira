@@ -6,6 +6,24 @@ export function QuestionDiagram({ diagram, phase }: { diagram: BankDiagram; phas
   if (diagram.kind === 'tenFrame') return <TenFrame first={diagram.first} second={diagram.second ?? 0} third={diagram.third}/>;
 
   const solved = phase === 'solution';
+  if (diagram.kind === 'bundlesAndOnes') {
+    return (
+      <View style={styles.transfer}>
+        <View style={styles.group} accessible accessibilityLabel={'10の まとまりが ' + diagram.tens + 'つ'}>
+          <Text style={styles.groupLabel}>10の まとまり</Text>
+          <View style={styles.bundles}>
+            {Array.from({ length: diagram.tens }, (_, i) => (
+              <View key={i} style={styles.bundle}><Text style={styles.bundleLabel}>10</Text></View>
+            ))}
+          </View>
+        </View>
+        <View style={styles.group}>
+          <Text style={styles.groupLabel}>ばら</Text>
+          <TenFrame first={diagram.ones} second={0}/>
+        </View>
+      </View>
+    );
+  }
   if (diagram.kind === 'borrowTen') {
     return (
       <View style={styles.transfer}>
@@ -95,6 +113,9 @@ export function WorkedSolution({ question, wrongAnswer }: { question: BankQuesti
 const styles = StyleSheet.create({
   transfer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   group: { minWidth: 108, padding: 6, gap: 5, backgroundColor: '#eef3ff', borderRadius: 8 },
+  bundles: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, maxWidth: 160 },
+  bundle: { backgroundColor: '#244b97', borderRadius: 4, alignItems: 'center', width: 28, paddingVertical: 4 },
+  bundleLabel: { color: '#fff', fontWeight: '700' },
   groupLabel: { color: '#243458', fontWeight: '700', fontSize: 13 },
   looseBalls: { flexDirection: 'row', gap: 3, flexWrap: 'wrap', maxWidth: 98 },
   frames: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
