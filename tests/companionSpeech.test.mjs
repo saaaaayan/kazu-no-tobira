@@ -30,3 +30,9 @@ test('負のインデックスや特殊な値でも表示できる', () => {
     assert.ok(companionSpeech('correct', index).length > 0);
   }
 });
+
+test('修正版には以前の固定セリフを含めない', () => {
+  for (let i = 0; i < 30; i++) {
+    assert.notEqual(companionSpeech('correct', i), 'やったね！ そのちょうし！');
+  }
+});
