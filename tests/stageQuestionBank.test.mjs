@@ -1,3 +1,5 @@
+import { carryAdditionStages } from '../scripts/carry-addition-unit.mjs';
+import { validateCarryAdditionBatch } from '../scripts/validate-carry-addition.mjs';
 import { countToTwentyStages } from '../scripts/count-to-twenty-unit.mjs';
 import { validateCountToTwentyBatch } from '../scripts/validate-count-to-twenty.mjs';
 import { makeTenStages } from '../scripts/make-ten-unit.mjs';
@@ -66,13 +68,19 @@ test('20までの数の単元を問題文から独立に検証する', () => {
   validateCountToTwentyBatch(countToTwentyBatch);
 });
 
-test('保存済み2,500問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
+const carryAdditionBatch = banks.filter(bank => carryAdditionStages.some(([id]) => id === bank.stageId));
+test('くりあがりの足し算で10のまとまり、正答、図、解説を検証する', () => {
+  assert.equal(carryAdditionBatch.length, 5);
+  validateCarryAdditionBatch(carryAdditionBatch);
+});
+
+test('保存済み3,000問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
   const allIds = new Set();
   const equations = new Set();
   for (const bank of banks) {
     assert.equal(bank.questions.length, 100);
     assert.equal(new Set(bank.questions.map(q => q.question)).size, 100);
-    assert.ok(new Set(bank.questions.map(q => q.format)).size >= (unitBatch.includes(bank) ? 3 : 4));
+    assert.ok(new Set(bank.questions.map(q => q.format)).size >= (unitBatch.includes(bank) || carryAdditionBatch.includes(bank) ? 3 : 4));
     const mathematicalTasks = new Set();
     for (const question of bank.questions) {
       assert.ok(question.id.startsWith(bank.stageId + ':bank' + bank.version + ':'));
@@ -84,7 +92,7 @@ test('保存済み2,500問の問題文から独立して再計算し、途中式
       const signature = JSON.stringify([question.format, task]);
       assert.ok(!mathematicalTasks.has(signature), question.id);
       mathematicalTasks.add(signature);
-      if (!unitBatch.includes(bank) && !subtractionBatch.includes(bank) && !makeTenBatch.includes(bank) && !countToTwentyBatch.includes(bank)) {
+      if (!unitBatch.includes(bank) && !subtractionBatch.includes(bank) && !makeTenBatch.includes(bank) && !countToTwentyBatch.includes(bank) && !carryAdditionBatch.includes(bank)) {
         assert.ok(checkMathAnswer(question, String(solveFromStem(question))), question.id);
       }
       assert.equal(question.hints.length, 3);
@@ -127,7 +135,7 @@ test('保存済み2,500問の問題文から独立して再計算し、途中式
       }
     }
   }
-  assert.equal(allIds.size, 2500);
+  assert.equal(allIds.size, 3000);
   assert.ok(equations.size > 100);
 });
 
