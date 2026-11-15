@@ -1,5 +1,5 @@
 import type { Progress, StageProgress } from './progress.ts';
-import { worldGrades, worldStageById, type WorldStage } from './worldCatalog.ts';
+import { worldIslands, worldGrades, worldStageById, sageIsland, type WorldStage } from './worldCatalog.ts';
 
 export type FullStageProgress = StageProgress & {
   perfectAt?: string;
@@ -11,7 +11,7 @@ export type FullStageProgress = StageProgress & {
 const legacyPerfect = new Set(['e1.forest', 'e1.bridge', 'e1.tower']);
 
 export function gradeProgress(progress: Progress, gradeId: string) {
-  const grade = worldGrades.find(item => item.id === gradeId);
+  const grade = worldIslands.find(item => item.id === gradeId);
   if (!grade) return { cleared: 0, perfect: 0, regularCleared: 0, extrasCleared: 0, mainPerfect: false };
   const main = grade.stages.slice(0, 60);
   const isPerfect = (stage: WorldStage) => {
@@ -27,11 +27,16 @@ export function gradeProgress(progress: Progress, gradeId: string) {
   };
 }
 
+export function isIslandUnlocked(progress: Progress, islandId: string): boolean {
+  const index = worldIslands.findIndex(island => island.id === islandId);
+  if (index < 1) return index === 0;
+  const previous = gradeProgress(progress, worldIslands[index - 1].id);
+  return previous.extrasCleared === 10 && (islandId !== 'sage' || previous.regularCleared === 50);
+}
+
 export function isWorldStageUnlocked(progress: Progress, stage: WorldStage): boolean {
-  const gradeIndex = worldGrades.findIndex(grade => grade.id === stage.gradeId);
-  if (gradeIndex < 0) return false;
-  if (gradeIndex > 0 && gradeProgress(progress, worldGrades[gradeIndex - 1].id).extrasCleared < 10) return false;
-  const grade = worldGrades[gradeIndex];
+  const grade = worldIslands.find(island => island.id === stage.gradeId);
+  if (!grade || !isIslandUnlocked(progress, stage.gradeId)) return false;
   if (stage.kind === 'secret') {
     if (!gradeProgress(progress, stage.gradeId).mainPerfect) return false;
     const previousSecret = stage.order > 60 ? grade.stages[stage.order - 1] : undefined;
@@ -85,5 +90,5 @@ export function unlockSummary(progress: Progress) {
 }
 
 export function getWorldStage(id: string) {
-  return worldStageById.get(id);
+  return worldStageById.get(id) ?? sageIsland.stages.find(stage => stage.id === id);
 }

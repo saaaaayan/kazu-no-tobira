@@ -1,7 +1,8 @@
-import { gradeIds, type GradeId } from './curriculum.ts';
+import type { GradeId } from './curriculum.ts';
 
 export type StageKind = 'normal' | 'extra' | 'secret';
-export type StageId780 = `${GradeId}.${string}`;
+export type IslandId = GradeId | 'sage';
+export type StageId780 = `${IslandId}.${string}`;
 
 export interface StudyUnit {
   code: string;
@@ -10,7 +11,7 @@ export interface StudyUnit {
 }
 
 export interface WorldGrade {
-  id: GradeId;
+  id: IslandId;
   title: string;
   island: string;
   theme: string;
@@ -20,7 +21,7 @@ export interface WorldGrade {
 
 export interface WorldStage {
   id: StageId780;
-  gradeId: GradeId;
+  gradeId: IslandId;
   kind: StageKind;
   order: number;
   unitIndex: number;
@@ -215,8 +216,9 @@ const secretNames = [
   'ひらめきの天文台', '無限のトビラ',
 ];
 
-function createStages(def: typeof gradeDefinitions[number]): WorldStage[] {
+function createStages(def: Omit<WorldGrade, 'stages'>): WorldStage[] {
   const stages: WorldStage[] = [];
+  const sage = def.id === 'sage';
   for (let unitIndex = 0; unitIndex < 10; unitIndex++) {
     const unit = def.units[unitIndex];
     for (let part = 0; part < 5; part++) {
@@ -232,7 +234,9 @@ function createStages(def: typeof gradeDefinitions[number]): WorldStage[] {
       stages.push({
         id: legacy ?? `${def.id}.n${String(order + 1).padStart(2, '0')}`,
         gradeId: def.id, kind: 'normal', order, unitIndex, part,
-        title: legacyInfo?.title ?? `${unit.title}・${trailNames[part]}`,
+        title: legacyInfo?.title ?? (sage
+          ? order === 49 ? '総合最終試験' : part === 4 ? '確認テスト ' + (unitIndex + 1) : '総合演習 ' + (order + 1)
+          : `${unit.title}・${trailNames[part]}`),
         subtitle: legacyInfo?.subtitle ?? unit.title,
         family: legacyInfo?.family ?? unit.family, questions: 10,
       });
@@ -243,7 +247,7 @@ function createStages(def: typeof gradeDefinitions[number]): WorldStage[] {
     stages.push({
       id: `${def.id}.x${String(i + 1).padStart(2, '0')}`, gradeId: def.id,
       kind: 'extra', order: 50 + i, unitIndex: i, part: 5,
-      title: `EX・${unit.title}`, subtitle: 'おうよう もんだい',
+      title: sage ? `EX・分野融合 ${i + 1}` : `EX・${unit.title}`, subtitle: 'おうよう もんだい',
       family: unit.family, questions: 10,
     });
   }
@@ -252,7 +256,7 @@ function createStages(def: typeof gradeDefinitions[number]): WorldStage[] {
       id: `${def.id}.s${String(i + 1).padStart(2, '0')}`, gradeId: def.id,
       kind: 'secret', order: 60 + i, unitIndex: i, part: 6,
       title: `ひみつ・${secretNames[i]}`, subtitle: '数の ふしぎを たんけん',
-      family: 'discovery', questions: 10,
+      family: sage ? 'sageMixed' : 'discovery', questions: 10,
     });
   }
   return stages;
@@ -262,6 +266,17 @@ export const worldGrades: readonly WorldGrade[] = gradeDefinitions.map(def => ({
   ...def,
   stages: createStages(def),
 }));
+
+const sageDefinition: Omit<WorldGrade, 'stages'> = {
+  id: 'sage',
+  title: '理系大学入試',
+  island: '賢者の島',
+  theme: '大図書館と天文台をめぐる 分野横断の総合演習',
+  units: Array.from({length:10}, (_, i) => ({ code: 'sage-mixed-' + (i+1), title: '総合演習', family: 'sageMixed' })),
+};
+
+export const sageIsland: WorldGrade = { ...sageDefinition, stages: createStages(sageDefinition) };
+export const worldIslands: readonly WorldGrade[] = [...worldGrades, sageIsland];
 
 export const worldStages: readonly WorldStage[] = worldGrades.flatMap(grade => grade.stages);
 export const worldStageById: ReadonlyMap<string, WorldStage> = new Map(worldStages.map(stage => [stage.id, stage]));

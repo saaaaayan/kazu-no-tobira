@@ -1,4 +1,4 @@
-import { worldGrades } from './worldCatalog.ts';
+import { worldIslands } from './worldCatalog.ts';
 
 export type Assessment = {
   kind: 'checkpoint' | 'final';
@@ -24,14 +24,9 @@ function assessmentStages(ids: readonly string[]) {
   });
 }
 
-const sageIds = Array.from({ length: 65 }, (_, index) => {
-  const [prefix, offset] = index < 50 ? ['n', 0] : index < 60 ? ['x', 50] : ['s', 60];
-  return 'sage.' + prefix + String(index + 1 - Number(offset)).padStart(2, '0');
-});
-
-export const assessmentIslands = [
-  ...worldGrades.map(grade => ({
-    id: grade.id, name: grade.island, stages: assessmentStages(grade.stages.map(stage => stage.id)),
-  })),
-  { id: 'sage', name: '賢者の島', stages: assessmentStages(sageIds), topics: sageTopics },
-] as const;
+export const assessmentIslands = worldIslands.map(grade => ({
+  id: grade.id,
+  name: grade.island,
+  stages: assessmentStages(grade.stages.map(stage => stage.id)),
+  ...(grade.id === 'sage' ? { topics: sageTopics } : {}),
+}));

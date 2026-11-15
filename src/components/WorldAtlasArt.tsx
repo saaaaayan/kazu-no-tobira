@@ -14,6 +14,9 @@ const islands = [
   { land: '#d0ba91', rock: '#8b716c', light: '#fbdeb4', coast: 'M-69 23Q-89 10-73-12L-47-20-25-38 3-31 33-39 68-21 81 0 68 22 46 26 24 42-6 29-39 37Z', feature: 'M-66 16V-7h12v-6h6v6h10v23Zm25 7V-2h29v25ZM-11 24V-11L8-29l17 18v35Zm39-3V-4h25v25Zm23-4V-10h13v-7h6v34Z' },
   { land: '#a4b2d2', rock: '#566890', light: '#d5eed4', coast: 'M-78 11Q-82-13-57-21L-42-40-17-29 8-46 39-35 46-18 76-12 80 13 53 31 14 27-12 39-46 27Z', feature: 'M-61 20V-8l15-22 15 22v28Zm33 0V-13L0-42l27 29v33Zm57 0V-8l15-22 15 22v28ZM-8 20v-15q8-12 16 0v15Z' },
   { land: '#bfa5cd', rock: '#6c5984', light: '#fae6ab', coast: 'M-78 8Q-89-11-62-24L-37-23-22-41 6-48 26-31 56-33 71-16 89-1 73 24 40 35 17 29-12 42-41 27-65 30Z', feature: 'M-59 19l19-21 18 21Zm33 4V1Q-23-26 0-28Q23-26 26 1v22Zm13-23L0-36 13 0Zm38 20 19-24 20 24Z' },
+  { land: '#8373b7', rock: '#34325d', light: '#ffe39d',
+    coast: 'M-87 4L-61-23-30-31-16-45 16-45 31-29 63-20 88 6 70 28 31 35 0 45-31 35-70 28Z',
+    feature: 'M-65 22V2L-45-12-25 2v20ZM-19 24v-32L0-39 19-8v32ZM26 22V5Q43-26 62 5v17ZM-8 24V7h16v17ZM-50 13h10v9h-10Z' },
 ] as const;
 
 function AtlasIsland({ index, x, y, scale, available, next }: {
@@ -32,6 +35,7 @@ function AtlasIsland({ index, x, y, scale, available, next }: {
       {[[-67,-21],[59,-24],[81,20]].map(([dx, dy], detail) => (
         <Circle key={detail} cx={dx} cy={dy} r={1.8} fill={art.light} opacity={0.78} />
       ))}
+      {index === 12 && <Path d="M43-22l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1Z M-43-24l4 5-4 5-4-5Z" fill={art.light}/>}
       {!available && <Path d={art.coast} fill="#253552" fillOpacity={0.11} />}
     </G>
   );

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ComponentRef } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { worldGrades, type WorldGrade, type WorldStage } from './domain/worldCatalog';
+import { worldIslands, type WorldGrade, type WorldStage } from './domain/worldCatalog';
 import { checkMathAnswer, isValidMathAnswer, type MathQuestion } from './domain/worldQuestions';
 import { isBankQuestion } from './domain/questionBank';
 import { prepareStageRound } from './stageRounds';
@@ -48,7 +48,7 @@ function AdventureWorld() {
   const [startError, setStartError] = useState('');
   const testRoundSeed = useRef(0);
   const testing = playMode === 'test';
-  const [grade, setGrade] = useState<WorldGrade>(worldGrades[0]);
+  const [grade, setGrade] = useState<WorldGrade>(worldIslands[0]);
   const [round, setRound] = useState<Round>();
   const [answer, setAnswer] = useState('');
   const [mode, setMode] = useState<AnswerMode>('keyboard');
@@ -182,7 +182,7 @@ function AdventureWorld() {
 
   const perfect = Boolean(round && round.correct === round.problems.length && !round.usedHint);
   const cleared = Boolean(round && round.correct >= Math.ceil(round.stage.questions * 0.8));
-  const nextStage = round && worldGrades.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
+  const nextStage = round && worldIslands.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
   const canContinue = nextStage && progress && canPlayWorldStage(playMode, progress, nextStage);
   const newlyEarnedTitles = round && progress && !testing ? adventureTitles(progress).filter(t=>t.unlocked).length : 0;
 

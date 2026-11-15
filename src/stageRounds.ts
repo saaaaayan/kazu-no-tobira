@@ -10,7 +10,10 @@ import { loadStageBank } from './stageBankLoader';
 const pending = new Map<string, Promise<unknown>>();
 
 export async function prepareStageRound(stage: WorldStage, mode: PlayMode, legacySeed: number) {
-  if (!hasStageBank(stage.id)) return generateWorldQuestions(stage, legacySeed);
+  if (!hasStageBank(stage.id)) {
+    if (stage.gradeId === 'sage') throw new Error('Sage stage bank is not published');
+    return generateWorldQuestions(stage, legacySeed);
+  }
 
   const stageId = stage.id;
   const key = stageDeckKey(mode, stageId);

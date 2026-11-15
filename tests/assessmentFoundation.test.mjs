@@ -1,5 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { sageIsland, worldIslands } from '../src/domain/worldCatalog.ts';
+import { emptyProgress } from '../src/domain/progress.ts';
+import { canPlayWorldStage } from '../src/domain/playMode.ts';
+import { isIslandUnlocked, isWorldStageUnlocked } from '../src/domain/worldProgress.ts';
 import { assessmentIslands } from '../src/domain/assessmentPlan.ts';
 import { dealAssessmentCycle } from '../src/domain/balancedAssessment.ts';
 import { drawStageRound, decodeStageDeck } from '../src/domain/stageDeck.ts';
@@ -32,6 +36,19 @@ test('13島の845ステージに、規定どおりの試験位置と出題範囲
     assert.equal(island.stages.filter(stage => stage.track === 'extra').length, 10);
     assert.equal(island.stages.filter(stage => stage.track === 'secret').length, 5);
   }
+});
+
+test('賢者の島は高3の通常・EX60地点が必要で、未配信地点は試験モードでも出題しない', () => {
+  assert.equal(worldIslands.length, 13);
+  const grade = worldIslands.find(island => island.id === 'h3');
+  const stages = Object.fromEntries(grade.stages.slice(0,60).map(stage => [stage.id, {clearedAt:'2026-11-15'}]));
+  const complete = { ...emptyProgress, stages };
+  const incomplete = { ...complete, stages: { ...stages } };
+  delete incomplete.stages[grade.stages[49].id];
+  assert.equal(isIslandUnlocked(incomplete, 'sage'), false);
+  assert.equal(isIslandUnlocked(complete, 'sage'), true);
+  assert.equal(isWorldStageUnlocked(complete, sageIsland.stages[0]), true);
+  assert.ok(sageIsland.stages.every(stage => !canPlayWorldStage('test', complete, stage)));
 });
 
 test('分野別に10回へ均等に配分し、保存・復元しても一巡と次周の非重複を維持する', () => {

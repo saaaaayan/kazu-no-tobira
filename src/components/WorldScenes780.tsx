@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 import { CompanionAvatar } from './AdventureCompanion';
-import { worldGrades, type WorldGrade, type WorldStage } from '../domain/worldCatalog';
-import { gradeProgress, unlockSummary } from '../domain/worldProgress';
+import { worldIslands, type WorldGrade, type WorldStage } from '../domain/worldCatalog';
+import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldProgress';
 import { canPlayWorldStage, type PlayMode } from '../domain/playMode';
 import WorldAtlasArt from './WorldAtlasArt';
 import { islandRouteByKind, islandStageLayout, routeThrough, worldMapLayout } from '../domain/worldMapLayout';
@@ -22,6 +22,7 @@ const palette = [
   { land: '#d4c7a8', dark: '#929c9e', detail: '#56718d', roof: '#f1cd8c' },
   { land: '#a8afcf', dark: '#737fb0', detail: '#465787', roof: '#a7d2c7' },
   { land: '#c5b3cd', dark: '#7375b1', detail: '#50528c', roof: '#ffe5a1' },
+  { land: '#8676b6', dark: '#474066', detail: '#2c284d', roof: '#f9d28b' },
 ] as const;
 const legacy = new Set(['e1.forest','e1.bridge','e1.tower']);
 
@@ -49,9 +50,9 @@ export function WorldMap780({ progress, mode, onGrade, onTitles }: {
   const layout = worldMapLayout(width);
   const testing = mode === 'test';
   const summary = unlockSummary(progress);
-  const stats = worldGrades.map(grade => gradeProgress(progress, grade.id));
-  const available = worldGrades.map((grade, index) => testing || index === 0 || stats[index - 1].extrasCleared === 10);
-  const current = testing ? -1 : available.findIndex((open, index) => open && stats[index].extrasCleared < 10);
+  const stats = worldIslands.map(grade => gradeProgress(progress, grade.id));
+  const available = worldIslands.map(grade => testing || isIslandUnlocked(progress, grade.id));
+  const current = testing ? -1 : available.findIndex((open, index) => open && worldIslands[index].id !== 'sage' && stats[index].extrasCleared < 10);
 
   return (
     <View style={styles.screen}>
@@ -59,7 +60,7 @@ export function WorldMap780({ progress, mode, onGrade, onTitles }: {
         <Text accessibilityRole="header" style={styles.bannerHeading}>数の世界地図</Text>
         <Text style={styles.bannerDescription}>島をえらんで、65のステージへ。</Text>
         <View style={styles.stats}>
-          <Text style={styles.stat}>12の島 · 780ステージ</Text>
+          <Text style={styles.stat}>{worldIslands.length}の島 · 845地点</Text>
           {!testing && <Text style={styles.stat}>{summary.cleared} / 780 クリア</Text>}
         </View>
       </View>
@@ -72,9 +73,9 @@ export function WorldMap780({ progress, mode, onGrade, onTitles }: {
             <View pointerEvents="none" style={StyleSheet.absoluteFill}>
               <WorldAtlasArt layout={layout} available={available} current={current} />
             </View>
-            {worldGrades.map((grade, index) => {
+            {worldIslands.map((grade, index) => {
               const point = layout.positions[index];
-              const label = testing ? '自由にプレイ' : index === current ? 'つぎの目的地' : available[index] ? 'ぼうけんへ' : '未解放・地図をみる';
+              const label = grade.id === 'sage' && available[index] ? '地図をみる' : testing ? '自由にプレイ' : index === current ? 'つぎの目的地' : available[index] ? 'ぼうけんへ' : '未解放・地図をみる';
               return (
                 <Pressable key={grade.id} accessibilityRole="button"
                   accessibilityLabel={`${grade.title}、${grade.island}、${grade.stages.length}ステージ、${label}`}
@@ -189,6 +190,8 @@ function IslandTerrain({gradeIndex,width,height,positions,grade,next}: {
 }
 
 function stageText(stage:WorldStage):string {
+  if (stage.gradeId === 'sage' && stage.order === 49) return '♜50';
+  if (stage.gradeId === 'sage' && stage.kind === 'normal' && (stage.order+1)%5 === 0) return '◇' + (stage.order+1);
   if(stage.kind==='normal') return String(stage.order+1).padStart(2,'0');
   if(stage.kind==='extra') return 'EX'+String(stage.order-49);
   return '秘'+String(stage.order-59);
@@ -201,7 +204,7 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
   const actual=measuredWidth(width);
   const geometry=islandStageLayout(actual,grade.stages.length);
   const stats=gradeProgress(progress,grade.id);
-  const gradeIndex=worldGrades.findIndex(g=>g.id===grade.id);
+  const gradeIndex=worldIslands.findIndex(g=>g.id===grade.id);
   const testing = mode === 'test';
   const next = testing ? undefined : grade.stages.find(stage => canPlayWorldStage(mode, progress, stage) && !progress.stages[stage.id]);
   const marker=Math.max(46,Math.min(57,Math.floor(actual/5)-9));
@@ -215,7 +218,8 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
           <Text style={styles.eyebrow}>{grade.title} の ぼうけんマップ</Text>
           <Text style={styles.bannerHeading}>{grade.island}</Text>
           <Text style={styles.bannerDescription}>{grade.theme}</Text>
-          <Text style={styles.islandBannerCount}>{testing ? "65ステージ すべてプレイできるよ" : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
+          <Text style={styles.islandBannerCount}>{grade.id === 'sage' ? (testing || isIslandUnlocked(progress, grade.id)
+            ? '全65地点・専用問題を準備中' : '高校3年生の通常50・EX10をクリアすると解放') : testing ? "65ステージ すべてプレイできるよ" : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
         </View>
         <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
       </View>
@@ -262,7 +266,7 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
           return (
             <Pressable key={stage.id} accessibilityRole="button" disabled={!unlocked}
               accessibilityState={{disabled:!unlocked}}
-              accessibilityLabel={stage.title+'、'+(perfect?'パーフェクト':cleared?'クリア済み':unlocked?'挑戦できる':'未解放')}
+              accessibilityLabel={stage.title+'、'+(perfect?'パーフェクト':cleared?'クリア済み':unlocked?'挑戦できる':stage.gradeId === 'sage' ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
                 styles.stagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,

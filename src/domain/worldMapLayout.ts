@@ -4,19 +4,19 @@ export type MapPoint = { x: number; y: number };
 
 const atlasLandscape = [
   [128, 510], [125, 330], [252, 195], [403, 283], [332, 471], [528, 551],
-  [701, 474], [852, 366], [661, 287], [510, 136], [711, 102], [893, 157],
+  [701, 474], [852, 366], [661, 287], [510, 136], [711, 102], [893, 157], [865, 535],
 ] as const;
 const atlasPortrait = [
   [111, 111], [302, 177], [211, 304], [105, 425], [300, 482], [270, 610],
-  [106, 676], [188, 801], [312, 894], [124, 956], [164, 1089], [306, 1169],
+  [106, 676], [188, 801], [312, 894], [124, 956], [164, 1089], [306, 1169], [182, 1310],
 ] as const;
 
 export function worldMapLayout(width: number) {
   const actualWidth = Math.max(244, width || 360);
   const compact = actualWidth < 700;
-  const height = compact ? 1265 : Math.round(actualWidth * 0.68);
+  const height = compact ? 1400 : Math.round(actualWidth * 0.68);
   const baseWidth = compact ? 420 : 1000;
-  const baseHeight = compact ? 1265 : 680;
+  const baseHeight = compact ? 1400 : 680;
   const targetWidth = compact ? Math.min(124, Math.floor(actualWidth * 0.43)) : Math.min(156, Math.floor(actualWidth * 0.16));
   return {
     width: actualWidth, height, compact, targetWidth,
