@@ -40,6 +40,13 @@ function Adventure() {
   const [saving, setSaving] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
   const submitting = useRef(false);
+  const blockedRef = useRef(false);
+  const [handwritingBlocked, setHandwritingBlocked] = useState(false);
+
+  function blockHandwriting(blocked: boolean) {
+    blockedRef.current = blocked;
+    setHandwritingBlocked(blocked);
+  }
   const [drawing, setDrawing] = useState(false);
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   const wide = useWindowDimensions().width >= 760;
@@ -56,13 +63,14 @@ function Adventure() {
 
   function start(stage: AdditionStage) {
     setInput('');
+    blockHandwriting(false);
     setMessage('');
     scroll.current?.scrollTo({ y: 0, animated: false });
     setRound({ stage, problems: generateAdditionRound(stage.skillId), index: 0, correct: 0 });
   }
 
   async function submit() {
-    if (!round || !progress || round.feedback || submitting.current || mode === 'handwriting') return;
+    if (!round || !progress || round.feedback || submitting.current || (mode === 'handwriting' && (blockedRef.current || drawing))) return;
     const problem = round.problems[round.index];
     const result = gradeInteger(problem.answer, input);
     if (result.status === 'invalid') {
@@ -99,6 +107,8 @@ function Adventure() {
   function advance() {
     if (!round) return;
     setInput('');
+    blockHandwriting(false);
+    setDrawing(false);
     scroll.current?.scrollTo({ y: 0, animated: false });
     if (round.index === round.problems.length - 1) {
       setRound({ ...round, complete: true });
@@ -192,7 +202,7 @@ function Adventure() {
                               <Pressable key={option.id} accessibilityRole="button" accessibilityLabel={option.label}
                                 accessibilityState={{ selected: option.id === mode, disabled: saving || drawing }}
                                 disabled={saving || drawing}
-                                onPress={() => { setMode(option.id); setMessage(''); }}
+                                onPress={() => { if (option.id !== mode) { setMode(option.id); blockHandwriting(false); setMessage(''); } }}
                                 style={[styles.mode, option.id === mode && styles.modeActive]}>
                                 <Text style={[styles.modeText, option.id === mode && styles.modeTextActive]}>{option.label}</Text>
                               </Pressable>
@@ -203,7 +213,7 @@ function Adventure() {
                               key={problem.id} value={input} onChangeText={value => { setInput(value); setMessage(''); }}
                               onSubmitEditing={submit} editable={!saving} placeholder="すうじ" placeholderTextColor={muted}
                               style={styles.input} />
-                          ) : (
+                          ) : mode === 'panel' && (
                             <View accessibilityLiveRegion="polite" style={styles.readout}>
                               <Text accessibilityLabel={input ? `こたえ ${input}` : 'こたえは まだありません'}
                                 style={input ? styles.readoutValue : styles.readoutHint}>{input || 'すうじ'}</Text>
@@ -214,14 +224,12 @@ function Adventure() {
                             setMessage('');
                           }} />}
                           {mode === 'handwriting' && (
-                            <HandwritingAnswer key={problem.id} onDrawingChange={setDrawing} onApply={value => {
-                              setInput(value);
-                              setMode('keyboard');
-                              setMessage('');
-                            }} />
+                            <HandwritingAnswer key={problem.id} value={input} disabled={saving} onDrawingChange={setDrawing}
+                              onBlockedChange={blockHandwriting} onChange={value => { setInput(value); setMessage(''); }} />
                           )}
                           {!!message && <Text accessibilityLiveRegion="polite" style={styles.error}>{message}</Text>}
-                          {mode !== 'handwriting' && <Action label={saving ? 'ほぞんちゅう…' : 'こたえあわせ'} onPress={submit} disabled={saving} />}
+                          <Action label={saving ? 'ほぞんちゅう…' : 'こたえあわせ'} onPress={submit}
+                            disabled={saving || (mode === 'handwriting' && (handwritingBlocked || drawing))} />
                         </>
                       )}
                     </View>

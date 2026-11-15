@@ -5,7 +5,7 @@ export default function InkSurface({ children, label = 'てがきエリア', sta
   const active = useRef<number | null>(null);
   function point(event: PointerEvent<HTMLDivElement>) {
     const bounds = event.currentTarget.getBoundingClientRect();
-    return { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
+    return { x: event.clientX - bounds.left, y: event.clientY - bounds.top, time: event.timeStamp };
   }
 
   return (

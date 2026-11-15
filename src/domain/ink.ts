@@ -1,4 +1,4 @@
-export type Point = { x: number; y: number };
+export type Point = { x: number; y: number; time?: number };
 export type Size = { width: number; height: number };
 export type Stroke = readonly Point[];
 export type Drawing = readonly Stroke[];
@@ -7,6 +7,7 @@ export function normalizePoint(point: Point, size: Size): Point {
   return {
     x: Math.max(0, Math.min(1, point.x / size.width)),
     y: Math.max(0, Math.min(1, point.y / size.height)),
+    ...(point.time === undefined ? {} : { time: point.time }),
   };
 }
 

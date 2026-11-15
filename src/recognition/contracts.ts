@@ -7,6 +7,7 @@ export interface DigitInk {
 
 export type RecognitionResult =
   | { status: 'recognized'; value: string }
+  | { status: 'ambiguous'; candidates: readonly string[] }
   | { status: 'empty' | 'gap' | 'uncertain' | 'unavailable' };
 
 export interface DigitRecognizer {

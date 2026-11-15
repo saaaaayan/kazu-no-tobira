@@ -4,7 +4,7 @@ import type { InkSurfaceProps } from './inkSurfaceProps';
 
 export default function InkSurface({ children, label = 'てがきエリア', start, move, finish, cancel }: InkSurfaceProps) {
   const active = useRef<number | null>(null);
-  const point = ({ nativeEvent }: GestureResponderEvent) => ({ x: nativeEvent.locationX, y: nativeEvent.locationY });
+  const point = ({ nativeEvent }: GestureResponderEvent) => ({ x: nativeEvent.locationX, y: nativeEvent.locationY, time: nativeEvent.timestamp });
   return (
     <View style={StyleSheet.absoluteFill}>
       <View pointerEvents="none" style={StyleSheet.absoluteFill}>{children}</View>

@@ -20,3 +20,11 @@ test('未入力・桁の空き・小さな点を数字として適用しない',
   assert.deepEqual(recognizeDigits([one, blank, two]), { status: 'gap' });
   assert.deepEqual(recognizeDigits([cell([[0.5, 0.5]])]), { status: 'uncertain' });
 });
+
+test('曖昧な筆跡は解答として確定せず、複数の修正候補を返す', () => {
+  const ink = cell([[0.26, 0.42], [0.32, 0.74], [0.41, 0.57], [0.30, 0.80], [0.45, 0.78]]);
+  const result = recognizeDigits([ink]);
+  assert.equal(result.status, 'ambiguous');
+  assert.equal(new Set(result.candidates).size, 3);
+  assert.ok(result.candidates.every(candidate => /^[0-9]$/.test(candidate)));
+});

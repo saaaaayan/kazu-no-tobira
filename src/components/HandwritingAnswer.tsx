@@ -1,96 +1,129 @@
-import { useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import Svg, { Circle, Polyline } from 'react-native-svg';
 import { normalizePoint, type Drawing, type Point } from '../domain/ink';
 import digitRecognizer from '../recognition/digitRecognizer';
+import { createRecognitionQueue } from '../recognition/recognitionQueue';
 import type { RecognitionResult } from '../recognition/contracts';
 import InkSurface from './InkSurface';
 
 const size = { width: 90, height: 90 };
+type Status = RecognitionResult | { status: 'idle' } | { status: 'pending' };
 const failures = {
-  empty: 'わくに すうじを かいてね。',
+  empty: '',
   gap: 'ひだりの わくから ひとつずつ かいてね。',
-  uncertain: 'よみとれなかったよ。かきなおすか、ほかの 入力を つかってね。',
+  uncertain: 'よみとれなかったよ。かきなおすか、こたえを なおしてね。',
   unavailable: 'この たんまつでは キーボードか すうじパネルを つかってね。',
 };
 
-export default function HandwritingAnswer({ onApply, onDrawingChange }: {
-  onApply: (value: string) => void;
+export default function HandwritingAnswer({ value, disabled, onChange, onBlockedChange, onDrawingChange }: {
+  value: string;
+  disabled: boolean;
+  onChange: (value: string) => void;
+  onBlockedChange: (blocked: boolean) => void;
   onDrawingChange: (active: boolean) => void;
 }) {
-  const [cells, setCells] = useState<Drawing[]>([[], []]);
-  const [candidate, setCandidate] = useState<string>();
-  const [message, setMessage] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [drawing, setDrawing] = useState(false);
-
-  function drawingChange(active: boolean) {
-    setDrawing(active);
-    onDrawingChange(active);
-  }
-
-  function updateCell(index: number, drawing: Drawing) {
-    setCells(previous => previous.map((cell, i) => i === index ? drawing : cell));
-    setCandidate(undefined);
-    setMessage('');
-  }
-
-  async function recognize() {
-    setCandidate(undefined);
-    setMessage('');
-    setBusy(true);
-    let result: RecognitionResult;
-    try {
-      result = await digitRecognizer.recognize(cells.map(drawing => ({ drawing, size })));
-    } catch {
-      result = { status: 'uncertain' };
-    } finally {
-      setBusy(false);
+  const [cells, setCells] = useState<Drawing[]>([[], [], []]);
+  const cellsRef = useRef(cells);
+  const [status, setStatus] = useState<Status>({ status: 'idle' });
+  const drawing = useRef(false);
+  const automaticValue = useRef<string | undefined>(undefined);
+  const editedWhileDrawing = useRef(false);
+  const callbacks = useRef({ onChange, onBlockedChange });
+  callbacks.current = { onChange, onBlockedChange };
+  const [queue] = useState(() => createRecognitionQueue(digitRecognizer.recognize, result => {
+    if (result.status === 'recognized') {
+      automaticValue.current = result.value;
+      callbacks.current.onChange(result.value);
     }
-    if (result.status === 'recognized') setCandidate(result.value);
-    else setMessage(failures[result.status]);
+    callbacks.current.onBlockedChange(result.status !== 'recognized' && result.status !== 'empty');
+    setStatus(result);
+  }));
+
+  useLayoutEffect(() => () => queue.cancel(), [queue]);
+
+  function begin() {
+    if (disabled || drawing.current) return false;
+    drawing.current = true;
+    editedWhileDrawing.current = false;
+    queue.cancel();
+    onBlockedChange(true);
+    onDrawingChange(true);
+    setStatus({ status: 'pending' });
+    return true;
+  }
+
+  function end(index: number, ink?: Drawing) {
+    drawing.current = false;
+    onDrawingChange(false);
+    if (ink) {
+      cellsRef.current = cellsRef.current.map((cell, i) => i === index ? ink : cell);
+      setCells(cellsRef.current);
+    }
+    if (editedWhileDrawing.current) return;
+    if (cellsRef.current.some(cell => cell.length)) {
+      queue.schedule(cellsRef.current.map(drawing => ({ drawing, size })));
+    } else {
+      onBlockedChange(false);
+      setStatus({ status: 'idle' });
+    }
+  }
+
+  function correct(next: string) {
+    automaticValue.current = undefined;
+    editedWhileDrawing.current = drawing.current;
+    queue.cancel();
+    onChange(next);
+    onBlockedChange(false);
+    setStatus({ status: 'idle' });
   }
 
   if (!digitRecognizer.available) return <Text style={styles.hint}>{failures.unavailable}</Text>;
 
-  const disabled = busy || drawing;
-  const validCandidate = candidate !== undefined && /^[0-9０-９]+$/.test(candidate.trim());
+  const message = status.status === 'pending' ? 'てがきを よみとりちゅう…'
+    : status.status === 'ambiguous' ? 'どの すうじかな？ えらぶか、こたえを なおしてね。'
+    : status.status === 'recognized' ? 'よみとった すうじを たしかめてね。'
+    : status.status === 'idle' ? '' : failures[status.status];
 
   return (
     <View style={styles.section}>
+      <TextInput accessibilityLabel="こたえ" inputMode="numeric" value={value} editable={!disabled}
+        onChangeText={correct} placeholder="すうじ" placeholderTextColor="#535b73" style={styles.input} />
       <Text style={styles.hint}>ひだりから、ひとわくに すうじを ひとつ。</Text>
       <View style={styles.cells}>
         {cells.map((cell, index) => (
-          <DigitCell key={index} index={index} ink={cell} disabled={busy} onDrawingChange={drawingChange}
-            onChange={value => updateCell(index, value)} />
+          <DigitCell key={index} index={index} ink={cell} onBegin={begin}
+            onEnd={ink => end(index, ink)} />
         ))}
       </View>
       <View style={styles.tools}>
-        <Button label="わくを ふやす" disabled={disabled} onPress={() => setCells(previous => [...previous, []])} />
-        <Button label="手書きを けす" disabled={disabled || !cells.some(cell => cell.length)} onPress={() => {
-          setCells(previous => previous.map(() => []));
-          setCandidate(undefined);
-          setMessage('');
+        <Button label="わくを ふやす" disabled={disabled || drawing.current} onPress={() => {
+          if (drawing.current) return;
+          cellsRef.current = [...cellsRef.current, []];
+          setCells(cellsRef.current);
+        }} />
+        <Button label="手書きを けす" disabled={disabled || drawing.current || !cells.some(cell => cell.length)} onPress={() => {
+          if (drawing.current) return;
+          cellsRef.current = cellsRef.current.map(() => []);
+          setCells(cellsRef.current);
+          correct(value === automaticValue.current ? '' : value);
         }} />
       </View>
-      <Button label={busy ? 'よみとりちゅう…' : 'すうじを よみとる'} primary disabled={disabled} onPress={recognize} />
       {!!message && <Text accessibilityLiveRegion="polite" style={styles.hint}>{message}</Text>}
-      {candidate !== undefined && (
-        <View style={styles.section} accessibilityLiveRegion="polite">
-          <Text style={styles.hint}>よみとった すうじ。ちがったら なおしてね。</Text>
-          <TextInput accessibilityLabel="よみとった すうじ" inputMode="numeric" value={candidate}
-            onChangeText={setCandidate} style={styles.input} />
-          <Button label="この こたえを つかう" primary disabled={disabled || !validCandidate}
-            onPress={() => onApply(candidate.trim())} />
+      {status.status === 'ambiguous' && (
+        <View style={styles.tools}>
+          {status.candidates.map(candidate => (
+            <Button key={candidate} label={candidate} disabled={disabled} onPress={() => correct(candidate)} />
+          ))}
         </View>
       )}
     </View>
   );
 }
 
-function DigitCell({ index, ink, disabled, onDrawingChange, onChange }: {
-  index: number; ink: Drawing; disabled: boolean; onDrawingChange: (active: boolean) => void;
-  onChange: (value: Drawing) => void;
+function DigitCell({ index, ink, onBegin, onEnd }: {
+  index: number; ink: Drawing; onBegin: () => boolean;
+  onEnd: (value?: Drawing) => void;
 }) {
   const active = useRef<Point[] | null>(null);
   const [preview, setPreview] = useState<readonly Point[]>();
@@ -100,18 +133,16 @@ function DigitCell({ index, ink, disabled, onDrawingChange, onChange }: {
     if (!points) return;
     active.current = null;
     setPreview(undefined);
-    onDrawingChange(false);
-    if (commit) onChange([...ink, points]);
+    onEnd(commit ? [...ink, points] : undefined);
   }
 
   const strokes = preview ? [...ink, preview] : ink;
   return (
     <View style={styles.cell}>
       <InkSurface label={`手書き ${index + 1}けた目`} start={point => {
-        if (disabled) return;
+        if (!onBegin()) return;
         active.current = [normalizePoint(point, size)];
         setPreview(active.current);
-        onDrawingChange(true);
       }} move={point => {
         if (!active.current) return;
         const next = normalizePoint(point, size);
@@ -131,13 +162,13 @@ function DigitCell({ index, ink, disabled, onDrawingChange, onChange }: {
   );
 }
 
-function Button({ label, onPress, primary, disabled }: {
-  label: string; onPress: () => void; primary?: boolean; disabled: boolean;
+function Button({ label, onPress, disabled = false }: {
+  label: string; onPress: () => void; disabled?: boolean;
 }) {
   return (
     <Pressable accessibilityRole="button" accessibilityState={{ disabled }} disabled={disabled} onPress={onPress}
-      style={[styles.button, primary && styles.primary, disabled && styles.disabled]}>
-      <Text style={[styles.buttonText, primary && styles.primaryText]}>{label}</Text>
+      style={[styles.button, disabled && styles.disabled]}>
+      <Text style={styles.buttonText}>{label}</Text>
     </Pressable>
   );
 }
@@ -150,8 +181,6 @@ const styles = StyleSheet.create({
   tools: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   button: { minHeight: 44, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 8, borderRadius: 8, backgroundColor: '#e8ecfa' },
   buttonText: { color: '#232b56', fontSize: 13, fontWeight: '700' },
-  primary: { backgroundColor: '#36488c' },
-  primaryText: { color: 'white' },
   disabled: { opacity: 0.55 },
   input: { color: '#232b56', fontSize: 22, backgroundColor: 'white', borderWidth: 1, borderColor: '#858caf',
     borderRadius: 8, minHeight: 46, paddingHorizontal: 10 },
