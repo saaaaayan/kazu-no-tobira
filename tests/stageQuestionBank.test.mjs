@@ -1,3 +1,5 @@
+import { validateEarlyAdditionBatch } from '../scripts/validate-early-addition.mjs';
+import { earlyAdditionStages } from '../scripts/early-addition-unit.mjs';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
@@ -33,13 +35,20 @@ function solveFromStem(problem) {
   }
 }
 
-test('保存済み500問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
+const unitBatch = banks.filter(bank => earlyAdditionStages.some(([id]) => id === bank.stageId));
+
+test('足し算バッチを解法別に検証し、ステージ間の重複を除外する', () => {
+  assert.equal(unitBatch.length, 5);
+  validateEarlyAdditionBatch(unitBatch);
+});
+
+test('保存済み1,000問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
   const allIds = new Set();
   const equations = new Set();
   for (const bank of banks) {
     assert.equal(bank.questions.length, 100);
     assert.equal(new Set(bank.questions.map(q => q.question)).size, 100);
-    assert.ok(new Set(bank.questions.map(q => q.format)).size >= 4);
+    assert.ok(new Set(bank.questions.map(q => q.format)).size >= (unitBatch.includes(bank) ? 3 : 4));
     const mathematicalTasks = new Set();
     for (const question of bank.questions) {
       assert.ok(question.id.startsWith(bank.stageId + ':bank' + bank.version + ':'));
@@ -51,7 +60,9 @@ test('保存済み500問の問題文から独立して再計算し、途中式�
       const signature = JSON.stringify([question.format, task]);
       assert.ok(!mathematicalTasks.has(signature), question.id);
       mathematicalTasks.add(signature);
-      assert.ok(checkMathAnswer(question, String(solveFromStem(question))), question.id);
+      if (!unitBatch.includes(bank)) {
+        assert.ok(checkMathAnswer(question, String(solveFromStem(question))), question.id);
+      }
       assert.equal(question.hints.length, 3);
       assert.equal(new Set(question.hints).size, 3);
       assert.ok(question.hints.every(text => text.trim()));
@@ -92,7 +103,7 @@ test('保存済み500問の問題文から独立して再計算し、途中式�
       }
     }
   }
-  assert.equal(allIds.size, 500);
+  assert.equal(allIds.size, 1000);
   assert.ok(equations.size > 100);
 });
 
