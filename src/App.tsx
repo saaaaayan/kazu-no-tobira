@@ -4,6 +4,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { generateAdditionRound, type AdditionProblem } from './domain/addition';
 import { firstGradeStages, type AdditionStage } from './domain/curriculum';
 import { gradeInteger } from './domain/grading';
+import { applyNumberPadKey } from './domain/answerInput';
 import { recordAttempt, type Progress } from './domain/progress';
 import { loadProgress, saveProgress } from './storage';
 import CalculationMemo from './components/CalculationMemo';
@@ -76,7 +77,7 @@ function Adventure() {
     const problem = round.problems[round.index];
     const result = gradeInteger(problem.answer, input);
     if (result.status === 'invalid') {
-      setMessage('0から9までの すうじで こたえを いれてね。');
+      setMessage('こたえを すうじで いれてね。');
       if (mode === 'keyboard') answerInput.current?.focus();
       return;
     }
@@ -218,7 +219,7 @@ function Adventure() {
                             </View>
                           )}
                           {mode === 'panel' && <NumberPad disabled={saving} onChange={key => {
-                            setInput(value => key === '全部消す' ? '' : key === 'けす' ? value.slice(0, -1) : value + key);
+                            setInput(value => applyNumberPadKey(value, key));
                             setMessage('');
                           }} />}
                           {mode === 'handwriting' && (
