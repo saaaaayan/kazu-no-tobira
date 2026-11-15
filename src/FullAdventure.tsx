@@ -15,6 +15,7 @@ import { MagicMeter, ComboBadge, SparkleBurst } from './components/AdventureJuic
 import { CorrectSpark } from './components/AdventureEffects';
 import CalculationMemo from './components/CalculationMemo';
 import HandwritingAnswer from './components/HandwritingAnswer';
+import { MathText } from './components/MathText';
 import NumberPad from './components/NumberPad';
 import AdventureHome, { ModeBadge, ModeControls } from './components/AdventureHome';
 
@@ -234,8 +235,8 @@ function AdventureWorld() {
                       mood={round.feedback === 'correct' ? 'correct' : round.feedback === 'incorrect' ? 'incorrect' : 'ready'}
                       variation={round.dialogueOffset + round.index}/>
                     <Text style={styles.difficulty}>{round.stage.kind==='secret'?'✦ ひみつの なぞ':round.stage.kind==='extra'?'★ EXチャレンジ':round.index<3?'● きほん':round.index<8?'● ひょうじゅん':'★ おうよう'}</Text>
-                    <Text style={styles.questionText}>{question.question}</Text>
-                    <Text style={styles.prompt}>{question.prompt}</Text>
+                    <MathText style={styles.questionText} value={question.question}/>
+                    <MathText style={styles.prompt} value={question.prompt}/>
                   </View>
                   <View style={[styles.workArea,wide&&styles.workWide]}>
                     <View style={[styles.answerArea,wide&&styles.answerWide]}>
@@ -252,9 +253,9 @@ function AdventureWorld() {
                                 {round.feedback==='correct'&&<CorrectSpark/>}
                               </View>
                             </View>
-                            <Text style={styles.yourAnswer}>きみの こたえ：{answer}</Text>
-                            {round.feedback==='incorrect'&&<Text style={styles.answerHint}>ただしい こたえ：{question.answer}</Text>}
-                            <Text style={styles.explanation}>{question.explanation}</Text>
+                            <MathText style={styles.yourAnswer} prefix="きみの こたえ：" value={answer} format={question.type === 'choice'}/>
+                            {round.feedback==='incorrect'&&<MathText style={styles.answerHint} prefix="ただしい こたえ：" value={question.answer}/>}
+                            <MathText style={styles.explanation} value={question.explanation}/>
                           </View>
                           {round.feedback==='correct'&&<ComboBadge results={round.results}/>}
                           <GameButton gold label={round.index+1===round.problems.length?'けっかを みる':'つぎの もんだいへ'} onPress={advance}/>
@@ -265,11 +266,11 @@ function AdventureWorld() {
                           {question.type==='choice' ? (
                             <View style={styles.options}>
                               {question.choices?.map(option => (
-                                <Pressable key={option} accessibilityRole="button"
+                                <Pressable key={option} accessibilityRole="button" accessibilityLabel={option}
                                   accessibilityState={{selected:answer===option,disabled:saving}}
                                   disabled={saving} onPress={()=>{setAnswer(option);setMessage('');}}
                                   style={[styles.option,answer===option&&styles.optionSelected]}>
-                                  <Text style={[styles.optionText,answer===option&&styles.optionTextSelected]}>{option}</Text>
+                                  <MathText style={[styles.optionText,answer===option&&styles.optionTextSelected]} value={option}/>
                                 </Pressable>
                               ))}
                             </View>
@@ -319,7 +320,7 @@ function AdventureWorld() {
                             </Pressable>
                           )}
                           {round.showHint && (
-                            <View style={styles.hintBox}><Text style={styles.hintText}>💡 {question.hint}</Text></View>
+                            <View style={styles.hintBox}><MathText style={styles.hintText} prefix="💡 " value={question.hint}/></View>
                           )}
                           {!!message&&<Text accessibilityLiveRegion="polite" style={styles.error}>{message}</Text>}
                           <GameButton label={saving?'きろくしているよ…':'こたえあわせ'} onPress={submit}

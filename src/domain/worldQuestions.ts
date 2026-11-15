@@ -54,6 +54,11 @@ export function isValidMathAnswer(problem: MathQuestion, typed: string): boolean
   return /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(normalized) && Number.isFinite(Number(normalized));
 }
 
+// Format a monomial without a redundant coefficient of 1 or exponent of 1.
+function monomial(coefficient: number, exponent: number): string {
+  return `${coefficient === 1 ? '' : coefficient}x${exponent === 1 ? '' : '^' + exponent}`;
+}
+
 function numeric(question: string, answer: number, explanation: string, hint = 'どこから計算できるかな？'): Omit<MathQuestion, 'id' | 'skillId'> {
   return { type: 'number', prompt: 'こたえを 数字で いれてね', question, answer: answerString(answer), explanation, hint };
 }
@@ -516,24 +521,25 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
     }
     case 'calculus': {
       const a = n(1,7), power=n(2,5), x=n(1,4);
-      return numeric(`f(x)=${a}x^${power}。x=${x}での f'(x) は？`,
+      return numeric(`f(x)=${monomial(a, power)} のとき、f'(${x}) の値は？`,
         a*power*x**(power-1),
-        `導関数は${a*power}x^${power-1}。x=${x}を代入しよう。`);
+        `導関数は f'(x)=${monomial(a * power, power - 1)}。x=${x}を代入しよう。`);
     }
     case 'integral': {
       const p = n(1,3), to=n(2,4), a=(p+1)*n(1,4);
-      return numeric(`∫[0,${to}] ${a}x^${p} dx は？`,
+      return numeric(`∫[0,${to}] ${monomial(a, p)} dx は？`,
         a/(p+1)*to**(p+1),
-        `x^${p}の積分は x^${p+1}/${p+1}。上下の端を代入するよ。`);
+        `不定積分は ∫ ${monomial(a, p)} dx = ${monomial(a / (p + 1), p + 1)}+C。原始関数の上端と下端での値の差を求めよう。`,
+        `まず x^${p} の原始関数を考えよう。`);
     }
     case 'sequence': {
       const a = n(1,7), d=n(2,7), k=n(4,9);
       return numeric(`初項${a}、公差${d}の等差数列の第${k}項は？`,a+(k-1)*d,
-        `a_n=${a}+(${k}-1)×${d}。`);
+        `一般項は a_n=${a}+(n-1)×${d}。n=${k}を代入しよう。`);
     }
     case 'vector': {
       const a=n(-5,5),b=n(-5,5),c=n(-5,5),d=n(-5,5);
-      return numeric(`a=(${a},${b}), b=(${c},${d}) の内積 a・b は？`,
+      return numeric(`vec(a)=(${a},${b}), vec(b)=(${c},${d}) の内積 vec(a)・vec(b) は？`,
         a*c+b*d,'対応する成分どうしをかけてたそう。');
     }
     case 'limit': {
@@ -560,7 +566,7 @@ function discovery(stage: WorldStage, index: number, r: Random): Omit<MathQuesti
     if(mode===0) {
       const first=r.int(2,9), step=r.int(2,5);
       return numeric(`${first}, ${first+step}, ${first+2*step}, ？`,first+3*step,
-        '同じ数をずつ足す規則を見つけたね。');
+        '同じ数ずつ足す規則を見つけたね。');
     }
     if(mode===1) return numeric('三角形を3つ集めたら、角はいくつ？',9,'三角形の角は3個。3×3=9個だね。');
     if(mode===2) return concept('一番小さい素数は？','2',['0','1','4','9'],r);
@@ -589,7 +595,7 @@ function discovery(stage: WorldStage, index: number, r: Random): Omit<MathQuesti
     '公比1/2の無限等比級数の和は2。',r);
   if(mode===1) return choice('e^(iπ) ＋ 1 の値は？','0',['1','−1','i','π'],
     'オイラーの等式は5つの重要な定数を結びつけるよ。',r);
-  if(mode===2) return numeric('1から10までの整数の和は？',55,'10×11÷2=55。n(n＋1)/2が使えるね。');
+  if(mode===2) return numeric('1から10までの整数の和は？',55,'Σ[k=1,10] k=10×11÷2=55。初項と末項を組にして考えよう。');
   if(mode===3) return choice('lim[n→∞] (1＋1/n)^n は？','e',['1','π','0','∞'],
     '自然対数の底eを定義する有名な極限だよ。',r);
   return choice('無限に続く素数は存在する？','無限にある',['有限個しかない','2だけ','奇数だけ','1000個'],
