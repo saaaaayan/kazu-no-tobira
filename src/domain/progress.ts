@@ -20,6 +20,8 @@ export interface SkillProgress {
 
 export interface Progress {
   version: 1;
+  /** Lesson completion is optional for backward-compatible version 1 saves. */
+  lessons?: Record<string, { completedAt: string }>;
   attempts: readonly Attempt[];
   stages: Partial<Record<StageId, StageProgress>>;
   skills: Partial<Record<SkillId, SkillProgress>>;
@@ -30,6 +32,7 @@ export const emptyProgress: Progress = { version: 1, attempts: [], stages: {}, s
 export function recordAttempt(progress: Progress, attempt: Attempt, cleared: boolean): Progress {
   const previous = progress.skills[attempt.skillId] ?? { answered: 0, correct: 0 };
   return {
+    ...progress,
     version: 1,
     attempts: [...progress.attempts, attempt],
     skills: {
