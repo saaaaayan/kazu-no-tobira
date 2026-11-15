@@ -268,8 +268,12 @@ function AdventureWorld() {
           {loadingRound && <Text accessibilityLiveRegion="polite">もんだいを よみこんでいるよ…</Text>}
           {!!startError && <Text accessibilityLiveRegion="polite" style={styles.error}>{startError}</Text>}
           {screen === 'home' && !round ? (
-            <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress}
-              onStart={() => { resetAnswer(); setScreen('world'); }} />
+            <>
+              <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress}
+                onStart={() => { resetAnswer(); setScreen('world'); }} />
+              <Pressable accessibilityRole="button" onPress={()=>setScreen('study')}
+                style={styles.studyButton}><Text style={styles.studyButtonText}>📚 まなびの広場 ・ 単元別学習と個別学習 ›</Text></Pressable>
+            </>
           ) : (
             <View style={styles.navigation}>
               <View style={styles.navigationHeader}>
@@ -280,19 +284,32 @@ function AdventureWorld() {
                   </Pressable>
                 )}
                 <ModeBadge mode={playMode} />
+                {!round && <Pressable accessibilityRole="button" onPress={()=>{setLearningStage(undefined);setScreen('study');}}>
+                  <Text style={styles.studyLink}>📚 まなびの広場</Text>
+                </Pressable>}
               </View>
               {!round && screen !== 'titles' && <ModeControls mode={playMode} onChange={setPlayMode} />}
             </View>
           )}
+          {!round && <PlanSwitcher plan={plan} onChange={setPlan} testEnabled={canTogglePlans} />}
           {!progress && (
             <Text style={styles.loading}>{loadError ? 'きろくを よみこめなかったよ。アプリを ひらきなおしてね。' : 'ぼうけんの じゅんびを しているよ…'}</Text>
           )}
-          {progress && !round && screen === 'world' &&
+          {progress && !round && !learningStage && screen === 'world' &&
             <WorldMap780 progress={progress} mode={playMode} onGrade={openGrade} onTitles={()=>setScreen('titles')}/>}
-          {progress && !round && screen === 'island' &&
-            <IslandStageMap key={grade.id} grade={grade} progress={progress} mode={playMode} onBack={()=>setScreen('world')}
-              onTitles={()=>setScreen('titles')} onStart={start}/>}
-          {progress && !round && screen === 'titles' &&
+          {progress && !round && !learningStage && screen === 'island' &&
+            <IslandStageMap key={grade.id} grade={grade} progress={progress} mode={playMode} plan={plan}
+              onBack={()=>setScreen('world')} onTitles={()=>setScreen('titles')} onStart={chooseStage}/>}
+          {progress && !round && learningStage &&
+            <LearningExperience key={learningStage.id} stage={learningStage}
+              completed={isLessonComplete(progress,guideForStage(learningStage).id)}
+              onBack={()=>setLearningStage(undefined)}
+              onComplete={()=>{void finishLesson(learningStage)}}
+              onPlay={()=>{const stage=learningStage;setLearningStage(undefined);void start(stage)}}/>}
+          {progress && !round && !learningStage && screen === 'study' &&
+            <StudyDashboard progress={progress} plan={plan} onPlan={setPlan} showSwitch={canTogglePlans}
+              onBack={()=>setScreen('world')} onStage={openLearning} onPractice={activity=>{void startPractice(activity)}}/>}
+          {progress && !round && !learningStage && screen === 'titles' &&
             <TitleAlbum progress={progress} onBack={()=>setScreen('world')}/>}
           {round && question && (
             <View style={styles.playPanel}>
@@ -304,9 +321,9 @@ function AdventureWorld() {
                   <View style={styles.finishHero}>
                     {!testing && cleared && <SparkleBurst big/>}
                     {!testing && <Text style={styles.finishEmoji}>{perfect?'🌟':cleared?'✨':'🌱'}</Text>}
-                    <Text style={styles.finishStage}>{round.stage.title}</Text>
+                    <Text style={styles.finishStage}>{round.activity ? '個別学習のまとめ' : round.stage.title}</Text>
                     <Text accessibilityRole="header" style={styles.finishTitle}>
-                      {testing ? 'テストの けっか' : perfect?'パーフェクト！':cleared?'ステージ クリア！':'おつかれさま！'}
+                      {round.activity ? 'きょうも おつかれさま！' : testing ? 'テストの けっか' : perfect?'パーフェクト！':cleared?'ステージ クリア！':'おつかれさま！'}
                     </Text>
                     <Text style={styles.finishCount}>{round.problems.length}もんのうち {round.correct}もん せいかい</Text>
                   </View>
@@ -316,7 +333,7 @@ function AdventureWorld() {
                     <Text style={styles.hintNote}>ヒントをつかったので、パーフェクトは 次のチャレンジで めざそう！</Text>
                   )}
                   {!testing && cleared && <Text style={styles.rewardMessage}>しょうごう ずかん：{newlyEarnedTitles}こ はっけんずみ</Text>}
-                  {canContinue && <GameButton label="つぎの ステージへ" onPress={()=>start(nextStage)} gold/>}
+                  {canContinue && <GameButton label="つぎの ステージへ" onPress={()=>chooseStage(nextStage)} gold/>}
                   <GameButton label="この ステージに もういちど ちょうせん" onPress={()=>start(round.stage)} secondary/>
                   <GameButton label="島のマップへ" onPress={goToIsland}/>
                 </View>
@@ -361,10 +378,12 @@ function AdventureWorld() {
                               <ClockFace time={question.clock.start} caption={question.clock.read ? 'よみとった じこく' : 'はじめ'}/>
                               {!question.clock.read && <ClockFace time={question.clock.end} caption="はりを うごかした あと"/>}
                             </View>}
-                            {bankQuestion
+                            <MathText style={styles.explanation} value={question.explanation}/>
+                            {plan==='premium' ? (bankQuestion
                               ? <WorkedSolution question={bankQuestion} wrongAnswer={round.feedback === 'incorrect' ? answer : undefined}/>
                               : question.steps ? <WrittenSolution steps={question.steps}/>
-                              : <MathText style={styles.explanation} value={question.explanation}/>}
+                              : <Text style={styles.hintNote}>詳しい説明は、単元別学習ページでも確認できます。</Text>)
+                              : <Text style={styles.hintNote}>🔒 途中式・図解・間違えやすいポイントの詳しい解説はプレミアム限定です。</Text>}
                           </View>
                           {round.feedback==='correct'&&<ComboBadge results={round.results}/>}
                           <GameButton gold label={round.index+1===round.problems.length?'けっかを みる':'つぎの もんだいへ'} onPress={advance}/>
