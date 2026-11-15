@@ -3,8 +3,8 @@ export const gradeIds = [
 ] as const;
 
 export type GradeId = typeof gradeIds[number];
-export type StageId = `${GradeId}.${string}`;
-export type SkillId = `${GradeId}.${string}`;
+export type StageId = `${GradeId | 'sage'}.${string}`;
+export type SkillId = `${GradeId | 'sage'}.${string}`;
 
 export interface Skill {
   id: SkillId;

@@ -92,7 +92,7 @@ export default function AdventureHome({ mode, onMode, onStart, loading }: {
       <View style={[styles.copy, wide && styles.copyWide]}>
         <Text accessibilityRole="header" style={[styles.title, wide && styles.titleWide]}>数のトビラ</Text>
         <Text style={styles.subtitle}>ひとつ解くたび、世界がひらく。</Text>
-        <Text style={styles.invitation}>ルミといっしょに、12の島をめぐろう。</Text>
+        <Text style={styles.invitation}>ルミといっしょに、13の島をめぐろう。</Text>
         <ModeControls mode={mode} onChange={onMode} />
         <Text style={styles.modeHint}>{mode === 'test' ? '全ステージをためせるよ。記録やごほうびは のこらないよ。' : 'まなびの記録をのこしながら、島をひとつずつ開こう。'}</Text>
         <Pressable accessibilityRole="button" accessibilityState={{ disabled: loading }} disabled={loading} onPress={onStart}
