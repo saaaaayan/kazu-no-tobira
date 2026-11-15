@@ -2,13 +2,15 @@ import { useEffect, useRef, useState, type ComponentRef } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { generateAdditionRound, type AdditionProblem } from './domain/addition';
-import { additionSkills, firstGradeStages, type AdditionStage } from './domain/curriculum';
+import { firstGradeStages, type AdditionStage } from './domain/curriculum';
 import { gradeInteger } from './domain/grading';
 import { recordAttempt, type Progress } from './domain/progress';
 import { loadProgress, saveProgress } from './storage';
 import CalculationMemo from './components/CalculationMemo';
 import NumberPad from './components/NumberPad';
 import HandwritingAnswer from './components/HandwritingAnswer';
+import AdventureMap from './components/AdventureMap';
+import { ClearScene, CorrectSpark, QuestionTrail, type AnswerFeedback } from './components/AdventureEffects';
 
 const answerModes = [
   { id: 'keyboard', label: 'キーボード' },
@@ -17,7 +19,6 @@ const answerModes = [
 ] as const;
 type AnswerMode = typeof answerModes[number]['id'];
 
-const stageIcons = ['🌲', '🌙', '✦'];
 const ink = '#202c47';
 const navy = '#182343';
 const muted = '#535b73';
@@ -27,7 +28,8 @@ type Round = {
   problems: AdditionProblem[];
   index: number;
   correct: number;
-  feedback?: 'correct' | 'incorrect';
+  results: AnswerFeedback[];
+  feedback?: AnswerFeedback;
   complete?: boolean;
 };
 
@@ -66,7 +68,7 @@ function Adventure() {
     blockHandwriting(false);
     setMessage('');
     scroll.current?.scrollTo({ y: 0, animated: false });
-    setRound({ stage, problems: generateAdditionRound(stage.skillId), index: 0, correct: 0 });
+    setRound({ stage, problems: generateAdditionRound(stage.skillId), index: 0, correct: 0, results: [] });
   }
 
   async function submit() {
@@ -95,7 +97,7 @@ function Adventure() {
     try {
       await saveProgress(next);
       setProgress(next);
-      setRound({ ...round, correct, feedback: result.status });
+      setRound({ ...round, correct, feedback: result.status, results: [...round.results, result.status] });
     } catch {
       setMessage('きろくを ほぞんできなかったよ。もういちど おしてね。');
     } finally {
@@ -118,15 +120,17 @@ function Adventure() {
   }
 
   const problem = round?.problems[round.index];
+  const perfectRound = round && round.correct === round.problems.length;
+  const nextStage = round && firstGradeStages[firstGradeStages.findIndex(stage => stage.id === round.stage.id) + 1];
+  const canContinue = perfectRound && nextStage && progress?.stages[round.stage.id];
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView ref={scroll} scrollEnabled={!drawing} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scroll}>
         <View style={[styles.shell, round && !round.complete && styles.practiceShell]}>
           <View style={[styles.hero, round && styles.compactHero]}>
             <View style={styles.moon} />
-            <Text style={styles.brand}>数のトビラ</Text>
-            <Text accessibilityRole="header" style={styles.title}>たしざんの冒険</Text>
-            <Text style={styles.subtitle}>小学1年生 · たしざん</Text>
+            <Text accessibilityRole="header" style={round ? styles.brand : styles.title}>数のトビラ</Text>
+            {!round && <Text style={styles.subtitle}>ひとつ解くたび、世界がひらく。</Text>}
           </View>
           {!progress && (
             <Text accessibilityLiveRegion="polite" style={styles.notice}>
@@ -134,29 +138,7 @@ function Adventure() {
             </Text>
           )}
           {progress && !round && (
-            <View style={styles.map}>
-              <Text accessibilityRole="header" style={styles.heading}>冒険マップ</Text>
-              <View style={styles.trail}>
-                {firstGradeStages.map((stage, index) => {
-                  const skill = progress.skills[stage.skillId];
-                  const cleared = Boolean(progress.stages[stage.id]);
-                  const locked = index > 0 && !progress.stages[firstGradeStages[index - 1].id];
-                  return (
-                    <Pressable key={stage.id} accessibilityRole="button" accessibilityState={{ disabled: locked }}
-                      disabled={locked} onPress={() => start(stage)}
-                      style={({ pressed }) => [styles.stage, locked && styles.locked, pressed && styles.pressed]}>
-                      <Text style={styles.icon} accessible={false}>{stageIcons[index]}</Text>
-                      <View style={styles.stageInfo}>
-                        <Text style={styles.stageTitle}>{stage.title}</Text>
-                        <Text style={styles.detail}>{additionSkills[index].title}</Text>
-                        <Text style={styles.detail}>{skill ? `せいかい ${skill.correct} / ${skill.answered}もん` : 'きろくなし'}</Text>
-                      </View>
-                      <Text style={styles.state}>{cleared ? 'クリア ✓' : locked ? '🔒' : 'すすむ ›'}</Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
+            <AdventureMap progress={progress} onStart={start} />
           )}
           {round && problem && (
             <View style={[styles.panel, !round.complete && styles.practicePanel]}>
@@ -164,18 +146,31 @@ function Adventure() {
                 onPress={() => { setDrawing(false); setRound(undefined); }} style={styles.back}>
                 <Text style={styles.backText}>‹ マップにもどる</Text>
               </Pressable>
-              <Text accessibilityRole="header" style={styles.heading}>{round.stage.title}</Text>
               {round.complete ? (
                 <>
-                  <Text style={styles.equation}>{round.correct === round.problems.length ? 'クリア！' : 'おつかれさま！'}</Text>
-                  <Text style={styles.detail}>{round.problems.length}もんのうち {round.correct}もん せいかい</Text>
-                  {round.correct < round.problems.length && <Text style={styles.detail}>ぜんもん せいかいで、ステージを クリアできるよ。</Text>}
-                  <Action label="もういちど あそぶ" onPress={() => start(round.stage)} />
+                  {perfectRound ? <ClearScene title={round.stage.title} /> : (
+                    <>
+                      <Text style={styles.detail}>{round.stage.title}</Text>
+                      <Text accessibilityRole="header" style={styles.equation}>おつかれさま！</Text>
+                    </>
+                  )}
+                  <Text style={styles.resultSummary}>{round.problems.length}もんのうち {round.correct}もん せいかい</Text>
+                  {canContinue ? (
+                    <>
+                      <Text style={styles.detail}>つぎは {nextStage.title}</Text>
+                      <Action label="つぎの場所へ" onPress={() => start(nextStage)} />
+                    </>
+                  ) : perfectRound ? (
+                    <Action label="マップへ" onPress={() => setRound(undefined)} />
+                  ) : (
+                    <Text style={styles.detail}>ぜんもん せいかいで、ステージを クリアできるよ。</Text>
+                  )}
+                  <Action label="もういちど あそぶ" onPress={() => start(round.stage)} secondary={!!perfectRound} />
                 </>
               ) : (
                 <>
                   <View style={styles.question}>
-                    <Text style={styles.questionStep}>{round.index + 1} / {round.problems.length} もん</Text>
+                    <QuestionTrail stage={round.stage.title} results={round.results} index={round.index} total={round.problems.length} />
                     <Text style={styles.prompt}>あわせると いくつ？</Text>
                     <Text style={[styles.formula, wide && styles.wideFormula]}>
                       {problem.left} ＋ {problem.right} ＝ {round.feedback ? problem.answer : '？'}
@@ -186,9 +181,12 @@ function Adventure() {
                       {round.feedback ? (
                         <>
                           <View accessibilityLiveRegion="polite" style={[styles.feedback, round.feedback === 'incorrect' && styles.incorrect]}>
-                            <Text accessibilityRole="header" style={styles.feedbackTitle}>
-                              {round.feedback === 'correct' ? 'せいかい！' : 'おしい！'}
-                            </Text>
+                            <View style={styles.feedbackHeader}>
+                              {round.feedback === 'correct' && <CorrectSpark />}
+                              <Text accessibilityRole="header" style={styles.feedbackTitle}>
+                                {round.feedback === 'correct' ? 'せいかい！' : 'おしい！'}
+                              </Text>
+                            </View>
                             <Text style={styles.detail}>きみの こたえは {input.trim()}</Text>
                             <Text style={styles.detail}>{problem.explanation}</Text>
                           </View>
@@ -245,11 +243,11 @@ function Adventure() {
   );
 }
 
-function Action({ label, onPress, disabled = false }: { label: string; onPress: () => void; disabled?: boolean }) {
+function Action({ label, onPress, disabled = false, secondary = false }: { label: string; onPress: () => void; disabled?: boolean; secondary?: boolean }) {
   return (
     <Pressable accessibilityRole="button" accessibilityState={{ disabled }} disabled={disabled} onPress={onPress}
-      style={({ pressed }) => [styles.action, (disabled || pressed) && styles.pressed]}>
-      <Text style={styles.actionLabel}>{label}</Text>
+      style={({ pressed }) => [styles.action, secondary && styles.secondaryAction, (disabled || pressed) && styles.pressed]}>
+      <Text style={[styles.actionLabel, secondary && styles.secondaryLabel]}>{label}</Text>
     </Pressable>
   );
 }
@@ -259,24 +257,15 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#f0eee8' },
+  safe: { flex: 1, backgroundColor: '#f0eef4' },
   scroll: { flexGrow: 1, padding: 16, paddingBottom: 40 },
-  shell: { width: '100%', maxWidth: 660, alignSelf: 'center', gap: 20 },
-  hero: { backgroundColor: navy, overflow: 'hidden', paddingHorizontal: 24, paddingVertical: 32, borderRadius: 24, gap: 8 },
+  shell: { width: '100%', maxWidth: 952, alignSelf: 'center', gap: 20 },
+  hero: { backgroundColor: navy, overflow: 'hidden', paddingHorizontal: 24, paddingVertical: 20, borderRadius: 24, gap: 8 },
   moon: { position: 'absolute', width: 104, height: 104, right: -20, top: -20, borderRadius: 52, backgroundColor: '#34466b' },
   brand: { color: '#f6cf8b', fontSize: 16, fontWeight: '700' },
   title: { color: 'white', fontSize: 32, fontWeight: '800' },
   subtitle: { color: '#d6deef', fontSize: 15 },
-  map: { gap: 16, paddingHorizontal: 4 },
-  heading: { fontSize: 22, fontWeight: '800', color: ink },
-  trail: { gap: 12, paddingLeft: 14, borderLeftWidth: 3, borderLeftColor: '#9aa9a2' },
-  stage: { flexDirection: 'row', gap: 10, alignItems: 'center', padding: 14, backgroundColor: '#fffdf8', borderWidth: 1, borderColor: '#d8dcca', borderRadius: 16 },
-  stageInfo: { flex: 1, gap: 3 },
-  icon: { fontSize: 22, color: ink },
-  stageTitle: { color: ink, fontWeight: '700', fontSize: 17 },
   detail: { color: muted, lineHeight: 23, fontSize: 15 },
-  state: { color: '#265342', fontWeight: '700', fontSize: 13 },
-  locked: { backgroundColor: '#e7e8e4' },
   pressed: { opacity: 0.8 },
   panel: { backgroundColor: '#fffdf8', borderRadius: 20, padding: 20, gap: 12 },
   back: { alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' },
@@ -286,7 +275,6 @@ const styles = StyleSheet.create({
   compactHero: { paddingVertical: 14 },
   practicePanel: { backgroundColor: '#fbfaff', padding: 14 },
   question: { padding: 16, gap: 6, borderRadius: 14, backgroundColor: '#21294f' },
-  questionStep: { color: '#d0d8fa', fontSize: 14, fontWeight: '700' },
   prompt: { color: '#fff', fontSize: 21, fontWeight: '700' },
   formula: { color: '#fff', fontSize: 34, fontWeight: '800', fontVariant: ['tabular-nums'] },
   wideFormula: { fontSize: 50 },
@@ -310,6 +298,10 @@ const styles = StyleSheet.create({
     fontSize: 24, fontWeight: '700', paddingHorizontal: 12, minHeight: 50, borderRadius: 10 },
   action: { minHeight: 48, borderRadius: 12, backgroundColor: '#36488c', justifyContent: 'center', alignItems: 'center', padding: 12 },
   actionLabel: { color: 'white', fontWeight: '700', fontSize: 16 },
+  resultSummary: { color: ink, fontSize: 18, fontWeight: '800', textAlign: 'center', paddingVertical: 3 },
+  secondaryAction: { backgroundColor: '#ede9f6' },
+  secondaryLabel: { color: '#34386a' },
+  feedbackHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   feedback: { backgroundColor: '#e2eee8', padding: 14, borderRadius: 12, gap: 8 },
   incorrect: { backgroundColor: '#ece6f6' },
   feedbackTitle: { color: '#25264b', fontSize: 22, fontWeight: '800' },
