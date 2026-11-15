@@ -2,31 +2,28 @@ import type { WorldStage } from './worldCatalog.ts';
 
 export type MapPoint = { x: number; y: number };
 
-export type WorldMapLayout = {
-  columns: 2 | 3;
-  rowHeight: number;
-  height: number;
-  positions: readonly MapPoint[];
-};
+const atlasLandscape = [
+  [128, 510], [125, 330], [252, 195], [403, 283], [332, 471], [528, 551],
+  [701, 474], [852, 366], [661, 287], [510, 136], [711, 102], [893, 157],
+] as const;
+const atlasPortrait = [
+  [111, 111], [302, 177], [211, 304], [105, 425], [300, 482], [270, 610],
+  [106, 676], [188, 801], [312, 894], [124, 956], [164, 1089], [306, 1169],
+] as const;
 
-export function worldMapLayout(width: number): WorldMapLayout {
-  const safeWidth = Math.max(290, width || 360);
-  const columns = safeWidth >= 700 ? 3 : 2;
-  const rowHeight = columns === 3 ? 208 : 193;
-  const positions = Array.from({ length: 12 }, (_, index) => {
-    const row = Math.floor(index / columns);
-    // Snaking from island to island keeps the grade order visible as a voyage.
-    const column = row % 2 === 0 ? index % columns : columns - 1 - index % columns;
-    return {
-      x: Math.round(safeWidth * (column + 0.5) / columns),
-      y: Math.round(104 + row * rowHeight),
-    };
-  });
+export function worldMapLayout(width: number) {
+  const actualWidth = Math.max(244, width || 360);
+  const compact = actualWidth < 700;
+  const height = compact ? 1265 : Math.round(actualWidth * 0.68);
+  const baseWidth = compact ? 420 : 1000;
+  const baseHeight = compact ? 1265 : 680;
+  const targetWidth = compact ? Math.min(124, Math.floor(actualWidth * 0.43)) : Math.min(156, Math.floor(actualWidth * 0.16));
   return {
-    columns,
-    rowHeight,
-    height: Math.ceil(positions.at(-1)!.y + 129),
-    positions,
+    width: actualWidth, height, compact, targetWidth,
+    positions: (compact ? atlasPortrait : atlasLandscape).map(([x, y]) => ({
+      x: Math.round(x / baseWidth * actualWidth),
+      y: Math.round(y / baseHeight * height),
+    })),
   };
 }
 
@@ -42,7 +39,7 @@ export function islandStageLayout(width: number, stageCount = 65): {
   positions: readonly IslandStagePoint[];
 } {
   if (!Number.isInteger(stageCount) || stageCount < 1) throw new RangeError('Invalid stage count');
-  const safeWidth = Math.max(290, width || 360);
+  const safeWidth = Math.max(244, width || 360);
   const rowHeight = 119;
   const positions: IslandStagePoint[] = Array.from({ length: stageCount }, (_, order) => {
     const row = Math.floor(order / 5);
