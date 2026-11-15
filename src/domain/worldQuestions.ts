@@ -59,6 +59,12 @@ function numeric(question: string, answer: number, explanation: string, hint = '
 }
 function choice(question: string, right: string, wrongs: readonly string[], explanation: string, r: Random, hint = 'よく見くらべてみよう'): Omit<MathQuestion, 'id' | 'skillId'> {
   const all = [...new Set([right, ...wrongs.map(String)])];
+  // Fraction simplification can collapse different distractors to the same
+  // value (e.g. 2/4 and 1/2). Always present four distinct answers.
+  for (const candidate of ['0', '1', '2', '3', '−1', '1/2', '2/3', '3/4', '4/5', '5/6', 'π']) {
+    if (all.length >= 4) break;
+    if (!all.includes(candidate)) all.push(candidate);
+  }
   if (all.length < 4) throw new Error('Choice lacks four distinct options: ' + question + '/' + all.join(','));
   const selected = [right, ...all.filter(item => item !== right).slice(0, 3)];
   for (let i = selected.length - 1; i > 0; i--) {
