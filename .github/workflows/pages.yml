@@ -15,7 +15,8 @@ concurrency:
 
 jobs:
   build-and-deploy:
-    if: github.ref == 'refs/heads/main'
+    # Keep the last production deployment until purchase verification and content delivery are ready.
+    if: github.ref == 'refs/heads/main' && vars.PRODUCTION_ENTITLEMENTS_READY == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
