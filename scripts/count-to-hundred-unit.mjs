@@ -14,9 +14,9 @@ export function countToHundredPools() {
     const base = 10*tens;
     const total = base+ones;
     add(task('hundredBundle', [tens,ones],
-      `10この まとまりが ${tens}つ、ばらの たまが ${ones}こ あります。ぜんぶで なんこですか？`, total,
+      `10この まとまりが ${tens}こ、ばらの たまが ${ones}こ あります。ぜんぶで なんこですか？`, total,
       ['10の まとまりと ばらを わけて みよう。', 'まとまりを 10ずつ かぞえ、さいごに ばらを たすよ。',
-        `${tens}つの まとまりを 10ずつ かぞえて、ばらの ${ones}こを たそう。`],
+        `まとまり ${tens}こを 10ずつ かぞえて、ばらの ${ones}こを たそう。`],
       `まとまりは ${base}こ。 ${base}＋${ones}＝${total}。`,
       `${total}−${ones}＝${base}。ばらを のぞくと まとまりだけに なるね。`,
       'まとまりを 1こと かぞえないよ。', 1, { kind: 'bundlesAndOnes', tens, ones }));
