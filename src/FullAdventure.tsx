@@ -7,7 +7,7 @@ import { isBankQuestion } from './domain/questionBank';
 import { prepareStageRound } from './stageRounds';
 import { QuestionDiagram, WorkedSolution, WrittenSolution } from './components/QuestionSupport';
 import type { Progress } from './domain/progress';
-import { canAccessStage, freeAccess, hasPremium, type Entitlement } from './domain/accessPlan';
+import { canAccessFeature, canAccessStage, freeAccess, hasPremium, type Entitlement } from './domain/accessPlan';
 import { readServerEntitlement } from './domain/serverEntitlement';
 import { canPlayWorldStage, progressAfterWorldAnswer, worldStageAction, type PlayMode } from './domain/playMode';
 import { adventureTitles } from './domain/titles';
@@ -51,6 +51,7 @@ function AdventureWorld() {
   const [playMode, setPlayMode] = useState<PlayMode>('normal');
   const [access, setAccess] = useState<Entitlement>(freeAccess);
   const [showPlanInfo, setShowPlanInfo] = useState(false);
+  const [showWorkedSolution, setShowWorkedSolution] = useState(false);
   const starting = useRef(false);
   const [loadingRound, setLoadingRound] = useState(false);
   const [startError, setStartError] = useState('');
@@ -108,6 +109,7 @@ function AdventureWorld() {
   }
   function resetAnswer() {
     setAnswer('');
+    setShowWorkedSolution(false);
     setMessage('');
     setDrawing(false);
     blockHandwriting(false);
@@ -186,6 +188,7 @@ function AdventureWorld() {
 
   const question = round?.problems[round.index];
   const bankQuestion = question && isBankQuestion(question) ? question : undefined;
+  const canReadWorkedSolution = canAccessFeature(access, 'workedSolutions');
   const hints = bankQuestion?.hints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0;
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
@@ -280,7 +283,7 @@ function AdventureWorld() {
           </View>}
           {showPlanInfo && <View style={styles.playPanel}>
             <Text accessibilityRole="header" style={styles.rewardMessage}>プレミアムのご案内</Text>
-            <Text style={styles.explanation}>EX・ひみつの道・賢者の島はプレミアムで遊べます。通常ステージと単元学習は無料です。</Text>
+            <Text style={styles.explanation}>EX・ひみつの道・賢者の島でのプレイと、途中式や図を使った詳しい解説はプレミアムで利用できます。通常ステージ、単元学習、基本の解説は無料です。</Text>
             <GameButton label="とじる" secondary onPress={() => setShowPlanInfo(false)} />
           </View>}
           {loadingRound && <Text accessibilityLiveRegion="polite">もんだいを よみこんでいるよ…</Text>}
@@ -380,15 +383,25 @@ function AdventureWorld() {
                               </View>
                             </View>
                             <MathText style={styles.yourAnswer} prefix="きみの こたえ：" value={answer} format={question.type === 'choice'}/>
-                            {round.feedback==='incorrect'&&<MathText style={styles.answerHint} prefix="ただしい こたえ：" value={question.answer}/>}
+                            <MathText style={styles.answerHint} prefix="ただしい こたえ：" value={question.answer}/>
                             {question.clock && <View style={{flexDirection:'row', flexWrap:'wrap', gap:8}}>
                               <ClockFace time={question.clock.start} caption={question.clock.read ? 'よみとった じこく' : 'はじめ'}/>
                               {!question.clock.read && <ClockFace time={question.clock.end} caption="はりを うごかした あと"/>}
                             </View>}
-                            {bankQuestion
-                              ? <WorkedSolution question={bankQuestion} wrongAnswer={round.feedback === 'incorrect' ? answer : undefined}/>
-                              : question.steps ? <WrittenSolution steps={question.steps}/>
-                              : <MathText style={styles.explanation} value={question.explanation}/>}
+                            <Text style={styles.answerHeading}>基本の かいせつ</Text>
+                            <MathText style={styles.explanation} value={question.explanation}/>
+                            {(bankQuestion || question.steps) && <>
+                              <GameButton secondary label={canReadWorkedSolution
+                                ? showWorkedSolution ? 'くわしい かいせつを とじる' : 'くわしい かいせつを みる'
+                                : 'くわしい かいせつ（プレミアム）'}
+                                onPress={() => {
+                                  if (canReadWorkedSolution) setShowWorkedSolution(value => !value);
+                                  else { setShowPlanInfo(true); scroll.current?.scrollTo({ y: 0 }); }
+                                }} />
+                              {showWorkedSolution && canReadWorkedSolution && (bankQuestion
+                                ? <WorkedSolution question={bankQuestion} wrongAnswer={round.feedback === 'incorrect' ? answer : undefined}/>
+                                : question.steps ? <WrittenSolution steps={question.steps}/> : null)}
+                            </>}
                           </View>
                           {round.feedback==='correct'&&<ComboBadge results={round.results}/>}
                           <GameButton gold label={round.index+1===round.problems.length?'けっかを みる':'つぎの もんだいへ'} onPress={advance}/>

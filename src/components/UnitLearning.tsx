@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
+import { MathText } from './MathText';
 import { CompanionMoment } from './AdventureCompanion';
 import { SparkleBurst } from './AdventureJuice';
 import {
@@ -35,6 +36,11 @@ function Action({ label, onPress, disabled, secondary }: { label: string; onPres
 function Diagram({ diagram, action, revealed }: { diagram: LessonDiagram; action?: 'count' | 'pair'; revealed: number }) {
   const [counted, setCounted] = useState<number[]>([]);
   const [paired, setPaired] = useState(0);
+  if (diagram.kind === 'table') return <View style={styles.chart}>
+    {diagram.cells.map((row, index) => <View key={index} style={styles.route}>
+      {row.map((cell, i) => <View key={i} style={styles.tableCell}><MathText style={styles.small} value={cell}/></View>)}
+    </View>)}
+  </View>;
   if (diagram.kind === 'path') {
     const numbers = Array.from({ length: diagram.last - diagram.first + 1 }, (_, i) => diagram.first + i);
     return <View style={styles.chart}>
@@ -143,30 +149,30 @@ function LessonContent({ lesson, progress, busy, onChange, onChallenge }: Lesson
   return <View style={styles.card}>
     {page === 0 && <>
       <Text accessibilityRole="header" style={styles.heading}>きょうの めあて</Text>
-      {lesson.goals.map(goal => <Text key={goal} style={styles.text}>✦ {goal}</Text>)}
+      {lesson.goals.map(goal => <MathText key={goal} style={styles.text} value={goal}/>)}
       <CompanionMoment mood="ready" variation={page} />
       <Text style={styles.text}>{lesson.readiness}</Text>
       <Action label="いっしょに はじめる" disabled={busy} onPress={goNext} />
     </>}
     {chapter && <>
       <Text accessibilityRole="header" style={styles.heading}>{chapter.title}</Text>
-      <Text style={styles.text}>{chapter.text}</Text>
+      <MathText style={styles.text} value={chapter.text}/>
       {chapter.diagram && <Diagram diagram={chapter.diagram} revealed={0} action={chapter.action} />}
       <Action label="つぎへ" disabled={busy} onPress={goNext} />
     </>}
     {example && <>
       <Text accessibilityRole="header" style={styles.heading}>{example.title}</Text>
-      <Text style={styles.text}>{example.text}</Text>
+      <MathText style={styles.text} value={example.text}/>
       <Diagram diagram={example.diagram} revealed={revealed} />
-      {example.reveal.slice(0, revealed).map((text, i) => <Text key={i} style={styles.reveal}>{i + 1}. {text}</Text>)}
+      {example.reveal.slice(0, revealed).map((text, i) => <View key={i} style={styles.reveal}><MathText style={styles.text} value={text} prefix={(i + 1) + '. '}/></View>)}
       {revealed < example.reveal.length
         ? <Action secondary label={revealed ? 'つぎの かんがえかたを みる' : 'かんがえかたを みる'} disabled={busy} onPress={() => setRevealed(revealed + 1)} />
         : <Action label={page + 1 === lessonCheckStart(lesson) ? 'たしかめ もんだいへ' : 'つぎへ'} disabled={busy} onPress={goNext} />}
     </>}
     {check && <>
       <Text accessibilityRole="header" style={styles.heading}>たしかめ {page - lessonCheckStart(lesson) + 1} / {lesson.checks.length}</Text>
-      <Text style={styles.text}>{check.prompt}</Text>
-      <Diagram diagram={check.diagram} revealed={0} />
+      <MathText style={styles.text} value={check.prompt}/>
+      {check.diagram && <Diagram diagram={check.diagram} revealed={0} />}
       <View style={styles.options}>{check.choices.map(choice => <Pressable key={choice} accessibilityRole="button"
         accessibilityLabel={choice + ' を えらぶ'} disabled={busy || progress.checks[check.id]?.correct}
         style={[styles.choice, progress.checks[check.id]?.lastAnswer === choice && styles.visited]}
@@ -205,6 +211,7 @@ const styles = StyleSheet.create({
   numberTile: { flex: 1, borderRadius: 6, minHeight: 40, backgroundColor: '#fffaf0', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#b8c7e3' },
   number: { color: '#243653', fontSize: 14, fontWeight: '900' },
   visited: { backgroundColor: '#ffe6a0', borderColor: '#ab7733' },
+  tableCell: { flex: 1, minWidth: 0, backgroundColor: '#fffaf0', borderRadius: 6, padding: 4, justifyContent: 'center' },
   pairColumn: { flex: 1, alignItems: 'center', borderRadius: 8, backgroundColor: '#fffaf0' },
   pairSlot: { height: 34, justifyContent: 'center' },
   pairLink: { width: 3, height: 15 },
