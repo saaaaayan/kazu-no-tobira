@@ -1,7 +1,7 @@
 import { useRef, type PointerEvent } from 'react';
 import type { InkSurfaceProps } from './inkSurfaceProps';
 
-export default function InkSurface({ children, start, move, finish, cancel }: InkSurfaceProps) {
+export default function InkSurface({ children, label = 'てがきエリア', start, move, finish, cancel }: InkSurfaceProps) {
   const active = useRef<number | null>(null);
   function point(event: PointerEvent<HTMLDivElement>) {
     const bounds = event.currentTarget.getBoundingClientRect();
@@ -9,7 +9,7 @@ export default function InkSurface({ children, start, move, finish, cancel }: In
   }
 
   return (
-    <div aria-label="てがきエリア" role="img"
+    <div aria-label={label} role="img"
       style={{ position: 'absolute', inset: 0, touchAction: 'none', userSelect: 'none', cursor: 'crosshair' }}
       onPointerDown={event => {
         if (active.current !== null || event.button !== 0) return;

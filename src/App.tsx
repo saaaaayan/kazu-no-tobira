@@ -8,6 +8,14 @@ import { recordAttempt, type Progress } from './domain/progress';
 import { loadProgress, saveProgress } from './storage';
 import CalculationMemo from './components/CalculationMemo';
 import NumberPad from './components/NumberPad';
+import HandwritingAnswer from './components/HandwritingAnswer';
+
+const answerModes = [
+  { id: 'keyboard', label: 'キーボード' },
+  { id: 'panel', label: 'すうじパネル' },
+  { id: 'handwriting', label: 'てがき' },
+] as const;
+type AnswerMode = typeof answerModes[number]['id'];
 
 const stageIcons = ['🌲', '🌙', '✦'];
 const ink = '#202c47';
@@ -27,6 +35,7 @@ function Adventure() {
   const [progress, setProgress] = useState<Progress>();
   const [round, setRound] = useState<Round>();
   const [input, setInput] = useState('');
+  const [mode, setMode] = useState<AnswerMode>('keyboard');
   const [message, setMessage] = useState('');
   const [saving, setSaving] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -53,12 +62,12 @@ function Adventure() {
   }
 
   async function submit() {
-    if (!round || !progress || round.feedback || submitting.current) return;
+    if (!round || !progress || round.feedback || submitting.current || mode === 'handwriting') return;
     const problem = round.problems[round.index];
     const result = gradeInteger(problem.answer, input);
     if (result.status === 'invalid') {
       setMessage('0から9までの すうじで こたえを いれてね。');
-      answerInput.current?.focus();
+      if (mode === 'keyboard') answerInput.current?.focus();
       return;
     }
 
@@ -178,16 +187,41 @@ function Adventure() {
                       ) : (
                         <>
                           <Text style={styles.answerTitle}>こたえ</Text>
-                          <TextInput ref={answerInput} accessibilityLabel="こたえ" enterKeyHint="done" inputMode="numeric"
-                            key={problem.id} value={input} onChangeText={value => { setInput(value); setMessage(''); }}
-                            onSubmitEditing={submit} editable={!saving} placeholder="すうじ" placeholderTextColor={muted}
-                            style={styles.input} />
-                          <NumberPad disabled={saving} onChange={key => {
+                          <View style={styles.modeRow}>
+                            {answerModes.map(option => (
+                              <Pressable key={option.id} accessibilityRole="button" accessibilityLabel={option.label}
+                                accessibilityState={{ selected: option.id === mode, disabled: saving || drawing }}
+                                disabled={saving || drawing}
+                                onPress={() => { setMode(option.id); setMessage(''); }}
+                                style={[styles.mode, option.id === mode && styles.modeActive]}>
+                                <Text style={[styles.modeText, option.id === mode && styles.modeTextActive]}>{option.label}</Text>
+                              </Pressable>
+                            ))}
+                          </View>
+                          {mode === 'keyboard' ? (
+                            <TextInput ref={answerInput} accessibilityLabel="こたえ" enterKeyHint="done" inputMode="numeric"
+                              key={problem.id} value={input} onChangeText={value => { setInput(value); setMessage(''); }}
+                              onSubmitEditing={submit} editable={!saving} placeholder="すうじ" placeholderTextColor={muted}
+                              style={styles.input} />
+                          ) : (
+                            <View accessibilityLiveRegion="polite" style={styles.readout}>
+                              <Text accessibilityLabel={input ? `こたえ ${input}` : 'こたえは まだありません'}
+                                style={input ? styles.readoutValue : styles.readoutHint}>{input || 'すうじ'}</Text>
+                            </View>
+                          )}
+                          {mode === 'panel' && <NumberPad disabled={saving} onChange={key => {
                             setInput(value => key === '全部消す' ? '' : key === 'けす' ? value.slice(0, -1) : value + key);
                             setMessage('');
-                          }} />
+                          }} />}
+                          {mode === 'handwriting' && (
+                            <HandwritingAnswer key={problem.id} onDrawingChange={setDrawing} onApply={value => {
+                              setInput(value);
+                              setMode('keyboard');
+                              setMessage('');
+                            }} />
+                          )}
                           {!!message && <Text accessibilityLiveRegion="polite" style={styles.error}>{message}</Text>}
-                          <Action label={saving ? 'ほぞんちゅう…' : 'こたえあわせ'} onPress={submit} disabled={saving} />
+                          {mode !== 'handwriting' && <Action label={saving ? 'ほぞんちゅう…' : 'こたえあわせ'} onPress={submit} disabled={saving} />}
                         </>
                       )}
                     </View>
@@ -252,6 +286,16 @@ const styles = StyleSheet.create({
   practiceWide: { flexDirection: 'row-reverse', alignItems: 'stretch' },
   answerPanel: { minWidth: 0, gap: 8, backgroundColor: '#f4f6fd', borderRadius: 18, padding: 14 },
   answerWide: { width: 300 },
+  modeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
+  mode: { flexGrow: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center',
+    paddingHorizontal: 6, borderRadius: 8, backgroundColor: '#e8ecfa' },
+  modeActive: { backgroundColor: '#36488c' },
+  modeText: { color: '#232b56', fontSize: 13, fontWeight: '700' },
+  modeTextActive: { color: 'white' },
+  readout: { minHeight: 50, justifyContent: 'center', paddingHorizontal: 12, backgroundColor: 'white',
+    borderWidth: 1, borderColor: '#777fa8', borderRadius: 10 },
+  readoutValue: { color: ink, fontSize: 24, fontWeight: '700' },
+  readoutHint: { color: muted, fontSize: 24, fontWeight: '700' },
   answerTitle: { color: '#232b56', fontSize: 17, fontWeight: '800' },
   input: { color: ink, backgroundColor: 'white', borderColor: '#777fa8', borderWidth: 1,
     fontSize: 24, fontWeight: '700', paddingHorizontal: 12, minHeight: 50, borderRadius: 10 },
