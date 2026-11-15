@@ -14,6 +14,7 @@ import AdventureMap from './components/AdventureMap';
 import { ClearScene, CorrectSpark, QuestionTrail, type AnswerFeedback } from './components/AdventureEffects';
 import { CompanionMoment, TreasureChest } from './components/AdventureCompanion';
 import VersionNotice from './components/VersionNotice';
+import { MagicMeter, ComboBadge, SparkleBurst } from './components/AdventureJuice';
 
 const answerModes = [
   { id: 'keyboard', label: 'キーボード' },
@@ -156,7 +157,12 @@ function Adventure() {
               </Pressable>
               {round.complete ? (
                 <>
-                  {perfectRound ? <ClearScene title={round.stage.title} /> : (
+                  {perfectRound ? (
+                    <View style={styles.clearStage}>
+                      <ClearScene title={round.stage.title} />
+                      <SparkleBurst big />
+                    </View>
+                  ) : (
                     <>
                       <Text style={styles.detail}>{round.stage.title}</Text>
                       <Text accessibilityRole="header" style={styles.equation}>おつかれさま！</Text>
@@ -164,12 +170,12 @@ function Adventure() {
                   )}
                   <CompanionMoment mood={perfectRound ? 'clear' : 'encourage'}
                     variation={round.dialogueOffset + round.index} />
-                  <TreasureChest open={Boolean(perfectRound)} />
+                  <TreasureChest open={Boolean(perfectRound)} stageId={round.stage.id} />
                   <Text style={styles.resultSummary}>{round.problems.length}もんのうち {round.correct}もん せいかい</Text>
                   {canContinue ? (
                     <>
                       <Text style={styles.detail}>つぎは {nextStage.title}</Text>
-                      <Action label="つぎの場所へ" onPress={() => start(nextStage)} />
+                      <Action label="つぎの場所へ" onPress={() => start(nextStage)} accent />
                     </>
                   ) : perfectRound ? (
                     <Action label="マップへ" onPress={() => setRound(undefined)} />
@@ -182,6 +188,7 @@ function Adventure() {
                 <>
                   <View style={styles.question}>
                     <QuestionTrail stage={round.stage.title} results={round.results} index={round.index} total={round.problems.length} />
+                    <MagicMeter results={round.results} total={round.problems.length} />
                     <CompanionMoment mood={round.feedback === 'correct' ? 'correct' : round.feedback === 'incorrect' ? 'incorrect' : 'ready'}
                       variation={round.dialogueOffset + round.index} onDark compact />
                     <Text style={styles.prompt}>あわせると いくつ？</Text>
@@ -194,6 +201,7 @@ function Adventure() {
                       {round.feedback ? (
                         <>
                           <View accessibilityLiveRegion="polite" style={[styles.feedback, round.feedback === 'incorrect' && styles.incorrect]}>
+                            {round.feedback === 'correct' && <SparkleBurst />}
                             <View style={styles.feedbackHeader}>
                               <Text accessibilityLabel={round.feedback === 'correct' ? '正解' : '不正解'}
                                 style={[styles.feedbackSymbol, round.feedback === 'incorrect' && styles.incorrectSymbol]}>
@@ -212,7 +220,8 @@ function Adventure() {
                             )}
                             <Text style={styles.detail}>{problem.explanation}</Text>
                           </View>
-                          <Action label={round.index + 1 === round.problems.length ? 'けっかを みる' : 'つぎの もんだい'} onPress={advance} />
+                          {round.feedback === 'correct' && <ComboBadge results={round.results} />}
+                          <Action label={round.index + 1 === round.problems.length ? 'けっかを みる' : 'つぎの もんだい'} onPress={advance} accent />
                         </>
                       ) : (
                         <>
@@ -265,11 +274,11 @@ function Adventure() {
   );
 }
 
-function Action({ label, onPress, disabled = false, secondary = false }: { label: string; onPress: () => void; disabled?: boolean; secondary?: boolean }) {
+function Action({ label, onPress, disabled = false, secondary = false, accent = false }: { label: string; onPress: () => void; disabled?: boolean; secondary?: boolean; accent?: boolean }) {
   return (
     <Pressable accessibilityRole="button" accessibilityState={{ disabled }} disabled={disabled} onPress={onPress}
-      style={({ pressed }) => [styles.action, secondary && styles.secondaryAction, (disabled || pressed) && styles.pressed]}>
-      <Text style={[styles.actionLabel, secondary && styles.secondaryLabel]}>{label}</Text>
+      style={({ pressed }) => [styles.action, accent && styles.highlightAction, secondary && styles.secondaryAction, (disabled || pressed) && styles.pressed]}>
+      <Text style={[styles.actionLabel, (accent || secondary) && styles.secondaryLabel]}>{label}</Text>
     </Pressable>
   );
 }
@@ -294,6 +303,7 @@ const styles = StyleSheet.create({
   backText: { color: '#265342', fontWeight: '700' },
   equation: { color: ink, fontSize: 30, fontWeight: '800', marginVertical: 6 },
   practiceShell: { maxWidth: 1032 },
+  clearStage: { position: 'relative' },
   compactHero: { paddingVertical: 14 },
   practicePanel: { backgroundColor: '#fbfaff', padding: 14 },
   question: { padding: 16, gap: 6, borderRadius: 14, backgroundColor: '#21294f' },
@@ -320,6 +330,7 @@ const styles = StyleSheet.create({
     fontSize: 24, fontWeight: '700', paddingHorizontal: 12, minHeight: 50, borderRadius: 10 },
   action: { minHeight: 48, borderRadius: 12, backgroundColor: '#36488c', justifyContent: 'center', alignItems: 'center', padding: 12 },
   actionLabel: { color: 'white', fontWeight: '700', fontSize: 16 },
+  highlightAction: { backgroundColor: '#f2cf7a', borderWidth: 2, borderColor: '#d89e48', elevation: 3 },
   resultSummary: { color: ink, fontSize: 18, fontWeight: '800', textAlign: 'center', paddingVertical: 3 },
   secondaryAction: { backgroundColor: '#ede9f6' },
   secondaryLabel: { color: '#34386a' },
