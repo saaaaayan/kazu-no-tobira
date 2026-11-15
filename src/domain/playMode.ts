@@ -1,11 +1,13 @@
 import { hasStageBank } from './questionBank.ts';
+import { canAccessStage, type UserPlan } from './access.ts';
 import { recordAttempt, type Attempt, type Progress } from './progress.ts';
 import type { WorldStage } from './worldCatalog.ts';
 import { finishWorldStage, isWorldStageUnlocked } from './worldProgress.ts';
 
 export type PlayMode = 'normal' | 'test';
 
-export function canPlayWorldStage(mode: PlayMode, progress: Progress, stage: WorldStage): boolean {
+export function canPlayWorldStage(mode: PlayMode, progress: Progress, stage: WorldStage, plan: UserPlan = 'free'): boolean {
+  if (!canAccessStage(plan, stage)) return false;
   if (stage.gradeId === 'sage' && !hasStageBank(stage.id)) return false;
   return mode === 'test' || isWorldStageUnlocked(progress, stage);
 }
