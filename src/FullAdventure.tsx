@@ -134,6 +134,8 @@ function AdventureWorld() {
   function openLearning(stage: WorldStage) {
     if (starting.current || submitting.current) return;
     setLearningStage(stage);
+    const island = worldIslands.find(g => g.id === stage.gradeId);
+    if (island) setGrade(island);
     setScreen('island');
     resetAnswer();
   }
@@ -291,7 +293,7 @@ function AdventureWorld() {
               {!round && screen !== 'titles' && <ModeControls mode={playMode} onChange={setPlayMode} />}
             </View>
           )}
-          {!round && <PlanSwitcher plan={plan} onChange={setPlan} testEnabled={canTogglePlans} />}
+          {!round && screen !== 'study' && <PlanSwitcher plan={plan} onChange={setPlan} testEnabled={canTogglePlans} />}
           {!progress && (
             <Text style={styles.loading}>{loadError ? 'きろくを よみこめなかったよ。アプリを ひらきなおしてね。' : 'ぼうけんの じゅんびを しているよ…'}</Text>
           )}
