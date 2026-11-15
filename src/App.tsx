@@ -185,12 +185,21 @@ function Adventure() {
                         <>
                           <View accessibilityLiveRegion="polite" style={[styles.feedback, round.feedback === 'incorrect' && styles.incorrect]}>
                             <View style={styles.feedbackHeader}>
-                              {round.feedback === 'correct' && <CorrectSpark />}
-                              <Text accessibilityRole="header" style={styles.feedbackTitle}>
-                                {round.feedback === 'correct' ? 'せいかい！' : 'おしい！'}
+                              <Text accessibilityLabel={round.feedback === 'correct' ? '正解' : '不正解'}
+                                style={[styles.feedbackSymbol, round.feedback === 'incorrect' && styles.incorrectSymbol]}>
+                                {round.feedback === 'correct' ? '〇' : '✕'}
                               </Text>
+                              <View style={styles.feedbackHeading}>
+                                <Text accessibilityRole="header" style={[styles.feedbackTitle, round.feedback === 'incorrect' && styles.incorrectTitle]}>
+                                  {round.feedback === 'correct' ? 'せいかい！' : 'ちがうよ'}
+                                </Text>
+                                {round.feedback === 'correct' && <CorrectSpark />}
+                              </View>
                             </View>
                             <Text style={styles.detail}>きみの こたえは {input.trim()}</Text>
+                            {round.feedback === 'incorrect' && (
+                              <Text style={styles.rightAnswer}>ただしい こたえは {problem.left + problem.right}</Text>
+                            )}
                             <Text style={styles.detail}>{problem.explanation}</Text>
                           </View>
                           <Action label={round.index + 1 === round.problems.length ? 'けっかを みる' : 'つぎの もんだい'} onPress={advance} />
@@ -304,10 +313,15 @@ const styles = StyleSheet.create({
   resultSummary: { color: ink, fontSize: 18, fontWeight: '800', textAlign: 'center', paddingVertical: 3 },
   secondaryAction: { backgroundColor: '#ede9f6' },
   secondaryLabel: { color: '#34386a' },
-  feedbackHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  feedback: { backgroundColor: '#e2eee8', padding: 14, borderRadius: 12, gap: 8 },
-  incorrect: { backgroundColor: '#ece6f6' },
-  feedbackTitle: { color: '#25264b', fontSize: 22, fontWeight: '800' },
+  feedbackHeader: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  feedbackHeading: { flex: 1, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
+  feedback: { backgroundColor: '#e2eee8', borderColor: '#3c9470', borderWidth: 2, padding: 14, borderRadius: 12, gap: 8 },
+  incorrect: { backgroundColor: '#fff0f0', borderColor: '#c33443' },
+  feedbackSymbol: { color: '#176b4c', fontSize: 64, lineHeight: 74, fontWeight: '900', minWidth: 70, textAlign: 'center' },
+  incorrectSymbol: { color: '#b42335' },
+  feedbackTitle: { color: '#176b4c', fontSize: 24, fontWeight: '900' },
+  incorrectTitle: { color: '#b42335' },
+  rightAnswer: { color: '#a01d2d', fontSize: 18, fontWeight: '800', lineHeight: 26 },
   notice: { padding: 12, color: ink },
   error: { color: '#922b2b' },
 });
