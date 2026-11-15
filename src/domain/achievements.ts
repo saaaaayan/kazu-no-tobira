@@ -16,8 +16,8 @@ export function getAchievements(progress: Progress): Achievement[] {
   const perfect = worldStages.filter(stage => isPerfect(stage, progress)).length;
   const secretCleared = worldStages.filter(stage =>
     stage.kind === 'secret' && Boolean(progress.stages[stage.id])).length;
-  const finishedGrades = worldGrades.filter(grade =>
-    grade.stages.every(stage => Boolean(progress.stages[stage.id]))).length;
+  const masteredGrades = worldGrades.filter(grade =>
+    grade.stages.every(stage => isPerfect(stage, progress))).length;
 
   return [
     { id: 'first-step', title: 'はじめての冒険者', description: 'ステージを初めてクリア', category: 'adventure', earned: cleared >= 1 },
@@ -30,7 +30,7 @@ export function getAchievements(progress: Progress): Achievement[] {
     { id: 'fifty-perfect', title: '星を集める者', description: '50ステージでパーフェクト', category: 'mastery', earned: perfect >= 50 },
     { id: 'first-secret', title: '秘密を知る者', description: '隠しステージを初めてクリア', category: 'exploration', earned: secretCleared >= 1 },
     { id: 'twenty-secrets', title: '数の探究者', description: '隠しステージを20個クリア', category: 'exploration', earned: secretCleared >= 20 },
-    { id: 'first-island', title: '一島完全制覇', description: '1つの島の65ステージをクリア', category: 'adventure', earned: finishedGrades >= 1 },
-    { id: 'all-islands', title: '十二島の大賢者', description: '12の島の全ステージをクリア', category: 'mastery', earned: finishedGrades === 12 },
+    { id: 'first-island', title: '一島完全制覇', description: '1つの島の65ステージを全パーフェクト', category: 'adventure', earned: masteredGrades >= 1 },
+    { id: 'all-islands', title: '十二島の大賢者', description: '12の島の全ステージを全パーフェクト', category: 'mastery', earned: masteredGrades === 12 },
   ];
 }
