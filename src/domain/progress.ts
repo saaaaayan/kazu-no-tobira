@@ -11,6 +11,8 @@ export interface Attempt {
 
 export interface StageProgress {
   clearedAt: string;
+  /** Required for new stages to distinguish a normal clear from a perfect run. */
+  perfectAt?: string;
 }
 
 export interface SkillProgress {
