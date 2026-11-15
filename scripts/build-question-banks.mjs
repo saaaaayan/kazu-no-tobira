@@ -1,3 +1,5 @@
+import { countToTwentyPools, countToTwentyStages } from './count-to-twenty-unit.mjs';
+import { validateCountToTwentyBatch } from './validate-count-to-twenty.mjs';
 import { makeTenObjective, makeTenPools, makeTenStages } from './make-ten-unit.mjs';
 import { validateMakeTenBatch } from './validate-make-ten.mjs';
 import { earlySubtractionPools, earlySubtractionStages } from './early-subtraction-unit.mjs';
@@ -256,7 +258,9 @@ validateEarlyAdditionBatch(addition);
 validateEarlySubtractionBatch(subtraction);
 const makeTen = buildUnit(makeTenStages, makeTenPools(), makeTenObjective);
 validateMakeTenBatch(makeTen);
-banks.push(...addition, ...subtraction, ...makeTen);
+const counting = buildUnit(countToTwentyStages, countToTwentyPools(), '20までの かずを、まとまりと ならびで かんがえる。');
+validateCountToTwentyBatch(counting);
+banks.push(...addition, ...subtraction, ...makeTen, ...counting);
 for (const bank of banks) {
   const json = JSON.stringify(bank, null, 2) + '\n';
   await output(new URL(bank.stageId + '.v1.json', directory), json);

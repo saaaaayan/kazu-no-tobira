@@ -1,3 +1,5 @@
+import { countToTwentyStages } from '../scripts/count-to-twenty-unit.mjs';
+import { validateCountToTwentyBatch } from '../scripts/validate-count-to-twenty.mjs';
 import { makeTenStages } from '../scripts/make-ten-unit.mjs';
 import { validateMakeTenBatch } from '../scripts/validate-make-ten.mjs';
 import { validateEarlySubtractionBatch } from '../scripts/validate-early-subtraction.mjs';
@@ -58,7 +60,13 @@ test('10をつくる単元の正答、条件、図、ヒント、途中式、重
   validateMakeTenBatch(makeTenBatch);
 });
 
-test('保存済み2,000問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
+const countToTwentyBatch = banks.filter(bank => countToTwentyStages.some(([id]) => id === bank.stageId));
+test('20までの数の単元を問題文から独立に検証する', () => {
+  assert.equal(countToTwentyBatch.length, 5);
+  validateCountToTwentyBatch(countToTwentyBatch);
+});
+
+test('保存済み2,500問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
   const allIds = new Set();
   const equations = new Set();
   for (const bank of banks) {
@@ -76,7 +84,7 @@ test('保存済み2,000問の問題文から独立して再計算し、途中式
       const signature = JSON.stringify([question.format, task]);
       assert.ok(!mathematicalTasks.has(signature), question.id);
       mathematicalTasks.add(signature);
-      if (!unitBatch.includes(bank) && !subtractionBatch.includes(bank) && !makeTenBatch.includes(bank)) {
+      if (!unitBatch.includes(bank) && !subtractionBatch.includes(bank) && !makeTenBatch.includes(bank) && !countToTwentyBatch.includes(bank)) {
         assert.ok(checkMathAnswer(question, String(solveFromStem(question))), question.id);
       }
       assert.equal(question.hints.length, 3);
@@ -119,7 +127,7 @@ test('保存済み2,000問の問題文から独立して再計算し、途中式
       }
     }
   }
-  assert.equal(allIds.size, 2000);
+  assert.equal(allIds.size, 2500);
   assert.ok(equations.size > 100);
 });
 

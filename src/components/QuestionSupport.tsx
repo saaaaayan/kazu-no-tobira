@@ -9,7 +9,7 @@ export function QuestionDiagram({ diagram, phase }: { diagram: BankDiagram; phas
   if (diagram.kind === 'takeAway') {
     return solved ? (
       <View style={styles.group}>
-        <Text style={styles.groupLabel}>あおは のこり、きいろは とりだした たま</Text>
+        <Text style={styles.groupLabel}>あおは のこり、きいろは とりだした ぶん</Text>
         <TenFrame first={diagram.total - diagram.used} second={diagram.used}/>
       </View>
     ) : <TenFrame first={diagram.total} second={0}/>;
