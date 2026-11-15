@@ -244,7 +244,7 @@ function createStages(def: typeof gradeDefinitions[number]): WorldStage[] {
       id: `${def.id}.x${String(i + 1).padStart(2, '0')}`, gradeId: def.id,
       kind: 'extra', order: 50 + i, unitIndex: i, part: 5,
       title: `EX・${unit.title}`, subtitle: 'おうよう もんだい',
-      family: unit.family, questions: 8,
+      family: unit.family, questions: 10,
     });
   }
   for (let i = 0; i < 5; i++) {
@@ -252,7 +252,7 @@ function createStages(def: typeof gradeDefinitions[number]): WorldStage[] {
       id: `${def.id}.s${String(i + 1).padStart(2, '0')}`, gradeId: def.id,
       kind: 'secret', order: 60 + i, unitIndex: i, part: 6,
       title: `ひみつ・${secretNames[i]}`, subtitle: '数の ふしぎを たんけん',
-      family: 'discovery', questions: 4,
+      family: 'discovery', questions: 10,
     });
   }
   return stages;

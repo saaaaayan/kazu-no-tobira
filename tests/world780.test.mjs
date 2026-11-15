@@ -19,9 +19,7 @@ test('全12学年・各65ステージ（50通常＋10EX＋5隠し）＝780を定
     assert.equal(grade.stages.filter(s=>s.kind==='normal').length,50,grade.id);
     assert.equal(grade.stages.filter(s=>s.kind==='extra').length,10,grade.id);
     assert.equal(grade.stages.filter(s=>s.kind==='secret').length,5,grade.id);
-    assert.equal(grade.stages.filter(s=>s.questions===10).length,50,grade.id);
-    assert.equal(grade.stages.filter(s=>s.questions===8).length,10,grade.id);
-    assert.equal(grade.stages.filter(s=>s.questions===4).length,5,grade.id);
+    assert.ok(grade.stages.every(stage => stage.questions === 10), grade.id);
     assert.ok(grade.stages.every((s,i)=>s.order===i && s.gradeId===grade.id));
   }
   assert.deepEqual(worldGrades[0].stages.slice(0,3).map(s=>s.id),['e1.forest','e1.bridge','e1.tower']);

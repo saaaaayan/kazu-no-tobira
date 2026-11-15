@@ -2,7 +2,10 @@ import { useEffect, useRef, useState, type ComponentRef } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { worldGrades, type WorldGrade, type WorldStage } from './domain/worldCatalog';
-import { generateWorldQuestions, checkMathAnswer, isValidMathAnswer, type MathQuestion } from './domain/worldQuestions';
+import { checkMathAnswer, isValidMathAnswer, type MathQuestion } from './domain/worldQuestions';
+import { isBankQuestion } from './domain/questionBank';
+import { prepareStageRound } from './stageRounds';
+import { TenFrame, WorkedSolution } from './components/QuestionSupport';
 import type { Progress } from './domain/progress';
 import { canPlayWorldStage, progressAfterWorldAnswer, type PlayMode } from './domain/playMode';
 import { adventureTitles } from './domain/titles';
@@ -30,7 +33,7 @@ type Round = {
   results: Feedback[];
   dialogueOffset: number;
   usedHint: boolean;
-  showHint: boolean;
+  hintLevel: number;
   feedback?: Feedback;
   complete?: boolean;
 };
@@ -40,6 +43,9 @@ function AdventureWorld() {
   const [loadError, setLoadError] = useState(false);
   const [screen, setScreen] = useState<Screen>('home');
   const [playMode, setPlayMode] = useState<PlayMode>('normal');
+  const starting = useRef(false);
+  const [loadingRound, setLoadingRound] = useState(false);
+  const [startError, setStartError] = useState('');
   const testRoundSeed = useRef(0);
   const testing = playMode === 'test';
   const [grade, setGrade] = useState<WorldGrade>(worldGrades[0]);
@@ -76,23 +82,36 @@ function AdventureWorld() {
     blockHandwriting(false);
     scroll.current?.scrollTo({ y: 0, animated: false });
   }
-  function start(stage: WorldStage) {
-    if (!progress || !canPlayWorldStage(playMode, progress, stage)) return;
-    resetAnswer();
+  async function start(stage: WorldStage) {
+    if (!progress || starting.current || submitting.current || !canPlayWorldStage(playMode, progress, stage)) return;
+    starting.current = true;
+    setLoadingRound(true);
+    setStartError('');
     const attemptSeed = testing ? testRoundSeed.current++ : progress.attempts.length;
-    setRound({
-      stage,
-      problems: generateWorldQuestions(stage, attemptSeed),
-      index: 0,
-      correct: 0,
-      results: [],
-      dialogueOffset: attemptSeed,
-      usedHint: false,
-      showHint: false,
-    });
+    try {
+      const problems = await prepareStageRound(stage, playMode, attemptSeed);
+      resetAnswer();
+      setRound({
+        stage,
+        problems,
+        index: 0,
+        correct: 0,
+        results: [],
+        dialogueOffset: Math.floor(Math.random() * 1000),
+        usedHint: false,
+        hintLevel: 0,
+      });
+    } catch {
+      setStartError('もんだいを ひらけなかったよ。もういちど えらんでね。');
+    } finally {
+      starting.current = false;
+      setLoadingRound(false);
+    }
   }
 
   const question = round?.problems[round.index];
+  const bankQuestion = question && isBankQuestion(question) ? question : undefined;
+  const hints = bankQuestion?.hints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0;
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
 
@@ -142,13 +161,15 @@ function AdventureWorld() {
     if (!round || !round.feedback) return;
     resetAnswer();
     if (round.index === round.problems.length - 1) {
-      setRound({ ...round, complete: true, showHint: false });
+      setRound({ ...round, complete: true, hintLevel: 0 });
     } else {
-      setRound({ ...round, index: round.index + 1, feedback: undefined, showHint: false });
+      setRound({ ...round, index: round.index + 1, feedback: undefined, hintLevel: 0 });
     }
   }
 
   function goToIsland() {
+    if (starting.current || submitting.current) return;
+    setStartError('');
     resetAnswer();
     setRound(undefined);
     setScreen('island');
@@ -169,7 +190,10 @@ function AdventureWorld() {
     <SafeAreaView style={styles.safe}>
       <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" scrollEnabled={!drawing}
         contentContainerStyle={styles.scroll}>
-        <View style={[styles.shell,round && !round.complete && styles.playShell]}>
+        <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}
+          style={[styles.shell,round && !round.complete && styles.playShell]}>
+          {loadingRound && <Text accessibilityLiveRegion="polite">もんだいを よみこんでいるよ…</Text>}
+          {!!startError && <Text accessibilityLiveRegion="polite" style={styles.error}>{startError}</Text>}
           {screen === 'home' && !round ? (
             <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress}
               onStart={() => { resetAnswer(); setScreen('world'); }} />
@@ -236,6 +260,7 @@ function AdventureWorld() {
                       variation={round.dialogueOffset + round.index}/>
                     <Text style={styles.difficulty}>{round.stage.kind==='secret'?'✦ ひみつの なぞ':round.stage.kind==='extra'?'★ EXチャレンジ':round.index<3?'● きほん':round.index<8?'● ひょうじゅん':'★ おうよう'}</Text>
                     <MathText style={styles.questionText} value={question.question}/>
+                    {bankQuestion?.diagram && <TenFrame diagram={bankQuestion.diagram} revealSecond={!round.feedback} />}
                     <MathText style={styles.prompt} value={question.prompt}/>
                   </View>
                   <View style={[styles.workArea,wide&&styles.workWide]}>
@@ -255,7 +280,9 @@ function AdventureWorld() {
                             </View>
                             <MathText style={styles.yourAnswer} prefix="きみの こたえ：" value={answer} format={question.type === 'choice'}/>
                             {round.feedback==='incorrect'&&<MathText style={styles.answerHint} prefix="ただしい こたえ：" value={question.answer}/>}
-                            <MathText style={styles.explanation} value={question.explanation}/>
+                            {bankQuestion
+                              ? <WorkedSolution question={bankQuestion} wrongAnswer={round.feedback === 'incorrect' ? answer : undefined}/>
+                              : <MathText style={styles.explanation} value={question.explanation}/>}
                           </View>
                           {round.feedback==='correct'&&<ComboBadge results={round.results}/>}
                           <GameButton gold label={round.index+1===round.problems.length?'けっかを みる':'つぎの もんだいへ'} onPress={advance}/>
@@ -314,13 +341,20 @@ function AdventureWorld() {
                               )}
                             </>
                           )}
-                          {!round.showHint && (
-                            <Pressable accessibilityRole="button" onPress={()=>setRound({...round,showHint:true,usedHint:true})} style={styles.hintButton}>
-                              <Text style={styles.hintButtonText}>💡 ヒントを みる</Text>
+                          {hints.slice(0, round.hintLevel).map((hint, i) => (
+                            <View key={i} style={styles.hintBox}>
+                              <MathText style={styles.hintText} prefix={bankQuestion ? 'ヒント ' + (i + 1) + '　' : '💡 '} value={hint}/>
+                            </View>
+                          ))}
+                          {round.hintLevel < hints.length && (
+                            <Pressable accessibilityRole="button"
+                              onPress={() => setRound(current => current && !current.feedback && current.hintLevel < hints.length
+                                ? { ...current, hintLevel: current.hintLevel + 1, usedHint: true }
+                                : current)} style={styles.hintButton}>
+                              <Text style={styles.hintButtonText}>{bankQuestion
+                                ? ['ヒント1を みる', 'もうすこし ヒントを みる', 'さいごの ヒントを みる'][round.hintLevel]
+                                : '💡 ヒントを みる'}</Text>
                             </Pressable>
-                          )}
-                          {round.showHint && (
-                            <View style={styles.hintBox}><MathText style={styles.hintText} prefix="💡 " value={question.hint}/></View>
                           )}
                           {!!message&&<Text accessibilityLiveRegion="polite" style={styles.error}>{message}</Text>}
                           <GameButton label={saving?'きろくしているよ…':'こたえあわせ'} onPress={submit}

@@ -61,6 +61,6 @@ test('checks mathematical notation across every stage and renders varied example
     assert.match(svg.xml, /<path /, latex);
     assert.ok(svg.width > 0 && svg.height > 0, latex);
   }
-  assert.equal(questionCount, 14400);
+  assert.equal(questionCount, 15600);
   t.diagnostic(questionCount + ' questions; ' + shapes.size + ' expression shapes rendered');
 });

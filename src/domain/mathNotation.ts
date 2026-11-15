@@ -6,7 +6,7 @@ const symbols: Record<string, string> = {
   '＋':'+', '−':'-', '＝':'=', '×':'\\times ', '÷':'\\div ',
   '≤':'\\le ', '≥':'\\ge ', '≠':'\\ne ', '∩':'\\cap ', '∪':'\\cup ',
   '∞':'\\infty ', '→':'\\to ', 'π':'\\pi ', '…':'\\ldots ', '・':'\\cdot ',
-  '？':'?', '%':'\\%', '°':'^{\\circ}',
+  '？':'?', '□':'\\square ', '%':'\\%', '°':'^{\\circ}',
 };
 
 function toLatex(source: string): string {
@@ -20,7 +20,7 @@ function toLatex(source: string): string {
   if (indefinite) return '\\int ' + toLatex(indefinite[1]) + '\\,\\mathrm{d}x = ' + toLatex(indefinite[2]);
   // Match complete single-level operands before replacing individual symbols.
   const operand = /(?:√\([^()]+\)|√\d+|\([^()]+\)|\d+(?:\.\d+)?|[a-z])(?:\^(?:\([^()]+\)|\d+|[a-z])|[²³⁴])?/.source;
-  const terms = new RegExp('(' + operand + ')/([−-]?' + operand + ')|√(?:\\(([^()]+)\\)|(\\d+))|\\^\\(([^()]+)\\)|\\^(\\d+|[a-z])|_(\\d+|[a-z])|(?:sin|cos|tan|log)(?![a-z])|cm[²³]|km|kg|dL|cm|(?<=[0-9])[mgL]\\b|vec\\(([ab])\\)|[²³⁴＋−＝×÷≤≥≠∩∪∞→π…・？%°]', 'g');
+  const terms = new RegExp('(' + operand + ')/([−-]?' + operand + ')|√(?:\\(([^()]+)\\)|(\\d+))|\\^\\(([^()]+)\\)|\\^(\\d+|[a-z])|_(\\d+|[a-z])|(?:sin|cos|tan|log)(?![a-z])|cm[²³]|km|kg|dL|cm|(?<=[0-9])[mgL]\\b|vec\\(([ab])\\)|[²³⁴＋−＝×÷≤≥≠∩∪∞→π…・？%°□]', 'g');
   const ungroup = (x: string) => x.startsWith('(') && x.endsWith(')') ? x.slice(1, -1) : x;
   return source.replace(terms, (token, num, den, radGroup, radNum, expGroup, exp, sub, vec) => {
     if (num !== undefined) return '\\frac{' + toLatex(ungroup(num)) + '}{' + toLatex(ungroup(den)) + '}';
@@ -39,8 +39,8 @@ function toLatex(source: string): string {
 
 // Legacy curriculum templates use ASCII/Unicode notation next to Japanese prose.
 // Tokenize only those authored strings, preserving punctuation and prose verbatim.
-const mathRun = /[A-Za-z0-9()[\].,'+−＋=＝×÷\-*/^_<>≤≥≠∩∪∞→π…・？%°²³⁴√∫Σ:]+(?:[ \t]+[A-Za-z0-9()[\].,'+−＋=＝×÷\-*/^_<>≤≥≠∩∪∞→π…・？%°²³⁴√∫Σ:]+)*/g;
-const notation = /[A-Za-z√∫Σ∞π_²³⁴×÷＋−=＝<>≤≥≠∩∪^%°]|\d…|[0-9][+\-*/:,]|[+\-*/:][0-9]/;
+const mathRun = /[A-Za-z0-9()[\].,'+−＋=＝×÷\-*/^_<>≤≥≠∩∪∞→π…・？□%°²³⁴√∫Σ:]+(?:[ \t]+[A-Za-z0-9()[\].,'+−＋=＝×÷\-*/^_<>≤≥≠∩∪∞→π…・？□%°²³⁴√∫Σ:]+)*/g;
+const notation = /[A-Za-z√∫Σ∞π□_²³⁴×÷＋−=＝<>≤≥≠∩∪^%°]|\d…|[0-9][+\-*/:,]|[+\-*/:][0-9]/;
 
 export function formatMathText(source: string): MathPart[] {
   const parts: MathPart[] = [];
