@@ -1,5 +1,5 @@
-import { firstGradeStages, gradeIds, type GradeId, type StageId } from './curriculum';
-import type { Progress } from './progress';
+import { firstGradeStages, gradeIds, type GradeId, type StageId } from './curriculum.ts';
+import type { Progress } from './progress.ts';
 
 // Structural plan only: 'planned' does NOT indicate reviewed curriculum content.
 export type StageKind = 'normal' | 'extra' | 'secret';
