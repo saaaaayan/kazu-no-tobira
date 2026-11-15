@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { type BankDiagram, type BankQuestion, mistakenReason } from '../domain/questionBank';
-import { MathText } from './MathText';
+import type { SolutionStep } from '../domain/writtenSolution';
+import { MathDisplay, MathText } from './MathText';
 
 export function QuestionDiagram({ diagram, phase }: { diagram: BankDiagram; phase: 'question' | 'hint' | 'solution' }) {
   if (diagram.kind === 'tenFrame') return <TenFrame first={diagram.first} second={diagram.second ?? 0} third={diagram.third}/>;
@@ -94,18 +95,27 @@ function TenFrame({ first, second, third = 0 }: { first: number; second: number;
   );
 }
 
+export function WrittenSolution({ steps }: { steps: readonly SolutionStep[] }) {
+  return <View style={styles.details}>
+    {steps.some(step => step.equations?.length) && <Text accessibilityRole="header" style={styles.modelTitle}>記述式の模範解答</Text>}
+    {steps.map((step, index) => (
+    <View key={step.title} style={styles.step}>
+      <Text accessibilityRole="header" style={styles.title}>{index + 1}．{step.title}</Text>
+      <MathText value={step.body} style={styles.body} />
+      {!!step.equations?.length && <View style={styles.equations}>
+        {step.equations.map((latex, i) => <MathDisplay key={i} latex={latex} />)}
+      </View>}
+    </View>
+  ))}</View>;
+}
+
 export function WorkedSolution({ question, wrongAnswer }: { question: BankQuestion; wrongAnswer?: string }) {
   const reason = wrongAnswer === undefined ? undefined : mistakenReason(question, wrongAnswer);
   return (
     <View style={styles.details}>
       {reason && <MathText value={reason} style={styles.reason} />}
       {question.diagram && <QuestionDiagram diagram={question.diagram} phase="solution" />}
-      {question.steps.map((step, index) => (
-        <View key={step.title} style={styles.step}>
-          <Text accessibilityRole="header" style={styles.title}>{index + 1}．{step.title}</Text>
-          <MathText value={step.body} style={styles.body} />
-        </View>
-      ))}
+      <WrittenSolution steps={question.steps} />
     </View>
   );
 }
@@ -125,9 +135,11 @@ const styles = StyleSheet.create({
   blue: { backgroundColor: '#244b97', borderColor: '#244b97' },
   red: { backgroundColor: '#c54a40', borderColor: '#78261e' },
   gold: { backgroundColor: '#efb857', borderColor: '#885517' },
-  details: { gap: 12, paddingTop: 8 },
+  details: { gap: 12, paddingTop: 8, minWidth: 0 },
+  equations: { alignSelf: 'stretch', minWidth: 0, gap: 6, padding: 9, backgroundColor: '#eef3ff', borderRadius: 8 },
   step: { gap: 4, borderTopWidth: 1, borderColor: '#c5cbd8', paddingTop: 8 },
   title: { color: '#243458', fontSize: 16, fontWeight: '800' },
+  modelTitle: { color: '#243458', fontSize: 20, fontWeight: '900' },
   body: { color: '#263659', fontSize: 17, lineHeight: 25 },
   reason: { color: '#823b36', fontSize: 17, lineHeight: 25, fontWeight: '700' },
 });

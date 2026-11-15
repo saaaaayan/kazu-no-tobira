@@ -1,3 +1,4 @@
+import { highSchoolSolutions as hs, discoverySolution, logicSolution, type SolutionStep } from './writtenSolution.ts';
 import { clockLabel } from './clockFace.ts';
 import type { WorldStage } from './worldCatalog.ts';
 import type { SkillId } from './curriculum.ts';
@@ -10,6 +11,7 @@ export type MathQuestion = {
   answer: string;
   choices?: readonly string[];
   explanation: string;
+  steps?: readonly SolutionStep[];
   hint: string;
   clock?: { start: number; end: number; read: boolean };
   skillId: SkillId;
@@ -88,10 +90,14 @@ function concept(question: string, correct: string, other: readonly string[], r:
 function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQuestion, 'id' | 'skillId'> {
   const diff = stage.kind !== 'normal' ? 2 : index < 3 ? 0 : index < 8 ? 1 : 2;
   const grade = levels[stage.gradeId];
+  const formal = (q: Omit<MathQuestion, 'id' | 'skillId'>, get: () => readonly SolutionStep[]) => grade >= 10 ? { ...q, steps: get() } : q;
   const unit = stage.family;
   const code = stage.subtitle;
   const n = (a: number, b: number) => r.int(a, b);
-  if (stage.kind === 'secret') return discovery(stage, index, r);
+  if (stage.kind === 'secret') {
+    const q = discovery(stage, index, r);
+    return formal(q, () => discoverySolution((stage.order - 60 + index) % 10, Number(q.answer)));
+  }
   if (stage.id === 'e1.forest') {
     const a = n(0, 6), b = n(0, 9 - a);
     return numeric(`${a} ＋ ${b} ＝ ？`, a + b, `${a}と${b}を あわせると${a + b}。`);
@@ -274,8 +280,8 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         return numeric(question, answer, explanation);
       }
       const a = n(2, 10), b = n(2, 10);
-      return numeric(`たて ${a}cm、よこ ${b}cm の長方形の周りの長さは？（cm）`, 2 * (a + b),
-        `(${a}+${b})×2 = ${2 * (a + b)}cm。`);
+      return formal(numeric(`たて ${a}cm、よこ ${b}cm の長方形の周りの長さは？（cm）`, 2 * (a + b),
+        `(${a}+${b})×2 = ${2 * (a + b)}cm。`), () => hs.perimeter(a,b));
     }
     case 'operation': {
       const a = n(3, 15), b = n(2, 9), c = n(2, 7);
@@ -309,7 +315,7 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
     case 'divisor': {
       const a = n(2, 9), b = n(2, 9);
       const g = gcd(a, b);
-      return numeric(`${a * 2} と ${b * 2} の最大公約数は？`, 2 * g, '共通の約数のうち 最大のものを探そう。');
+      return formal(numeric(`${a * 2} と ${b * 2} の最大公約数は？`, 2 * g, '共通の約数のうち 最大のものを探そう。'), () => hs.divisor(2*a,2*b));
     }
     case 'percent': {
       const base = n(2, 20) * 20, pct = r.pick([10,20,25,50,75]);
@@ -340,10 +346,10 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
     case 'data': {
       const mid = n(6, 18), spread = n(1, 5);
       const a = mid - spread, b = mid, c = mid + spread;
-      if (grade >= 8 && index % 2) return numeric(`${a}, ${b}, ${c} の中央値は？`, b,
-        '小さい順にならべて、真ん中の値をとるよ。');
-      return numeric(`${a}, ${b}, ${c} の平均は？`, mid,
-        '合計をデータの個数で割るよ。');
+      if (grade >= 8 && index % 2) return formal(numeric(`${a}, ${b}, ${c} の中央値は？`, b,
+        '小さい順にならべて、真ん中の値をとるよ。'), () => hs.data(a,b,c,true));
+      return formal(numeric(`${a}, ${b}, ${c} の平均は？`, mid,
+        '合計をデータの個数で割るよ。'), () => hs.data(a,b,c,false));
     }
     case 'speed': {
       const speed = n(3, 18), time = n(2, 7);
@@ -356,12 +362,12 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
     }
     case 'expression': {
       const a = n(1, 7), b = n(1, 7);
-      if (index % 2 === 0) return choice(`${a}x ＋ ${b}x を整理すると？`, `${a+b}x`,
+      if (index % 2 === 0) return formal(choice(`${a}x ＋ ${b}x を整理すると？`, `${a+b}x`,
         [`${a*b}x`, `${a+b}x²`, `${a-b}x`, `${a}x＋${b}`, `${a+b+1}x`],
-        '同じ文字の項は係数をたすよ。', r);
+        '同じ文字の項は係数をたすよ。', r), () => hs.likeTerms(a,b));
       const x = n(-5,5);
-      return numeric(`x=${x} のとき ${a}x＋${b} の値は？`, a*x+b,
-        `xに${x}を代入して計算するよ。`);
+      return formal(numeric(`x=${x} のとき ${a}x＋${b} の値は？`, a*x+b,
+        `xに${x}を代入して計算するよ。`), () => hs.substitute(a,b,x));
     }
     case 'equation': {
       const x = n(-8, 12), a = n(2, 7), b = n(1, 15);
@@ -422,10 +428,10 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
     }
     case 'probability': {
       const total = n(4,16), count = n(1,total-1);
-      return choice(`袋に赤玉${count}個、青玉${total-count}個。1個取り出して赤玉の確率は？`,
+      return formal(choice(`袋に赤玉${count}個、青玉${total-count}個。1個取り出して赤玉の確率は？`,
         fraction(count,total), [fraction(total-count,total), fraction(count,total+1),
           fraction(count,total-1), '1', '0', fraction(count+1,total)],
-        '赤玉の数÷玉の総数で求めるよ。', r);
+        '赤玉の数÷玉の総数で求めるよ。', r), () => hs.sampling(total,count,fraction(count,total)));
     }
     case 'radical': {
       const a = n(2, 13);
@@ -433,10 +439,10 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
     }
     case 'factor': {
       const a = n(1, 9), b = n(1, 9);
-      return choice(`(x＋${a})(x＋${b}) を展開すると？`,
+      return formal(choice(`(x＋${a})(x＋${b}) を展開すると？`,
         `x²＋${a+b}x＋${a*b}`,
         [`x²＋${a*b}x＋${a+b}`, `x²＋${a+b}x＋${a+b}`, `x²＋${a*b}x＋${a*b}`, `x²＋${a+b+1}x＋${a*b}`, `x²＋${a+b}x＋${a*b+1}`],
-        `x²＋(${a}＋${b})x＋${a}×${b}。`, r);
+        `x²＋(${a}＋${b})x＋${a}×${b}。`, r), () => hs.expand(a,b));
     }
     case 'quadratic': {
       const x = n(2, 8), y = n(1, x-1);
@@ -445,8 +451,8 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
     }
     case 'quadraticFunction': {
       const a = n(1, 5), b = n(-6, 6), c = n(-5, 8);
-      return numeric(`y=${a}(x−(${b}))²＋(${c}) の頂点のx座標は？`, b,
-        `頂点は (${b},${c}) だよ。`);
+      return formal(numeric(`y=${a}(x−(${b}))²＋(${c}) の頂点のx座標は？`, b,
+        `頂点は (${b},${c}) だよ。`), () => hs.vertex(a,b,c));
     }
     case 'pythagoras': {
       const triple = r.pick([[3, 4, 5], [5, 12, 13], [8, 15, 17], [7, 24, 25]] as const);
@@ -488,14 +494,15 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         ['「x=3ならx²=9」の対偶は？', 'x²≠9ならx≠3',
           ['x²=9ならx=3', 'x≠3ならx²≠9', 'x²≠9ならx=3']],
       ];
-      const [question, answer, alternatives] = r.pick(logicFacts);
-      return concept(question, answer, alternatives, r);
+      const fact = r.pick(logicFacts);
+      const [question, answer, alternatives] = fact;
+      return formal(concept(question, answer, alternatives, r), () => logicSolution(logicFacts.indexOf(fact),answer));
     }
     case 'inequality': {
       const a = n(1, 24);
-      return choice(`x²−${a*a}<0 の解は？`, `−${a}<x<${a}`,
+      return formal(choice(`x²−${a*a}<0 の解は？`, `−${a}<x<${a}`,
         [`x<−${a} または x>${a}`, `x>${a}`, `x<−${a}`, `−${a}≤x≤${a}`],
-        `x²<${a*a} は −${a}<x<${a} を表す。`, r);
+        `x²<${a*a} は −${a}<x<${a} を表す。`, r), () => hs.inequality(a));
     }
     case 'trig': {
       const identities: readonly [string, string][] = [
@@ -506,64 +513,64 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         ['tan 0°','0'], ['tan 30°','√3/3'], ['tan 45°','1'], ['tan 60°','√3'],
       ];
       const [expression, ans] = r.pick(identities);
-      return choice(`${expression} の値は？`, ans,
+      return formal(choice(`${expression} の値は？`, ans,
         ['0', '1/2', '√2/2', '√3/2', '√3/3', '1', '√3', '2'].filter(x=>x!==ans),
-        '基本的な角度の三角比を確認しよう。', r);
+        '基本的な角度の三角比を確認しよう。', r), () => hs.trig(expression,ans));
     }
     case 'combinatorics': {
       const a = n(4,11), b = n(2,4);
       let result = 1;
       for(let k = 0; k<b; k++) result *= a-k;
-      return numeric(`${a}人から順番に${b}人選ぶ並べ方は何通り？`, result,
-        `順番を考えるから${Array.from({length:b},(_,i)=>a-i).join('×')}。`);
+      return formal(numeric(`${a}人から順番に${b}人選ぶ並べ方は何通り？`, result,
+        `順番を考えるから${Array.from({length:b},(_,i)=>a-i).join('×')}。`), () => hs.permutation(a,b,result));
     }
     case 'complex': {
       const pow = n(1,12), ans = ['1','i','−1','−i'][pow%4];
-      return choice(`虚数単位 i の ${pow}乗、i^${pow} は？`,ans,
+      return formal(choice(`虚数単位 i の ${pow}乗、i^${pow} は？`,ans,
         ['1','i','−1','−i'].filter(x=>x!==ans),
-        'i²=−1で、4乗ごとに同じ値へ戻るよ。',r);
+        'i²=−1で、4乗ごとに同じ値へ戻るよ。',r), () => hs.complex(pow,ans));
     }
     case 'coordinateGeometry': {
       const a = n(-5,5), b = n(-5,5), scale = n(1, 4);
-      return numeric(`点(${a},${b}) と(${a+3*scale},${b+4*scale})の距離は？`,5*scale,
-        `2点間の距離は √(${3*scale}²＋${4*scale}²)＝${5*scale}。`);
+      return formal(numeric(`点(${a},${b}) と(${a+3*scale},${b+4*scale})の距離は？`,5*scale,
+        `2点間の距離は √(${3*scale}²＋${4*scale}²)＝${5*scale}。`), () => hs.distance(a,b,scale));
     }
     case 'exponential': {
       const a = n(2,5), p = n(2,5);
-      if(index%2) return numeric(`log_${a}(${a**p})＝？`,p,
-        `${a}の${p}乗が${a**p}だから答えは${p}。`);
-      return numeric(`${a}^${p}＝？`,a**p,`${a}を${p}回かけると${a**p}。`);
+      if(index%2) return formal(numeric(`log_${a}(${a**p})＝？`,p,
+        `${a}の${p}乗が${a**p}だから答えは${p}。`), () => hs.exponential(a,p,true));
+      return formal(numeric(`${a}^${p}＝？`,a**p,`${a}を${p}回かけると${a**p}。`), () => hs.exponential(a,p,false));
     }
     case 'calculus': {
       const a = n(1,7), power=n(2,5), x=n(1,4);
-      return numeric(`f(x)=${monomial(a, power)} のとき、f'(${x}) の値は？`,
+      return formal(numeric(`f(x)=${monomial(a, power)} のとき、f'(${x}) の値は？`,
         a*power*x**(power-1),
-        `導関数は f'(x)=${monomial(a * power, power - 1)}。x=${x}を代入しよう。`);
+        `導関数は f'(x)=${monomial(a * power, power - 1)}。x=${x}を代入しよう。`), () => hs.derivative(a,power,x));
     }
     case 'integral': {
       const p = n(1,3), to=n(2,4), a=(p+1)*n(1,4);
-      return numeric(`∫[0,${to}] ${monomial(a, p)} dx は？`,
+      return formal(numeric(`∫[0,${to}] ${monomial(a, p)} dx は？`,
         a/(p+1)*to**(p+1),
         `不定積分は ∫ ${monomial(a, p)} dx = ${monomial(a / (p + 1), p + 1)}+C。原始関数の上端と下端での値の差を求めよう。`,
-        `まず x^${p} の原始関数を考えよう。`);
+        `まず x^${p} の原始関数を考えよう。`), () => hs.integral(a,p,to));
     }
     case 'sequence': {
       const a = n(1,7), d=n(2,7), k=n(4,9);
-      return numeric(`初項${a}、公差${d}の等差数列の第${k}項は？`,a+(k-1)*d,
-        `一般項は a_n=${a}+(n-1)×${d}。n=${k}を代入しよう。`);
+      return formal(numeric(`初項${a}、公差${d}の等差数列の第${k}項は？`,a+(k-1)*d,
+        `一般項は a_n=${a}+(n-1)×${d}。n=${k}を代入しよう。`), () => hs.sequence(a,d,k));
     }
     case 'vector': {
       const a=n(-5,5),b=n(-5,5),c=n(-5,5),d=n(-5,5);
-      return numeric(`vec(a)=(${a},${b}), vec(b)=(${c},${d}) の内積 vec(a)・vec(b) は？`,
-        a*c+b*d,'対応する成分どうしをかけてたそう。');
+      return formal(numeric(`vec(a)=(${a},${b}), vec(b)=(${c},${d}) の内積 vec(a)・vec(b) は？`,
+        a*c+b*d,'対応する成分どうしをかけてたそう。'), () => hs.vector(a,b,c,d));
     }
     case 'limit': {
       const a=n(1,12), b=n(1,15);
-      if (index % 3 === 0) return choice(`lim[n→∞] ${a}/(n＋${b}) の値は？`, '0',
+      if (index % 3 === 0) return formal(choice(`lim[n→∞] ${a}/(n＋${b}) の値は？`, '0',
         ['1', '∞', String(a), '1/2', '−1'],
-        '分子は一定で、分母は無限に大きくなるから0に近づくよ。', r);
-      return numeric(`lim[x→${a}] (x²＋${b}) は？`, a*a+b,
-        `連続な多項式だからx=${a}を代入して${a*a+b}。`);
+        '分子は一定で、分母は無限に大きくなるから0に近づくよ。', r), () => hs.limit(a,b,true));
+      return formal(numeric(`lim[x→${a}] (x²＋${b}) は？`, a*a+b,
+        `連続な多項式だからx=${a}を代入して${a*a+b}。`), () => hs.limit(a,b,false));
     }
     case 'mixed': {
       const families = grade<=9?['quadratic','pythagoras','probability','function']:['calculus','integral','sequence','vector'];
