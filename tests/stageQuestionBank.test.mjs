@@ -1,3 +1,5 @@
+import { validateEarlySubtractionBatch } from '../scripts/validate-early-subtraction.mjs';
+import { earlySubtractionStages } from '../scripts/early-subtraction-unit.mjs';
 import { validateEarlyAdditionBatch } from '../scripts/validate-early-addition.mjs';
 import { earlyAdditionStages } from '../scripts/early-addition-unit.mjs';
 import assert from 'node:assert/strict';
@@ -42,7 +44,13 @@ test('足し算バッチを解法別に検証し、ステージ間の重複を�
   validateEarlyAdditionBatch(unitBatch);
 });
 
-test('保存済み1,000問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
+const subtractionBatch = banks.filter(bank => earlySubtractionStages.some(([id]) => id === bank.stageId));
+test('引き算バッチの数学とステージ間の重複を検証する', () => {
+  assert.equal(subtractionBatch.length, 5);
+  validateEarlySubtractionBatch(subtractionBatch);
+});
+
+test('保存済み1,500問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
   const allIds = new Set();
   const equations = new Set();
   for (const bank of banks) {
@@ -60,7 +68,7 @@ test('保存済み1,000問の問題文から独立して再計算し、途中式
       const signature = JSON.stringify([question.format, task]);
       assert.ok(!mathematicalTasks.has(signature), question.id);
       mathematicalTasks.add(signature);
-      if (!unitBatch.includes(bank)) {
+      if (!unitBatch.includes(bank) && !subtractionBatch.includes(bank)) {
         assert.ok(checkMathAnswer(question, String(solveFromStem(question))), question.id);
       }
       assert.equal(question.hints.length, 3);
@@ -103,7 +111,7 @@ test('保存済み1,000問の問題文から独立して再計算し、途中式
       }
     }
   }
-  assert.equal(allIds.size, 1000);
+  assert.equal(allIds.size, 1500);
   assert.ok(equations.size > 100);
 });
 

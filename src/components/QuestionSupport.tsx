@@ -6,6 +6,14 @@ export function QuestionDiagram({ diagram, phase }: { diagram: BankDiagram; phas
   if (diagram.kind === 'tenFrame') return <TenFrame first={diagram.first} second={diagram.second ?? 0} third={diagram.third}/>;
 
   const solved = phase === 'solution';
+  if (diagram.kind === 'takeAway') {
+    return solved ? (
+      <View style={styles.group}>
+        <Text style={styles.groupLabel}>あおは のこり、きいろは とりだした たま</Text>
+        <TenFrame first={diagram.total - diagram.used} second={diagram.used}/>
+      </View>
+    ) : <TenFrame first={diagram.total} second={0}/>;
+  }
   const moved = solved ? 10 - diagram.inside : 0;
   const outside = diagram.outside - moved;
   return (
