@@ -194,10 +194,17 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
       return numeric(question, ans, `${explanation}。だから ${ans}。`);
     }
     case 'shape': {
-      const topics = ['三角形', '四角形', '五角形', '六角形'];
-      const sides = [3, 4, 5, 6];
-      const at = n(0, grade <= 2 ? 1 : 3);
-      return numeric(`${topics[at]}の 辺は何本？`, sides[at], `${topics[at]}には${sides[at]}本の 辺があるよ。`);
+      const topics = ['三角形', '四角形', '正方形', '長方形', 'ひし形'];
+      const edges = [3, 4, 4, 4, 4];
+      const at = n(0, topics.length - 1);
+      const count = edges[at];
+      const format = n(0, 2);
+      if (format === 0) return numeric(`${topics[at]}の まっすぐな辺は何本？`, count,
+        `${topics[at]}の 辺は${count}本だよ。`);
+      if (format === 1) return numeric(`${topics[at]}の かどは何こ？`, count,
+        `${topics[at]}には${count}この かどがあるよ。`);
+      return numeric(`${topics[at]}を2つ べつべつに おくと、辺は あわせて何本？`,
+        count * 2, `${count}＋${count}＝${count * 2}本だよ。`);
     }
     case 'geometry': {
       if (stage.subtitle.includes('円と')) {
@@ -210,13 +217,41 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
           `${a}×${scale}＝${a * scale}cm。`);
       }
       if (stage.subtitle.includes('合同')) {
-        return concept('合同な三角形の 対応する辺の長さは？', '等しい', ['すべて異なる', '必ず2倍', '必ず0になる'], r);
+        const length = n(2, 36), mode = index % 3;
+        if (mode === 0) return numeric(
+          `合同な三角形ABCとDEFで AB＝${length}cm。対応するDEの長さは？（cm）`,
+          length, '合同な図形では対応する辺の長さが等しいよ。');
+        if (mode === 1) return numeric(
+          `合同な2つの図形の一方の周りは${length}cm。もう一方の周りは？（cm）`,
+          length, '合同なら周りの長さも等しいよ。');
+        return numeric(
+          `合同な三角形の対応する角Aが${length}°。角Dは何度？`,
+          length, '合同な図形の対応する角は等しいよ。');
       }
       if (stage.subtitle.includes('対称')) {
-        return concept('線対称な図形を 対称の軸で折ると？', 'ぴったり重なる', ['必ず2倍になる', '必ずずれる', '辺が消える'], r);
+        const distance = n(2, 35);
+        return numeric(`線対称な図形で 点Aは対称の軸から${distance}cm。対応する点Bは軸から何cm？`,
+          distance, '線対称の対応する点は軸から同じ距離にあるよ。');
       }
       if (stage.subtitle.includes('立方体')) {
-        return numeric('立方体の 頂点はいくつ？', 8, '立方体には 頂点が8個あるよ。');
+        const shapeQuestions: readonly [string, number, string][] = [
+          ['立方体の 頂点はいくつ？', 8, '頂点は8こだよ。'],
+          ['直方体の 頂点はいくつ？', 8, '頂点は8こだよ。'],
+          ['立方体の 面はいくつ？', 6, '面は6つだよ。'],
+          ['直方体の 面はいくつ？', 6, '面は6つだよ。'],
+          ['立方体の 辺は何本？', 12, '辺は12本だよ。'],
+          ['直方体の 辺は何本？', 12, '辺は12本だよ。'],
+          ['立方体の 1つの頂点に集まる辺は何本？', 3, '3本の辺が集まるよ。'],
+          ['直方体の 1つの頂点に集まる辺は何本？', 3, '3本の辺が集まるよ。'],
+          ['立方体の 隣り合う辺の角度は何度？', 90, '直角の90°だよ。'],
+          ['直方体の 隣り合う辺の角度は何度？', 90, '直角の90°だよ。'],
+          ['立方体の 3つの面が集まる頂点は何こ？', 8, '8この頂点があるよ。'],
+          ['直方体の 3つの面が集まる頂点は何こ？', 8, '8この頂点があるよ。'],
+          ['立方体には 向かい合う面の組が何組ある？', 3, '面は6つで3組になるよ。'],
+          ['直方体には 向かい合う面の組が何組ある？', 3, '面は6つで3組になるよ。'],
+        ];
+        const [question, answer, explanation] = r.pick(shapeQuestions);
+        return numeric(question, answer, explanation);
       }
       const a = n(2, 10), b = n(2, 10);
       return numeric(`たて ${a}cm、よこ ${b}cm の長方形の周りの長さは？（cm）`, 2 * (a + b),
