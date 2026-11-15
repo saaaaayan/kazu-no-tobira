@@ -4,14 +4,16 @@ import type { MathQuestion } from './worldQuestions.ts';
 
 export type BankDiagram = { kind: 'tenFrame'; first: number; second?: number; third?: number }
   | { kind: 'transferToTen'; inside: number; outside: number }
-  | { kind: 'takeAway'; total: number; used: number };
+  | { kind: 'takeAway'; total: number; used: number }
+  | { kind: 'borrowTen'; total: number; used: number };
 export type BankQuestion = MathQuestion & {
   format: 'calculation' | 'missingPart' | 'story' | 'decomposition' | 'comparison' | 'position' | 'interval' | 'sequence' | 'line' | 'reverseTransfer'
     | 'joinThree' | 'target' | 'splitTotal' | 'compareGroups' | 'returnSome' | 'refill' | 'twoCollections'
     | 'takeAway' | 'takeTwice' | 'startAmount' | 'unknownLast' | 'compareAfter' | 'moveAway' | 'equalize' | 'comparedStart'
     | 'tenCompareGaps' | 'tenAfterRemoval' | 'tenSecondSource' | 'tenReserved' | 'tenEqualShare' | 'tenTrimAfterTwo' | 'tenShift'
     | 'twentyBundle' | 'twentyOnes' | 'twentyPosition' | 'twentyInner' | 'twentyMiddle' | 'twentyNearest' | 'twentyTwoMoves' | 'twentyOrder'
-    | 'carryThenUse' | 'carryFindFirstGain' | 'carryCompare' | 'carryThreeGroups' | 'carryPackTarget';
+    | 'carryThenUse' | 'carryFindFirstGain' | 'carryCompare' | 'carryThreeGroups' | 'carryPackTarget'
+    | 'borrowDirect' | 'borrowThenUse' | 'borrowFindLater' | 'borrowNeedMore' | 'borrowCompare';
   difficulty: 1 | 2 | 3;
   hints: readonly [string, string, string];
   steps: readonly { title: string; body: string }[];
