@@ -1,5 +1,6 @@
 import { bankStageIds } from './bankStageIds.ts';
 export { bankStageIds };
+import type { SolutionStep } from './writtenSolution.ts';
 import type { MathQuestion } from './worldQuestions.ts';
 
 export type BankDiagram = { kind: 'tenFrame'; first: number; second?: number; third?: number }
@@ -19,7 +20,7 @@ export type BankQuestion = MathQuestion & {
   topic?: string;
   difficulty: 1 | 2 | 3;
   hints: readonly [string, string, string];
-  steps: readonly { title: string; body: string }[];
+  steps: readonly SolutionStep[];
   mistakes: readonly { answer?: string; explanation: string }[];
   diagram?: BankDiagram;
 };

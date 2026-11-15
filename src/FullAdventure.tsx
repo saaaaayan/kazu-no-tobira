@@ -5,7 +5,7 @@ import { worldIslands, type WorldGrade, type WorldStage } from './domain/worldCa
 import { checkMathAnswer, isValidMathAnswer, type MathQuestion } from './domain/worldQuestions';
 import { isBankQuestion } from './domain/questionBank';
 import { prepareStageRound } from './stageRounds';
-import { QuestionDiagram, WorkedSolution } from './components/QuestionSupport';
+import { QuestionDiagram, WorkedSolution, WrittenSolution } from './components/QuestionSupport';
 import type { Progress } from './domain/progress';
 import { canPlayWorldStage, progressAfterWorldAnswer, type PlayMode } from './domain/playMode';
 import { adventureTitles } from './domain/titles';
@@ -291,6 +291,7 @@ function AdventureWorld() {
                             </View>}
                             {bankQuestion
                               ? <WorkedSolution question={bankQuestion} wrongAnswer={round.feedback === 'incorrect' ? answer : undefined}/>
+                              : question.steps ? <WrittenSolution steps={question.steps}/>
                               : <MathText style={styles.explanation} value={question.explanation}/>}
                           </View>
                           {round.feedback==='correct'&&<ComboBadge results={round.results}/>}

@@ -22,6 +22,16 @@ function Formula({ latex, fallback, fontSize, color, maxWidth }: {
   }
 }
 
+export function MathDisplay({ latex }: { latex: string }) {
+  const [width, setWidth] = useState<number | null>(null);
+  return <View style={styles.display}
+    onLayout={({ nativeEvent }) => {
+      if (nativeEvent.layout.width > 0) setWidth(nativeEvent.layout.width);
+    }}>
+    {width !== null && <Formula latex={latex} fallback={latex} fontSize={19} color="#233859" maxWidth={width} />}
+  </View>;
+}
+
 export function MathText({ value, style, prefix = '', format = true }: {
   value: string; style?: StyleProp<TextStyle>; prefix?: string; format?: boolean;
 }) {
@@ -45,4 +55,5 @@ export function MathText({ value, style, prefix = '', format = true }: {
 const styles = StyleSheet.create({
   line: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', rowGap: 4, alignSelf: 'stretch', minWidth: 0 },
   prose: { maxWidth: '100%', flexShrink: 1 },
+  display: { alignSelf: 'stretch', minWidth: 0, paddingVertical: 3 },
 });
