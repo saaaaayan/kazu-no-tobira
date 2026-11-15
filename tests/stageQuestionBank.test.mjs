@@ -93,7 +93,7 @@ test('100までの数の正答、十のまとまり、図を問題文から検�
 test('保存済み4,000問の問題文から独立して再計算し、途中式・ヒント・図を検証する', () => {
   const allIds = new Set();
   const equations = new Set();
-  for (const bank of banks) {
+  for (const bank of banks.filter(bank => bank.gradeId !== 'sage')) {
     assert.equal(bank.questions.length, 100);
     assert.equal(new Set(bank.questions.map(q => q.question)).size, 100);
     assert.ok(new Set(bank.questions.map(q => q.format)).size >= (unitBatch.includes(bank) || carryAdditionBatch.includes(bank) || countToHundredBatch.includes(bank) ? 3 : 4));

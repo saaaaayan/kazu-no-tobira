@@ -1,3 +1,5 @@
+import { buildSageIntroBanks } from './sage-intro-unit.mjs';
+import { validateSageIntroBanks } from './validate-sage-intro.mjs';
 import { assessmentIslands } from '../src/domain/assessmentPlan.ts';
 import { countToHundredPools, countToHundredStages } from './count-to-hundred-unit.mjs';
 import { validateCountToHundredBatch } from './validate-count-to-hundred.mjs';
@@ -274,6 +276,9 @@ validateBorrowSubtractionBatch(borrow);
 const hundred = buildUnit(countToHundredStages, countToHundredPools(), '100までの かずを 10の まとまりと ばらで かんがえる。');
 validateCountToHundredBatch(hundred);
 banks.push(...addition, ...subtraction, ...makeTen, ...counting, ...carry, ...borrow, ...hundred);
+const sage = buildSageIntroBanks();
+validateSageIntroBanks(sage);
+banks.push(...sage);
 for (const bank of banks) {
   const json = JSON.stringify(bank, null, 2) + '\n';
   await output(new URL(bank.stageId + '.v1.json', directory), json);
@@ -298,8 +303,10 @@ const entries = worldStages.map(stage => {
 const sagePlan = assessmentIslands.find(island => island.id === 'sage');
 for (const stage of sagePlan.stages) {
   const label = stage.assessment?.kind === 'final' ? '最終試験' : stage.assessment ? '確認テスト' : '総合演習';
-  entries.push([stage.id, '賢者の島・' + label + ' ' + stage.number, 0,
-    '未実施', '未実施', '未実施', '未実施', '未実施', '未実施', '未着手'].join('\t'));
+  const bank = byStage.get(stage.id);
+  entries.push([stage.id, '賢者の島・' + label + ' ' + stage.number, bank?.questions.length ?? 0,
+    ...(bank ? ['自動検証','正答を独立計算','代表例確認','図なし','3段階','5項目','公開可能']
+      : ['未実施','未実施','未実施','未実施','未実施','未実施','未着手'])].join('\t'));
 }
 const columns = 'ステージID\tステージ名\t制作済み\t重複\t正答\t問題文\t図解\tヒント\t解説\t状態';
 await output(new URL('../docs/question-bank-progress.tsv', import.meta.url), [columns, ...entries].join('\n') + '\n');
