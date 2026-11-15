@@ -4,7 +4,7 @@ import Svg, { Path } from 'react-native-svg';
 import { firstGradeStages, type AdditionStage } from '../domain/curriculum';
 import type { Progress } from '../domain/progress';
 import IslandScene, { islandHeight, islandSites, islandWidth } from './IslandScene';
-import { CompanionAvatar } from './AdventureCompanion';
+import { CompanionAvatar, TreasureCollection } from './AdventureCompanion';
 
 export default function AdventureMap({ progress, onStart }: { progress: Progress; onStart: (stage: AdditionStage) => void }) {
   const [width, setWidth] = useState(0);
@@ -73,6 +73,7 @@ export default function AdventureMap({ progress, onStart }: { progress: Progress
           );
         })}
       </View>
+      <TreasureCollection progress={progress} />
     </View>
   );
 }
