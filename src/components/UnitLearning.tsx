@@ -119,11 +119,14 @@ export function UnitLearning(props: LessonProps) {
       <View style={styles.meter} accessible={false}><View style={[styles.meterFill, { width: ((progress.page + 1) / (end + 1) * 100) + '%' as `${number}%` }]} /></View>
     </View>
     <LessonContent key={progress.page} {...props} />
+    {progress.page >= end - 1 && (
+      <Action label="島の マップへ もどる" disabled={busy} secondary onPress={onBack} />
+    )}
     {error ? <Text accessibilityLiveRegion="polite" style={styles.problem}>{error}</Text> : null}
   </View>;
 }
 
-function LessonContent({ lesson, progress, busy, onChange, onBack, onChallenge }: LessonProps) {
+function LessonContent({ lesson, progress, busy, onChange, onChallenge }: LessonProps) {
   const [revealed, setRevealed] = useState(0);
   const goNext = () => onChange(advanceLesson(lesson, progress));
   const page = progress.page;
@@ -136,7 +139,6 @@ function LessonContent({ lesson, progress, busy, onChange, onBack, onChallenge }
     <Text style={styles.text}>たしかめ もんだいに ぜんぶ せいかいしたね。</Text>
     <CompanionMoment mood="clear" speech={lesson.completionMessage} />
     {onChallenge && <Action label="ステージもんだいに チャレンジ" disabled={busy} onPress={onChallenge} />}
-    <Action label="島の マップへ もどる" disabled={busy} secondary={Boolean(onChallenge)} onPress={onBack} />
   </View>;
   return <View style={styles.card}>
     {page === 0 && <>
