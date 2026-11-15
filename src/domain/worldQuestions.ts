@@ -395,9 +395,11 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         `頂点は (${b},${c}) だよ。`);
     }
     case 'pythagoras': {
-      const scale = n(1, 6);
-      return numeric(`直角三角形の2辺が ${3*scale}cm と ${4*scale}cm。斜辺は？（cm）`, 5*scale,
-        '三平方の定理で ' + (3*scale)**2 + '＋' + (4*scale)**2 + '＝' + (5*scale)**2 + '。');
+      const triple = r.pick([[3, 4, 5], [5, 12, 13], [8, 15, 17], [7, 24, 25]] as const);
+      const scale = n(1, 7);
+      const a = triple[0] * scale, b = triple[1] * scale, c = triple[2] * scale;
+      return numeric(`直角三角形の直角をはさむ2辺が ${a}cm と ${b}cm。斜辺は？（cm）`,
+        c, `三平方の定理で √(${a}²＋${b}²)＝${c}。`);
     }
     case 'logic': {
       return concept('「偶数なら2で割り切れる」の逆の命題は？', '2で割り切れるなら偶数',
@@ -410,11 +412,17 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         `x²<${a*a} は −${a}<x<${a} を表す。`, r);
     }
     case 'trig': {
-      const angle = r.pick([30,45,60]);
-      const ans = angle===30 ? '1/2' : angle===45 ? '√2/2' : '√3/2';
-      return choice(`sin ${angle}° の値は？`, ans,
-        ['0', '1/2', '√2/2', '√3/2', '1'].filter(x=>x!==ans),
-        '直角三角形の基本的な三角比を使おう。', r);
+      const identities: readonly [string, string][] = [
+        ['sin 0°','0'], ['sin 30°','1/2'], ['sin 45°','√2/2'],
+        ['sin 60°','√3/2'], ['sin 90°','1'],
+        ['cos 0°','1'], ['cos 30°','√3/2'], ['cos 45°','√2/2'],
+        ['cos 60°','1/2'], ['cos 90°','0'],
+        ['tan 0°','0'], ['tan 30°','√3/3'], ['tan 45°','1'], ['tan 60°','√3'],
+      ];
+      const [expression, ans] = r.pick(identities);
+      return choice(`${expression} の値は？`, ans,
+        ['0', '1/2', '√2/2', '√3/2', '√3/3', '1', '√3', '2'].filter(x=>x!==ans),
+        '基本的な角度の三角比を確認しよう。', r);
     }
     case 'combinatorics': {
       const a = n(4,11), b = n(2,4);
@@ -463,10 +471,11 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
         a*c+b*d,'対応する成分どうしをかけてたそう。');
     }
     case 'limit': {
-      const a=n(1,6),b=n(1,7);
-      if(index%3===0) return choice('lim[n→∞] 1/n の値は？','0',['1','∞','−1','1/2'],
-        '分母がどこまでも大きくなると0に近づくよ。',r);
-      return numeric(`lim[x→${a}] (x²＋${b}) は？`,a*a+b,
+      const a=n(1,12), b=n(1,15);
+      if (index % 3 === 0) return choice(`lim[n→∞] ${a}/(n＋${b}) の値は？`, '0',
+        ['1', '∞', String(a), '1/2', '−1'],
+        '分子は一定で、分母は無限に大きくなるから0に近づくよ。', r);
+      return numeric(`lim[x→${a}] (x²＋${b}) は？`, a*a+b,
         `連続な多項式だからx=${a}を代入して${a*a+b}。`);
     }
     case 'mixed': {
