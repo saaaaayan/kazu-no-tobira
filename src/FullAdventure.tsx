@@ -7,7 +7,7 @@ import { isBankQuestion } from './domain/questionBank';
 import { prepareStageRound } from './stageRounds';
 import { QuestionDiagram, WorkedSolution, WrittenSolution } from './components/QuestionSupport';
 import type { Progress } from './domain/progress';
-import { canPlayWorldStage, progressAfterWorldAnswer, type PlayMode } from './domain/playMode';
+import { canPlayWorldStage, progressAfterWorldAnswer, worldStageAction, type PlayMode } from './domain/playMode';
 import { adventureTitles } from './domain/titles';
 import { loadProgress, saveProgress } from './storage';
 import { applyNumberPadKey } from './domain/answerInput';
@@ -22,10 +22,13 @@ import { ClockFace } from './components/ClockFace';
 import { MathText } from './components/MathText';
 import NumberPad from './components/NumberPad';
 import AdventureHome, { ModeBadge, ModeControls } from './components/AdventureHome';
+import { UnitLearning } from './components/UnitLearning';
+import { lessonForStage, newLessonProgress, type LessonProgress, type UnitLesson } from './domain/unitLessons';
 
 type Feedback = 'correct' | 'incorrect';
 type AnswerMode = 'keyboard' | 'panel' | 'handwriting';
-type Screen = 'home' | 'world' | 'island' | 'titles';
+type Screen = 'home' | 'world' | 'island' | 'titles' | 'lesson';
+type Learning = { lesson: UnitLesson; progress: LessonProgress; target?: WorldStage; practice: boolean };
 type Round = {
   stage: WorldStage;
   problems: MathQuestion[];
@@ -51,6 +54,9 @@ function AdventureWorld() {
   const testing = playMode === 'test';
   const [grade, setGrade] = useState<WorldGrade>(worldIslands[0]);
   const [round, setRound] = useState<Round>();
+  const [learning, setLearning] = useState<Learning>();
+  const [lessonError, setLessonError] = useState('');
+  const lessonWrite = useRef(false);
   const [answer, setAnswer] = useState('');
   const [mode, setMode] = useState<AnswerMode>('keyboard');
   const [message, setMessage] = useState('');
@@ -83,8 +89,49 @@ function AdventureWorld() {
     blockHandwriting(false);
     scroll.current?.scrollTo({ y: 0, animated: false });
   }
+  function openLesson(lesson: UnitLesson, target?: WorldStage) {
+    if (!progress || lessonWrite.current || starting.current || submitting.current) return;
+    const saved = progress.lessons?.[lesson.id];
+    const practice = testing || Boolean(saved?.completedAt && !target);
+    const record = practice ? newLessonProgress() : saved ?? newLessonProgress();
+    setLessonError('');
+    setStartError('');
+    resetAnswer();
+    setRound(undefined);
+    setLearning({ lesson, progress: record, target, practice });
+    setScreen('lesson');
+  }
+
+  async function updateLesson(next: LessonProgress) {
+    if (!progress || !learning || lessonWrite.current || next === learning.progress) return;
+    lessonWrite.current = true;
+    setSaving(true);
+    setLessonError('');
+    try {
+      if (!learning.practice) {
+        const updated = { ...progress, lessons: { ...progress.lessons, [learning.lesson.id]: next } };
+        await saveProgress(updated);
+        setProgress(updated);
+      }
+      if (next.page !== learning.progress.page) scroll.current?.scrollTo({ y: 0, animated: false });
+      setLearning({ ...learning, progress: next });
+    } catch {
+      setLessonError('がくしゅうを きろくできなかったよ。もういちど おしてね。');
+    } finally {
+      lessonWrite.current = false;
+      setSaving(false);
+    }
+  }
+
   async function start(stage: WorldStage) {
-    if (!progress || starting.current || submitting.current || !canPlayWorldStage(playMode, progress, stage)) return;
+    if (!progress || starting.current || submitting.current || lessonWrite.current) return;
+    const action = worldStageAction(playMode, progress, stage);
+    if (action === 'locked') return;
+    if (action === 'learn') {
+      const lesson = lessonForStage(stage.id);
+      if (lesson) openLesson(lesson, stage);
+      return;
+    }
     starting.current = true;
     setLoadingRound(true);
     setStartError('');
@@ -92,6 +139,8 @@ function AdventureWorld() {
     try {
       const problems = await prepareStageRound(stage, playMode, attemptSeed);
       resetAnswer();
+      setLearning(undefined);
+      setScreen('island');
       setRound({
         stage,
         problems,
@@ -169,7 +218,8 @@ function AdventureWorld() {
   }
 
   function goToIsland() {
-    if (starting.current || submitting.current) return;
+    if (starting.current || submitting.current || lessonWrite.current) return;
+    setLearning(undefined);
     setStartError('');
     resetAnswer();
     setRound(undefined);
@@ -184,7 +234,9 @@ function AdventureWorld() {
   const perfect = Boolean(round && round.correct === round.problems.length && !round.usedHint);
   const cleared = Boolean(round && round.correct >= Math.ceil(round.stage.questions * 0.8));
   const nextStage = round && worldIslands.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
-  const canContinue = nextStage && progress && canPlayWorldStage(playMode, progress, nextStage);
+  const canContinue = nextStage && progress && worldStageAction(playMode, progress, nextStage) !== 'locked';
+  const lessonStage = learning && (learning.target ?? grade.stages.find(stage => learning.lesson.linkedStageIds.includes(stage.id)));
+  const canChallenge = lessonStage && progress && canPlayWorldStage(playMode, progress, lessonStage);
   const newlyEarnedTitles = round && progress && !testing ? adventureTitles(progress).filter(t=>t.unlocked).length : 0;
 
   return (
@@ -202,14 +254,14 @@ function AdventureWorld() {
             <View style={styles.navigation}>
               <View style={styles.navigationHeader}>
                 {round ? <Text style={styles.logo}>数のトビラ</Text> : (
-                  <Pressable accessibilityRole="button" accessibilityLabel="トップへもどる"
-                    onPress={() => { resetAnswer(); setScreen('home'); }} style={styles.homeLink}>
+                  <Pressable accessibilityRole="button" accessibilityLabel="トップへもどる" disabled={saving}
+                    onPress={() => { resetAnswer(); setLearning(undefined); setScreen('home'); }} style={styles.homeLink}>
                     <Text style={styles.logo}>‹ 数のトビラ</Text>
                   </Pressable>
                 )}
                 <ModeBadge mode={playMode} />
               </View>
-              {!round && screen !== 'titles' && <ModeControls mode={playMode} onChange={setPlayMode} />}
+              {!round && screen !== 'titles' && screen !== 'lesson' && <ModeControls mode={playMode} onChange={setPlayMode} />}
             </View>
           )}
           {!progress && (
@@ -219,9 +271,13 @@ function AdventureWorld() {
             <WorldMap780 progress={progress} mode={playMode} onGrade={openGrade} onTitles={()=>setScreen('titles')}/>}
           {progress && !round && screen === 'island' &&
             <IslandStageMap key={grade.id} grade={grade} progress={progress} mode={playMode} onBack={()=>setScreen('world')}
-              onTitles={()=>setScreen('titles')} onStart={start}/>}
+              onTitles={()=>setScreen('titles')} onStart={start} onLearn={openLesson}/>}
           {progress && !round && screen === 'titles' &&
             <TitleAlbum progress={progress} onBack={()=>setScreen('world')}/>}
+          {progress && screen === 'lesson' && !round && learning &&
+            <UnitLearning key={learning.lesson.id} lesson={learning.lesson} progress={learning.progress}
+              practice={testing} busy={saving} error={lessonError} onChange={updateLesson} onBack={goToIsland}
+              onChallenge={canChallenge ? () => start(lessonStage) : undefined}/>}
           {round && question && (
             <View style={styles.playPanel}>
               <Pressable accessibilityRole="button" disabled={saving} onPress={goToIsland} style={styles.back}>
@@ -246,6 +302,8 @@ function AdventureWorld() {
                   {!testing && cleared && <Text style={styles.rewardMessage}>しょうごう ずかん：{newlyEarnedTitles}こ はっけんずみ</Text>}
                   {canContinue && <GameButton label="つぎの ステージへ" onPress={()=>start(nextStage)} gold/>}
                   <GameButton label="この ステージに もういちど ちょうせん" onPress={()=>start(round.stage)} secondary/>
+                  {lessonForStage(round.stage.id) && <GameButton label="がくしゅうを みなおす" secondary
+                    onPress={() => { const lesson = lessonForStage(round.stage.id); if (lesson) openLesson(lesson); }}/>}
                   <GameButton label="島のマップへ" onPress={goToIsland}/>
                 </View>
               ) : (

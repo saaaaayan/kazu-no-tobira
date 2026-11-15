@@ -43,7 +43,7 @@ export const gradeDefinitions: readonly { id: GradeId; title: string; island: st
   {
     id: 'e1', title: '小学1年生', island: 'はじまりの島', theme: 'かずと なかよし',
     units: makeUnits(`
-number-order|かずの じゅんばん|count
+number-order|10までの かず|count
 add-small|9までの たしざん|addition
 sub-small|9までの ひきざん|subtraction
 make-ten|10を つくろう|addition
@@ -233,7 +233,8 @@ function createStages(def: Omit<WorldGrade, 'stages'>): WorldStage[] {
         : undefined;
       stages.push({
         id: legacy ?? `${def.id}.n${String(order + 1).padStart(2, '0')}`,
-        gradeId: def.id, kind: 'normal', order, unitIndex, part,
+        gradeId: def.id, kind: 'normal', order,
+        unitIndex: legacyInfo ? [1, 3, 5][order] : unitIndex, part,
         title: legacyInfo?.title ?? (sage
           ? order === 49 ? '総合最終試験' : part === 4 ? '確認テスト ' + (unitIndex + 1) : '総合演習 ' + (order + 1)
           : `${unit.title}・${trailNames[part]}`),
@@ -259,7 +260,15 @@ function createStages(def: Omit<WorldGrade, 'stages'>): WorldStage[] {
       family: sage ? 'sageMixed' : 'discovery', questions: 10,
     });
   }
-  return stages;
+  if (def.id !== 'e1') return stages;
+  // These are the original positions, not new stage IDs. Keep the original banks and saves.
+  const countStages = [
+    { ...stages[3], title: '10までの かず・かずの みち' },
+    { ...stages[4], title: '10までの かず・ならびの たんけん' },
+  ];
+  const route = [...countStages, stages[0], ...stages.slice(5, 15),
+    stages[1], ...stages.slice(15, 25), stages[2], ...stages.slice(25)];
+  return route.map((stage, order) => ({ ...stage, order }));
 }
 
 export const worldGrades: readonly WorldGrade[] = gradeDefinitions.map(def => ({

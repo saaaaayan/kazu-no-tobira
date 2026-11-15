@@ -87,11 +87,12 @@ export function CompanionAvatar({ mood = 'ready', size = 88 }: {
   );
 }
 
-export function CompanionMoment({ mood, variation = 0, onDark = false, compact = false }: {
+export function CompanionMoment({ mood, variation = 0, onDark = false, compact = false, speech }: {
   mood: CompanionMood;
   variation?: number;
   onDark?: boolean;
   compact?: boolean;
+  speech?: string;
 }) {
   return (
     <View style={[styles.moment, !compact && styles.momentBig]}>
@@ -99,7 +100,7 @@ export function CompanionMoment({ mood, variation = 0, onDark = false, compact =
       <View style={[styles.speech, onDark ? styles.speechDark : styles.speechLight]}>
         <Text style={[styles.name, onDark && styles.nameDark]}>ルミ</Text>
         <Text accessibilityLiveRegion="polite" style={[styles.message, onDark && styles.messageDark]}>
-          {companionSpeech(mood, variation)}
+          {speech ?? companionSpeech(mood, variation)}
         </Text>
       </View>
     </View>
