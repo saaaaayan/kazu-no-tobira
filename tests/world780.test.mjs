@@ -22,7 +22,7 @@ test('全12学年・各65ステージ（50通常＋10EX＋5隠し）＝780を定
     assert.ok(grade.stages.every(stage => stage.questions === 10), grade.id);
     assert.ok(grade.stages.every((s,i)=>s.order===i && s.gradeId===grade.id));
   }
-  assert.deepEqual(worldGrades[0].stages.slice(0,3).map(s=>s.id),['e1.forest','e1.bridge','e1.tower']);
+  assert.deepEqual(worldGrades[0].stages.slice(0,3).map(s=>s.id),['e1.n04','e1.n05','e1.forest']);
 });
 
 test('すべての780ステージに実際に解ける問題・答え・解説がある', () => {

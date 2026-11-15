@@ -1,16 +1,17 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { canPlayWorldStage, progressAfterWorldAnswer } from '../src/domain/playMode.ts';
+import { canPlayWorldStage, progressAfterWorldAnswer, worldStageAction } from '../src/domain/playMode.ts';
 import { emptyProgress } from '../src/domain/progress.ts';
 import { worldGrades } from '../src/domain/worldCatalog.ts';
 import { isWorldStageUnlocked, unlockSummary } from '../src/domain/worldProgress.ts';
 import { adventureTitles } from '../src/domain/titles.ts';
 
-test('テストモードで12学年780ステージを選べ、通常モードは従来の解放条件を使う', () => {
+test('テストモードで12学年780ステージを選べ、通常モードは最初の学習から始まる', () => {
   const stages = worldGrades.flatMap(grade => grade.stages);
   assert.equal(stages.filter(stage => canPlayWorldStage('test', emptyProgress, stage)).length, 780);
-  assert.deepEqual(stages.filter(stage => canPlayWorldStage('normal', emptyProgress, stage)),
+  assert.deepEqual(stages.filter(stage => worldStageAction('normal', emptyProgress, stage) !== 'locked'),
     stages.filter(stage => isWorldStageUnlocked(emptyProgress, stage)));
+  assert.equal(worldStageAction('normal', emptyProgress, worldGrades[0].stages[0]), 'learn');
   assert.equal(canPlayWorldStage('normal', emptyProgress, worldGrades[11].stages[64]), false);
   assert.equal(canPlayWorldStage('test', emptyProgress, worldGrades[11].stages[64]), true);
 });

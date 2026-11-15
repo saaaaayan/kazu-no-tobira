@@ -36,13 +36,19 @@ export function isIslandUnlocked(progress: Progress, islandId: string): boolean 
 
 export function isWorldStageUnlocked(progress: Progress, stage: WorldStage): boolean {
   const grade = worldIslands.find(island => island.id === stage.gradeId);
-  if (!grade || !isIslandUnlocked(progress, stage.gradeId)) return false;
+  if (!grade) return false;
+  if (progress.stages[stage.id]?.clearedAt) return true;
+  if (!isIslandUnlocked(progress, stage.gradeId)) return false;
   if (stage.kind === 'secret') {
     if (!gradeProgress(progress, stage.gradeId).mainPerfect) return false;
     const previousSecret = stage.order > 60 ? grade.stages[stage.order - 1] : undefined;
     return !previousSecret || Boolean(progress.stages[previousSecret.id]?.clearedAt);
   }
   if (stage.order === 0) return true;
+  // Moved landmarks may already be cleared in old saves. Keep the other route prerequisite too.
+  if (stage.id === 'e1.n06' && !progress.stages['e1.n05']?.clearedAt) return false;
+  if (stage.id === 'e1.n16' && !progress.stages['e1.n15']?.clearedAt) return false;
+  if (stage.id === 'e1.n26' && !progress.stages['e1.n25']?.clearedAt) return false;
   return Boolean(progress.stages[grade.stages[stage.order - 1].id]?.clearedAt);
 }
 

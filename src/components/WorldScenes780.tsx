@@ -4,11 +4,13 @@ import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Rect, Stop } from 
 import { CompanionAvatar } from './AdventureCompanion';
 import { worldIslands, type WorldGrade, type WorldStage } from '../domain/worldCatalog';
 import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldProgress';
-import { canPlayWorldStage, type PlayMode } from '../domain/playMode';
+import { worldStageAction, type PlayMode } from '../domain/playMode';
 import WorldAtlasArt from './WorldAtlasArt';
 import { islandRouteByKind, islandStageLayout, routeThrough, worldMapLayout } from '../domain/worldMapLayout';
 import { hasStageBank } from '../domain/questionBank';
 import type { Progress } from '../domain/progress';
+import { lessonStatus, unitLessons, type UnitLesson } from '../domain/unitLessons';
+import { featureAccess } from '../domain/accessPlan';
 
 const palette = [
   { land: '#8fcb86', dark: '#4e8f65', detail: '#315f5c', roof: '#cf8c63' },
@@ -198,8 +200,9 @@ function stageText(stage:WorldStage):string {
   return '秘'+String(stage.order-59);
 }
 
-export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
+export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles,onLearn}: {
   grade:WorldGrade;progress:Progress;mode:PlayMode;onBack:()=>void;onStart:(stage:WorldStage)=>void;onTitles:()=>void;
+  onLearn:(lesson:UnitLesson)=>void;
 }) {
   const [width,setWidth]=useState(0);
   const actual=measuredWidth(width);
@@ -207,7 +210,8 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
   const stats=gradeProgress(progress,grade.id);
   const gradeIndex=worldIslands.findIndex(g=>g.id===grade.id);
   const testing = mode === 'test';
-  const next = testing ? undefined : grade.stages.find(stage => canPlayWorldStage(mode, progress, stage) && !progress.stages[stage.id]);
+  const next = testing ? undefined : grade.stages.find(stage => worldStageAction(mode, progress, stage) !== 'locked' && !progress.stages[stage.id]);
+  const lessons = unitLessons.filter(lesson => lesson.grade === grade.id);
   const marker=Math.max(46,Math.min(57,Math.floor(actual/5)-9));
   return (
     <View style={styles.screen}>
@@ -224,6 +228,29 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
         </View>
         <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
       </View>
+      {lessons.length > 0 && <View style={styles.studyCard}>
+        <Text accessibilityRole="header" style={styles.mapTitle}>ルミと まなぶ</Text>
+        {lessons.map(lesson => {
+          const status = testing ? 'not-started' : lessonStatus(progress.lessons?.[lesson.id]);
+          const first = grade.stages.find(stage => lesson.linkedStageIds.includes(stage.id));
+          const action = first && worldStageAction(mode, progress, first);
+          return <View key={lesson.id} style={styles.studyEntry}>
+            <Text style={styles.mapTitle}>{lesson.title}</Text>
+            <Text style={styles.hintText}>
+              {featureAccess.unitLessons === 'free' ? 'むりょう　·　' : ''}
+              {status === 'completed' ? 'がくしゅうずみ' : status === 'in-progress' ? 'がくしゅうの とちゅう' : lesson.summary}
+            </Text>
+            <View style={styles.studyButtons}>
+              <Pressable accessibilityRole="button" onPress={()=>onLearn(lesson)} style={styles.studyButton}>
+                <Text style={styles.studyButtonText}>{status === 'completed' ? 'がくしゅうを みなおす' : status === 'in-progress' ? 'がくしゅうの つづき' : 'まず まなぼう'}</Text>
+              </Pressable>
+              {first && action === 'play' && <Pressable accessibilityRole="button" onPress={()=>onStart(first)} style={styles.studyStage}>
+                <Text style={styles.nextText}>ステージもんだいへ</Text>
+              </Pressable>}
+            </View>
+          </View>;
+        })}
+      </View>}
       {!testing && <View style={styles.legend}>
         <Text style={styles.legendText}>✦ 挑戦できる</Text>
         <Text style={styles.legendText}>✓ クリア</Text>
@@ -232,7 +259,7 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
       </View>}
       {next && (
         <Pressable accessibilityRole="button" onPress={()=>onStart(next)} style={styles.nextButton}>
-          <Text style={styles.nextText}>✦ つづきから ぼうけんする　ステージ {stageText(next)} ›</Text>
+          <Text style={styles.nextText}>✦ {worldStageAction(mode, progress, next) === 'learn' ? 'まず まなぼう' : 'つづきから ぼうけんする'}　ステージ {stageText(next)} ›</Text>
         </Pressable>
       )}
       <View style={styles.mapHeading}>
@@ -249,7 +276,8 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
         </View>
         {Array.from({length:13},(_,row)=>{
           const y=geometry.positions[row*5]?.y??0;
-          const label=row<10 ? grade.units[row].title : row<12 ? '✦ エクストラの道' : '✧ ひみつの道';
+          const rowUnits = [...new Set(grade.stages.slice(row * 5, row * 5 + 5).map(stage => stage.unitIndex))];
+          const label=row<10 ? grade.units[rowUnits[0]].title + (rowUnits.length > 1 ? ' など' : '') : row<12 ? '✦ エクストラの道' : '✧ ひみつの道';
           return (
             <View key={row} pointerEvents="none"
               style={[styles.zoneLabel,{top:y-76,left:Math.min(14,actual*0.035)}]}>
@@ -260,14 +288,15 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
         {grade.stages.map((stage,index)=>{
           const position=geometry.positions[index];
           const record=(testing ? undefined : progress.stages[stage.id]) as {clearedAt?:string;perfectAt?:string}|undefined;
-          const unlocked=canPlayWorldStage(mode,progress,stage);
+          const action=worldStageAction(mode,progress,stage);
+          const unlocked=action !== 'locked';
           const cleared=Boolean(record?.clearedAt);
           const perfect=Boolean(record?.perfectAt||(legacy.has(stage.id)&&cleared));
           const current=stage.id===next?.id;
           return (
             <Pressable key={stage.id} accessibilityRole="button" disabled={!unlocked}
               accessibilityState={{disabled:!unlocked}}
-              accessibilityLabel={stage.title+'、'+(perfect?'パーフェクト':cleared?'クリア済み':unlocked?'挑戦できる':stage.gradeId === 'sage' && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
+              accessibilityLabel={stage.title+'、'+(perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':stage.gradeId === 'sage' && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
                 styles.stagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
@@ -327,6 +356,12 @@ const styles=StyleSheet.create({
   bookText:{color:'#433d60',fontSize:15,fontWeight:'900'},
   back:{alignSelf:'flex-start',minHeight:44,justifyContent:'center',paddingHorizontal:6},
   backText:{color:'#345d80',fontSize:15,fontWeight:'900'},
+  studyCard:{borderRadius:18,backgroundColor:'#fff2ce',borderWidth:1,borderColor:'#e5c682',padding:15,gap:9},
+  studyEntry:{backgroundColor:'#fffaf0',borderRadius:12,padding:12,gap:8},
+  studyButtons:{flexDirection:'row',flexWrap:'wrap',gap:8},
+  studyButton:{backgroundColor:'#3f548f',minHeight:46,justifyContent:'center',paddingHorizontal:12,borderRadius:10},
+  studyStage:{backgroundColor:'#f3d896',minHeight:46,justifyContent:'center',paddingHorizontal:12,borderRadius:10},
+  studyButtonText:{color:'#fff',fontSize:15,fontWeight:'900'},
   legend:{flexDirection:'row',flexWrap:'wrap',gap:7,alignItems:'center'},
   legendText:{backgroundColor:'#e7eaf1',color:'#485779',paddingVertical:5,paddingHorizontal:8,borderRadius:9,fontSize:12,fontWeight:'800'},
   nextButton:{minHeight:49,justifyContent:'center',alignItems:'center',padding:11,borderRadius:13,backgroundColor:'#f4d188',borderWidth:2,borderColor:'#d19e56'},

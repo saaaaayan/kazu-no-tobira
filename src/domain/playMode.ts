@@ -1,13 +1,21 @@
 import { hasStageBank } from './questionBank.ts';
 import { recordAttempt, type Attempt, type Progress } from './progress.ts';
+import { lessonForStage } from './unitLessons.ts';
 import type { WorldStage } from './worldCatalog.ts';
 import { finishWorldStage, isWorldStageUnlocked } from './worldProgress.ts';
 
 export type PlayMode = 'normal' | 'test';
 
+export function worldStageAction(mode: PlayMode, progress: Progress, stage: WorldStage): 'play' | 'learn' | 'locked' {
+  if (stage.gradeId === 'sage' && !hasStageBank(stage.id)) return 'locked';
+  if (mode === 'test' || progress.stages[stage.id]?.clearedAt) return 'play';
+  if (!isWorldStageUnlocked(progress, stage)) return 'locked';
+  const lesson = lessonForStage(stage.id);
+  return lesson && !progress.lessons?.[lesson.id]?.completedAt ? 'learn' : 'play';
+}
+
 export function canPlayWorldStage(mode: PlayMode, progress: Progress, stage: WorldStage): boolean {
-  if (stage.gradeId === 'sage' && !hasStageBank(stage.id)) return false;
-  return mode === 'test' || isWorldStageUnlocked(progress, stage);
+  return worldStageAction(mode, progress, stage) === 'play';
 }
 
 export function progressAfterWorldAnswer(
