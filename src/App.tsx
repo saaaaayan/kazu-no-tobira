@@ -30,6 +30,7 @@ type Round = {
   problems: AdditionProblem[];
   index: number;
   correct: number;
+  dialogueOffset: number;
   results: AnswerFeedback[];
   feedback?: AnswerFeedback;
   complete?: boolean;
@@ -70,7 +71,8 @@ function Adventure() {
     blockHandwriting(false);
     setMessage('');
     scroll.current?.scrollTo({ y: 0, animated: false });
-    setRound({ stage, problems: generateAdditionRound(stage.skillId), index: 0, correct: 0, results: [] });
+    setRound({ stage, problems: generateAdditionRound(stage.skillId), index: 0, correct: 0,
+      dialogueOffset: progress?.attempts.length ?? 0, results: [] });
   }
 
   async function submit() {
@@ -158,7 +160,8 @@ function Adventure() {
                       <Text accessibilityRole="header" style={styles.equation}>おつかれさま！</Text>
                     </>
                   )}
-                  <CompanionMoment mood={perfectRound ? 'clear' : 'encourage'} />
+                  <CompanionMoment mood={perfectRound ? 'clear' : 'encourage'}
+                    variation={round.dialogueOffset + round.index} />
                   <TreasureChest open={Boolean(perfectRound)} />
                   <Text style={styles.resultSummary}>{round.problems.length}もんのうち {round.correct}もん せいかい</Text>
                   {canContinue ? (
@@ -177,7 +180,8 @@ function Adventure() {
                 <>
                   <View style={styles.question}>
                     <QuestionTrail stage={round.stage.title} results={round.results} index={round.index} total={round.problems.length} />
-                    <CompanionMoment mood={round.feedback === 'correct' ? 'correct' : round.feedback === 'incorrect' ? 'incorrect' : 'ready'} onDark compact />
+                    <CompanionMoment mood={round.feedback === 'correct' ? 'correct' : round.feedback === 'incorrect' ? 'incorrect' : 'ready'}
+                      variation={round.dialogueOffset + round.index} onDark compact />
                     <Text style={styles.prompt}>あわせると いくつ？</Text>
                     <Text style={[styles.formula, wide && styles.wideFormula]}>
                       {problem.left} ＋ {problem.right} ＝ {round.feedback ? problem.left + problem.right : '？'}
