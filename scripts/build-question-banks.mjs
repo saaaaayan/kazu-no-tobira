@@ -1,3 +1,4 @@
+import { assessmentIslands } from '../src/domain/assessmentPlan.ts';
 import { countToHundredPools, countToHundredStages } from './count-to-hundred-unit.mjs';
 import { validateCountToHundredBatch } from './validate-count-to-hundred.mjs';
 import { borrowSubtractionPools, borrowSubtractionStages } from './borrow-subtraction-unit.mjs';
@@ -294,5 +295,11 @@ const entries = worldStages.map(stage => {
     : ['未実施', '未実施', '未実施', '未実施', '未実施', '未実施'];
   return [stage.id, stage.title, bank?.questions.length ?? 0, ...review, bank ? '完成' : '未着手'].join('\t');
 });
+const sagePlan = assessmentIslands.find(island => island.id === 'sage');
+for (const stage of sagePlan.stages) {
+  const label = stage.assessment?.kind === 'final' ? '最終試験' : stage.assessment ? '確認テスト' : '総合演習';
+  entries.push([stage.id, '賢者の島・' + label + ' ' + stage.number, 0,
+    '未実施', '未実施', '未実施', '未実施', '未実施', '未実施', '未着手'].join('\t'));
+}
 const columns = 'ステージID\tステージ名\t制作済み\t重複\t正答\t問題文\t図解\tヒント\t解説\t状態';
 await output(new URL('../docs/question-bank-progress.tsv', import.meta.url), [columns, ...entries].join('\n') + '\n');

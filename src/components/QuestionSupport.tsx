@@ -9,7 +9,7 @@ export function QuestionDiagram({ diagram, phase }: { diagram: BankDiagram; phas
   if (diagram.kind === 'bundlesAndOnes') {
     return (
       <View style={styles.transfer}>
-        <View style={styles.group} accessible accessibilityLabel={'10の まとまりが ' + diagram.tens + 'つ'}>
+        <View style={styles.group} accessible accessibilityLabel={'10の まとまりが ' + diagram.tens + 'こ'}>
           <Text style={styles.groupLabel}>10の まとまり</Text>
           <View style={styles.bundles}>
             {Array.from({ length: diagram.tens }, (_, i) => (

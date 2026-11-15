@@ -16,6 +16,7 @@ export type BankQuestion = MathQuestion & {
     | 'carryThenUse' | 'carryFindFirstGain' | 'carryCompare' | 'carryThreeGroups' | 'carryPackTarget'
     | 'borrowDirect' | 'borrowThenUse' | 'borrowFindLater' | 'borrowNeedMore' | 'borrowCompare'
     | 'hundredBundle' | 'hundredTensForward' | 'hundredComparePlaces' | 'hundredNextBundle' | 'hundredStepsToTarget';
+  topic?: string;
   difficulty: 1 | 2 | 3;
   hints: readonly [string, string, string];
   steps: readonly { title: string; body: string }[];
@@ -25,6 +26,7 @@ export type BankQuestion = MathQuestion & {
 
 export type StageBank = {
   version: number;
+  selection?: 'balanced';
   stageId: string;
   gradeId: string;
   islandId: string;

@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { dealAssessmentCycle } from './domain/balancedAssessment';
 import type { PlayMode } from './domain/playMode';
 import { decodeStageDeck, drawStageRound, stageDeckKey } from './domain/stageDeck';
 import { hasStageBank, type StageBank } from './domain/questionBank';
@@ -22,9 +23,13 @@ export async function prepareStageRound(stage: WorldStage, mode: PlayMode, legac
       const ids = [...questions.keys()];
       if (ids.length !== bank.questions.length) throw new Error('Duplicate stage question ID');
 
-      const saved = decodeStageDeck(await AsyncStorage.getItem(key), ids, bank.version);
-      const deck = drawStageRound(ids, stage.questions, bank.version, saved);
-      await AsyncStorage.setItem(key, JSON.stringify(deck));
+      // The new policy uses its own deck so older random draws are preserved.
+      const storageKey = bank.selection === 'balanced' ? key + ':balanced' : key;
+      const saved = decodeStageDeck(await AsyncStorage.getItem(storageKey), ids, bank.version);
+      const deck = bank.selection === 'balanced' && !saved?.remaining.length
+        ? dealAssessmentCycle(bank.questions.map(question => ({ id: question.id, topic: question.topic ?? '' })), saved, bank.version)
+        : drawStageRound(ids, stage.questions, bank.version, saved);
+      await AsyncStorage.setItem(storageKey, JSON.stringify(deck));
       return deck.lastRound.map(id => questions.get(id)!).sort((a, b) => a.difficulty - b.difficulty);
     });
 
