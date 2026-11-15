@@ -3,8 +3,8 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDime
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { worldGrades, type WorldGrade, type WorldStage } from './domain/worldCatalog';
 import { generateWorldQuestions, checkMathAnswer, isValidMathAnswer, type MathQuestion } from './domain/worldQuestions';
-import { recordAttempt, type Progress } from './domain/progress';
-import { finishWorldStage, isWorldStageUnlocked } from './domain/worldProgress';
+import type { Progress } from './domain/progress';
+import { canPlayWorldStage, progressAfterWorldAnswer, type PlayMode } from './domain/playMode';
 import { adventureTitles } from './domain/titles';
 import { loadProgress, saveProgress } from './storage';
 import { applyNumberPadKey } from './domain/answerInput';
@@ -16,11 +16,11 @@ import { CorrectSpark } from './components/AdventureEffects';
 import CalculationMemo from './components/CalculationMemo';
 import HandwritingAnswer from './components/HandwritingAnswer';
 import NumberPad from './components/NumberPad';
-import VersionNotice from './components/VersionNotice';
+import AdventureHome, { ModeBadge, ModeControls } from './components/AdventureHome';
 
 type Feedback = 'correct' | 'incorrect';
 type AnswerMode = 'keyboard' | 'panel' | 'handwriting';
-type Screen = 'world' | 'island' | 'titles';
+type Screen = 'home' | 'world' | 'island' | 'titles';
 type Round = {
   stage: WorldStage;
   problems: MathQuestion[];
@@ -37,7 +37,10 @@ type Round = {
 function AdventureWorld() {
   const [progress, setProgress] = useState<Progress>();
   const [loadError, setLoadError] = useState(false);
-  const [screen, setScreen] = useState<Screen>('world');
+  const [screen, setScreen] = useState<Screen>('home');
+  const [playMode, setPlayMode] = useState<PlayMode>('normal');
+  const testRoundSeed = useRef(0);
+  const testing = playMode === 'test';
   const [grade, setGrade] = useState<WorldGrade>(worldGrades[0]);
   const [round, setRound] = useState<Round>();
   const [answer, setAnswer] = useState('');
@@ -73,9 +76,9 @@ function AdventureWorld() {
     scroll.current?.scrollTo({ y: 0, animated: false });
   }
   function start(stage: WorldStage) {
-    if (!progress || !isWorldStageUnlocked(progress, stage)) return;
+    if (!progress || !canPlayWorldStage(playMode, progress, stage)) return;
     resetAnswer();
-    const attemptSeed = progress.attempts.length;
+    const attemptSeed = testing ? testRoundSeed.current++ : progress.attempts.length;
     setRound({
       stage,
       problems: generateWorldQuestions(stage, attemptSeed),
@@ -110,20 +113,21 @@ function AdventureWorld() {
     const submitted = question.type === 'choice'
       ? question.choices?.indexOf(answer) ?? -1
       : Number(answer.normalize('NFKC').replaceAll('−', '-'));
-    const attempted = recordAttempt(progress, {
+    const saved = progressAfterWorldAnswer(playMode, progress, {
       problemId: question.id,
       stageId: round.stage.id,
       skillId: question.skillId,
       submitted,
       correct: correctAnswer,
       answeredAt: now,
-    }, false);
-    const saved = round.index === round.problems.length - 1
-      ? finishWorldStage(attempted, round.stage, newCorrect, round.usedHint, now)
-      : attempted;
+    }, round.index === round.problems.length - 1
+      ? { stage: round.stage, correct: newCorrect, usedHint: round.usedHint }
+      : undefined);
     try {
-      await saveProgress(saved);
-      setProgress(saved);
+      if (saved) {
+        await saveProgress(saved);
+        setProgress(saved);
+      }
       setRound({ ...round, correct: newCorrect, results: [...round.results, result], feedback: result });
     } catch {
       setMessage('きろくを ほぞんできなかったよ。もういちど おしてね。');
@@ -157,27 +161,38 @@ function AdventureWorld() {
   const perfect = Boolean(round && round.correct === round.problems.length && !round.usedHint);
   const cleared = Boolean(round && round.correct >= Math.ceil(round.stage.questions * 0.8));
   const nextStage = round && worldGrades.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
-  const canContinue = nextStage && progress && isWorldStageUnlocked(progress,nextStage);
-  const newlyEarnedTitles = round && progress ? adventureTitles(progress).filter(t=>t.unlocked).length : 0;
+  const canContinue = nextStage && progress && canPlayWorldStage(playMode, progress, nextStage);
+  const newlyEarnedTitles = round && progress && !testing ? adventureTitles(progress).filter(t=>t.unlocked).length : 0;
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" scrollEnabled={!drawing}
         contentContainerStyle={styles.scroll}>
         <View style={[styles.shell,round && !round.complete && styles.playShell]}>
-          <View style={[styles.hero,round && styles.smallHero]}>
-            <View style={styles.moon}/>
-            <Text style={[styles.logo,round && styles.smallLogo]}>数のトビラ</Text>
-            <Text style={styles.slogan}>ひとつ解くたび、世界がひらく。</Text>
-            <VersionNotice/>
-          </View>
+          {screen === 'home' && !round ? (
+            <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress}
+              onStart={() => { resetAnswer(); setScreen('world'); }} />
+          ) : (
+            <View style={styles.navigation}>
+              <View style={styles.navigationHeader}>
+                {round ? <Text style={styles.logo}>数のトビラ</Text> : (
+                  <Pressable accessibilityRole="button" accessibilityLabel="トップへもどる"
+                    onPress={() => { resetAnswer(); setScreen('home'); }} style={styles.homeLink}>
+                    <Text style={styles.logo}>‹ 数のトビラ</Text>
+                  </Pressable>
+                )}
+                <ModeBadge mode={playMode} />
+              </View>
+              {!round && screen !== 'titles' && <ModeControls mode={playMode} onChange={setPlayMode} />}
+            </View>
+          )}
           {!progress && (
             <Text style={styles.loading}>{loadError ? 'きろくを よみこめなかったよ。アプリを ひらきなおしてね。' : 'ぼうけんの じゅんびを しているよ…'}</Text>
           )}
           {progress && !round && screen === 'world' &&
-            <WorldMap780 progress={progress} onGrade={openGrade} onTitles={()=>setScreen('titles')}/>}
+            <WorldMap780 progress={progress} mode={playMode} onGrade={openGrade} onTitles={()=>setScreen('titles')}/>}
           {progress && !round && screen === 'island' &&
-            <IslandStageMap key={grade.id} grade={grade} progress={progress} onBack={()=>setScreen('world')}
+            <IslandStageMap key={grade.id} grade={grade} progress={progress} mode={playMode} onBack={()=>setScreen('world')}
               onTitles={()=>setScreen('titles')} onStart={start}/>}
           {progress && !round && screen === 'titles' &&
             <TitleAlbum progress={progress} onBack={()=>setScreen('world')}/>}
@@ -189,20 +204,20 @@ function AdventureWorld() {
               {round.complete ? (
                 <View style={styles.finish}>
                   <View style={styles.finishHero}>
-                    {cleared && <SparkleBurst big/>}
-                    <Text style={styles.finishEmoji}>{perfect?'🌟':cleared?'✨':'🌱'}</Text>
+                    {!testing && cleared && <SparkleBurst big/>}
+                    {!testing && <Text style={styles.finishEmoji}>{perfect?'🌟':cleared?'✨':'🌱'}</Text>}
                     <Text style={styles.finishStage}>{round.stage.title}</Text>
                     <Text accessibilityRole="header" style={styles.finishTitle}>
-                      {perfect?'パーフェクト！':cleared?'ステージ クリア！':'おつかれさま！'}
+                      {testing ? 'テストの けっか' : perfect?'パーフェクト！':cleared?'ステージ クリア！':'おつかれさま！'}
                     </Text>
                     <Text style={styles.finishCount}>{round.problems.length}もんのうち {round.correct}もん せいかい</Text>
                   </View>
-                  <CompanionMoment mood={perfect?'clear':'encourage'} variation={round.dialogueOffset + round.index}/>
-                  <WorldChest opened={cleared} perfect={perfect} stage={round.stage}/>
-                  {round.usedHint && (
+                  <CompanionMoment mood={!testing && perfect?'clear':'encourage'} variation={round.dialogueOffset + round.index}/>
+                  {testing ? <Text style={styles.hintNote}>テストの結果は 記録されません。</Text> : <WorldChest opened={cleared} perfect={perfect} stage={round.stage}/>}
+                  {!testing && round.usedHint && (
                     <Text style={styles.hintNote}>ヒントをつかったので、パーフェクトは 次のチャレンジで めざそう！</Text>
                   )}
-                  {cleared && <Text style={styles.rewardMessage}>しょうごう ずかん：{newlyEarnedTitles}こ はっけんずみ</Text>}
+                  {!testing && cleared && <Text style={styles.rewardMessage}>しょうごう ずかん：{newlyEarnedTitles}こ はっけんずみ</Text>}
                   {canContinue && <GameButton label="つぎの ステージへ" onPress={()=>start(nextStage)} gold/>}
                   <GameButton label="この ステージに もういちど ちょうせん" onPress={()=>start(round.stage)} secondary/>
                   <GameButton label="島のマップへ" onPress={goToIsland}/>
@@ -268,7 +283,7 @@ function AdventureWorld() {
                                 ]).map(([id,label])=>(
                                   <Pressable key={id} accessibilityRole="button"
                                     disabled={saving||drawing} accessibilityState={{selected:shownMode===id}}
-                                    onPress={()=>{setMode(id);setMessage('');blockHandwriting(false);}}
+                                    onPress={()=>{if (shownMode !== id) { setMode(id);setMessage('');blockHandwriting(false); }}}
                                     style={[styles.mode,shownMode===id&&styles.modeActive]}>
                                     <Text style={[styles.modeLabel,shownMode===id&&styles.modeLabelActive]}>{label}</Text>
                                   </Pressable>
@@ -341,12 +356,10 @@ const styles = StyleSheet.create({
   scroll: { flexGrow: 1, padding: 14, paddingBottom: 55 },
   shell: { width: '100%', maxWidth: 1030, alignSelf: 'center', gap: 15 },
   playShell: { maxWidth: 1090 },
-  hero: { position: 'relative', overflow: 'hidden', borderRadius: 23, backgroundColor: '#1d284e', padding: 20, gap: 5 },
-  smallHero: { paddingVertical: 13 },
-  moon: { position: 'absolute', width: 110, height: 110, borderRadius: 55, top: -55, right: -13, backgroundColor: '#3e5079' },
-  logo: { fontWeight: '900', color: '#fff7db', fontSize: 30 },
-  smallLogo: { fontSize: 18 },
-  slogan: { color: '#dce4f6', fontSize: 13 },
+  navigation: { borderRadius: 16, backgroundColor: '#162d48', padding: 12, gap: 7 },
+  navigationHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 },
+  homeLink: { minHeight: 44, justifyContent: 'center' },
+  logo: { fontWeight: '900', color: '#ffedb8', fontSize: 19 },
   loading: { padding: 22, color: '#3e4569' },
   playPanel: { backgroundColor: '#fffdf7', borderRadius: 22, padding: 14, gap: 13 },
   back: { alignSelf: 'flex-start', paddingVertical: 7, minHeight: 40, justifyContent: 'center' },

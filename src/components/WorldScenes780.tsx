@@ -3,7 +3,9 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 import { CompanionAvatar } from './AdventureCompanion';
 import { worldGrades, type WorldGrade, type WorldStage } from '../domain/worldCatalog';
-import { gradeProgress, isWorldStageUnlocked, unlockSummary } from '../domain/worldProgress';
+import { gradeProgress, unlockSummary } from '../domain/worldProgress';
+import { canPlayWorldStage, type PlayMode } from '../domain/playMode';
+import WorldAtlasArt from './WorldAtlasArt';
 import { islandRouteByKind, islandStageLayout, routeThrough, worldMapLayout } from '../domain/worldMapLayout';
 import type { Progress } from '../domain/progress';
 
@@ -21,11 +23,10 @@ const palette = [
   { land: '#a8afcf', dark: '#737fb0', detail: '#465787', roof: '#a7d2c7' },
   { land: '#c5b3cd', dark: '#7375b1', detail: '#50528c', roof: '#ffe5a1' },
 ] as const;
-const emblems = ['✿','♣','◈','♜','◉','☾','✧','◇','✵','△','✺','★'];
 const legacy = new Set(['e1.forest','e1.bridge','e1.tower']);
 
 function measuredWidth(width: number) {
-  return Math.max(290, width || 360);
+  return Math.max(244, width || 360);
 }
 
 function OceanTexture({ width, height, seed = 0 }: { width: number; height: number; seed?: number }) {
@@ -41,153 +42,62 @@ function OceanTexture({ width, height, seed = 0 }: { width: number; height: numb
   );
 }
 
-function IslandArt({ index, x, y, scale = 1, locked = false }: {
-  index: number; x: number; y: number; scale?: number; locked?: boolean;
+export function WorldMap780({ progress, mode, onGrade, onTitles }: {
+  progress: Progress; mode: PlayMode; onGrade: (grade: WorldGrade) => void; onTitles: () => void;
 }) {
-  const p = palette[index];
-  return (
-    <G transform={`translate(${x} ${y}) scale(${scale})`} opacity={locked ? 0.71 : 1}>
-      <Ellipse cy={38} rx={87} ry={33} fill="#285c7c" opacity={0.23}/>
-      <Path d="M-83 14Q-84-18-55-31Q-37-50-9-36Q12-57 36-39Q66-42 77-10Q98 16 71 34Q39 59 10 44Q-22 62-47 38Q-76 42-83 14Z"
-        transform="translate(0 8)" fill="#2b7186" opacity={0.5}/>
-      <Path d="M-83 14Q-84-18-55-31Q-37-50-9-36Q12-57 36-39Q66-42 77-10Q98 16 71 34Q39 59 10 44Q-22 62-47 38Q-76 42-83 14Z"
-        fill={p.land} stroke="#f3e1ab" strokeWidth={5} strokeLinejoin="round"/>
-      <Path d="M-63 8Q-57-9-40-16Q-22-20-11-9Q0-29 17-23Q32-25 52-6Q71 4 52 24Q35 43 14 26Q-7 42-29 22Q-48 32-63 8Z"
-        fill={p.dark} opacity={0.39}/>
-      <Path d="M-49 24Q-22 1 2 18T52 2" fill="none" stroke="#fcdf9d" strokeWidth={7} strokeLinecap="round" opacity={0.82}/>
-      <Ellipse cx={-51} cy={-9} rx={20} ry={10} fill={p.dark} opacity={0.42}/>
-      <Path d="M-53-8L-43-35-33-8Z" fill={p.detail}/>
-      <Path d="M-46-15L-43-35-37-17Z" fill="#dcecf1" opacity={0.75}/>
-      <Path d="M31-11L45-43 58-10Z" fill={p.detail} opacity={0.9}/>
-      <Path d="M39-26L45-43 52-26Z" fill="#fcf5d9" opacity={0.84}/>
-      <G transform="translate(-25 9)">
-        <Path d="M-5 17V-10H5V17Z" fill="#765d5a"/>
-        <Path d="M-19 1L0-26 19 1ZM-16 12L0-14 16 12Z" fill={p.detail}/>
-        <Path d="M-7-7L0-24 7-7Z" fill="#9fd0b4" opacity={0.55}/>
-      </G>
-      <G transform="translate(25 15)">
-        <Rect x={-12} y={-14} width={24} height={26} rx={3} fill="#f0dcb3" stroke="#74687a" strokeWidth={2}/>
-        <Path d="M-17-14L0-31 17-14Z" fill={p.roof} stroke="#74687a" strokeWidth={2}/>
-        <Rect x={-4} y={-2} width={8} height={14} rx={2} fill="#7e708b"/>
-        <Circle cx={-7} cy={-6} r={3} fill="#fff7c8"/>
-        <Circle cx={7} cy={-6} r={3} fill="#fff7c8"/>
-      </G>
-      {index >= 6 && (
-        <G>
-          <Path d="M-1 0L7-58 15 0Z" fill="#c9c0e2" stroke="#626b9d" strokeWidth={2}/>
-          <Path d="M-7-56L7-76 22-56Z" fill={p.roof}/>
-          <Path d="M7-82L10-74 18-71 10-68 7-60 4-68-4-71 4-74Z" fill="#ffe7a8"/>
-        </G>
-      )}
-      <Circle cx={-72} cy={-33} r={2.5} fill="#fff8d3" opacity={0.85}/>
-      <Circle cx={67} cy={-43} r={2.2} fill="#fff8d3" opacity={0.85}/>
-      {locked && <Ellipse rx={84} ry={42} fill="#dbe5ec" opacity={0.25}/>}
-    </G>
-  );
-}
+  const [width, setWidth] = useState(0);
+  const layout = worldMapLayout(width);
+  const testing = mode === 'test';
+  const summary = unlockSummary(progress);
+  const stats = worldGrades.map(grade => gradeProgress(progress, grade.id));
+  const available = worldGrades.map((grade, index) => testing || index === 0 || stats[index - 1].extrasCleared === 10);
+  const current = testing ? -1 : available.findIndex((open, index) => open && stats[index].extrasCleared < 10);
 
-function WorldSea({ width, height, positions, columns, current }: {
-  width: number; height: number; positions: readonly {x:number;y:number}[];
-  columns: number; current: number;
-}) {
-  const isMobile = columns === 2;
-  return (
-    <Svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" accessible={false}>
-      <Defs>
-        <LinearGradient id="voyage-sea" x1="0" y1="0" x2="0.8" y2="1">
-          <Stop offset="0" stopColor="#386a97"/><Stop offset=".48" stopColor="#4f95af"/>
-          <Stop offset="1" stopColor="#82bdc4"/>
-        </LinearGradient>
-      </Defs>
-      <Rect width={width} height={height} fill="url(#voyage-sea)"/>
-      <OceanTexture width={width} height={height}/>
-      <Path d={routeThrough(positions,0.2)} fill="none" stroke="#245a87"
-        strokeWidth={11} opacity={0.36} strokeLinecap="round"/>
-      <Path d={routeThrough(positions,0.2)} fill="none" stroke="#fff2bf"
-        strokeWidth={3.5} strokeDasharray="7 13" opacity={0.94} strokeLinecap="round"/>
-      {positions.map((spot,i) => (
-        <G key={worldGrades[i].id}>
-          {i === current && (
-            <G>
-              <Circle cx={spot.x} cy={spot.y-15} r={isMobile?68:84} fill="#fff3a7" opacity={0.23}/>
-              <Circle cx={spot.x} cy={spot.y-15} r={isMobile?63:77}
-                stroke="#ffe6a2" strokeWidth={2.5} strokeDasharray="6 8" fill="none"/>
-            </G>
-          )}
-          <IslandArt index={i} x={spot.x} y={spot.y-20} scale={isMobile?0.87:1.12} locked={i>current && current>=0}/>
-        </G>
-      ))}
-      {positions.length>0 && (
-        <G transform={`translate(${positions[0].x-54} ${positions[0].y-72})`}>
-          <Circle r={11} fill="#ffe9a0" opacity={0.75}/>
-          <Path d="M0-10L3-3 10 0 3 3 0 10-3 3-10 0-3-3Z" fill="white"/>
-        </G>
-      )}
-    </Svg>
-  );
-}
-
-export function WorldMap780({ progress, onGrade, onTitles }: {
-  progress: Progress; onGrade: (grade: WorldGrade) => void; onTitles: () => void;
-}) {
-  const [width,setWidth] = useState(0);
-  const layout = worldMapLayout(measuredWidth(width));
-  const summary=unlockSummary(progress);
-  const current = worldGrades.findIndex((grade,i) => {
-    if (i>0 && gradeProgress(progress,worldGrades[i-1].id).extrasCleared < 10) return true;
-    return gradeProgress(progress,grade.id).extrasCleared < 10;
-  });
-  const size = layout.columns===3?206:Math.min(160,Math.floor(measuredWidth(width)/2)-10);
   return (
     <View style={styles.screen}>
       <View style={styles.worldBanner}>
-        <Text style={styles.eyebrow}>12の島をめぐる すうがくの大ぼうけん</Text>
-        <Text style={styles.bannerHeading}>数の世界地図</Text>
-        <Text style={styles.bannerDescription}>島をタッチして ぼうけんに出発！ 小学1年生から高校3年生まで。</Text>
+        <Text accessibilityRole="header" style={styles.bannerHeading}>数の世界地図</Text>
+        <Text style={styles.bannerDescription}>島をえらんで、65のステージへ。</Text>
         <View style={styles.stats}>
-          <Text style={styles.stat}>✦ {summary.cleared} / 780 クリア</Text>
-          <Text style={styles.stat}>★ {summary.perfect} パーフェクト</Text>
+          <Text style={styles.stat}>12の島 · 780ステージ</Text>
+          {!testing && <Text style={styles.stat}>{summary.cleared} / 780 クリア</Text>}
         </View>
       </View>
-      <View style={styles.mapHeading}>
-        <Text style={styles.mapTitle}>✧ 12の島が つながる世界</Text>
-        <Text style={styles.hintText}>どの島も地図で見られるよ。ステージは順番に開放されるよ。</Text>
-      </View>
-      <View style={[styles.ocean,{height:layout.height}]} onLayout={event=>{
-        const next=Math.round(event.nativeEvent.layout.width);
-        if(next>0 && next!==width) setWidth(next);
+      <View style={[styles.atlas, { height: layout.height }]} onLayout={event => {
+        const next = Math.round(event.nativeEvent.layout.width);
+        if (next > 0 && next !== width) setWidth(next);
       }}>
-        <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-          <WorldSea width={measuredWidth(width)} height={layout.height}
-            positions={layout.positions} columns={layout.columns} current={current}/>
-        </View>
-        {worldGrades.map((grade,index)=>{
-          const position=layout.positions[index];
-          const locked=index>0 && gradeProgress(progress,worldGrades[index-1].id).extrasCleared<10;
-          const count=gradeProgress(progress,grade.id).cleared;
-          return (
-            <Pressable key={grade.id} accessibilityRole="button"
-              accessibilityLabel={grade.title+' '+grade.island+'、'+count+'／65ステージ、'+(locked?'まだ解放されていない島。マップを見られます':'冒険できます')}
-              onPress={()=>onGrade(grade)}
-              style={({pressed})=>[styles.islandTarget,{
-                width:size,left:position.x-size/2,top:position.y-86,
-              },pressed&&styles.pressed]}>
-              <View style={styles.islandHeader}>
-                <Text style={styles.islandOrder}>{String(index+1).padStart(2,'0')} / 12</Text>
-                <Text style={styles.islandMark}>{locked?'🔒':emblems[index]}</Text>
-              </View>
-              <View style={styles.islandTag}>
-                <Text style={styles.gradeName}>{grade.title}</Text>
-                <Text style={styles.islandName} numberOfLines={1}>{grade.island}</Text>
-                <Text style={styles.islandCount}>{count} / 65　{locked?'マップをみる':'ぼうけんへ ›'}</Text>
-              </View>
-            </Pressable>
-          );
-        })}
+        {width > 0 && (
+          <>
+            <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+              <WorldAtlasArt layout={layout} available={available} current={current} />
+            </View>
+            {worldGrades.map((grade, index) => {
+              const point = layout.positions[index];
+              const label = testing ? '自由にプレイ' : index === current ? 'つぎの目的地' : available[index] ? 'ぼうけんへ' : '未解放・地図をみる';
+              return (
+                <Pressable key={grade.id} accessibilityRole="button"
+                  accessibilityLabel={`${grade.title}、${grade.island}、${grade.stages.length}ステージ、${label}`}
+                  onPress={() => onGrade(grade)}
+                  style={({ pressed }) => [styles.atlasTarget, {
+                    width: layout.targetWidth,
+                    left: point.x - layout.targetWidth / 2,
+                    top: point.y - 36,
+                  }, pressed && styles.pressed]}>
+                  <View style={[styles.islandTag, index === current && styles.islandTagCurrent]}>
+                    <Text style={styles.gradeName}>{grade.title}</Text>
+                    <Text style={styles.islandName}>{grade.island}</Text>
+                    <Text style={styles.islandCount}>{label} ›</Text>
+                  </View>
+                </Pressable>
+              );
+            })}
+          </>
+        )}
       </View>
-      <Pressable accessibilityRole="button" onPress={onTitles} style={styles.book}>
-        <Text style={styles.bookText}>🏅 しょうごう ずかんを みる</Text>
-      </Pressable>
+      {!testing && <Pressable accessibilityRole="button" onPress={onTitles} style={styles.book}>
+        <Text style={styles.bookText}>しょうごう ずかんを みる</Text>
+      </Pressable>}
     </View>
   );
 }
@@ -205,13 +115,12 @@ function longIslandCoast(width:number,height:number): string {
   return 'M'+[...left,...right].map(p=>`${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' L')+' Z';
 }
 
-function IslandTerrain({gradeIndex,width,height,positions,grade,progress}: {
+function IslandTerrain({gradeIndex,width,height,positions,grade,next}: {
   gradeIndex:number;width:number;height:number;
-  positions:readonly {x:number;y:number}[];grade:WorldGrade;progress:Progress;
+  positions:readonly {x:number;y:number}[];grade:WorldGrade;next:number;
 }) {
   const p=palette[gradeIndex];
   const paths=islandRouteByKind(grade.stages,positions.map((spot,order)=>({...spot,order,row:Math.floor(order/5),column:0})));
-  const next=grade.stages.findIndex(stage=>isWorldStageUnlocked(progress,stage)&&!progress.stages[stage.id]);
   return (
     <Svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" accessible={false}>
       <Defs>
@@ -285,15 +194,16 @@ function stageText(stage:WorldStage):string {
   return '秘'+String(stage.order-59);
 }
 
-export function IslandStageMap({grade,progress,onBack,onStart,onTitles}: {
-  grade:WorldGrade;progress:Progress;onBack:()=>void;onStart:(stage:WorldStage)=>void;onTitles:()=>void;
+export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles}: {
+  grade:WorldGrade;progress:Progress;mode:PlayMode;onBack:()=>void;onStart:(stage:WorldStage)=>void;onTitles:()=>void;
 }) {
   const [width,setWidth]=useState(0);
   const actual=measuredWidth(width);
   const geometry=islandStageLayout(actual,grade.stages.length);
   const stats=gradeProgress(progress,grade.id);
   const gradeIndex=worldGrades.findIndex(g=>g.id===grade.id);
-  const next=grade.stages.find(stage=>isWorldStageUnlocked(progress,stage)&&!progress.stages[stage.id]);
+  const testing = mode === 'test';
+  const next = testing ? undefined : grade.stages.find(stage => canPlayWorldStage(mode, progress, stage) && !progress.stages[stage.id]);
   const marker=Math.max(46,Math.min(57,Math.floor(actual/5)-9));
   return (
     <View style={styles.screen}>
@@ -305,16 +215,16 @@ export function IslandStageMap({grade,progress,onBack,onStart,onTitles}: {
           <Text style={styles.eyebrow}>{grade.title} の ぼうけんマップ</Text>
           <Text style={styles.bannerHeading}>{grade.island}</Text>
           <Text style={styles.bannerDescription}>{grade.theme}</Text>
-          <Text style={styles.islandBannerCount}>✦ {stats.cleared} / 65 クリア　★ {stats.perfect} パーフェクト</Text>
+          <Text style={styles.islandBannerCount}>{testing ? "65ステージ すべてプレイできるよ" : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
         </View>
         <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
       </View>
-      <View style={styles.legend}>
+      {!testing && <View style={styles.legend}>
         <Text style={styles.legendText}>✦ 挑戦できる</Text>
         <Text style={styles.legendText}>✓ クリア</Text>
         <Text style={styles.legendText}>★ パーフェクト</Text>
         <Text style={styles.legendText}>🔒 未解放</Text>
-      </View>
+      </View>}
       {next && (
         <Pressable accessibilityRole="button" onPress={()=>onStart(next)} style={styles.nextButton}>
           <Text style={styles.nextText}>✦ つづきから ぼうけんする　ステージ {stageText(next)} ›</Text>
@@ -330,7 +240,7 @@ export function IslandStageMap({grade,progress,onBack,onStart,onTitles}: {
       }}>
         <View pointerEvents="none" style={StyleSheet.absoluteFill}>
           <IslandTerrain gradeIndex={gradeIndex} width={actual} height={geometry.height}
-            positions={geometry.positions} grade={grade} progress={progress}/>
+            positions={geometry.positions} grade={grade} next={next?.order ?? -1}/>
         </View>
         {Array.from({length:13},(_,row)=>{
           const y=geometry.positions[row*5]?.y??0;
@@ -344,11 +254,11 @@ export function IslandStageMap({grade,progress,onBack,onStart,onTitles}: {
         })}
         {grade.stages.map((stage,index)=>{
           const position=geometry.positions[index];
-          const record=progress.stages[stage.id] as {clearedAt?:string;perfectAt?:string}|undefined;
-          const unlocked=isWorldStageUnlocked(progress,stage);
+          const record=(testing ? undefined : progress.stages[stage.id]) as {clearedAt?:string;perfectAt?:string}|undefined;
+          const unlocked=canPlayWorldStage(mode,progress,stage);
           const cleared=Boolean(record?.clearedAt);
           const perfect=Boolean(record?.perfectAt||(legacy.has(stage.id)&&cleared));
-          const current=unlocked&&!cleared;
+          const current=stage.id===next?.id;
           return (
             <Pressable key={stage.id} accessibilityRole="button" disabled={!unlocked}
               accessibilityState={{disabled:!unlocked}}
@@ -370,17 +280,17 @@ export function IslandStageMap({grade,progress,onBack,onStart,onTitles}: {
           );
         })}
       </View>
-      <View style={styles.footer}>
+      {!testing && <View style={styles.footer}>
         <Text style={styles.footerTitle}>✦ この島には 65のステージ</Text>
         <Text style={styles.footerInfo}>通常ステージ 50こ → EX 10こ → ひみつ 5こ。ひみつの道は通常とEXの60ステージをぜんぶパーフェクトにすると開くよ。</Text>
         <Text style={styles.footerInfo}>ひみつの道まで パーフェクト：{grade.stages.slice(0,60).filter(stage=>{
           const r=progress.stages[stage.id] as {perfectAt?:string;clearedAt?:string}|undefined;
           return Boolean(r?.perfectAt||(legacy.has(stage.id)&&r?.clearedAt));
         }).length} / 60</Text>
-      </View>
-      <Pressable accessibilityRole="button" onPress={onTitles} style={styles.book}>
+      </View>}
+      {!testing && <Pressable accessibilityRole="button" onPress={onTitles} style={styles.book}>
         <Text style={styles.bookText}>🏅 しょうごう ずかんを みる</Text>
-      </Pressable>
+      </Pressable>}
     </View>
   );
 }
@@ -400,15 +310,14 @@ const styles=StyleSheet.create({
   mapTitle:{color:'#2b395e',fontWeight:'900',fontSize:19},
   hintText:{color:'#5c657d',fontSize:13,lineHeight:20},
   ocean:{borderRadius:22,backgroundColor:'#548cab',overflow:'hidden',position:'relative',borderWidth:3,borderColor:'#d1dbdd'},
-  islandTarget:{position:'absolute',height:177,alignItems:'center',justifyContent:'space-between',paddingVertical:6},
-  islandHeader:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',width:'81%',backgroundColor:'#edf0de',paddingHorizontal:8,paddingVertical:3,borderRadius:10,opacity:0.95},
-  islandOrder:{color:'#445a66',fontSize:11,fontWeight:'900'},
-  islandMark:{color:'#b98533',fontWeight:'900',fontSize:13},
-  islandTag:{width:'100%',backgroundColor:'#fff9e9',borderRadius:11,paddingVertical:7,paddingHorizontal:6,alignItems:'center',borderWidth:2,borderColor:'#e5cda0',
-    shadowColor:'#153958',shadowOpacity:0.18,shadowRadius:4,shadowOffset:{width:0,height:3}},
-  gradeName:{fontSize:12,color:'#646079',fontWeight:'900'},
-  islandName:{fontSize:14,color:'#2c3d5e',fontWeight:'900',textAlign:'center'},
-  islandCount:{fontSize:11,color:'#457a73',fontWeight:'800',marginTop:2},
+  atlas:{borderRadius:22,backgroundColor:'#244e68',overflow:'hidden',position:'relative'},
+  atlasTarget:{position:'absolute',minHeight:114,paddingTop:61,alignItems:'stretch'},
+  islandTag:{backgroundColor:'#f9f4e3',borderRadius:9,paddingVertical:5,paddingHorizontal:5,alignItems:'center',borderWidth:1,
+    borderColor:'#babfa9',shadowColor:'#0e2d48',shadowOpacity:0.33,shadowRadius:5,shadowOffset:{width:0,height:3}},
+  islandTagCurrent:{backgroundColor:'#ffe8a8',borderColor:'#f6cf72',borderWidth:2},
+  gradeName:{fontSize:10,color:'#514c59',fontWeight:'900',lineHeight:13},
+  islandName:{fontSize:12,color:'#233b4f',fontWeight:'900',textAlign:'center',lineHeight:16},
+  islandCount:{fontSize:10,color:'#3c625b',fontWeight:'800',textAlign:'center',lineHeight:14},
   book:{minHeight:47,padding:12,alignItems:'center',justifyContent:'center',borderRadius:13,backgroundColor:'#f1d18b'},
   bookText:{color:'#433d60',fontSize:15,fontWeight:'900'},
   back:{alignSelf:'flex-start',minHeight:44,justifyContent:'center',paddingHorizontal:6},

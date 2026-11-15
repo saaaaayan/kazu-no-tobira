@@ -3,25 +3,23 @@ import assert from 'node:assert/strict';
 import { worldMapLayout, islandStageLayout, routeThrough, islandRouteByKind } from '../src/domain/worldMapLayout.ts';
 import { worldGrades } from '../src/domain/worldCatalog.ts';
 
-test('世界地図はデスクトップで3列×4行、スマホで2列×6行、全12島を表示', () => {
-  for (const [width, cols, rows] of [[340, 2, 6], [430, 2, 6], [700, 3, 4], [1000, 3, 4]]) {
+test('世界地図の12島は格子に揃わず、狭い画面でも島ラベルが地図内に収まる', () => {
+  for (const width of [288, 340, 430, 699, 700, 820, 1000]) {
     const map = worldMapLayout(width);
-    assert.equal(map.columns, cols);
     assert.equal(map.positions.length, 12);
-    assert.equal(new Set(map.positions.map(point => point.x + ':' + point.y)).size, 12);
-    assert.ok(map.height >= map.positions.at(-1).y + 80);
-    assert.equal(new Set(map.positions.map(p=>p.y)).size, rows);
+    assert.equal(new Set(map.positions.map(point => point.y)).size, 12);
+    assert.equal(new Set(map.positions.map(point => point.x)).size, 12);
     for (const point of map.positions) {
-      assert.ok(point.x >= 65 && point.x < width - 65, JSON.stringify({width,point}));
-      assert.ok(point.y >= 60 && point.y < map.height);
+      assert.ok(point.x - map.targetWidth / 2 >= 0 && point.x + map.targetWidth / 2 <= width);
+      assert.ok(point.y >= 36 && point.y + 85 <= map.height);
     }
-    for (let i = 1; i < map.positions.length; i++) {
-      const prev=map.positions[i-1], next=map.positions[i];
-      // Adjacent grade islands follow the chart without impossible teleportation.
-      assert.ok(Math.hypot(next.x-prev.x,next.y-prev.y)<width/cols+120);
+    for (const [index, point] of map.positions.entries()) {
+      for (const other of map.positions.slice(index + 1)) {
+        assert.ok(Math.abs(point.x - other.x) >= map.targetWidth || Math.abs(point.y - other.y) >= 52,
+          JSON.stringify({ width, point, other }));
+      }
     }
-    assert.ok(routeThrough(map.positions).startsWith('M'));
-    assert.equal((routeThrough(map.positions).match(/ Q/g)||[]).length, 11);
+    assert.equal((routeThrough(map.positions).match(/ Q/g) || []).length, 11);
   }
 });
 
