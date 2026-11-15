@@ -561,7 +561,9 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
 
 function discovery(stage: WorldStage, index: number, r: Random): Omit<MathQuestion, 'id' | 'skillId'> {
   const grade = levels[stage.gradeId];
-  const mode = (stage.order - 60 + index) % 5;
+  const slot = (stage.order - 60 + index) % 10;
+  if (slot >= 5) return discoveryExtension(grade, slot - 5, r);
+  const mode = slot;
   if (grade <= 3) {
     if(mode===0) {
       const first=r.int(2,9), step=r.int(2,5);
@@ -600,6 +602,44 @@ function discovery(stage: WorldStage, index: number, r: Random): Omit<MathQuesti
     '自然対数の底eを定義する有名な極限だよ。',r);
   return choice('無限に続く素数は存在する？','無限にある',['有限個しかない','2だけ','奇数だけ','1000個'],
     'どんな有限個の素数を並べても、別の素数があることを示せるよ。',r);
+}
+
+function discoveryExtension(grade: number, slot: number, r: Random): Omit<MathQuestion, 'id' | 'skillId'> {
+  const n = r.int(3, grade <= 3 ? 8 : 14);
+  if (grade <= 3) {
+    switch (slot) {
+      case 0: return numeric(`2, 4, 6, 8, ？ とつづきます。つぎの かずは？`, 10, 'まえの かずに 2を たすよ。8＋2＝10。');
+      case 1: return numeric(`1つの はこに たまが 2こ。はこが ${n}こ あると、たまは なんこ？`, 2 * n, `2こずつ ${n}かい あわせると ${2 * n}こ。`);
+      case 2: return numeric('はじめに 1こ、つぎに 2こ、さいごに 3こ もらったよ。ぜんぶで なんこ？', 6, '1＋2＝3。そこに 3こ たすと 6こ。');
+      case 3: return numeric(`あかと あおを 1こずつ くみに します。あかが ${n}こ、あおが ${n + 2}こ あります。あおは なんこ あまる？`, 2, `つかう あおは ${n}こ。あまりは ${n + 2}−${n}＝2こ。`);
+      default: return numeric('1から9までの かずから、1と9、2と8、3と7、4と6を くみに します。のこる かずは？', 5, 'どの くみも たすと 10。5だけが くみを つくらないよ。');
+    }
+  }
+  if (grade <= 6) {
+    switch (slot) {
+      case 0: return numeric(`1辺に ${n}こずつ石を置いた正方形の外わく。四つの角を二重に数えないと、石は何こ？`, 4 * n - 4, `4辺で ${4 * n}こ。各角が1回ずつ多いから ${4 * n}−4＝${4 * n - 4}こ。`);
+      case 1: return numeric('1、4、9、16と正方形を作る数が続く。次の数は？', 25, '一辺が5になるので 5×5＝25。');
+      case 2: return numeric(`1から ${2 * n}までの数を、最小と最大から順に組にする。どの組の和もいくつ？`, 2 * n + 1, `小さい方が1増えると、大きい方が1減る。どの和も 1＋${2 * n}＝${2 * n + 1}。`);
+      case 3: return numeric('3、6、12、24と前の数を倍にする。6番目の数は？', 96, '5番目は 24×2＝48。6番目は 48×2＝96。');
+      default: return numeric('三角形を5枚つないで列にした。隣の三角形どうしは辺を1本共有する。外まわりの辺は何本？', 7, '別々なら 3×5＝15本。共有する4か所では2本ずつ外まわりから消えるから 15−8＝7本。');
+    }
+  }
+  if (grade <= 9) {
+    switch (slot) {
+      case 0: return numeric(`連続する3整数の平均が ${n}。最も大きい数は？`, n + 1, `真ん中が平均の ${n}。最大はその次の ${n + 1}。`);
+      case 1: return numeric('1から20までで、2でも3でも割り切れる整数はいくつ？', 3, '2と3の最小公倍数6の倍数を探す。6、12、18の3個。');
+      case 2: return numeric('正方形の一辺を3倍、厚さも3倍にした正方形の柱。体積は何倍？', 27, '底面積が3×3＝9倍、高さは3倍。合わせて 9×3＝27倍。');
+      case 3: return numeric('連続する5個の奇数の和が55。中央の数は？', 11, '中央からの差は両側で打ち消し合う。中央は平均 55÷5＝11。');
+      default: return numeric('折り目で紙の点を重ねると、折り目から両方の点までの距離は等しい。片方が7 cmなら、もう一方は何 cm？', 7, '折り目は対称の軸なので、対応する点は軸から同じ距離にある。');
+    }
+  }
+  switch (slot) {
+    case 0: return numeric(`Σ[k=1,${n}] (2k−1) の値は？`, n ** 2, `第1項は1、末項は ${2 * n - 1}。両端の平均は ${n}。項数も ${n}なので和は ${n}²＝${n ** 2}。`);
+    case 1: return numeric('i^4 の値は？', 1, 'i²＝−1なので i⁴＝(−1)²＝1。');
+    case 2: return numeric('初項3、公比2の等比数列で、第5項は？', 48, '初項から第5項までに4回倍にする。3×2^4＝48。');
+    case 3: return numeric('∫[0,2] 2x dx の値は？', 4, '2xの原始関数は x²+C。上端と下端での差は 2²−0²＝4。');
+    default: return numeric('sin 30° と cos 60° の和は？', 1, 'sin 30°＝1/2、cos 60°＝1/2。和は1。');
+  }
 }
 
 export function generateWorldQuestions(stage: WorldStage, attemptSeed = 0): MathQuestion[] {

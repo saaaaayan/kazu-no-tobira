@@ -57,13 +57,16 @@ export function finishWorldStage(
   const past = progress.stages[stage.id] as FullStageProgress | undefined;
   const cleared = correct >= Math.ceil(stage.questions * 0.8);
   const perfect = correct === stage.questions && !usedHint;
-  const improved = Math.max(correct, past?.bestCorrect ?? -1);
+  const priorCorrect = past?.bestCorrect;
+  const priorTotal = past?.bestTotal;
+  const priorWasBetter = priorCorrect !== undefined && priorTotal !== undefined && priorTotal > 0 &&
+    priorCorrect * stage.questions > correct * priorTotal;
   const updated: FullStageProgress = {
     ...past,
     ...(cleared && !past?.clearedAt ? { clearedAt: completedAt } : {}),
     ...(perfect && !past?.perfectAt ? { perfectAt: completedAt } : {}),
-    bestCorrect: improved,
-    bestTotal: stage.questions,
+    bestCorrect: priorWasBetter ? priorCorrect : correct,
+    bestTotal: priorWasBetter ? priorTotal : stage.questions,
     plays: (past?.plays ?? 0) + 1,
   } as FullStageProgress;
   // The StageProgress type requires a clearedAt; don't treat failed attempts as clears.
