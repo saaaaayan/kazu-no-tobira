@@ -1,5 +1,5 @@
-import type { Progress } from './progress';
-import { worldGrades, worldStages, isPerfect } from './worldPlan';
+import type { Progress } from './progress.ts';
+import { worldGrades, worldStages, isPerfect } from './worldPlan.ts';
 
 export type AchievementCategory = 'adventure' | 'mastery' | 'exploration';
 
