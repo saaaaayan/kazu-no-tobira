@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState, type ComponentRef } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { generateAdditionRound, type AdditionProblem } from './domain/addition';
 import { additionSkills, firstGradeStages, type AdditionStage } from './domain/curriculum';
 import { gradeInteger } from './domain/grading';
 import { recordAttempt, type Progress } from './domain/progress';
 import { loadProgress, saveProgress } from './storage';
+import CalculationMemo from './components/CalculationMemo';
+import NumberPad from './components/NumberPad';
 
 const stageIcons = ['🌲', '🌙', '✦'];
 const ink = '#202c47';
@@ -29,6 +31,9 @@ function Adventure() {
   const [saving, setSaving] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
   const submitting = useRef(false);
+  const [drawing, setDrawing] = useState(false);
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+  const wide = useWindowDimensions().width >= 760;
   const answerInput = useRef<ComponentRef<typeof TextInput>>(null);
 
   useEffect(() => {
@@ -43,6 +48,7 @@ function Adventure() {
   function start(stage: AdditionStage) {
     setInput('');
     setMessage('');
+    scroll.current?.scrollTo({ y: 0, animated: false });
     setRound({ stage, problems: generateAdditionRound(stage.skillId), index: 0, correct: 0 });
   }
 
@@ -84,6 +90,7 @@ function Adventure() {
   function advance() {
     if (!round) return;
     setInput('');
+    scroll.current?.scrollTo({ y: 0, animated: false });
     if (round.index === round.problems.length - 1) {
       setRound({ ...round, complete: true });
     } else {
@@ -94,9 +101,9 @@ function Adventure() {
   const problem = round?.problems[round.index];
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scroll}>
-        <View style={styles.shell}>
-          <View style={styles.hero}>
+      <ScrollView ref={scroll} scrollEnabled={!drawing} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scroll}>
+        <View style={[styles.shell, round && !round.complete && styles.practiceShell]}>
+          <View style={[styles.hero, round && styles.compactHero]}>
             <View style={styles.moon} />
             <Text style={styles.brand}>数のトビラ</Text>
             <Text accessibilityRole="header" style={styles.title}>たしざんの冒険</Text>
@@ -133,9 +140,9 @@ function Adventure() {
             </View>
           )}
           {round && problem && (
-            <View style={styles.panel}>
+            <View style={[styles.panel, !round.complete && styles.practicePanel]}>
               <Pressable accessibilityRole="button" disabled={saving} accessibilityState={{ disabled: saving }}
-                onPress={() => setRound(undefined)} style={styles.back}>
+                onPress={() => { setDrawing(false); setRound(undefined); }} style={styles.back}>
                 <Text style={styles.backText}>‹ マップにもどる</Text>
               </Pressable>
               <Text accessibilityRole="header" style={styles.heading}>{round.stage.title}</Text>
@@ -148,26 +155,44 @@ function Adventure() {
                 </>
               ) : (
                 <>
-                  <Text style={styles.detail}>{round.index + 1} / {round.problems.length} もん</Text>
-                  <Text style={styles.equation}>{problem.left} ＋ {problem.right} ＝ {round.feedback ? problem.answer : '?'}</Text>
-                  {round.feedback ? (
-                    <>
-                      <View accessibilityLiveRegion="polite" style={styles.feedback}>
-                        <Text style={styles.stageTitle}>{round.feedback === 'correct' ? 'せいかい！' : 'おしい！'}</Text>
-                        <Text style={styles.detail}>{problem.explanation}</Text>
-                      </View>
-                      <Action label={round.index + 1 === round.problems.length ? 'けっかを みる' : 'つぎの もんだい'} onPress={advance} />
-                    </>
-                  ) : (
-                    <>
-                      <TextInput ref={answerInput} accessibilityLabel="こたえ" enterKeyHint="done" inputMode="numeric"
-                        key={problem.id} value={input} onChangeText={value => { setInput(value); setMessage(''); }}
-                        onSubmitEditing={submit} editable={!saving} placeholder="こたえ" placeholderTextColor={muted}
-                        style={styles.input} />
-                      {!!message && <Text accessibilityLiveRegion="polite" style={styles.error}>{message}</Text>}
-                      <Action label={saving ? 'ほぞんちゅう…' : 'こたえあわせ'} onPress={submit} disabled={saving} />
-                    </>
-                  )}
+                  <View style={styles.question}>
+                    <Text style={styles.questionStep}>{round.index + 1} / {round.problems.length} もん</Text>
+                    <Text style={styles.prompt}>あわせると いくつ？</Text>
+                    <Text style={[styles.formula, wide && styles.wideFormula]}>
+                      {problem.left} ＋ {problem.right} ＝ {round.feedback ? problem.answer : '？'}
+                    </Text>
+                  </View>
+                  <View style={[styles.practice, wide && styles.practiceWide]}>
+                    <View style={[styles.answerPanel, wide && styles.answerWide]}>
+                      {round.feedback ? (
+                        <>
+                          <View accessibilityLiveRegion="polite" style={[styles.feedback, round.feedback === 'incorrect' && styles.incorrect]}>
+                            <Text accessibilityRole="header" style={styles.feedbackTitle}>
+                              {round.feedback === 'correct' ? 'せいかい！' : 'おしい！'}
+                            </Text>
+                            <Text style={styles.detail}>きみの こたえは {input.trim()}</Text>
+                            <Text style={styles.detail}>{problem.explanation}</Text>
+                          </View>
+                          <Action label={round.index + 1 === round.problems.length ? 'けっかを みる' : 'つぎの もんだい'} onPress={advance} />
+                        </>
+                      ) : (
+                        <>
+                          <Text style={styles.answerTitle}>こたえ</Text>
+                          <TextInput ref={answerInput} accessibilityLabel="こたえ" enterKeyHint="done" inputMode="numeric"
+                            key={problem.id} value={input} onChangeText={value => { setInput(value); setMessage(''); }}
+                            onSubmitEditing={submit} editable={!saving} placeholder="すうじ" placeholderTextColor={muted}
+                            style={styles.input} />
+                          <NumberPad disabled={saving} onChange={key => {
+                            setInput(value => key === '全部消す' ? '' : key === 'けす' ? value.slice(0, -1) : value + key);
+                            setMessage('');
+                          }} />
+                          {!!message && <Text accessibilityLiveRegion="polite" style={styles.error}>{message}</Text>}
+                          <Action label={saving ? 'ほぞんちゅう…' : 'こたえあわせ'} onPress={submit} disabled={saving} />
+                        </>
+                      )}
+                    </View>
+                    <CalculationMemo key={problem.id} onDrawingChange={setDrawing} />
+                  </View>
                 </>
               )}
             </View>
@@ -215,10 +240,26 @@ const styles = StyleSheet.create({
   back: { alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' },
   backText: { color: '#265342', fontWeight: '700' },
   equation: { color: ink, fontSize: 30, fontWeight: '800', marginVertical: 6 },
-  input: { color: ink, backgroundColor: 'white', borderColor: '#858da3', borderWidth: 1, fontSize: 20, padding: 12, borderRadius: 10 },
-  action: { minHeight: 48, borderRadius: 12, backgroundColor: '#275645', justifyContent: 'center', alignItems: 'center', padding: 12 },
+  practiceShell: { maxWidth: 1032 },
+  compactHero: { paddingVertical: 14 },
+  practicePanel: { backgroundColor: '#fbfaff', padding: 14 },
+  question: { padding: 16, gap: 6, borderRadius: 14, backgroundColor: '#21294f' },
+  questionStep: { color: '#d0d8fa', fontSize: 14, fontWeight: '700' },
+  prompt: { color: '#fff', fontSize: 21, fontWeight: '700' },
+  formula: { color: '#fff', fontSize: 34, fontWeight: '800', fontVariant: ['tabular-nums'] },
+  wideFormula: { fontSize: 50 },
+  practice: { gap: 14 },
+  practiceWide: { flexDirection: 'row-reverse', alignItems: 'stretch' },
+  answerPanel: { minWidth: 0, gap: 8, backgroundColor: '#f4f6fd', borderRadius: 18, padding: 14 },
+  answerWide: { width: 300 },
+  answerTitle: { color: '#232b56', fontSize: 17, fontWeight: '800' },
+  input: { color: ink, backgroundColor: 'white', borderColor: '#777fa8', borderWidth: 1,
+    fontSize: 24, fontWeight: '700', paddingHorizontal: 12, minHeight: 50, borderRadius: 10 },
+  action: { minHeight: 48, borderRadius: 12, backgroundColor: '#36488c', justifyContent: 'center', alignItems: 'center', padding: 12 },
   actionLabel: { color: 'white', fontWeight: '700', fontSize: 16 },
-  feedback: { backgroundColor: '#e9efe3', padding: 14, borderRadius: 12, gap: 5 },
+  feedback: { backgroundColor: '#e2eee8', padding: 14, borderRadius: 12, gap: 8 },
+  incorrect: { backgroundColor: '#ece6f6' },
+  feedbackTitle: { color: '#25264b', fontSize: 22, fontWeight: '800' },
   notice: { padding: 12, color: ink },
   error: { color: '#922b2b' },
 });
