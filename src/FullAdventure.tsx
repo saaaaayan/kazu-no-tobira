@@ -7,6 +7,8 @@ import { isBankQuestion } from './domain/questionBank';
 import { prepareStageRound } from './stageRounds';
 import { QuestionDiagram, WorkedSolution, WrittenSolution } from './components/QuestionSupport';
 import type { Progress } from './domain/progress';
+import { canAccessStage, freeAccess, hasPremium, type Entitlement } from './domain/accessPlan';
+import { readServerEntitlement } from './domain/serverEntitlement';
 import { canPlayWorldStage, progressAfterWorldAnswer, worldStageAction, type PlayMode } from './domain/playMode';
 import { adventureTitles } from './domain/titles';
 import { loadProgress, saveProgress } from './storage';
@@ -47,6 +49,8 @@ function AdventureWorld() {
   const [loadError, setLoadError] = useState(false);
   const [screen, setScreen] = useState<Screen>('home');
   const [playMode, setPlayMode] = useState<PlayMode>('normal');
+  const [access, setAccess] = useState<Entitlement>(freeAccess);
+  const [showPlanInfo, setShowPlanInfo] = useState(false);
   const starting = useRef(false);
   const [loadingRound, setLoadingRound] = useState(false);
   const [startError, setStartError] = useState('');
@@ -77,6 +81,26 @@ function AdventureWorld() {
     );
     return () => { active = false; };
   }, []);
+
+  useEffect(() => {
+    if (__DEV__) return;
+    const controller = new AbortController();
+    const refresh = () => {
+      void readServerEntitlement(process.env.EXPO_PUBLIC_ENTITLEMENT_URL, controller.signal).then(next => {
+        if (!controller.signal.aborted) setAccess(next);
+      });
+    };
+    refresh();
+    const interval = setInterval(refresh, 60_000);
+    return () => { controller.abort(); clearInterval(interval); };
+  }, []);
+
+  useEffect(() => {
+    if (round && !canAccessStage(access, round.stage)) {
+      setRound(undefined);
+      setScreen('island');
+    }
+  }, [access, round]);
 
   function blockHandwriting(value: boolean) {
     blockRef.current = value;
@@ -125,7 +149,8 @@ function AdventureWorld() {
 
   async function start(stage: WorldStage) {
     if (!progress || starting.current || submitting.current || lessonWrite.current) return;
-    const action = worldStageAction(playMode, progress, stage);
+    const action = worldStageAction(playMode, progress, stage, access);
+    if (action === 'premium') { setShowPlanInfo(true); scroll.current?.scrollTo({ y: 0 }); return; }
     if (action === 'locked') return;
     if (action === 'learn') {
       const lesson = lessonForStage(stage.id);
@@ -137,7 +162,7 @@ function AdventureWorld() {
     setStartError('');
     const attemptSeed = testing ? testRoundSeed.current++ : progress.attempts.length;
     try {
-      const problems = await prepareStageRound(stage, playMode, attemptSeed);
+      const problems = await prepareStageRound(stage, playMode, attemptSeed, access);
       resetAnswer();
       setLearning(undefined);
       setScreen('island');
@@ -166,7 +191,7 @@ function AdventureWorld() {
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
 
   async function submit() {
-    if (!round || !progress || !question || round.feedback || submitting.current || saving ||
+    if (!round || !progress || !question || !canAccessStage(access, round.stage) || round.feedback || submitting.current || saving ||
       (shownMode === 'handwriting' && (blockRef.current || drawing))) return;
     if (!isValidMathAnswer(question, answer)) {
       setMessage(question.type === 'choice' ? 'こたえを ひとつ えらんでね。' : 'こたえを 数字で いれてね。');
@@ -226,6 +251,7 @@ function AdventureWorld() {
     setScreen('island');
   }
   function openGrade(next: WorldGrade) {
+    if (next.id === 'sage' && !hasPremium(access)) { setShowPlanInfo(true); scroll.current?.scrollTo({ y: 0 }); return; }
     resetAnswer();
     setGrade(next);
     setScreen('island');
@@ -234,9 +260,9 @@ function AdventureWorld() {
   const perfect = Boolean(round && round.correct === round.problems.length && !round.usedHint);
   const cleared = Boolean(round && round.correct >= Math.ceil(round.stage.questions * 0.8));
   const nextStage = round && worldIslands.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
-  const canContinue = nextStage && progress && worldStageAction(playMode, progress, nextStage) !== 'locked';
+  const canContinue = nextStage && progress && ['play', 'learn'].includes(worldStageAction(playMode, progress, nextStage, access));
   const lessonStage = learning && (learning.target ?? grade.stages.find(stage => learning.lesson.linkedStageIds.includes(stage.id)));
-  const canChallenge = lessonStage && progress && canPlayWorldStage(playMode, progress, lessonStage);
+  const canChallenge = lessonStage && progress && canPlayWorldStage(playMode, progress, lessonStage, access);
   const newlyEarnedTitles = round && progress && !testing ? adventureTitles(progress).filter(t=>t.unlocked).length : 0;
 
   return (
@@ -245,6 +271,18 @@ function AdventureWorld() {
         contentContainerStyle={styles.scroll}>
         <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}
           style={[styles.shell,round && !round.complete && styles.playShell]}>
+          {__DEV__ && <View style={styles.navigation}>
+            <Text style={styles.logo}>開発用プラン　{hasPremium(access) ? '有料ユーザー' : '無料ユーザー'}</Text>
+            <View style={styles.navigationHeader}>
+              <GameButton label="無料ユーザー" secondary disabled={loadingRound || saving} onPress={() => { setAccess(freeAccess); setShowPlanInfo(false); }} />
+              <GameButton label="有料ユーザー" secondary disabled={loadingRound || saving} onPress={() => { setAccess({ plan: 'premium', verifiedUntil: Infinity }); setShowPlanInfo(false); }} />
+            </View>
+          </View>}
+          {showPlanInfo && <View style={styles.playPanel}>
+            <Text accessibilityRole="header" style={styles.rewardMessage}>プレミアムのご案内</Text>
+            <Text style={styles.explanation}>EX・ひみつの道・賢者の島はプレミアムで遊べます。通常ステージと単元学習は無料です。</Text>
+            <GameButton label="とじる" secondary onPress={() => setShowPlanInfo(false)} />
+          </View>}
           {loadingRound && <Text accessibilityLiveRegion="polite">もんだいを よみこんでいるよ…</Text>}
           {!!startError && <Text accessibilityLiveRegion="polite" style={styles.error}>{startError}</Text>}
           {screen === 'home' && !round ? (
@@ -268,9 +306,9 @@ function AdventureWorld() {
             <Text style={styles.loading}>{loadError ? 'きろくを よみこめなかったよ。アプリを ひらきなおしてね。' : 'ぼうけんの じゅんびを しているよ…'}</Text>
           )}
           {progress && !round && screen === 'world' &&
-            <WorldMap780 progress={progress} mode={playMode} onGrade={openGrade} onTitles={()=>setScreen('titles')}/>}
+            <WorldMap780 progress={progress} mode={playMode} access={access} onGrade={openGrade} onTitles={()=>setScreen('titles')}/>}
           {progress && !round && screen === 'island' &&
-            <IslandStageMap key={grade.id} grade={grade} progress={progress} mode={playMode} onBack={()=>setScreen('world')}
+            <IslandStageMap key={grade.id} grade={grade} progress={progress} mode={playMode} access={access} onBack={()=>setScreen('world')}
               onTitles={()=>setScreen('titles')} onStart={start} onLearn={openLesson}/>}
           {progress && !round && screen === 'titles' &&
             <TitleAlbum progress={progress} onBack={()=>setScreen('world')}/>}
@@ -278,7 +316,7 @@ function AdventureWorld() {
             <UnitLearning key={learning.lesson.id} lesson={learning.lesson} progress={learning.progress}
               practice={testing} busy={saving} error={lessonError} onChange={updateLesson} onBack={goToIsland}
               onChallenge={canChallenge ? () => start(lessonStage) : undefined}/>}
-          {round && question && (
+          {round && question && canAccessStage(access, round.stage) && (
             <View style={styles.playPanel}>
               <Pressable accessibilityRole="button" disabled={saving} onPress={goToIsland} style={styles.back}>
                 <Text style={styles.backText}>‹ {grade.island}のマップへ</Text>

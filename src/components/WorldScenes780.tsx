@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 import { CompanionAvatar } from './AdventureCompanion';
 import { worldIslands, type WorldGrade, type WorldStage } from '../domain/worldCatalog';
+import { hasPremium, type Entitlement } from '../domain/accessPlan';
 import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldProgress';
 import { worldStageAction, type PlayMode } from '../domain/playMode';
 import WorldAtlasArt from './WorldAtlasArt';
@@ -46,16 +47,16 @@ function OceanTexture({ width, height, seed = 0 }: { width: number; height: numb
   );
 }
 
-export function WorldMap780({ progress, mode, onGrade, onTitles }: {
-  progress: Progress; mode: PlayMode; onGrade: (grade: WorldGrade) => void; onTitles: () => void;
+export function WorldMap780({ progress, mode, access, onGrade, onTitles }: {
+  progress: Progress; mode: PlayMode; access: Entitlement; onGrade: (grade: WorldGrade) => void; onTitles: () => void;
 }) {
   const [width, setWidth] = useState(0);
   const layout = worldMapLayout(width);
   const testing = mode === 'test';
   const summary = unlockSummary(progress);
   const stats = worldIslands.map(grade => gradeProgress(progress, grade.id));
-  const available = worldIslands.map(grade => testing || isIslandUnlocked(progress, grade.id));
-  const current = testing ? -1 : available.findIndex((open, index) => open && worldIslands[index].id !== 'sage' && stats[index].extrasCleared < 10);
+  const available = worldIslands.map(grade => (grade.id !== 'sage' || hasPremium(access)) && (testing || isIslandUnlocked(progress, grade.id)));
+  const current = testing ? -1 : available.findIndex((open, index) => open && worldIslands[index].id !== 'sage' && stats[index].regularCleared < 50);
 
   return (
     <View style={styles.screen}>
@@ -78,7 +79,7 @@ export function WorldMap780({ progress, mode, onGrade, onTitles }: {
             </View>
             {worldIslands.map((grade, index) => {
               const point = layout.positions[index];
-              const label = grade.id === 'sage' && available[index] ? '出題中の地点へ' : testing ? '自由にプレイ' : index === current ? 'つぎの目的地' : available[index] ? 'ぼうけんへ' : '未解放・地図をみる';
+              const label = grade.id === 'sage' && !hasPremium(access) ? 'プレミアム限定' : grade.id === 'sage' && available[index] ? '出題中の地点へ' : testing ? '自由にプレイ' : index === current ? 'つぎの目的地' : available[index] ? 'ぼうけんへ' : '未解放・地図をみる';
               return (
                 <Pressable key={grade.id} accessibilityRole="button"
                   accessibilityLabel={`${grade.title}、${grade.island}、${grade.stages.length}ステージ、${label}`}
@@ -200,8 +201,8 @@ function stageText(stage:WorldStage):string {
   return '秘'+String(stage.order-59);
 }
 
-export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles,onLearn}: {
-  grade:WorldGrade;progress:Progress;mode:PlayMode;onBack:()=>void;onStart:(stage:WorldStage)=>void;onTitles:()=>void;
+export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitles,onLearn}: {
+  grade:WorldGrade;progress:Progress;mode:PlayMode;access:Entitlement;onBack:()=>void;onStart:(stage:WorldStage)=>void;onTitles:()=>void;
   onLearn:(lesson:UnitLesson)=>void;
 }) {
   const [width,setWidth]=useState(0);
@@ -210,7 +211,7 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles,onLe
   const stats=gradeProgress(progress,grade.id);
   const gradeIndex=worldIslands.findIndex(g=>g.id===grade.id);
   const testing = mode === 'test';
-  const next = testing ? undefined : grade.stages.find(stage => worldStageAction(mode, progress, stage) !== 'locked' && !progress.stages[stage.id]);
+  const next = testing ? undefined : grade.stages.find(stage => ['play', 'learn'].includes(worldStageAction(mode, progress, stage, access)) && !progress.stages[stage.id]);
   const lessons = unitLessons.filter(lesson => lesson.grade === grade.id);
   const marker=Math.max(46,Math.min(57,Math.floor(actual/5)-9));
   return (
@@ -224,7 +225,7 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles,onLe
           <Text style={styles.bannerHeading}>{grade.island}</Text>
           <Text style={styles.bannerDescription}>{grade.theme}</Text>
           <Text style={styles.islandBannerCount}>{grade.id === 'sage' ? (testing || isIslandUnlocked(progress, grade.id)
-            ? `${grade.stages.filter(stage => hasStageBank(stage.id)).length} / 65 地点で出題中` : '高校3年生の通常50・EX10をクリアすると解放') : testing ? "65ステージ すべてプレイできるよ" : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
+            ? `${grade.stages.filter(stage => hasStageBank(stage.id)).length} / 65 地点で出題中` : '高校3年生の通常50・EX10をクリアすると解放') : testing ? (hasPremium(access) ? "65ステージ すべてプレイできるよ" : "通常50ステージを 自由に あそべるよ") : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
         </View>
         <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
       </View>
@@ -233,7 +234,7 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles,onLe
         {lessons.map(lesson => {
           const status = testing ? 'not-started' : lessonStatus(progress.lessons?.[lesson.id]);
           const first = grade.stages.find(stage => lesson.linkedStageIds.includes(stage.id));
-          const action = first && worldStageAction(mode, progress, first);
+          const action = first && worldStageAction(mode, progress, first, access);
           return <View key={lesson.id} style={styles.studyEntry}>
             <Text style={styles.mapTitle}>{lesson.title}</Text>
             <Text style={styles.hintText}>
@@ -259,7 +260,7 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles,onLe
       </View>}
       {next && (
         <Pressable accessibilityRole="button" onPress={()=>onStart(next)} style={styles.nextButton}>
-          <Text style={styles.nextText}>✦ {worldStageAction(mode, progress, next) === 'learn' ? 'まず まなぼう' : 'つづきから ぼうけんする'}　ステージ {stageText(next)} ›</Text>
+          <Text style={styles.nextText}>✦ {worldStageAction(mode, progress, next, access) === 'learn' ? 'まず まなぼう' : 'つづきから ぼうけんする'}　ステージ {stageText(next)} ›</Text>
         </Pressable>
       )}
       <View style={styles.mapHeading}>
@@ -288,15 +289,16 @@ export function IslandStageMap({grade,progress,mode,onBack,onStart,onTitles,onLe
         {grade.stages.map((stage,index)=>{
           const position=geometry.positions[index];
           const record=(testing ? undefined : progress.stages[stage.id]) as {clearedAt?:string;perfectAt?:string}|undefined;
-          const action=worldStageAction(mode,progress,stage);
-          const unlocked=action !== 'locked';
+          const action=worldStageAction(mode,progress,stage,access);
+          const unlocked=action === 'play' || action === 'learn';
+          const selectable=unlocked || action === 'premium';
           const cleared=Boolean(record?.clearedAt);
           const perfect=Boolean(record?.perfectAt||(legacy.has(stage.id)&&cleared));
           const current=stage.id===next?.id;
           return (
-            <Pressable key={stage.id} accessibilityRole="button" disabled={!unlocked}
-              accessibilityState={{disabled:!unlocked}}
-              accessibilityLabel={stage.title+'、'+(perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':stage.gradeId === 'sage' && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
+            <Pressable key={stage.id} accessibilityRole="button" disabled={!selectable}
+              accessibilityState={{disabled:!selectable}}
+              accessibilityLabel={stage.title+'、'+(action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':stage.gradeId === 'sage' && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
                 styles.stagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,

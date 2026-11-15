@@ -31,7 +31,9 @@ export function isIslandUnlocked(progress: Progress, islandId: string): boolean 
   const index = worldIslands.findIndex(island => island.id === islandId);
   if (index < 1) return index === 0;
   const previous = gradeProgress(progress, worldIslands[index - 1].id);
-  return previous.extrasCleared === 10 && (islandId !== 'sage' || previous.regularCleared === 50);
+  // Earlier releases unlocked ordinary islands via EX clears. Honor those saves.
+  return islandId === 'sage' ? previous.regularCleared === 50 && previous.extrasCleared === 10
+    : previous.regularCleared === 50 || previous.extrasCleared === 10;
 }
 
 export function isWorldStageUnlocked(progress: Progress, stage: WorldStage): boolean {
