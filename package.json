@@ -17,7 +17,10 @@
     "typecheck": "tsc --noEmit",
     "bank:build": "node scripts/build-question-banks.mjs",
     "bank:check": "node scripts/build-question-banks.mjs --check",
-    "test": "pnpm bank:check && node --test tests/*.test.mjs"
+    "bank:audit": "node scripts/audit-question-quality.mjs",
+    "bank:audit:check": "node scripts/audit-question-quality.mjs --check",
+    "bank:quality-gate": "node scripts/audit-question-quality.mjs --require-reviewed",
+    "test": "pnpm bank:check && pnpm bank:audit:check && node --test tests/*.test.mjs"
   },
   "dependencies": {
     "@expo/metro-runtime": "~58.0.17",
