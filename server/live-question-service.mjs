@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { checkpointsFor } from '../src/domain/stageStructure.ts';
 import { worldIslands } from '../src/domain/worldCatalog.ts';
 import { checkMathAnswer, isValidMathAnswer } from '../src/domain/worldQuestions.ts';
+import { betaQuestionsPerStage } from './beta-readiness.mjs';
 
 const study = new Set(['daily','review','remediation','diagnosis']);
 const unavailable = () => fail(404,'条件に合う公開済みの問題を準備中です。');
@@ -101,10 +102,24 @@ export function liveQuestionRepository(pool,{preview=false}={}) {
   const select=`select q.id,q.stage_id as "stageId",q.fingerprint,v.payload ${from}`;
   return {
     async findCandidates({mode,stageId,skills,sourceStageIds,excludeIds,premium,limit}) {
+      if (sourceStageIds) {
+        // Choose ten per source before drawing the checkpoint. A large bank cannot
+        // compensate for an incomplete source stage.
+        const {rows}=await pool.query(`with ranked as (
+          select q.id,q.stage_id as "stageId",q.fingerprint,v.payload,
+            row_number() over (partition by q.stage_id order by random()) as position
+          ${from} where ${eligibility} and q.stage_id=any($3::text[])
+        ), deck as (
+          select id,"stageId",fingerprint,payload from ranked where position<=$4
+        )
+        select * from deck where (select count(*) from deck)=cardinality($3::text[])*$4::integer
+        order by random() limit $5`,[false,premium,sourceStageIds,betaQuestionsPerStage,limit]);
+        return rows;
+      }
       const studyMode=study.has(mode);
-      const condition=studyMode ? "v.payload->>'skillId'=any($3::text[])" : sourceStageIds ? 'q.stage_id=any($3::text[])' : 'q.stage_id=$3';
+      const condition=studyMode ? "v.payload->>'skillId'=any($3::text[])" : 'q.stage_id=$3';
       const {rows}=await pool.query(`${select} where ${eligibility} and ${condition}
-        order by q.id=any($4::text[]), random() limit $5`,[preview && !sourceStageIds,premium,studyMode?skills:sourceStageIds??stageId,sourceStageIds?[]:excludeIds,limit]);
+        order by q.id=any($4::text[]), random() limit $5`,[preview,premium,studyMode?skills:stageId,excludeIds,limit]);
       return rows;
     },
     async findCurrent({id,fingerprint,premium,readyOnly}) {

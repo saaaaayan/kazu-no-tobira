@@ -11,3 +11,5 @@
 GitHub の管理設定を変更できない場合は、管理者に **Settings → General → Allow auto-merge** と、`main` を対象とした **Rulesets** の PR 必須・`verify` 必須・マージ前の最新化を確認してもらう。**Settings → Pages** の公開元は GitHub Actions を使う。手動で再公開する場合も、`main` の Pages ワークフローを使う。
 
 開発用のプラン切替を確認するときは、統合済み `main` から `pnpm exec expo export --platform web --dev --output-dir .expo/review-<SHA>` で専用フォルダーへ出力し、`node scripts/serve-review.mjs .expo/review-<SHA> 8115` で起動する。確認URLは `http://127.0.0.1:8115/`。このサーバーは同じPCからだけ接続可能で、出力を Pages にアップロードしない。Pages の成果物に認証情報や秘密鍵を含めない。
+
+限定βの教材判定、招待制環境の設計、公開失敗からの復旧は [限定β版の準備と運用](beta-operations.md) を参照する。
