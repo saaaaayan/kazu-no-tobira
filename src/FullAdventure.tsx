@@ -214,7 +214,7 @@ function AdventureWorld() {
   }
 
   function startCheckpoint(item:Checkpoint) {
-    if (uiPreview) { void start({...item.after,title:'確認テスト '+item.number}); return; }
+    if (uiPreview) { setStartError('確認テストの体験用問題は準備中です。'); return; }
     if (!gameOrigin) { setStartError('確認テストを準備しています。'); return; }
     void startLive({...item.after,title:'確認テスト '+item.number},'checkpoint',item.id);
   }
@@ -228,9 +228,12 @@ function AdventureWorld() {
   async function start(stage: WorldStage) {
     if (!progress || starting.current || submitting.current || lessonWrite.current) return;
     if (uiPreview) {
+      const problems=uiPreviewRound(stage);
+      if (!problems.length) { setStartError('このステージの体験用問題は準備中です。'); return; }
+      setStartError('');
       resetAnswer();
       setScreen('island');
-      setRound({stage,problems:uiPreviewRound(stage),index:0,correct:0,results:[],dialogueOffset:0,usedHint:false,hintLevel:0});
+      setRound({stage,problems,index:0,correct:0,results:[],dialogueOffset:0,usedHint:false,hintLevel:0});
       return;
     }
     const action = worldStageAction(playMode, progress, stage, access);
@@ -375,6 +378,7 @@ function AdventureWorld() {
   function openGrade(next: WorldGrade) {
     if (!uiPreview && next.id === 'sage' && !hasPremium(access)) { setShowPlanInfo(true); scroll.current?.scrollTo({ y: 0 }); return; }
     resetAnswer();
+    setStartError('');
     setGrade(next);
     setScreen('island');
   }
