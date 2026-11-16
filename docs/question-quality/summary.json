@@ -1,0 +1,57 @@
+{
+  "stages": 845,
+  "target": 84500,
+  "registered": 4300,
+  "source": {
+    "bank": 43,
+    "fallback": 740,
+    "unavailable": 62
+  },
+  "fallback": {
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "questions": 22200
+  },
+  "checkedArithmetic": 1990,
+  "automatedFindingRows": 0,
+  "byQuestionSource": {
+    "bank": {
+      "checkedArithmetic": 40,
+      "figures": 539,
+      "automatedFindingRows": 0
+    },
+    "fallback": {
+      "checkedArithmetic": 1950,
+      "figures": 360,
+      "automatedFindingRows": 0
+    }
+  },
+  "figures": {
+    "shown": 899,
+    "explicitlyRequired": 144,
+    "missingForExplicitPrompt": 0,
+    "textOnlyVisualFamilyNeedsReview": 6480
+  },
+  "duplicates": {
+    "normalizedGroups": 2853,
+    "verifiedMathematicsGroups": 91,
+    "structuralCandidates": 182,
+    "registeredNormalizedGroups": 0,
+    "registeredMathematicsGroups": 0,
+    "registeredStructuralCandidates": 65,
+    "secretCrossGradeExact": 97,
+    "e5e6SecretExact": 24
+  },
+  "reviews": {
+    "mathematics": 0,
+    "pedagogy": 0,
+    "explanation": 0,
+    "diagram": 0,
+    "approvedIndependent": 0,
+    "revisionListed": 0,
+    "unlinkedLedgerIds": []
+  }
+}

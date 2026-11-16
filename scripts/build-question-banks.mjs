@@ -298,14 +298,14 @@ const entries = worldStages.map(stage => {
   const bank = byStage.get(stage.id);
   const review = bank ? ['自動検証', '自動検証', '代表例確認', '対象図の数値を照合', '3段階と代表例を確認', '構成・途中式と代表例を確認']
     : ['未実施', '未実施', '未実施', '未実施', '未実施', '未実施'];
-  return [stage.id, stage.title, bank?.questions.length ?? 0, ...review, bank ? '完成' : '未着手'].join('\t');
+  return [stage.id, stage.title, bank?.questions.length ?? 0, ...review, bank ? '登録済・品質レビュー待ち' : '未着手'].join('\t');
 });
 const sagePlan = assessmentIslands.find(island => island.id === 'sage');
 for (const stage of sagePlan.stages) {
   const label = stage.assessment?.kind === 'final' ? '最終試験' : stage.assessment ? '確認テスト' : '総合演習';
   const bank = byStage.get(stage.id);
   entries.push([stage.id, '賢者の島・' + label + ' ' + stage.number, bank?.questions.length ?? 0,
-    ...(bank ? ['自動検証','正答を独立計算','代表例確認','図なし','3段階','5項目','公開可能']
+    ...(bank ? ['自動検証','正答を独立計算','代表例確認','図なし','3段階','5項目','登録済・品質レビュー待ち']
       : ['未実施','未実施','未実施','未実施','未実施','未実施','未着手'])].join('\t'));
 }
 const columns = 'ステージID\tステージ名\t制作済み\t重複\t正答\t問題文\t図解\tヒント\t解説\t状態';

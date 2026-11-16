@@ -33,6 +33,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
+      - run: pnpm bank:quality-gate
       - name: Set GitHub Pages base path for this build
         run: |
           node -e "const fs=require('node:fs');const p=JSON.parse(fs.readFileSync('app.json','utf8'));p.expo.experiments={...p.expo.experiments,baseUrl:'/kazu-no-tobira'};fs.writeFileSync('app.json',JSON.stringify(p,null,2));"
