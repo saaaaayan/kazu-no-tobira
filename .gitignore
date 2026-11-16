@@ -3,3 +3,5 @@ node_modules/
 dist/
 *.tsbuildinfo
 /question-drafts/
+/.question-backups/
+/supabase/.temp/

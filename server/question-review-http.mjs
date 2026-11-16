@@ -42,7 +42,7 @@ async function exportQuestions(response, store, params, format) {
   };
   let first = true;
   await write(format==='csv' ? '\uFEFF'+headers.join(',')+'\r\n' : '[');
-  for (const { payload, ...row } of store.exportRows(params)) {
+  for await (const { payload, ...row } of store.exportRows(params)) {
     if (response.destroyed) return;
     if (format==='csv') await write([...headers.slice(0,-1).map(key => csvCell(row[key])),csvCell(payload)].join(',')+'\r\n');
     else await write((first ? '' : ',')+JSON.stringify({...row,question:JSON.parse(payload)}));
@@ -52,9 +52,9 @@ async function exportQuestions(response, store, params, format) {
 }
 
 // The loopback instance is a private review environment. Production auth/entitlement is not inferred from this session.
-export function createQuestionReviewServer({ store, port, adminKey, assets, test = false }) {
-  if (!/^[0-9a-f]{64}$/i.test(adminKey ?? '')) throw new Error('A random 256-bit admin key is required.');
-  const secret = hash(adminKey);
+export function createQuestionReviewServer({ store, port, adminKey, ownerAuth, assets, preview, test = false }) {
+  if (!ownerAuth && !/^[0-9a-f]{64}$/i.test(adminKey ?? '')) throw new Error('A random 256-bit admin key is required.');
+  const secret = ownerAuth ? null : hash(adminKey);
   const sessions = new Map();
   const admin = { subject: 'owner', role: 'question_admin' };
   const cookie = (value,maxAge) => `${cookieName}=${value}; Path=/review-api; HttpOnly; SameSite=Strict; Max-Age=${maxAge}`;
@@ -83,10 +83,21 @@ export function createQuestionReviewServer({ store, port, adminKey, assets, test
       const sessionId = sessionToken && hash(sessionToken).toString('hex');
       const session = sessions.get(sessionId);
 
+      if (request.method === 'GET' && url.pathname === '/review-api/login-mode') {
+        return json(200,{ mode:ownerAuth ? 'supabase' : 'local' });
+      }
+      if (preview && request.method==='POST' && ['/game-preview/deck','/game-preview/round'].includes(url.pathname)) {
+        const {stageId,ids}=await readJson(request);
+        const result=url.pathname.endsWith('/deck') ? await preview.deck(stageId) : await preview.round(stageId,ids);
+        return json(200,result);
+      }
       if (request.method === 'POST' && url.pathname === '/review-api/login') {
         if (now < lockUntil) throw error(429,'時間をおいて再試行してください。');
-        const { key } = await readJson(request);
-        if (typeof key !== 'string' || key.length > 128 || !timingSafeEqual(secret,hash(key))) {
+        const payload = await readJson(request);
+        const { key } = payload;
+        const identity = ownerAuth ? await ownerAuth.login(payload)
+          : typeof key==='string' && key.length<=128 && timingSafeEqual(secret,hash(key)) ? admin : null;
+        if (!identity) {
           failed++;
           if (failed >= 5) {
             lockUntil = Date.now() + 60_000;
@@ -98,29 +109,30 @@ export function createQuestionReviewServer({ store, port, adminKey, assets, test
         if (sessionId) sessions.delete(sessionId);
         if (sessions.size >= 20) sessions.delete(sessions.keys().next().value);
         const token = randomBytes(32).toString('hex');
-        sessions.set(hash(token).toString('hex'),{...admin,expires:now+sessionLifetime});
+        const expires=Math.min(now+sessionLifetime,identity.expires ?? Infinity);
+        sessions.set(hash(token).toString('hex'),{...identity,expires});
         response.setHeader('Set-Cookie',cookie(token,sessionLifetime/1000));
-        return json(200,{ role:admin.role });
+        return json(200,{ role:identity.role });
       }
 
-      if (session?.role !== 'question_admin') throw error(401,'管理者ログインが必要です。');
+      if (session?.role !== 'question_admin' || (ownerAuth && !await ownerAuth.validate(session))) throw error(401,'管理者ログインが必要です。');
       if (request.method === 'POST' && url.pathname === '/review-api/logout') {
         sessions.delete(sessionId);
         response.setHeader('Set-Cookie',cookie('',0));
         return json(200,{ signedOut:true });
       }
       if (request.method === 'GET' && url.pathname === '/review-api/session') return json(200,{ role:session.role });
-      if (request.method === 'GET' && url.pathname === '/review-api/questions') return json(200,store.list(url.searchParams));
-      if (request.method === 'GET' && url.pathname === '/review-api/stages') return json(200,store.stageTotals());
+      if (request.method === 'GET' && url.pathname === '/review-api/questions') return json(200,await store.list(url.searchParams));
+      if (request.method === 'GET' && url.pathname === '/review-api/stages') return json(200,await store.stageTotals());
       if (request.method === 'GET' && url.pathname.startsWith('/review-api/questions/')) {
         const id = decodeURIComponent(url.pathname.slice('/review-api/questions/'.length));
         const revision = url.searchParams.get('revision');
-        const value = revision ? store.historicalRevision(id,revision) : store.detail(id);
+        const value = await (revision ? store.historicalRevision(id,revision) : store.detail(id));
         if (!value) throw error(404,'問題が見つかりません。');
         return json(200,value);
       }
       if (request.method === 'POST' && url.pathname === '/review-api/reviews') {
-        return json(200,store.review(await readJson(request),session.subject));
+        return json(200,await store.review(await readJson(request),session.subject));
       }
       if (request.method === 'GET' && ['/review-api/export.csv','/review-api/export.json'].includes(url.pathname)) {
         await exportQuestions(response,store,url.searchParams,url.pathname.split('.').at(-1));
@@ -129,7 +141,7 @@ export function createQuestionReviewServer({ store, port, adminKey, assets, test
       throw error(404,'ページが見つかりません。');
     } catch (problem) {
       if (response.destroyed || response.headersSent) { response.destroy(); return; }
-      if (!problem.status) console.error(problem);
+      if (!problem.status) console.error('Question review request failed:',problem.code ?? problem.name);
       json(problem.status ?? 500,{error: problem.status ? problem.message : '審査サーバーの処理に失敗しました。'});
     }
   });

@@ -133,7 +133,7 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
       <h1>数のトビラ 問題審査</h1>
       <button type="button" style={button} onClick={() => void onLogout().catch(problem => setNotice(problem.message))}>ログアウト</button>
     </header>
-    <p>専用データベースの登録問題を審査します。既存ゲームへの配信連携は準備中です。</p>
+    <p>専用データベースの登録問題を審査します。一般向けの配信は別途公開判定を通ります。</p>
     <section aria-label="審査集計" style={{ ...panel, ...line }}>
       <strong>実登録 {total.toLocaleString('ja-JP')} / 104,000問</strong>
       {statuses.map(([key]) => <span key={key}><Badge status={key}/> {listing?.counts[key] ?? 0}問</span>)}
@@ -266,18 +266,21 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
 export default function ServerQuestionReview() {
   const [signedIn, setSignedIn] = useState(false);
   const [key, setKey] = useState('');
+  const [email, setEmail] = useState('');
+  const [mode, setMode] = useState<'local'|'supabase'>();
   const [error, setError] = useState('');
   useEffect(() => {
     const controller = new AbortController();
     const expired = () => setSignedIn(false);
     window.addEventListener('review-session-expired',expired);
+    void api<{mode:'local'|'supabase'}>('login-mode',undefined,controller.signal).then(result=>setMode(result.mode)).catch(()=>{});
     void api('session',undefined,controller.signal).then(() => setSignedIn(true)).catch(() => {});
     return () => { window.removeEventListener('review-session-expired',expired); controller.abort(); };
   },[]);
   async function login(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError('');
-    try { await api('login',{key}); setSignedIn(true); }
+    try { await api('login',mode==='supabase' ? {email,password:key} : {key}); setSignedIn(true); }
     catch (problem) { setError(String(problem instanceof Error ? problem.message : problem)); }
     finally { setKey(''); }
   }
@@ -286,11 +289,14 @@ export default function ServerQuestionReview() {
     <h1>数のトビラ 問題審査</h1>
     <form style={{...panel,maxWidth:420}} onSubmit={event => void login(event)}>
       <h2>管理者ログイン</h2>
-      <label style={labelStyle}>管理者キー
-        <input type="password" autoComplete="current-password" maxLength={128} required value={key}
+      {mode==='supabase' && <label style={labelStyle}>メールアドレス
+        <input type="email" autoComplete="username" value={email} required onChange={event=>setEmail(event.target.value)}/>
+      </label>}
+      <label style={labelStyle}>{mode==='supabase' ? 'パスワード' : '管理者キー'}
+        <input type="password" autoComplete="current-password" maxLength={mode==='supabase' ? 1024 : 128} required value={key}
           onChange={event => setKey(event.target.value)}/>
       </label>
-      <button type="submit" style={{...button,marginTop:12}}>ログイン</button>
+      <button type="submit" disabled={!mode} style={{...button,marginTop:12}}>ログイン</button>
       <p role="status">{error}</p>
     </form>
   </main>;
