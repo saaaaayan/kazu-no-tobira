@@ -296,7 +296,7 @@ function AdventureWorld() {
   }
 
   async function submit() {
-    if (!round || !progress || !question || (!round.live && !canAccessStage(access, round.stage)) || round.feedback || submitting.current || saving ||
+    if (!round || !progress || !question || (!uiPreview && !round.live && !canAccessStage(access, round.stage)) || round.feedback || submitting.current || saving ||
       (shownMode === 'handwriting' && (blockRef.current || drawing))) return;
     if (!isValidMathAnswer(question, answer)) {
       setMessage(question.type === 'choice' ? 'こたえを ひとつ えらんでね。' : 'こたえを 数字で いれてね。');
@@ -328,7 +328,7 @@ function AdventureWorld() {
       const activity=liveMode==='daily'||liveMode==='review'||liveMode==='remediation'||liveMode==='diagnosis' ? liveMode : undefined;
       const last=round.index===round.problems.length-1;
       const special=round.live && !['stage','test'].includes(round.live.mode);
-      let saved=special ? (testing ? undefined : recordAttempt(progress,{...attempt,activity},false))
+      let saved=uiPreview ? undefined : special ? (testing ? undefined : recordAttempt(progress,{...attempt,activity},false))
         : progressAfterWorldAnswer(playMode,progress,attempt,last
           ? {stage:round.stage,correct:newCorrect,usedHint:round.usedHint}: undefined);
       if (saved && last && round.live?.mode==='checkpoint' && round.live.eventId) {
@@ -383,7 +383,7 @@ function AdventureWorld() {
   const specialRound=Boolean(round?.live && !['stage','test'].includes(round.live.mode));
   const cleared = Boolean(round && !specialRound && round.correct >= Math.ceil(round.stage.questions * 0.8));
   const nextStage = round && (!round.live || ['stage','test'].includes(round.live.mode)) && worldIslands.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
-  const canContinue = nextStage && progress && ['play', 'learn'].includes(worldStageAction(playMode, progress, nextStage, access));
+  const canContinue = nextStage && progress && (uiPreview || ['play', 'learn'].includes(worldStageAction(playMode, progress, nextStage, access)));
   const lessonStage = learning && (learning.target ?? grade.stages.find(stage => learning.lesson.linkedStageIds.includes(stage.id)));
   const canChallenge = lessonStage && progress && canPlayWorldStage(playMode, progress, lessonStage, access);
   const newlyEarnedTitles = round && progress && !testing ? adventureTitles(progress).filter(t=>t.unlocked).length : 0;
