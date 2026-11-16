@@ -4,6 +4,7 @@ import type { SkillId, StageId } from './curriculum.ts';
 
 export interface Attempt {
   problemId: string;
+  activity?: 'daily'|'review'|'remediation'|'diagnosis';
   skillId: SkillId;
   stageId: StageId;
   submitted: number;
@@ -27,6 +28,7 @@ export interface Progress {
   skills: Partial<Record<SkillId, SkillProgress>>;
   lessons?: Partial<Record<string, LessonProgress>>;
   study?: StudyRecords;
+  checkpoints?: Record<string,{correct:number;total:number;completedAt:string}>;
 }
 
 export const emptyProgress: Progress = { version: 1, attempts: [], stages: {}, skills: {} };

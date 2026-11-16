@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import type { BankQuestion } from '../domain/questionBank';
 import { worldIslands } from '../domain/worldCatalog';
+import { stageLabels } from '../domain/stageStructure';
 import { rejectReasons, reviewStatusLabels, type ReviewReason, type ReviewStatus } from '../domain/reviewAdmin';
 import { MathText } from './MathText';
 import { QuestionDiagram } from './QuestionSupport';
@@ -161,7 +162,7 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
         </select>
       </label>
       {[
-        ['kind','ステージ種別',[['normal','通常'],['extra','EX'],['secret','隠し']]],
+        ['kind','ステージ種別',Object.entries(stageLabels)],
         ['difficulty','難易度',[['1','1'],['2','2'],['3','3']]],
         ['status','審査状態',statuses],
         ['has_figure','図',[['1','あり'],['0','なし']]],

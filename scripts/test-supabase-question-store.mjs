@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { openSupabasePool } from '../server/supabase-postgres.mjs';
 import { createSupabaseQuestionReview } from '../server/supabase-question-review.mjs';
+import { liveQuestionRepository,liveQuestionService } from '../server/live-question-service.mjs';
 import { questionDeck, questionRound } from '../server/question-round-selection.mjs';
 
 const pool=openSupabasePool('svc_kazu_review');
@@ -45,6 +46,19 @@ try {
   assert.equal((await store.review({items:reviewItems,status:'verified',note:'Rollback-only QA'},'qa')).updated,10);
   assert.equal((await store.review({items:reviewItems.map(item=>({...item,version:item.version+1})),status:'ready',note:'Rollback-only QA'},'qa')).updated,10);
   assert.equal((await questionRound(isolated,stage,ids)).length,10);
+  const protectedGame=liveQuestionService(liveQuestionRepository(isolated));
+  const challenge=await protectedGame.start({mode:'checkpoint',stageId:'e1.checkpoint1'});
+  assert.equal(challenge.questions.length,10);
+  assert.equal(new Set(challenge.questions.map(question=>question.id)).size,10);
+  assert.ok(challenge.questions.every(question=>question.stageId===stage && !('answer' in question) && !('steps' in question)));
+  const first=challenge.questions[0];
+  const correct=selected.find(item=>item.id===first.id).question.answer;
+  const hint=await protectedGame.hint({token:challenge.token,id:first.id,level:0});
+  assert.ok(hint.hint);
+  const result=await protectedGame.grade({token:challenge.token,id:first.id,answer:correct});
+  assert.equal(result.correct,true);
+  assert.equal('steps' in result,false);
+  await assert.rejects(protectedGame.start({mode:'daily',skills:['e1.addition'],premium:true}),{status:403});
   await assert.rejects(store.review({items:reviewItems,status:'needs_work',note:'Conflict check'},'qa'),{status:409});
   assert.equal((await store.review({items:[{...reviewItems[0],version:reviewItems[0].version+2}],
     status:'rejected',reason:'重複',note:'Rollback-only QA'},'qa')).updated,1);
@@ -52,6 +66,7 @@ try {
   assert.equal((await store.detail(ids[0])).reason,'重複');
   await assert.rejects(questionRound(isolated,stage,ids,preview),{status:409});
   await assert.rejects(questionRound(isolated,stage,ids),{status:409});
+  await assert.rejects(protectedGame.start({mode:'checkpoint',stageId:'e1.checkpoint1'}),{status:404});
   await assert.rejects(questionDeck(isolated,'sage.n01',preview),{status:404});
   assert.equal((await questionDeck(isolated,'sage.n01',{preview:true,premium:true})).cards.length,100);
   assert.equal((await store.list(new URLSearchParams('stage_id=preschool.n01'))).total,10);

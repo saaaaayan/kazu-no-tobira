@@ -1,5 +1,6 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { once } from 'node:events';
+import { isIP } from 'node:net';
 import { createServer } from 'node:http';
 
 const cookieName = 'kazu_question_admin';
@@ -52,14 +53,18 @@ async function exportQuestions(response, store, params, format) {
 }
 
 // The loopback instance is a private review environment. Production auth/entitlement is not inferred from this session.
-export function createQuestionReviewServer({ store, port, adminKey, ownerAuth, assets, preview, publicOrigin, test = false }) {
+export function createQuestionReviewServer({ store, port, adminKey, ownerAuth, assets, preview, game, publicOrigin, allowedGameOrigin, test = false }) {
   const secureOrigin = publicOrigin ? new URL(publicOrigin) : null;
   if (secureOrigin && (secureOrigin.protocol!=='https:' || secureOrigin.origin!==publicOrigin || !ownerAuth || preview)) {
     throw new Error('HTTPS review requires Supabase Auth and prohibits the preview API.');
   }
+  if (allowedGameOrigin && (!secureOrigin || new URL(allowedGameOrigin).protocol!=='https:' || new URL(allowedGameOrigin).origin!==allowedGameOrigin)) {
+    throw new Error('An external game origin requires HTTPS and an exact HTTPS origin.');
+  }
   if (!ownerAuth && !/^[0-9a-f]{64}$/i.test(adminKey ?? '')) throw new Error('A random 256-bit admin key is required.');
   const secret = ownerAuth ? null : hash(adminKey);
   const sessions = new Map();
+  const roundAttempts=new Map();
   const admin = { subject: 'owner', role: 'question_admin' };
   const name = secureOrigin ? '__Host-'+cookieName : cookieName;
   const cookie = (value,maxAge) => `${name}=${value}; Path=${secureOrigin?'/':'/review-api'}; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${secureOrigin?'; Secure':''}`;
@@ -75,12 +80,21 @@ export function createQuestionReviewServer({ store, port, adminKey, ownerAuth, a
     const json = (status,data) => response.writeHead(status,{'Content-Type':'application/json; charset=utf-8'}).end(JSON.stringify(data));
     try {
       if (request.headers.host !== host || (secureOrigin && request.headers['x-forwarded-proto']!=='https')) throw error(403,'無効なホストです。');
-      if (request.headers['sec-fetch-site'] === 'cross-site') throw error(403,'同じサイトから開いてください。');
       const url = new URL(request.url,origin);
+      const gamePath=game && ['/play-api/round','/play-api/answer','/play-api/hint'].includes(url.pathname);
+      const externalGame=Boolean(gamePath && allowedGameOrigin && request.headers.origin===allowedGameOrigin);
+      if (request.headers['sec-fetch-site']==='cross-site' && !externalGame) throw error(403,'同じサイトから開いてください。');
+      if (externalGame) {
+        response.setHeader('Access-Control-Allow-Origin',allowedGameOrigin);
+        response.setHeader('Vary','Origin');
+        if (request.method==='OPTIONS' && request.headers['access-control-request-method']==='POST') {
+          return response.writeHead(204,{'Access-Control-Allow-Methods':'POST','Access-Control-Allow-Headers':'Content-Type'}).end();
+        }
+      }
       if (request.method === 'GET' && !url.pathname.startsWith('/review-api/') && assets) {
         if (await assets(url.pathname,response)) return;
       }
-      if (request.method !== 'GET' && request.headers.origin !== origin) throw error(403,'送信元を確認できません。');
+      if (request.method !== 'GET' && request.headers.origin !== origin && !externalGame) throw error(403,'送信元を確認できません。');
       const now = Date.now();
       for (const [token,session] of sessions) if (session.expires <= now) sessions.delete(token);
       const sessionToken = request.headers.cookie?.split(';').map(item=>item.trim())
@@ -90,6 +104,24 @@ export function createQuestionReviewServer({ store, port, adminKey, ownerAuth, a
 
       if (request.method === 'GET' && url.pathname === '/review-api/login-mode') {
         return json(200,{ mode:ownerAuth ? 'supabase' : 'local' });
+      }
+      if (gamePath && request.method==='POST') {
+        const starting=url.pathname.endsWith('/round');
+        if (starting) {
+          const forwarded=request.headers['x-real-ip'];
+          const client=secureOrigin && typeof forwarded==='string' && isIP(forwarded) ? forwarded : request.socket.remoteAddress;
+          const now=Date.now();
+          for (const [address,bucket] of roundAttempts) if (bucket.until<=now) roundAttempts.delete(address);
+          const bucket=roundAttempts.get(client) ?? {count:0,until:now+60000};
+          if (bucket.count>=12 || (!roundAttempts.has(client) && roundAttempts.size>=4096)) {
+            throw error(429,'少し時間をおいてから、もう一度お試しください。');
+          }
+          bucket.count++;
+          roundAttempts.set(client,bucket);
+        }
+        const input=await readJson(request);
+        return json(200,starting ? await game.start(input,undefined) : url.pathname.endsWith('/hint')
+          ? await game.hint(input,undefined) : await game.grade(input,undefined));
       }
       if (preview && request.method==='POST' && ['/game-preview/deck','/game-preview/round'].includes(url.pathname)) {
         const {stageId,ids}=await readJson(request);

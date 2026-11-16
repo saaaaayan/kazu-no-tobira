@@ -46,14 +46,19 @@ export function upcomingReviews(progress: Progress, now: Date) {
   }).sort((a,b)=>a.dueAt.localeCompare(b.dueAt));
 }
 
-function getDailyQuestions(progress: Progress, now: Date) {
+export function dailySkills(progress:Progress,now:Date):SkillId[] {
   const goodSkills = skillEvidence(progress).filter(entry=>canPracticeSkill(entry.skillId));
-  const prioritized = [...new Set([
+  return [...new Set([
     ...upcomingReviews(progress,now).filter(entry=>entry.due).map(entry=>entry.skill),
     ...goodSkills.map(entry=>entry.skillId),
     ...orderedHistory(progress).map(attempt=>attempt.skillId).filter(canPracticeSkill),
     'e1.count' as const,
   ])].slice(0,3);
+}
+
+function getDailyQuestions(progress:Progress,now:Date) {
+  const goodSkills=skillEvidence(progress).filter(entry=>canPracticeSkill(entry.skillId));
+  const prioritized=dailySkills(progress,now);
   const limit = 15;
   const started = Number(studyDate(now).replaceAll('-',''));
   const perSkill = prioritized.map(skill => {
@@ -111,6 +116,20 @@ export function answerStudyPlan(access:Entitlement, progress:Progress, mode:Stud
   return {...savePracticeAnswer(access,progress,item,answer,answeredAt),study};
 }
 
+export function completeLiveStudy(progress:Progress,mode:StudyMode,skill:SkillId,correct:number,total:number,now:Date):Progress {
+  const study:StudyRecords={...progress.study};
+  if (mode==='daily') {
+    study.dailyCompleted=[...new Set([...(study.dailyCompleted??[]),studyDate(now)])];
+  } else {
+    const prior=study.reviews?.[skill]?.consecutive??0;
+    const consecutive=correct/total>=0.8 ? Math.min(prior+1,intervals.length) : 0;
+    const completedAt=now.toISOString();
+    study.reviews={...study.reviews,[skill]:{consecutive,completedAt,dueAt:plusDays(now,intervals[Math.max(0,consecutive-1)]).toISOString()}};
+    study.reviewHistory=[...(study.reviewHistory??[]),{skill,completedAt,correct,total}];
+  }
+  return {...progress,study};
+}
+
 export interface ReportRow {
   id: string;
   title: string;
@@ -152,7 +171,7 @@ export function growthReport(progress:Progress,now:Date) {
     add(total,at.getTime(),attempt.correct);
     if (at.getTime()>=newWindow && at<=now) {
       activeDays.add(studyDate(at));
-      if (attempt.problemId.startsWith('study:')) practiceAnswers++;
+      if (attempt.problemId.startsWith('study:') || attempt.activity) practiceAnswers++;
     }
     const stage = getWorldStage(attempt.stageId);
     if (!stage) continue;

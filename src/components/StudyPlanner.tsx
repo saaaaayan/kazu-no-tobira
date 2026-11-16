@@ -3,14 +3,15 @@ import { Text, TextInput, View } from 'react-native';
 import { canAccessFeature, type Entitlement } from '../domain/accessPlan';
 import { skillEvidence } from '../domain/studyPractice';
 import type { Progress } from '../domain/progress';
-import { answerStudyPlan, growthReport, openStudyPlan, studyDate, upcomingReviews, type ReportRow, type StudyMode } from '../domain/studyPlans';
+import type { SkillId } from '../domain/curriculum';
+import { dailySkills,answerStudyPlan, growthReport, openStudyPlan, studyDate, upcomingReviews, type ReportRow, type StudyMode } from '../domain/studyPlans';
 import { MathText } from './MathText';
 import { Button, styles } from './StudyWorkshop';
 
 export type UpdateStudy = (update:(previous:Progress)=>Progress) => Promise<boolean>;
 
-export function StudyPlanner({ access, progress, busy, error, onUpdate, onBack }: {
-  access:Entitlement; progress:Progress; busy:boolean; error:string; onUpdate:UpdateStudy; onBack:()=>void;
+export function StudyPlanner({ access, progress, busy, error, onUpdate, onBack,onLiveStart }: {
+  access:Entitlement; progress:Progress; busy:boolean; error:string; onUpdate:UpdateStudy; onBack:()=>void; onLiveStart?:(mode:StudyMode,skills:SkillId[])=>void;
 }) {
   const [view,setView]=useState<StudyMode|'report'>();
   const [answer,setAnswer]=useState('');
@@ -31,6 +32,11 @@ export function StudyPlanner({ access, progress, busy, error, onUpdate, onBack }
     if (busy || !(mode==='daily'?canDaily:canReview)) return;
     setAnswer('');
     setLast(undefined);
+    if (onLiveStart && !(mode==='daily' && daily?.completedAt)) {
+      const skills=mode==='daily' ? dailySkills(progress,now) : reviews.filter(entry=>entry.due).slice(0,1).map(entry=>entry.skill);
+      if (skills.length) onLiveStart(mode,skills);
+      return;
+    }
     const exists = mode==='daily' ? Boolean(daily) : Boolean(review && !review.completedAt);
     if (exists || await onUpdate(previous=>openStudyPlan(access,previous,mode,new Date()))) setView(mode);
   }
@@ -90,7 +96,7 @@ function Report({progress,now}:{progress:Progress; now:Date}) {
   const line=(row:ReportRow)=><View key={row.id} style={styles.row}>
     <Text style={styles.title}>{row.title}</Text>
     <Text style={styles.body}>直近14日 {period(row.correct,row.attempted)}　その前の14日 {period(row.previousCorrect,row.previousAttempted)}</Text>
-    {row.totalStages>0 && <Text style={styles.body}>通常ステージ {row.cleared} / {row.totalStages}地点 クリア</Text>}
+    {row.totalStages>0 && <Text style={styles.body}>冒険の道 {row.cleared} / {row.totalStages}地点 クリア</Text>}
   </View>;
   return <>
     <Text accessibilityRole="header" style={styles.heading}>保護者向け成長レポート</Text>
