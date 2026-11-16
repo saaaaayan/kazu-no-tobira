@@ -3,7 +3,9 @@ export { bankStageIds };
 import type { SolutionStep } from './writtenSolution.ts';
 import type { MathQuestion } from './worldQuestions.ts';
 
-export type BankDiagram = { kind: 'tenFrame'; first: number; second?: number; third?: number }
+export type CountingToken = 'dot' | 'triangle' | 'square' | 'empty' | 'marked';
+export type BankDiagram = { kind: 'countingBoard'; rows: readonly { label?: string; tokens: readonly CountingToken[] }[] }
+  | { kind: 'tenFrame'; first: number; second?: number; third?: number }
   | { kind: 'transferToTen'; inside: number; outside: number }
   | { kind: 'takeAway'; total: number; used: number }
   | { kind: 'borrowTen'; total: number; used: number }

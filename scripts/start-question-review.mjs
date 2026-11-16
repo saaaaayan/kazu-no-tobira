@@ -23,7 +23,8 @@ try {
   if (problem.code !== 'EEXIST') throw problem;
 }
 const key = (await readFile(keyFile,'utf8')).trim();
-const store = openQuestionReviewStore(resolve(data,'questions.sqlite'),new URL('../public/question-banks/',import.meta.url));
+const store = openQuestionReviewStore(resolve(data,'questions.sqlite'),new URL('../public/question-banks/',import.meta.url),
+  new URL('../question-drafts/',import.meta.url));
 const registered = store.importBanks();
 const types = {
   '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8',

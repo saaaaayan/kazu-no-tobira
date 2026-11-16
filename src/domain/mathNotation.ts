@@ -42,7 +42,7 @@ function toLatex(source: string): string {
 const mathRun = /[A-Za-z0-9()[\].,'+−＋=＝×÷\-*/^_<>≤≥≠∩∪∞→π…・？□%°²³⁴√∫Σ:]+(?:[ \t]+[A-Za-z0-9()[\].,'+−＋=＝×÷\-*/^_<>≤≥≠∩∪∞→π…・？□%°²³⁴√∫Σ:]+)*/g;
 const notation = /[A-Za-z√∫Σ∞π□_²³⁴×÷＋−=＝<>≤≥≠∩∪^%°]|\d…|[0-9][+\-*/:,]|[+\-*/:][0-9]/;
 
-export function formatMathText(source: string): MathPart[] {
+function formatLegacyMathText(source: string): MathPart[] {
   const parts: MathPart[] = [];
   let end = 0;
   for (const match of source.matchAll(mathRun)) {
@@ -55,5 +55,18 @@ export function formatMathText(source: string): MathPart[] {
     end = match.index + formula.length;
   }
   if (end < source.length) parts.push({ kind:'text', text:source.slice(end) });
+  return parts;
+}
+
+export function formatMathText(source: string): MathPart[] {
+  // Authored TeX takes precedence over the legacy template notation.
+  const parts: MathPart[] = [];
+  let end = 0;
+  for (const match of source.matchAll(/(?<!\\)\$([^$\r\n]+)(?<!\\)\$|\\\(([^\r\n]+?)\\\)/g)) {
+    if (match.index > end) parts.push(...formatLegacyMathText(source.slice(end, match.index)));
+    parts.push({ kind:'math', text:match[0], latex:match[1] ?? match[2] });
+    end = match.index + match[0].length;
+  }
+  if (end < source.length) parts.push(...formatLegacyMathText(source.slice(end)));
   return parts;
 }

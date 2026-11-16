@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { DatabaseSync } from 'node:sqlite';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { allWorldStagesById, worldIslands } from '../src/domain/worldCatalog.ts';
@@ -13,8 +13,9 @@ const islands = new Map(worldIslands.map(island => [island.id, island]));
 const badRequest = message => Object.assign(new Error(message), { status: 400 });
 const conflict = message => Object.assign(new Error(message), { status: 409 });
 
-export function openQuestionReviewStore(path, bankDirectory) {
-  const directory = bankDirectory instanceof URL ? fileURLToPath(bankDirectory) : bankDirectory;
+export function openQuestionReviewStore(path, bankDirectory, draftDirectory) {
+  const shipped = bankDirectory instanceof URL ? fileURLToPath(bankDirectory) : bankDirectory;
+  const drafts = draftDirectory instanceof URL ? fileURLToPath(draftDirectory) : draftDirectory;
   const db = new DatabaseSync(path);
   db.exec(`
     PRAGMA foreign_keys=ON;
@@ -61,10 +62,12 @@ export function openQuestionReviewStore(path, bankDirectory) {
   }
 
   function importBanks() {
-    const files = readdirSync(directory).filter(file => /\.v\d+\.json$/.test(file)).sort();
+    const directories = drafts && existsSync(drafts) ? [shipped,drafts] : [shipped];
+    const files = directories.flatMap(directory => readdirSync(directory).filter(file => /\.v\d+\.json$/.test(file)).sort()
+      .map(file => ({ directory,file })));
     if (!files.length) throw new Error('専用問題バンクが見つかりません。');
     const banks = new Map();
-    for (const file of files) {
+    for (const { directory,file } of files) {
       const bank = JSON.parse(readFileSync(join(directory, file), 'utf8'));
       const stage = allWorldStagesById.get(bank.stageId);
       if (!stage || stage.gradeId !== bank.gradeId || bank.islandId !== stage.gradeId ||
@@ -73,7 +76,9 @@ export function openQuestionReviewStore(path, bankDirectory) {
           !Array.isArray(bank.questions) || bank.questions.length > 100) {
         throw new Error('Invalid bank: ' + file);
       }
-      if (!banks.has(bank.stageId) || banks.get(bank.stageId).version < bank.version) banks.set(bank.stageId, bank);
+      const prior = banks.get(bank.stageId);
+      if (prior?.version===bank.version) throw new Error('Bank version is duplicated: '+file);
+      if (!prior || prior.version<bank.version) banks.set(bank.stageId,bank);
     }
     const upsert = db.prepare(`
       INSERT INTO questions(id,stage_id,island,unit,kind,skill,difficulty,format,has_figure,search,stem,exact,equivalent,shape,fingerprint,payload)

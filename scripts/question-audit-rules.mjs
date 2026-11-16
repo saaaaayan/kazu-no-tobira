@@ -52,6 +52,13 @@ export function arithmeticTask(stem) {
 function figureContext(q, maskNumbers) {
   // Only the question-facing figure disambiguates a stem that asks the reader to use a figure.
   if (q.clock?.read) return maskNumbers ? 'clock' : 'clock:' + q.clock.start%720;
+  if (q.diagram?.kind==='countingBoard') {
+    return JSON.stringify(q.diagram.rows.map(row => [row.label ?? '',maskNumbers ? [...new Set(row.tokens)].sort() : row.tokens]));
+  }
+  if (q.figure && /この図|図を見|図の|図で/.test(normalizeQuestion(q.question))) {
+    const figure = q.figure;
+    return maskNumbers ? JSON.stringify([figure.outline.map(points => points.length), Boolean(figure.circle)]) : JSON.stringify(figure);
+  }
   if (q.diagram && /この図|図を見|図の|グラフ|表を見/.test(normalizeQuestion(q.question))) {
     const values=Object.entries(q.diagram).sort(([a],[b])=>a.localeCompare(b,'en'));
     return JSON.stringify(maskNumbers ? values.map(([k,v])=>[k,typeof v==='number'?'#':v]) : values);

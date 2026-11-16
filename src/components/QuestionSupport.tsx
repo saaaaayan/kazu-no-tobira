@@ -1,9 +1,47 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { type BankDiagram, type BankQuestion, mistakenReason } from '../domain/questionBank';
 import type { SolutionStep } from '../domain/writtenSolution';
 import { MathDisplay, MathText } from './MathText';
 
+const tokenArt = {
+  dot: ['●','まる'], triangle: ['▲','さんかく'], square: ['■','しかく'],
+  marked: ['✓','しるしのついた まる'], empty: ['◯','からの おさら'],
+} as const;
+
+function CountingBoard({ diagram, interactive }: {
+  diagram: Extract<BankDiagram,{ kind:'countingBoard' }>; interactive: boolean;
+}) {
+  const [taps,setTaps] = useState<{ forDiagram:BankDiagram; ids:Set<string> }>();
+  const selected = taps?.forDiagram===diagram ? taps.ids : new Set<string>();
+  const toggle = (id: string) => setTaps(previous => {
+    const ids = new Set(previous?.forDiagram===diagram ? previous.ids : []);
+    if (ids.has(id)) ids.delete(id); else ids.add(id);
+    return { forDiagram:diagram, ids };
+  });
+  return <View style={{ padding:10, backgroundColor:'#edf4ff', borderRadius:12, gap:8 }}>
+    {diagram.rows.map(({label,tokens},row) => <View key={row} style={{ gap:5 }}>
+      {label && <Text style={{ color:'#293f61', fontSize:18, fontWeight:'700' }}>{label}</Text>}
+      <View style={{ flexDirection:'row', flexWrap:'wrap', gap:6 }}>
+        {tokens.map((token,column) => {
+          const id = row+':'+column;
+          const lit = selected.has(id);
+          const shape = tokenArt[token];
+          const card = { width:48, height:48, alignItems:'center', justifyContent:'center',
+            borderRadius:10, borderWidth:2, borderColor:lit ? '#3f765b' : '#ccd8ef',
+            backgroundColor:lit ? '#cce8db' : '#fff' } as const;
+          const icon = <Text style={{ fontSize:30, color:token==='marked' ? '#3f765b' : '#253e70' }}>{shape[0]}</Text>;
+          return interactive && token!=='empty' ? <Pressable key={id} style={card} onPress={() => toggle(id)}
+            accessibilityRole="button" accessibilityLabel={shape[1]} accessibilityState={{ selected:lit }}>{icon}</Pressable>
+            : <View key={id} accessible accessibilityLabel={shape[1]} style={card}>{icon}</View>;
+        })}
+      </View>
+    </View>)}
+  </View>;
+}
+
 export function QuestionDiagram({ diagram, phase }: { diagram: BankDiagram; phase: 'question' | 'hint' | 'solution' }) {
+  if (diagram.kind === 'countingBoard') return <CountingBoard diagram={diagram} interactive={phase==='question'}/>;
   if (diagram.kind === 'tenFrame') return <TenFrame first={diagram.first} second={diagram.second ?? 0} third={diagram.third}/>;
 
   const solved = phase === 'solution';
