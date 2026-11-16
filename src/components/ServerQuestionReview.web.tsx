@@ -4,6 +4,7 @@ import { worldIslands } from '../domain/worldCatalog';
 import { rejectReasons, reviewStatusLabels, type ReviewReason, type ReviewStatus } from '../domain/reviewAdmin';
 import { MathText } from './MathText';
 import { QuestionDiagram } from './QuestionSupport';
+import { StudyFigureView } from './StudyFigureView';
 
 type Row = { id: string; stage_id: string; stem: string; format: string; status: ReviewStatus; version: number };
 type Listing = { rows: Row[]; total: number; counts: Partial<Record<ReviewStatus, number>> };
@@ -225,6 +226,7 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
           <p>{detail.id}　<Badge status={detail.status}/></p>
           <MathText value={detail.question.question} style={{ fontSize:22, fontWeight:'700' }}/>
           {detail.question.diagram && <QuestionDiagram diagram={detail.question.diagram} phase="question"/>}
+          {detail.question.figure && <StudyFigureView figure={detail.question.figure}/>}
           <h3>解答・採点</h3>
           {detail.question.choices?.map((choice,index) => <MathText key={index} value={choice}/>)}
           <MathText value={detail.question.answer}/>
@@ -252,6 +254,7 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
           {previousRevision && <section aria-label="履歴の出題プレビュー">
             <h4>履歴に記録された版</h4><MathText value={previousRevision.question}/>
             {previousRevision.diagram && <QuestionDiagram diagram={previousRevision.diagram} phase="question"/>}
+            {previousRevision.figure && <StudyFigureView figure={previousRevision.figure}/>}
             <MathText value={previousRevision.answer}/><MathText value={previousRevision.explanation}/>
           </section>}
         </section>}

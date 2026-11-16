@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
@@ -11,7 +11,7 @@ const bank = JSON.parse(await readFile(new URL('../public/question-banks/e1.n04.
 const stage = bank.stageId;
 const [first,second] = bank.questions;
 
-async function fixture(t) {
+async function fixture() {
   const dir = await mkdtemp(join(tmpdir(),'kazu-review-'));
 
   const path = join(dir,'questions.sqlite');
@@ -22,7 +22,7 @@ async function fixture(t) {
 const items = (...questions) => questions.map(item => ({ id:item.id,version:item.version ?? 0 }));
 
 test('管理者審査は競合を検出し、ボツ・改訂を反映して選出を停止する', async t => {
-  const {dir,path,file} = await fixture(t);
+  const {dir,path,file} = await fixture();
   const store = openQuestionReviewStore(path,dir);
   try {
     assert.equal(store.importBanks(),2);
@@ -53,8 +53,27 @@ test('管理者審査は競合を検出し、ボツ・改訂を反映して選�
   } finally { reopened.db.close(); await rm(dir,{recursive:true,force:true}); }
 });
 
+test('制作中の専用問題を個別に取り込み、審査前の選出を禁止する', async () => {
+  const {dir,path} = await fixture();
+  const drafts = join(dir,'drafts');
+  await mkdir(drafts);
+  const draft = {...first,id:'preschool.n01:bank1:fixture'};
+  await writeFile(join(drafts,'preschool.n01.v1.json'),JSON.stringify({
+    stageId:'preschool.n01',gradeId:'preschool',islandId:'preschool',version:1,questions:[draft],
+  }));
+  const store = openQuestionReviewStore(path,dir,drafts);
+  try {
+    assert.equal(store.importBanks(),3);
+    assert.equal(store.list(new URLSearchParams('island=preschool')).total,1);
+    assert.equal(store.stageTotals().find(row=>row.id==='preschool.n01').states.unreviewed,1);
+    assert.ok(store.list(new URLSearchParams('duplicates=1')).total>=2);
+    assert.ok(store.detail(draft.id).duplicates.some(item=>item.id===first.id && item.kind==='exact'));
+    assert.deepEqual(store.readyQuestions('preschool.n01'),[]);
+  } finally { store.db.close(); await rm(dir,{recursive:true,force:true}); }
+});
+
 test('未ログイン・別オリジンでは問題本文もエクスポートも受け取れない', async t => {
-  const {dir,path} = await fixture(t);
+  const {dir,path} = await fixture();
   const store = openQuestionReviewStore(path,dir);
   store.importBanks();
   const key = 'a'.repeat(64);

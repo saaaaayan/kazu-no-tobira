@@ -7,6 +7,10 @@
     "fallback": 740,
     "unavailable": 257
   },
+  "privateDrafts": {
+    "stages": 0,
+    "registered": 0
+  },
   "fallback": {
     "seeds": [
       0,

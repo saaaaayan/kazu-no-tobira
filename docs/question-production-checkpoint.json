@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-16",
+  "state": "incomplete",
+  "target": 104000,
+  "stageTarget": 1040,
+  "combinedRegistered": 4323,
+  "shippedToGameBank": 4300,
+  "privateDrafts": 23,
+  "privateDraftsIndependentAnswerChecks": 23.0,
+  "privateDraftsWithFigures": 15.0,
+  "independentQualityAccepted": 0,
+  "incompleteStages": 997,
+  "missingQuestions": 99677,
+  "unresolvedDuplicateGroups": {
+    "normalizedGroups": 2807,
+    "verifiedMathematicsGroups": 91,
+    "structuralCandidates": 189,
+    "registeredNormalizedGroups": 0,
+    "registeredMathematicsGroups": 0,
+    "registeredStructuralCandidates": 65,
+    "secretCrossGradeExact": 97,
+    "e5e6SecretExact": 24
+  },
+  "nextStage": "preschool.n01",
+  "draftedStages": [
+    {
+      "id": "preschool.n01",
+      "registered": 10,
+      "missing": 90
+    },
+    {
+      "id": "e1.n41",
+      "registered": 4,
+      "missing": 96
+    },
+    {
+      "id": "sage.n04",
+      "registered": 3,
+      "missing": 97
+    },
+    {
+      "id": "champion.n01",
+      "registered": 3,
+      "missing": 97
+    },
+    {
+      "id": "cosmos.n01",
+      "registered": 3,
+      "missing": 97
+    }
+  ]
+}

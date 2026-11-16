@@ -6,6 +6,14 @@ import { formatMathText } from '../src/domain/mathNotation.ts';
 import { renderMathSvg } from '../src/domain/mathSvg.ts';
 
 const formulas = source => formatMathText(source).filter(part => part.kind === 'math').map(part => part.latex);
+
+test('authored TeX supports nested operands together with Japanese prose and legacy notation', () => {
+  const text = String.raw`合成では $g^{-1}(\{0\})$ を考え、\(x\in\mathbb R\) とする。2＋3＝5。`;
+  const parts = formatMathText(text);
+  assert.equal(parts.map(part=>part.text).join(''),text);
+  assert.deepEqual(formulas(text),[String.raw`g^{-1}(\{0\})`,String.raw`x\in\mathbb R`,'2+3=5']);
+  for (const latex of formulas(text)) assert.match(renderMathSvg(latex).xml,/<path /);
+});
 test('converts curriculum notation to TeX without changing the prose or answer values', () => {
   const examples = [
     ['x^12＋a_n', 'x^{12}+a_{n}'],

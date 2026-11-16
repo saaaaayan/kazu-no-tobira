@@ -8,9 +8,15 @@ import { generateWorldQuestions } from '../src/domain/worldQuestions.ts';
 import { lessonForStage } from '../src/domain/unitLessons.ts';
 import { inspectQuestion, questionKeys } from './question-audit-rules.mjs';
 
+const args=process.argv.slice(2);
+const includeDrafts=args.includes('--drafts');
+if (includeDrafts && ['--out','--update','--check','--require-reviewed'].some(flag=>args.includes(flag))) {
+  throw new Error('The draft audit writes only to question-drafts/report and cannot be combined with public audit options.');
+}
 const seeds=[0,1,2];
 const targetPerStage=100;
 const bankDir=new URL('../public/question-banks/',import.meta.url);
+const draftDir=new URL('../question-drafts/',import.meta.url);
 const reportDir=new URL('../docs/question-quality/',import.meta.url);
 const visualFamilies=new Set(['shape','geometry','area','angle','circle','volume','coordinateGeometry','vector','data','function']);
 const ledger=JSON.parse(await readFile(new URL('reviews.json',reportDir),'utf8'));
@@ -34,19 +40,36 @@ const banks=new Map(await Promise.all(files.map(async filename=>{
   return [bank.stageId,bank];
 })));
 
+const draftStages = new Set();
+const verifyDraft=includeDrafts ? (await import(new URL('verify-question-drafts.mjs',draftDir))).independentlyVerifyDraft : undefined;
+const draftFiles=includeDrafts ? (await readdir(draftDir)).filter(file=>/\.v\d+\.json$/.test(file)).sort() : [];
+for (const filename of draftFiles) {
+  const draft = JSON.parse(await readFile(new URL(filename,draftDir),'utf8'));
+  assert.equal(filename,draft.stageId+'.v'+draft.version+'.json');
+  assert.ok(!banks.has(draft.stageId),'Duplicate stage bank: '+draft.stageId);
+  assert.ok(draft.questions.length>0 && draft.questions.length<=targetPerStage,filename);
+  banks.set(draft.stageId,draft);
+  draftStages.add(draft.stageId);
+}
+
 for (const island of worldIslands) for (const stage of island.stages) {
   const bank=banks.get(stage.id);
   if (bank) assert.equal(bank.gradeId,island.id);
   const source=bank?'bank':hasGeneratedWorldQuestions(island.id)?'fallback':'unavailable';
-  const rounds=bank?[bank.questions]:source==='fallback'?seeds.map(seed=>generateWorldQuestions(stage,seed)):[];
-  const info={stage,island,source,bank,registered:bank?.questions.length ?? 0,sampled:0,numeric:0,choice:0,
+  const draft=draftStages.has(stage.id);
+  const rounds=bank?[{ source:'bank', questions:bank.questions }]:[];
+  if ((!bank || draft) && hasGeneratedWorldQuestions(island.id)) {
+    for (const seed of seeds) rounds.push({ source:'fallback', questions:generateWorldQuestions(stage,seed) });
+  }
+  const info={stage,island,source,bank,draft:draftStages.has(stage.id),registered:bank?.questions.length ?? 0,sampled:0,numeric:0,choice:0,
     figure:0,figureRequired:0,missingFigure:0,figureReview:0,independent:0,defects:0,exactGroups:0,equivalentGroups:0,shapeGroups:0,
     stepMin:null,stepMax:null,formats:new Set(),difficulty:new Map(),example:'',mathReviewed:0,pedagogyReviewed:0,
+    bankVerified:0,bankFigures:0,bankFigureRequired:0,bankDefects:0,bankFormats:new Set(),
     explanationReviewed:0,diagramReviewed:0,approved:0,revision:0};
   stageInfos.set(stage.id,info);
-  for (const round of rounds) {
+  for (const { source,questions } of rounds) {
     const seenThisRound=new Set();
-    for (const q of round) {
+    for (const q of questions) {
       if (!info.example) info.example=q.question;
       if (source==='bank') {
         assert.ok(!registeredIds.has(q.id),'Duplicate registered ID: '+q.id);
@@ -54,7 +77,14 @@ for (const island of worldIslands) for (const stage of island.stages) {
         registeredIds.add(q.id);
       } else info.sampled++;
       const result=inspectQuestion(q);
-      info.independent+=Number(result.independent);
+      const verified=Number(result.independent || (source==='bank' && draft && verifyDraft(q)));
+      info.independent+=verified;
+      if (source==='bank') {
+        info.bankVerified+=verified;
+        info.bankFigures+=Number(result.illustrated);
+        info.bankFigureRequired+=Number(result.visualPrompt);
+        info.bankFormats.add(q.format ?? ('回答:'+q.type));
+      }
       info.numeric+=Number(q.type==='number');
       info.choice+=Number(q.type==='choice');
       info.figure+=Number(result.illustrated);
@@ -93,6 +123,7 @@ for (const island of worldIslands) for (const stage of island.stages) {
 
       if (result.issues.length) {
         info.defects++;
+        if (source==='bank') info.bankDefects++;
         findings.push({category:'automated-finding',...entry,issues:result.issues});
       }
       push(exact,keys.exact,{...entry,recurrence:quality?.recurrence});
@@ -129,6 +160,7 @@ const structuralGroups=reportGroups(shapes,'structural-near-match','shapeGroups'
   entries=>new Set(entries.map(entry=>entry.exact)).size>1);
 for (const entry of approved.values()) stageInfos.get(entry.stageId).approved++;
 
+for (const stageId of banks.keys()) assert.ok(stageInfos.has(stageId),'Stage bank not assigned: '+stageId);
 const infos=[...stageInfos.values()];
 const sum=key=>infos.reduce((n,info)=>n+info[key],0);
 const bySource=source=>infos.filter(info=>info.source===source).length;
@@ -136,12 +168,13 @@ const bankFindings=source=>findings.filter(item=>item.entries?.filter(entry=>ent
 const summary={
   stages:infos.length,target:infos.length*targetPerStage,registered:sum('registered'),
   source:{bank:bySource('bank'),fallback:bySource('fallback'),unavailable:bySource('unavailable')},
+  privateDrafts:{ stages:draftStages.size, registered:infos.filter(i=>i.draft).reduce((n,i)=>n+i.registered,0) },
   fallback:{seeds,questions:sum('sampled')},
   checkedArithmetic:sum('independent'), automatedFindingRows:sum('defects'),
   byQuestionSource:Object.fromEntries(['bank','fallback'].map(source=>{
-    const selected=infos.filter(info=>info.source===source);
-    const tally=key=>selected.reduce((n,info)=>n+info[key],0);
-    return [source,{checkedArithmetic:tally('independent'),figures:tally('figure'),automatedFindingRows:tally('defects')}];
+    const registered=source==='bank';
+    const count=(total,bank)=>registered ? sum(bank) : sum(total)-sum(bank);
+    return [source,{checkedArithmetic:count('independent','bankVerified'),figures:count('figure','bankFigures'),automatedFindingRows:count('defects','bankDefects')}];
   })),
   figures:{shown:sum('figure'),explicitlyRequired:sum('figureRequired'),missingForExplicitPrompt:sum('missingFigure'),
     textOnlyVisualFamilyNeedsReview:sum('figureReview')},
@@ -169,10 +202,10 @@ const allRows=infos.map(i=>{
   const design=i.stage.kind==='secret'?'条件探索・規則性・説明':visualFamilies.has(i.stage.family)?'図表の判断・説明':'文章と式・条件整理';
   const lesson=lessonForStage(i.stage.id);
   const prerequisite=lesson?lesson.prerequisiteIds.join(', ')||'教材では指定なし':'要設計';
-  const status=i.source==='unavailable'?'未出題':i.defects || i.revision ? '改訂候補あり'
+  const status=i.source==='unavailable'?'未出題':i.draft?'非配信・制作中':i.defects || i.revision ? '改訂候補あり'
     :i.source==='fallback'?'生成サンプルのみ':i.approved===targetPerStage?'品質確認済み':'登録済・品質レビュー待ち';
   return [i.stage.id,i.island.id,i.stage.kind,unitTitle,i.stage.family,i.bank?.objective ?? '要設計',prerequisite,design,'要レビュー',
-    i.source,i.registered,i.sampled,i.numeric,i.choice,[...i.formats].sort().join(', '),[...i.difficulty].map(pair=>pair.join(':')).sort().join(', '),
+    i.draft?'private-draft':i.source,i.registered,i.sampled,i.numeric,i.choice,[...i.formats].sort().join(', '),[...i.difficulty].map(pair=>pair.join(':')).sort().join(', '),
     i.figure,i.figureRequired,i.missingFigure,i.figureReview,i.stepMin===null?'—':i.stepMin+'–'+i.stepMax,i.independent,i.defects,
     i.exactGroups,i.equivalentGroups,i.shapeGroups,i.mathReviewed,i.pedagogyReviewed,i.explanationReviewed,i.diagramReviewed,
     i.approved,status,i.example || '—'];
@@ -189,12 +222,12 @@ const production = {
     id: i.stage.id, islandId: i.island.id,
     unit: i.island.units[i.stage.unitIndex].code, skill: i.stage.family,
     target: targetPerStage, registered: i.registered,
-    source: i.source, implementation: isPlannedIsland(i.island.id) ? 'curriculum-only' : 'game',
-    formats: i.bank ? Object.fromEntries([...i.formats].sort().map(format => [
+    source: i.draft ? 'private-draft' : i.source, implementation: isPlannedIsland(i.island.id) ? 'curriculum-only' : 'game',
+    formats: i.bank ? Object.fromEntries([...i.bankFormats].sort().map(format => [
       format, i.bank.questions.filter(q => (q.format ?? ('回答:'+q.type)) === format).length,
     ])) : {},
-    figures: i.bank ? { requiredByPrompt: i.figureRequired, drawn: i.figure, reviewed: i.diagramReviewed } : null,
-    verifiedAnswers: i.bank ? i.independent : 0,
+    figures: i.bank ? { requiredByPrompt: i.bankFigureRequired, drawn: i.bankFigures, reviewed: i.diagramReviewed } : null,
+    verifiedAnswers: i.bankVerified,
     explanationReviewed: i.explanationReviewed,
     independentQualityApproved: i.approved,
     duplicateGroups: { exact: i.exactGroups, equivalent: i.equivalentGroups, structural: i.shapeGroups },
@@ -209,9 +242,14 @@ const outputs={
   'stages.tsv':[columns,...allRows].map(row=>row.map(cell).join('\t')).join('\n')+'\n',
   'summary.json':JSON.stringify(summary,null,2)+'\n',
 };
-const args=process.argv.slice(2);
 const progressFile = new URL('../question-production-progress.json', reportDir);
 const progressJSON = JSON.stringify(production, null, 2) + '\n';
+if (includeDrafts) {
+  const localReport=new URL('report/',draftDir);
+  await mkdir(localReport,{recursive:true});
+  await writeFile(new URL('question-production-progress.json',localReport),progressJSON);
+  await writeFile(new URL('summary.json',localReport),outputs['summary.json']);
+}
 if (args.includes('--update')) await writeFile(progressFile, progressJSON);
 if (args.includes('--check')) assert.equal((await readFile(progressFile,'utf8')).replaceAll('\r\n','\n'), progressJSON,
   'Stale question production progress. Run pnpm bank:audit --update.');
@@ -229,7 +267,7 @@ if (detailIndex!==-1) {
 }
 console.log(JSON.stringify(summary,null,2));
 
-if (args.includes('--require-reviewed') && (infos.some(i=>i.registered!==targetPerStage || i.approved!==targetPerStage) ||
+if (args.includes('--require-reviewed') && (infos.some(i=>i.draft || i.registered!==targetPerStage || i.approved!==targetPerStage) ||
     summary.automatedFindingRows || summary.reviews.unlinkedLedgerIds.length)) {
   console.error('Quality gate failed: each stage requires 100 independently reviewed, eligible questions and no unresolved automatic findings.');
   process.exitCode=2;
