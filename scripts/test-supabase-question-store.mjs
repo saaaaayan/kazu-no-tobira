@@ -3,6 +3,7 @@ import { openSupabasePool } from '../server/supabase-postgres.mjs';
 import { createSupabaseQuestionReview } from '../server/supabase-question-review.mjs';
 import { liveQuestionRepository,liveQuestionService } from '../server/live-question-service.mjs';
 import { questionDeck, questionRound } from '../server/question-round-selection.mjs';
+import { betaReadiness } from '../server/beta-readiness.mjs';
 
 const pool=openSupabasePool('svc_kazu_review');
 const connection=await pool.connect();
@@ -47,12 +48,28 @@ try {
   assert.equal((await store.review({items:reviewItems.map(item=>({...item,version:item.version+1})),status:'ready',note:'Rollback-only QA'},'qa')).updated,10);
   assert.equal((await questionRound(isolated,stage,ids)).length,10);
   const protectedGame=liveQuestionService(liveQuestionRepository(isolated));
+  await assert.rejects(protectedGame.start({mode:'checkpoint',stageId:'e1.checkpoint1'}),{status:404});
+  const sources=['e1.n04','e1.n05','e1.forest','e1.n07'];
+  const extras=[];
+  for (const source of sources) {
+    const deck=await questionDeck(isolated,source,preview);
+    for (const card of deck.cards.slice(0,10)) extras.push(await store.detail(card.id));
+  }
+  const additional=extras.map(item=>({id:item.id,version:item.version}));
+  assert.equal((await store.review({items:additional,status:'verified',note:'Rollback-only QA'},'qa')).updated,40);
+  assert.equal((await store.review({items:additional.map(item=>({...item,version:item.version+1})),status:'ready',note:'Rollback-only QA'},'qa')).updated,40);
+  const readiness=await betaReadiness(isolated);
+  assert.equal(readiness.target,10400);
+  assert.equal(readiness.ready,50);
+  assert.equal(readiness.playable,50);
+  assert.equal(readiness.complete,5);
+  assert.equal(readiness.inventoryReady,false);
   const challenge=await protectedGame.start({mode:'checkpoint',stageId:'e1.checkpoint1'});
   assert.equal(challenge.questions.length,10);
   assert.equal(new Set(challenge.questions.map(question=>question.id)).size,10);
-  assert.ok(challenge.questions.every(question=>question.stageId===stage && !('answer' in question) && !('steps' in question)));
+  assert.ok(challenge.questions.every(question=>[stage,...sources].includes(question.stageId) && !('answer' in question) && !('steps' in question)));
   const first=challenge.questions[0];
-  const correct=selected.find(item=>item.id===first.id).question.answer;
+  const correct=[...selected,...extras].find(item=>item.id===first.id).question.answer;
   const hint=await protectedGame.hint({token:challenge.token,id:first.id,level:0});
   assert.ok(hint.hint);
   const result=await protectedGame.grade({token:challenge.token,id:first.id,answer:correct});

@@ -20,6 +20,7 @@
     "bank:audit": "node scripts/audit-question-quality.mjs",
     "bank:audit:check": "node scripts/audit-question-quality.mjs --check",
     "bank:quality-gate": "node scripts/audit-question-quality.mjs --require-reviewed",
+    "beta:readiness": "node scripts/check-beta-readiness.mjs",
     "test": "pnpm bank:check && pnpm bank:audit:check && node --test tests/*.test.mjs"
   },
   "dependencies": {
