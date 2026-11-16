@@ -28,11 +28,12 @@ import { StudyPlanner } from './components/StudyPlanner';
 import { StudyWorkshop } from './components/StudyWorkshop';
 import { savePracticeAnswer, type PracticeItem } from './domain/studyPractice';
 import { UnitLearning } from './components/UnitLearning';
+import QuestionReviewAdmin from './components/QuestionReviewAdmin';
 import { lessonForStage, newLessonProgress, type LessonProgress, type UnitLesson } from './domain/unitLessons';
 
 type Feedback = 'correct' | 'incorrect';
 type AnswerMode = 'keyboard' | 'panel' | 'handwriting';
-type Screen = 'home' | 'world' | 'island' | 'titles' | 'lesson' | 'study' | 'study-plan';
+type Screen = 'home' | 'world' | 'island' | 'titles' | 'lesson' | 'study' | 'study-plan' | 'admin';
 type Learning = { lesson: UnitLesson; progress: LessonProgress; target?: WorldStage; practice: boolean };
 type Round = {
   stage: WorldStage;
@@ -330,12 +331,14 @@ function AdventureWorld() {
                 )}
                 <ModeBadge mode={playMode} />
               </View>
-              {!round && screen !== 'titles' && screen !== 'lesson' && screen !== 'study' && screen !== 'study-plan' && <ModeControls mode={playMode} onChange={setPlayMode} />}
+              {!round && screen !== 'titles' && screen !== 'lesson' && screen !== 'study' && screen !== 'study-plan' && screen !== 'admin' && <ModeControls mode={playMode} onChange={setPlayMode} />}
             </View>
           )}
           {!progress && (
             <Text style={styles.loading}>{loadError ? 'きろくを よみこめなかったよ。アプリを ひらきなおしてね。' : 'ぼうけんの じゅんびを しているよ…'}</Text>
           )}
+          {__DEV__ && !round && screen === 'home' && <GameButton label="管理者用・全問題レビュー" onPress={() => setScreen('admin')}/>}
+          {__DEV__ && !round && screen === 'admin' && <QuestionReviewAdmin onBack={() => setScreen('home')}/>}
           {progress && !round && !testing && screen === 'world' && <GameButton label="まなびの広場" onPress={()=>{ setStudyError(''); setScreen('study'); }}/>}
           {progress && !round && screen === 'study' && <GameButton label="個別学習・復習・成長レポート"
             disabled={saving} onPress={()=>{setStudyError('');setScreen('study-plan');}}/>}
