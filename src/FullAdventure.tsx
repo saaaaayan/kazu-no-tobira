@@ -338,7 +338,7 @@ function AdventureWorld() {
           {!progress && (
             <Text style={styles.loading}>{loadError ? 'きろくを よみこめなかったよ。アプリを ひらきなおしてね。' : 'ぼうけんの じゅんびを しているよ…'}</Text>
           )}
-          {__DEV__ && !round && screen === 'home' && <GameButton label="管理者用・全問題レビュー" onPress={() => setScreen('admin')}/>}
+          {__DEV__ && !round && screen === 'home' && <GameButton label="開発用・端末内の問題レビュー" onPress={() => setScreen('admin')}/>}
           {__DEV__ && !round && screen === 'admin' && <QuestionReviewAdmin onBack={() => setScreen('home')}/>}
           {progress && !round && !testing && screen === 'world' && <GameButton label="まなびの広場" onPress={()=>{ setStudyError(''); setScreen('study'); }}/>}
           {progress && !round && screen === 'study' && <GameButton label="個別学習・復習・成長レポート"

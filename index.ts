@@ -15,4 +15,6 @@ if (typeof document !== 'undefined') {
   if (!meta.parentNode) document.head.appendChild(meta);
 }
 
-registerRootComponent(App);
+const Root = __DEV__ && typeof window !== 'undefined' && window.location.pathname === '/admin'
+  ? require('./src/components/ServerQuestionReview').default : App;
+registerRootComponent(Root);

@@ -9,7 +9,7 @@ export const reviewStatusLabels = {
 } as const;
 
 export type ReviewStatus = keyof typeof reviewStatusLabels;
-export type ReviewReason = '問題不成立' | 'わかりにくい' | '正解に誤り' | '解説に誤り' | '図が不足' | '重複' | 'その他';
+export type ReviewReason = '問題不成立' | 'わかりにくい' | '正解に誤り' | '解説に誤り' | '図が不足' | '重複' | '単元・難易度が不適切' | 'その他';
 
 export type ReviewRecord = {
   status: ReviewStatus;
@@ -21,7 +21,7 @@ export type ReviewRecords = Record<string, ReviewRecord>;
 
 const statuses = new Set(Object.keys(reviewStatusLabels));
 export const rejectReasons: readonly ReviewReason[] = [
-  '問題不成立', 'わかりにくい', '正解に誤り', '解説に誤り', '図が不足', '重複', 'その他',
+  '問題不成立', 'わかりにくい', '正解に誤り', '解説に誤り', '図が不足', '重複', '単元・難易度が不適切', 'その他',
 ];
 
 export function parseReviewRecords(raw: string | null): ReviewRecords {
