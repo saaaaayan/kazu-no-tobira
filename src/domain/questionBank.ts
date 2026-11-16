@@ -11,7 +11,7 @@ export type BankDiagram = { kind: 'countingBoard'; rows: readonly { label?: stri
   | { kind: 'borrowTen'; total: number; used: number }
   | { kind: 'bundlesAndOnes'; tens: number; ones: number };
 export type BankQuestion = MathQuestion & {
-  format: 'calculation' | 'missingPart' | 'story' | 'decomposition' | 'comparison' | 'position' | 'interval' | 'sequence' | 'line' | 'reverseTransfer'
+  format: 'counting' | 'calculation' | 'missingPart' | 'story' | 'decomposition' | 'comparison' | 'position' | 'interval' | 'sequence' | 'line' | 'reverseTransfer'
     | 'joinThree' | 'target' | 'splitTotal' | 'compareGroups' | 'returnSome' | 'refill' | 'twoCollections'
     | 'takeAway' | 'takeTwice' | 'startAmount' | 'unknownLast' | 'compareAfter' | 'moveAway' | 'equalize' | 'comparedStart'
     | 'tenCompareGaps' | 'tenAfterRemoval' | 'tenSecondSource' | 'tenReserved' | 'tenEqualShare' | 'tenTrimAfterTwo' | 'tenShift'

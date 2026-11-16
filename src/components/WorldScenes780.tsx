@@ -13,6 +13,7 @@ import { hasStageBank } from '../domain/questionBank';
 import type { Progress } from '../domain/progress';
 import { lessonStatus, unitLessons, type UnitLesson } from '../domain/unitLessons';
 import { featureAccess } from '../domain/accessPlan';
+import { uiPreviewSampleKind } from '../domain/uiPreviewRound';
 
 const palette = [
   { land: '#b6d793', dark: '#609d77', detail: '#306d6e', roof: '#efb6a0' },
@@ -316,7 +317,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           return (
             <Pressable key={stage.id} accessibilityRole="button" disabled={!selectable}
               accessibilityState={{disabled:!selectable}}
-              accessibilityLabel={stageDisplayTitle(stage)+'、'+(preview ? 'サンプル問題' : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
+              accessibilityLabel={stageDisplayTitle(stage)+'、'+(preview ? (uiPreviewSampleKind(stage) ? 'サンプル問題' : '体験用問題は準備中') : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
                 styles.stagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
