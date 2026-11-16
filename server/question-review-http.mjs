@@ -52,24 +52,29 @@ async function exportQuestions(response, store, params, format) {
 }
 
 // The loopback instance is a private review environment. Production auth/entitlement is not inferred from this session.
-export function createQuestionReviewServer({ store, port, adminKey, ownerAuth, assets, preview, test = false }) {
+export function createQuestionReviewServer({ store, port, adminKey, ownerAuth, assets, preview, publicOrigin, test = false }) {
+  const secureOrigin = publicOrigin ? new URL(publicOrigin) : null;
+  if (secureOrigin && (secureOrigin.protocol!=='https:' || secureOrigin.origin!==publicOrigin || !ownerAuth || preview)) {
+    throw new Error('HTTPS review requires Supabase Auth and prohibits the preview API.');
+  }
   if (!ownerAuth && !/^[0-9a-f]{64}$/i.test(adminKey ?? '')) throw new Error('A random 256-bit admin key is required.');
   const secret = ownerAuth ? null : hash(adminKey);
   const sessions = new Map();
   const admin = { subject: 'owner', role: 'question_admin' };
-  const cookie = (value,maxAge) => `${cookieName}=${value}; Path=/review-api; HttpOnly; SameSite=Strict; Max-Age=${maxAge}`;
+  const name = secureOrigin ? '__Host-'+cookieName : cookieName;
+  const cookie = (value,maxAge) => `${name}=${value}; Path=${secureOrigin?'/':'/review-api'}; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${secureOrigin?'; Secure':''}`;
   let failed = 0;
   let lockUntil = 0;
   const server = createServer({ requestTimeout: 15000, headersTimeout: 10000 }, async (request,response) => {
-    const host = '127.0.0.1:'+(test ? server.address().port : port);
-    const origin = 'http://'+host;
+    const host = secureOrigin?.host ?? '127.0.0.1:'+(test ? server.address().port : port);
+    const origin = secureOrigin?.origin ?? 'http://'+host;
     response.setHeader('Cache-Control','private, no-store');
     response.setHeader('X-Content-Type-Options','nosniff');
     response.setHeader('X-Frame-Options','DENY');
     response.setHeader('Referrer-Policy','no-referrer');
     const json = (status,data) => response.writeHead(status,{'Content-Type':'application/json; charset=utf-8'}).end(JSON.stringify(data));
     try {
-      if (request.headers.host !== host) throw error(403,'無効なホストです。');
+      if (request.headers.host !== host || (secureOrigin && request.headers['x-forwarded-proto']!=='https')) throw error(403,'無効なホストです。');
       if (request.headers['sec-fetch-site'] === 'cross-site') throw error(403,'同じサイトから開いてください。');
       const url = new URL(request.url,origin);
       if (request.method === 'GET' && !url.pathname.startsWith('/review-api/') && assets) {
@@ -79,7 +84,7 @@ export function createQuestionReviewServer({ store, port, adminKey, ownerAuth, a
       const now = Date.now();
       for (const [token,session] of sessions) if (session.expires <= now) sessions.delete(token);
       const sessionToken = request.headers.cookie?.split(';').map(item=>item.trim())
-        .find(item=>item.startsWith(cookieName+'='))?.slice(cookieName.length+1);
+        .find(item=>item.startsWith(name+'='))?.slice(name.length+1);
       const sessionId = sessionToken && hash(sessionToken).toString('hex');
       const session = sessions.get(sessionId);
 
@@ -103,7 +108,7 @@ export function createQuestionReviewServer({ store, port, adminKey, ownerAuth, a
             lockUntil = Date.now() + 60_000;
             failed = 0;
           }
-          throw error(401,'管理者キーを確認してください。');
+          throw error(401,'管理者のログイン情報を確認してください。');
         }
         failed = 0;
         if (sessionId) sessions.delete(sessionId);
@@ -111,15 +116,23 @@ export function createQuestionReviewServer({ store, port, adminKey, ownerAuth, a
         const token = randomBytes(32).toString('hex');
         const expires=Math.min(now+sessionLifetime,identity.expires ?? Infinity);
         sessions.set(hash(token).toString('hex'),{...identity,expires});
-        response.setHeader('Set-Cookie',cookie(token,sessionLifetime/1000));
+        response.setHeader('Set-Cookie',cookie(token,Math.max(0,Math.floor((expires-now)/1000))));
         return json(200,{ role:identity.role });
       }
 
-      if (session?.role !== 'question_admin' || (ownerAuth && !await ownerAuth.validate(session))) throw error(401,'管理者ログインが必要です。');
       if (request.method === 'POST' && url.pathname === '/review-api/logout') {
         sessions.delete(sessionId);
         response.setHeader('Set-Cookie',cookie('',0));
+        if (ownerAuth && session) {
+          try { await ownerAuth.logout(session); }
+          catch { return json(503,{error:'この画面からログアウトしました。認証サービスのセッション終了を確認できませんでした。'}); }
+        }
         return json(200,{ signedOut:true });
+      }
+      if (session?.role !== 'question_admin' || (ownerAuth && !await ownerAuth.validate(session))) {
+        if (sessionId) sessions.delete(sessionId);
+        response.setHeader('Set-Cookie',cookie('',0));
+        throw error(401,'管理者ログインが必要です。');
       }
       if (request.method === 'GET' && url.pathname === '/review-api/session') return json(200,{ role:session.role });
       if (request.method === 'GET' && url.pathname === '/review-api/questions') return json(200,await store.list(url.searchParams));
