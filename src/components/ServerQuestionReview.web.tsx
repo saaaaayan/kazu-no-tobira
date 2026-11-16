@@ -284,7 +284,7 @@ export default function ServerQuestionReview() {
     catch (problem) { setError(String(problem instanceof Error ? problem.message : problem)); }
     finally { setKey(''); }
   }
-  if (signedIn) return <ReviewDashboard onLogout={async () => { await api('logout',{}); setSignedIn(false); }}/>;
+  if (signedIn) return <ReviewDashboard onLogout={async () => { try { await api('logout',{}); } finally { setSignedIn(false); } }}/>;
   return <main style={pageStyle}>
     <h1>数のトビラ 問題審査</h1>
     <form style={{...panel,maxWidth:420}} onSubmit={event => void login(event)}>

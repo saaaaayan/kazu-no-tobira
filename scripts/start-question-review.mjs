@@ -20,21 +20,23 @@ if (!location || (!(location==='..' || location.startsWith('..'+sep)) && !isAbso
   throw new Error('Place the admin database and credentials outside the web export directory.');
 }
 await mkdir(data,{recursive:true,mode:0o700});
+const keyForAuth=process.env.KAZU_QUESTION_AUTH_PUBLISHABLE_KEY;
+const publicOrigin=process.env.KAZU_REVIEW_HTTPS_ORIGIN;
+if (publicOrigin && !keyForAuth) throw new Error('HTTPS review requires Supabase Auth.');
 const keyFile = resolve(data,'admin-key.txt');
-try {
+if (!keyForAuth) try {
   await writeFile(keyFile,randomBytes(32).toString('hex')+'\n',{flag:'wx',mode:0o600});
 } catch (problem) {
   if (problem.code !== 'EEXIST') throw problem;
 }
-const key = (await readFile(keyFile,'utf8')).trim();
+const key = keyForAuth ? undefined : (await readFile(keyFile,'utf8')).trim();
 const supabase=Boolean(process.env.KAZU_QUESTION_DB_HOST);
 const pool=supabase ? openSupabasePool('svc_kazu_review') : undefined;
 const store = pool ? createSupabaseQuestionReview(pool) : openQuestionReviewStore(resolve(data,'questions.sqlite'),new URL('../public/question-banks/',import.meta.url),
   new URL('../question-drafts/',import.meta.url));
 const registered = await (pool ? store.stageTotals().then(stages=>stages.reduce((n,stage)=>n+stage.registered,0)) : store.importBanks());
-const keyForAuth=process.env.KAZU_QUESTION_AUTH_PUBLISHABLE_KEY;
 if (keyForAuth && !pool) throw new Error('Supabase Auth requires a Supabase review store.');
-const ownerAuth=keyForAuth ? createSupabaseOwnerAuth(keyForAuth,store.isAdministrator) : undefined;
+const ownerAuth=keyForAuth ? createSupabaseOwnerAuth(keyForAuth,store.isAdministratorSession) : undefined;
 const types = {
   '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8',
   '.css':'text/css; charset=utf-8', '.json':'application/json; charset=utf-8', '.png':'image/png', '.svg':'image/svg+xml',
@@ -42,13 +44,13 @@ const types = {
 };
 const allowed = /^\/(?:_expo\/static\/|assets\/)/;
 const server = createQuestionReviewServer({
-  store,port,adminKey:key,ownerAuth,
-  preview: pool ? {
+  store,port,adminKey:key,ownerAuth,publicOrigin,
+  preview: pool && !publicOrigin && !keyForAuth ? {
     deck:stageId=>questionDeck(pool,stageId,{preview:true,premium:true}),
     round:(stageId,ids)=>questionRound(pool,stageId,ids,{preview:true,premium:true}),
   } : undefined,
   async assets(path,response) {
-    const route = path === '/admin' || path === '/' || (pool && path === '/game-preview') ? '/index.html' : decodeURIComponent(path);
+    const route = path === '/admin' || path === '/' || (pool && !keyForAuth && path === '/game-preview') ? '/index.html' : decodeURIComponent(path);
     if (route !== '/index.html' && route !== '/version.json' && (!allowed.test(route) || !Object.hasOwn(types,extname(route)))) return false;
     try {
       const file = await realpath(resolve(root,'.'+route));
@@ -64,5 +66,5 @@ server.on('close',()=>pool ? void pool.end() : store.db.close());
 server.listen(port,'127.0.0.1',()=> {
   console.log('Question review: http://127.0.0.1:'+port+'/admin');
   console.log(registered+' registered questions via '+(pool ? 'Supabase' : 'SQLite'));
-  if (pool) console.log('Game preview: http://127.0.0.1:'+port+'/game-preview');
+  if (pool && !keyForAuth) console.log('Game preview: http://127.0.0.1:'+port+'/game-preview');
 });

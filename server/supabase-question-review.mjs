@@ -133,8 +133,8 @@ export function createSupabaseQuestionReview(pool) {
   }
 
   return {list,detail,historicalRevision,review,exportRows,stageTotals,
-    async isAdministrator(id) {
-      return Boolean((await pool.query(`select 1 from ${ns}.administrators where user_id=$1 and active`,[id])).rowCount);
+    async isAdministratorSession(id,sessionId) {
+      return (await pool.query(`select ${ns}.active_owner_session($1,$2) as allowed`,[id,sessionId])).rows[0].allowed;
     },
   };
 }
