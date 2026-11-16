@@ -2,6 +2,7 @@ import { checkMathAnswer, isValidMathAnswer } from '../src/domain/worldQuestions
 import { worldIslands } from '../src/domain/worldCatalog.ts';
 
 export const betaQuestionsPerStage = 10;
+export const productionQuestionsPerStage = 100;
 
 const nonblank = value => typeof value === 'string' && value.trim().length > 0;
 
@@ -22,7 +23,8 @@ export function playableBetaPayload(question) {
       (step.equations===undefined || (Array.isArray(step.equations) && step.equations.every(nonblank))));
 }
 
-export async function betaReadiness(pool) {
+export async function betaReadiness(pool,{production=false}={}) {
+  const perStage=production ? productionQuestionsPerStage : betaQuestionsPerStage;
   // One statement gives a consistent inventory. Only ready payloads are read.
   const {rows}=await pool.query(`
     select s.id,s.kind,s.island_id as island,
@@ -41,9 +43,9 @@ export async function betaReadiness(pool) {
     const playable=present ? row.payloads.filter(playableBetaPayload).length : 0;
     return {stageId:stage.id,islandId:island.id,kind:stage.kind,present,
       registered:row?.registered??0,verified:row?.verified??0,ready:row?.ready??0,
-      playable,missing:Math.max(0,betaQuestionsPerStage-playable)};
+      playable,missing:Math.max(0,perStage-playable)};
   }));
-  const target=stages.length*betaQuestionsPerStage;
+  const target=stages.length*perStage;
   const totals=stages.reduce((sum,row)=>({
     registered:sum.registered+row.registered,verified:sum.verified+row.verified,ready:sum.ready+row.ready,
     playable:sum.playable+row.playable,missing:sum.missing+row.missing,

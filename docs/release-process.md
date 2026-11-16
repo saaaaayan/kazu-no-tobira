@@ -13,3 +13,24 @@ GitHub の管理設定を変更できない場合は、管理者に **Settings �
 開発用のプラン切替を確認するときは、統合済み `main` から `pnpm exec expo export --platform web --dev --output-dir .expo/review-<SHA>` で専用フォルダーへ出力し、`node scripts/serve-review.mjs .expo/review-<SHA> 8115` で起動する。確認URLは `http://127.0.0.1:8115/`。このサーバーは同じPCからだけ接続可能で、出力を Pages にアップロードしない。Pages の成果物に認証情報や秘密鍵を含めない。
 
 限定βの教材判定、招待制環境の設計、公開失敗からの復旧は [限定β版の準備と運用](beta-operations.md) を参照する。
+
+## 配信先ごとの確認条件
+
+| 対象 | 確認条件 |
+| --- | --- |
+| 開発用UIプレビュー | 型チェック、自動テスト、サンプル専用成果物の検査、HTTPのSHA照合。全16島を閲覧でき、ゲーム画面で合成のサンプルを採点できる。DB、教材バンク、学習記録、権限情報を使わない。 |
+| 招待制β | `pnpm beta:readiness --require-ready`。全1,040ステージで各10問の公開準備完了教材が必要。加えて招待制HTTPS、操作検証と公開承認が必要。 |
+| 正式本番 | `pnpm production:readiness --require-ready` で各ステージ100問の公開準備完了教材を実DBで照合する。既存のPagesワークフローでは `PRODUCTION_ENTITLEMENTS_READY` と `pnpm bank:quality-gate` を引き続き必須とする。正式版のDB検査をCIに移す場合は、専用の読取り権限を用意してから行う。 |
+
+### 開発用UIプレビューの更新
+
+GitHub Actionsの **Build sample-only UI preview** が、検証済みのmainから `ui-preview-<SHA>` 成果物を生成する。これはGitHub Actionsの成果物で、本番Pagesへのアップロードは行わない。同じPCでビルド・確認するときは、mainを更新し、未使用の出力フォルダーを指定する。
+
+```sh
+node scripts/export-ui-preview.mjs .expo/ui-preview-web
+node scripts/serve-review.mjs .expo/ui-preview-web 8130
+```
+
+確認先は [開発用UIプレビュー](http://127.0.0.1:8130/)。別シェルから `node scripts/verify-web-release.mjs http://127.0.0.1:8130/ <完全なコミットSHA> ui-preview` を実行すると、マニフェストとHTMLが参照するJSの両方を検証する。GitHub Pagesでも同じスクリプトで本番のマニフェストとJSを確認する。
+
+別端末との共有が必要になった場合は、同じサンプル成果物を本番と別のHTTPSホストへ配置する。ホストとアクセス範囲は公開前に明示する。招待制βは専用の認可と出題APIを備えるまでは開始しない。

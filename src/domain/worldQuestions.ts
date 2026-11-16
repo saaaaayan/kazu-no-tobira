@@ -46,20 +46,7 @@ const fraction = (n: number, d: number) => {
 const answerString = (n: number) => String(Math.round(n * 10000) / 10000);
 const levels: Record<string, number> = { e1: 1, e2: 2, e3: 3, e4: 4, e5: 5, e6: 6, j1: 7, j2: 8, j3: 9, h1: 10, h2: 11, h3: 12 };
 
-export function checkMathAnswer(problem: MathQuestion, typed: string): boolean {
-  const normalized = typed.normalize('NFKC').trim().replaceAll('−', '-');
-  if (problem.type === 'choice') return typed.trim() === problem.answer || normalized === problem.answer.normalize('NFKC');
-  if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(normalized)) return false;
-  const actual = Number(normalized);
-  const expected = Number(problem.answer);
-  return Number.isFinite(actual) && Math.abs(actual - expected) < 0.000001;
-}
-
-export function isValidMathAnswer(problem: MathQuestion, typed: string): boolean {
-  const normalized = typed.normalize('NFKC').trim().replaceAll('−', '-');
-  if (problem.type === 'choice') return problem.choices?.includes(typed.trim()) ?? false;
-  return /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(normalized) && Number.isFinite(Number(normalized));
-}
+export { checkMathAnswer, isValidMathAnswer } from './mathAnswer.ts';
 
 // Format a monomial without a redundant coefficient of 1 or exponent of 1.
 function monomial(coefficient: number, exponent: number): string {

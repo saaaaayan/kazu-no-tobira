@@ -74,8 +74,8 @@ function PortalArt() {
   );
 }
 
-export default function AdventureHome({ mode, onMode, onStart, loading }: {
-  mode: PlayMode; onMode: (mode: PlayMode) => void; onStart: () => void; loading: boolean;
+export default function AdventureHome({ mode, onMode, onStart, loading, preview = false }: {
+  mode: PlayMode; onMode: (mode: PlayMode) => void; onStart: () => void; loading: boolean; preview?: boolean;
 }) {
   const width = useWindowDimensions().width;
   const wide = width >= 740;
@@ -94,14 +94,14 @@ export default function AdventureHome({ mode, onMode, onStart, loading }: {
         <Text accessibilityRole="header" style={[styles.title, wide && styles.titleWide]}>数のトビラ</Text>
         <Text style={styles.subtitle}>ひとつ解くたび、世界がひらく。</Text>
         <Text style={styles.invitation}>ルミといっしょに、{worldIslands.length}の島をめぐろう。</Text>
-        <ModeControls mode={mode} onChange={onMode} />
-        <Text style={styles.modeHint}>{mode === 'test' ? '全ステージをためせるよ。記録やごほうびは のこらないよ。' : 'まなびの記録をのこしながら、島をひとつずつ開こう。'}</Text>
+        {!preview && <ModeControls mode={mode} onChange={onMode} />}
+        {!preview && <Text style={styles.modeHint}>{mode === 'test' ? '全ステージをためせるよ。記録やごほうびは のこらないよ。' : 'まなびの記録をのこしながら、島をひとつずつ開こう。'}</Text>}
         <Pressable accessibilityRole="button" accessibilityState={{ disabled: loading }} disabled={loading} onPress={onStart}
           style={({ pressed }) => [styles.start, (pressed || loading) && styles.dim]}>
           <Text style={styles.startLabel}>{loading ? 'じゅんびちゅう…' : 'ぼうけんを はじめる'}</Text>
           <Text accessible={false} style={styles.arrow}>›</Text>
         </Pressable>
-        <VersionNotice />
+        {!preview && <VersionNotice />}
       </View>
     </View>
   );

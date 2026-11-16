@@ -21,6 +21,7 @@
     "bank:audit:check": "node scripts/audit-question-quality.mjs --check",
     "bank:quality-gate": "node scripts/audit-question-quality.mjs --require-reviewed",
     "beta:readiness": "node scripts/check-beta-readiness.mjs",
+    "production:readiness": "node scripts/check-beta-readiness.mjs --production",
     "beta:intake": "node scripts/intake-question-draft.mjs",
     "test": "pnpm bank:check && pnpm bank:audit:check && node --test tests/*.test.mjs"
   },
