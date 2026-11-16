@@ -88,7 +88,7 @@ export function inspectQuestion(q) {
   const computed=task?.result?.join('/');
   if (task && (!computed || computed!==rationalValue(q.answer)?.join('/'))) issues.push('arithmetic-answer');
   const visualPrompt=/この時計|このとけい|この図|図を見|図の|このグラフ|グラフを見|この表|表を見/.test(normalizeQuestion(q.question));
-  const illustrated=Boolean(q.diagram || q.clock);
+  const illustrated=Boolean(q.diagram || q.clock || q.figure);
   if (visualPrompt && !illustrated) issues.push('figure-referenced-but-missing');
   return {issues, independent: Boolean(computed && !issues.includes('arithmetic-answer')), visualPrompt, illustrated};
 }
