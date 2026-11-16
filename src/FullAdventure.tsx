@@ -20,6 +20,7 @@ import { MagicMeter, ComboBadge, SparkleBurst } from './components/AdventureJuic
 import { CorrectSpark } from './components/AdventureEffects';
 import CalculationMemo from './components/CalculationMemo';
 import HandwritingAnswer from './components/HandwritingAnswer';
+import { StudyFigureView } from './components/StudyFigureView';
 import { ClockFace } from './components/ClockFace';
 import { MathText } from './components/MathText';
 import NumberPad from './components/NumberPad';
@@ -218,7 +219,7 @@ function AdventureWorld() {
   const question = round?.problems[round.index];
   const bankQuestion = question && isBankQuestion(question) ? question : undefined;
   const canReadWorkedSolution = canAccessFeature(access, 'workedSolutions');
-  const hints = bankQuestion?.hints ?? (question ? [question.hint] : []);
+  const hints = bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0;
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
 
@@ -399,6 +400,7 @@ function AdventureWorld() {
                     <Text style={styles.difficulty}>{round.stage.kind==='secret'?'✦ ひみつの なぞ':round.stage.kind==='extra'?'★ EXチャレンジ':bankQuestion ? ['● きほん', '● ひょうじゅん', '★ おうよう'][bankQuestion.difficulty - 1]
                       : round.index<3?'● きほん':round.index<8?'● ひょうじゅん':'★ おうよう'}</Text>
                     <MathText style={styles.questionText} value={question.question}/>
+                    {question.figure && <StudyFigureView figure={question.figure}/>}
                     {question.clock && !round.feedback && <ClockFace time={question.clock.start} read={question.clock.read}/>}
                     {bankQuestion?.diagram && !round.feedback && (
                       <QuestionDiagram diagram={bankQuestion.diagram} phase={round.hintLevel ? 'hint' : 'question'} />
@@ -500,7 +502,7 @@ function AdventureWorld() {
                           )}
                           {hints.slice(0, round.hintLevel).map((hint, i) => (
                             <View key={i} style={styles.hintBox}>
-                              <MathText style={styles.hintText} prefix={bankQuestion ? 'ヒント ' + (i + 1) + '　' : '💡 '} value={hint}/>
+                              <MathText style={styles.hintText} prefix={hints.length > 1 ? 'ヒント ' + (i + 1) + '　' : '💡 '} value={hint}/>
                             </View>
                           ))}
                           {round.hintLevel < hints.length && (
@@ -508,7 +510,7 @@ function AdventureWorld() {
                               onPress={() => setRound(current => current && !current.feedback && current.hintLevel < hints.length
                                 ? { ...current, hintLevel: current.hintLevel + 1, usedHint: true }
                                 : current)} style={styles.hintButton}>
-                              <Text style={styles.hintButtonText}>{bankQuestion
+                              <Text style={styles.hintButtonText}>{hints.length > 1
                                 ? ['ヒント1を みる', 'もうすこし ヒントを みる', 'さいごの ヒントを みる'][round.hintLevel]
                                 : '💡 ヒントを みる'}</Text>
                             </Pressable>

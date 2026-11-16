@@ -1,3 +1,4 @@
+import { gradeFiveVisualProblem, type StudyFigure } from './gradeFiveGeometry.ts';
 import { highSchoolSolutions as hs, discoverySolution, logicSolution, type SolutionStep } from './writtenSolution.ts';
 import { clockLabel } from './clockFace.ts';
 import type { WorldStage } from './worldCatalog.ts';
@@ -13,6 +14,8 @@ export type MathQuestion = {
   explanation: string;
   steps?: readonly SolutionStep[];
   hint: string;
+  guidedHints?: readonly [string,string,string];
+  figure?: StudyFigure;
   clock?: { start: number; end: number; read: boolean };
   skillId: SkillId;
 };
@@ -94,6 +97,10 @@ function generateCore(stage: WorldStage, index: number, r: Random): Omit<MathQue
   const unit = stage.family;
   const code = stage.subtitle;
   const n = (a: number, b: number) => r.int(a, b);
+  if (stage.gradeId === 'e5' && stage.kind !== 'secret') {
+    const visual = gradeFiveVisualProblem(unit,index,n);
+    if (visual) return visual;
+  }
   if (stage.kind === 'secret') {
     const q = discovery(stage, index, r);
     return formal(q, () => discoverySolution((stage.order - 60 + index) % 10, Number(q.answer)));
@@ -684,7 +691,7 @@ export function generateWorldQuestions(stage: WorldStage, attemptSeed = 0): Math
     if (!unique) throw new Error('Not enough unique problems for ' + stage.id);
     questions.push({
       ...unique,
-      id: stage.id + ':' + attemptSeed + ':' + (index + 1),
+      id: stage.id + (unique.figure ? ':figure1:' : ':') + attemptSeed + ':' + (index + 1),
       skillId: (stage.gradeId + '.' + stage.family) as SkillId,
     });
   }
