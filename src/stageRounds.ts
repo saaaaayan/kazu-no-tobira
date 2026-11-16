@@ -6,6 +6,7 @@ import { decodeStageDeck, drawStageRound, stageDeckKey } from './domain/stageDec
 import { hasStageBank, type StageBank } from './domain/questionBank';
 import { hasGeneratedWorldQuestions, type WorldStage } from './domain/worldCatalog';
 import { generateWorldQuestions } from './domain/worldQuestions';
+import { fetchPreviewDeck, fetchPreviewRound, previewApiOrigin, previewDeckChanged } from './domain/questionDbPreview';
 import { loadStageBank } from './stageBankLoader';
 
 const pending = new Map<string, Promise<unknown>>();
@@ -22,6 +23,9 @@ export async function prepareStageRound(stage: WorldStage, mode: PlayMode, legac
   const previous = pending.get(key);
   const prepared = (previous?.catch(() => undefined) ?? Promise.resolve())
     .then(async () => {
+      const api = previewApiOrigin(typeof window==='undefined' ? undefined : window.location,__DEV__,
+        process.env.EXPO_PUBLIC_KAZU_NATIVE_PREVIEW_PORT);
+      if (api) return prepareRemoteRound(api,stage,key);
       const bank = await loadStageBank(stageId);
       validateHeader(stage, bank);
       const questions = new Map(bank.questions.map(q => [q.id, q]));
@@ -43,6 +47,35 @@ export async function prepareStageRound(stage: WorldStage, mode: PlayMode, legac
     return await prepared;
   } finally {
     if (pending.get(key) === prepared) pending.delete(key);
+  }
+}
+
+async function prepareRemoteRound(api:string,stage:WorldStage,key:string) {
+  for (let attempt=0;;attempt++) {
+    const remote=await fetchPreviewDeck(api,stage.id);
+    const ids=remote.cards.map(card=>card.id);
+    const balanced=remote.selection==='balanced' && ids.length===100;
+    const storageKey=balanced ? key+':balanced' : key;
+    const raw=await AsyncStorage.getItem(storageKey);
+    let saved;
+    try {
+      saved=decodeStageDeck(raw,ids,remote.version);
+    } catch {
+      // Moderation can invalidate a previously valid card without changing the bank version.
+      saved=undefined;
+    }
+    const deck=balanced && !saved?.remaining.length
+      ? dealAssessmentCycle(remote.cards,saved,remote.version)
+      : drawStageRound(ids,stage.questions,remote.version,saved);
+    try {
+      const round=await fetchPreviewRound(api,stage.id,deck.lastRound);
+      if (round.length!==stage.questions || new Set(round.map(q=>q.id)).size!==stage.questions ||
+          round.some(q=>!deck.lastRound.includes(q.id))) throw new Error('Invalid stage round');
+      await AsyncStorage.setItem(storageKey,JSON.stringify(deck));
+      return round;
+    } catch (error) {
+      if (attempt>0 || !previewDeckChanged(error)) throw error;
+    }
   }
 }
 
