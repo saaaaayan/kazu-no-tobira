@@ -14,6 +14,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  explain-publish-gate:
+    runs-on: ubuntu-latest
+    permissions: {}
+    env:
+      MAIN_BUILD: ${{ github.ref == 'refs/heads/main' }}
+      ENTITLEMENTS_READY: ${{ vars.PRODUCTION_ENTITLEMENTS_READY == 'true' }}
+    steps:
+      - name: Record whether production deployment is eligible
+        run: |
+          if [[ "$MAIN_BUILD" != true ]]; then
+            echo 'Production deployment skipped because the ref is outside main.' >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$ENTITLEMENTS_READY" != true ]]; then
+            echo 'Production deployment skipped because PRODUCTION_ENTITLEMENTS_READY is unset or is not true.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Production entitlement condition passed. Content and build checks are still required.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
   build-and-deploy:
     # Keep the last production deployment until purchase verification and content delivery are ready.
     if: github.ref == 'refs/heads/main' && vars.PRODUCTION_ENTITLEMENTS_READY == 'true'
@@ -58,8 +75,13 @@ jobs:
   verify-production:
     needs: build-and-deploy
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     timeout-minutes: 6
     steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -68,12 +90,7 @@ jobs:
           SITE: https://saaaaayan.github.io/kazu-no-tobira/
         run: |
           for attempt in {1..18}; do
-            query="?release=${GITHUB_SHA}-${GITHUB_RUN_ATTEMPT}-${attempt}"
-            if curl --fail --silent --show-error --max-time 5 "${SITE}version.json${query}" -o version.json \
-              && node --input-type=module -e 'import { readFileSync } from "node:fs"; if (JSON.parse(readFileSync("version.json", "utf8")).version !== process.env.GITHUB_SHA) process.exit(1)' \
-              && curl --fail --silent --show-error --max-time 5 "${SITE}${query}" -o index.html \
-              && grep -Fq '<title>数のトビラ</title>' index.html; then
-              echo "Public site verified at ${GITHUB_SHA}"
+            if node scripts/verify-web-release.mjs "$SITE" "$GITHUB_SHA"; then
               exit 0
             fi
             sleep 5

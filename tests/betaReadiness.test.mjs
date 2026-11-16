@@ -27,4 +27,8 @@ test('beta counts only playable ready questions and calculates shortages per sta
   assert.equal(totals.missing,10381);
   assert.equal(totals.inventoryReady,false);
   assert.equal(totals.stages.find(stage=>stage.stageId===third.id).present,false);
+  const production=await betaReadiness({query:async()=>({rows})},{production:true});
+  assert.equal(production.target,104000);
+  assert.equal(production.complete,0);
+  assert.equal(production.missing,103979);
 });
