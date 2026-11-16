@@ -1,11 +1,11 @@
 {
-  "stages": 845,
-  "target": 84500,
+  "stages": 1040,
+  "target": 104000,
   "registered": 4300,
   "source": {
     "bank": 43,
     "fallback": 740,
-    "unavailable": 62
+    "unavailable": 257
   },
   "fallback": {
     "seeds": [

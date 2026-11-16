@@ -1,6 +1,5 @@
 import { buildSageIntroBanks } from './sage-intro-unit.mjs';
 import { validateSageIntroBanks } from './validate-sage-intro.mjs';
-import { assessmentIslands } from '../src/domain/assessmentPlan.ts';
 import { countToHundredPools, countToHundredStages } from './count-to-hundred-unit.mjs';
 import { validateCountToHundredBatch } from './validate-count-to-hundred.mjs';
 import { borrowSubtractionPools, borrowSubtractionStages } from './borrow-subtraction-unit.mjs';
@@ -18,7 +17,7 @@ import { validateEarlyAdditionBatch } from './validate-early-addition.mjs';
 import bridgeSlots from './bridge-bank-slots.json' with { type: 'json' };
 import { addNumberOrderQuestions } from './number-order-questions.mjs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { worldStages, worldStageById } from '../src/domain/worldCatalog.ts';
+import { allWorldStages, worldStageById } from '../src/domain/worldCatalog.ts';
 
 const directory = new URL('../public/question-banks/', import.meta.url);
 const definitions = [
@@ -294,19 +293,11 @@ await output(new URL('../src/stageBankLoader.ts', import.meta.url), [
   '  switch (stageId) {', ...cases, '  }', '}', '',
 ].join('\n'));
 const byStage = new Map(banks.map(bank => [bank.stageId, bank]));
-const entries = worldStages.map(stage => {
+const entries = allWorldStages.map(stage => {
   const bank = byStage.get(stage.id);
   const review = bank ? ['自動検証', '自動検証', '代表例確認', '対象図の数値を照合', '3段階と代表例を確認', '構成・途中式と代表例を確認']
     : ['未実施', '未実施', '未実施', '未実施', '未実施', '未実施'];
   return [stage.id, stage.title, bank?.questions.length ?? 0, ...review, bank ? '登録済・品質レビュー待ち' : '未着手'].join('\t');
 });
-const sagePlan = assessmentIslands.find(island => island.id === 'sage');
-for (const stage of sagePlan.stages) {
-  const label = stage.assessment?.kind === 'final' ? '最終試験' : stage.assessment ? '確認テスト' : '総合演習';
-  const bank = byStage.get(stage.id);
-  entries.push([stage.id, '賢者の島・' + label + ' ' + stage.number, bank?.questions.length ?? 0,
-    ...(bank ? ['自動検証','正答を独立計算','代表例確認','図なし','3段階','5項目','登録済・品質レビュー待ち']
-      : ['未実施','未実施','未実施','未実施','未実施','未実施','未着手'])].join('\t'));
-}
 const columns = 'ステージID\tステージ名\t制作済み\t重複\t正答\t問題文\t図解\tヒント\t解説\t状態';
 await output(new URL('../docs/question-bank-progress.tsv', import.meta.url), [columns, ...entries].join('\n') + '\n');

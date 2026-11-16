@@ -3,7 +3,7 @@ import type { SkillId } from './curriculum.ts';
 import type { Progress } from './progress.ts';
 import { canPracticeSkill, practiceItems, savePracticeAnswer, skillEvidence, studySkillTitle, type PracticeItem } from './studyPractice.ts';
 import { getWorldStage } from './worldProgress.ts';
-import { worldIslands } from './worldCatalog.ts';
+import { worldGrades, worldIslands } from './worldCatalog.ts';
 
 export type StudyMode = 'daily' | 'review';
 export interface StudyPlan {
@@ -135,10 +135,10 @@ export function growthReport(progress:Progress,now:Date) {
   const total=row('all','すべての学年');
   const activeDays=new Set<string>();
   let practiceAnswers=0;
-  for (const grade of worldIslands) {
+  for (const grade of worldGrades) {
     const current=row(grade.id,grade.title);
     grades.set(grade.id,current);
-    for (const stage of grade.stages.filter(stage=>stage.gradeId!=='sage' && stage.kind==='normal')) {
+    for (const stage of grade.stages.filter(stage=>stage.kind==='normal')) {
       const unit = grade.units[stage.unitIndex];
       const id = grade.id+'.'+unit.code;
       const group=units.get(id) ?? row(id,unit.title);

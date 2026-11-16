@@ -1,4 +1,69 @@
 ステージID	学年・島	種別	単元	技能	目標（現行）	前提技能・教材	期待する表現（案）	思考・誤概念・難易度の設計	出題元	登録数	サンプル数	数値回答	単一選択	形式	難易度別	図あり	図参照が明示された問い	参照図なし	図形・グラフ系の図要否レビュー	解説ステップ数	独立計算（監査の対象式）	自動指摘数	一致グループ	数学同値グループ	構造類似候補	数学レビュー	教育レビュー	解説レビュー	図レビュー	品質合格の独立問題	品質状況	代表問題
+preschool.n01	preschool	normal	ものを かぞえる	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n02	preschool	normal	ものを かぞえる	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n03	preschool	normal	ものを かぞえる	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n04	preschool	normal	ものを かぞえる	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n05	preschool	normal	ものを かぞえる	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n06	preschool	normal	かずと すうじ	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n07	preschool	normal	かずと すうじ	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n08	preschool	normal	かずと すうじ	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n09	preschool	normal	かずと すうじ	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n10	preschool	normal	かずと すうじ	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n11	preschool	normal	すうじの なぞりがき	tracing	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n12	preschool	normal	すうじの なぞりがき	tracing	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n13	preschool	normal	すうじの なぞりがき	tracing	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n14	preschool	normal	すうじの なぞりがき	tracing	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n15	preschool	normal	すうじの なぞりがき	tracing	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n16	preschool	normal	かずの ならび	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n17	preschool	normal	かずの ならび	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n18	preschool	normal	かずの ならび	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n19	preschool	normal	かずの ならび	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n20	preschool	normal	かずの ならび	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n21	preschool	normal	おおい・すくない	comparison	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n22	preschool	normal	おおい・すくない	comparison	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n23	preschool	normal	おおい・すくない	comparison	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n24	preschool	normal	おおい・すくない	comparison	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n25	preschool	normal	おおい・すくない	comparison	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n26	preschool	normal	なかまわけ	sorting	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n27	preschool	normal	なかまわけ	sorting	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n28	preschool	normal	なかまわけ	sorting	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n29	preschool	normal	なかまわけ	sorting	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n30	preschool	normal	なかまわけ	sorting	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n31	preschool	normal	まる・さんかく・しかく	shape	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n32	preschool	normal	まる・さんかく・しかく	shape	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n33	preschool	normal	まる・さんかく・しかく	shape	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n34	preschool	normal	まる・さんかく・しかく	shape	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n35	preschool	normal	まる・さんかく・しかく	shape	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n36	preschool	normal	つぎは なにかな	pattern	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n37	preschool	normal	つぎは なにかな	pattern	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n38	preschool	normal	つぎは なにかな	pattern	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n39	preschool	normal	つぎは なにかな	pattern	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n40	preschool	normal	つぎは なにかな	pattern	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n41	preschool	normal	うえ・した・となり	position	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n42	preschool	normal	うえ・した・となり	position	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n43	preschool	normal	うえ・した・となり	position	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n44	preschool	normal	うえ・した・となり	position	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n45	preschool	normal	うえ・した・となり	position	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n46	preschool	normal	かずと かたちの あそび	mixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n47	preschool	normal	かずと かたちの あそび	mixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n48	preschool	normal	かずと かたちの あそび	mixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n49	preschool	normal	かずと かたちの あそび	mixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.n50	preschool	normal	かずと かたちの あそび	mixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.x01	preschool	extra	ものを かぞえる	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.x02	preschool	extra	かずと すうじ	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.x03	preschool	extra	すうじの なぞりがき	tracing	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.x04	preschool	extra	かずの ならび	count	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.x05	preschool	extra	おおい・すくない	comparison	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.x06	preschool	extra	なかまわけ	sorting	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.x07	preschool	extra	まる・さんかく・しかく	shape	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.x08	preschool	extra	つぎは なにかな	pattern	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.x09	preschool	extra	うえ・した・となり	position	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.x10	preschool	extra	かずと かたちの あそび	mixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.s01	preschool	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.s02	preschool	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.s03	preschool	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.s04	preschool	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+preschool.s05	preschool	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
 e1.n04	e1	normal	10までの かず	count	1から10までの ならびを つかって、まえ・あと・あいだの かずを みつける。	教材では指定なし	文章と式・条件整理	要レビュー	bank	100	0	100	0	interval, line, position, sequence	1:27, 2:27, 3:46	0	0	0	0	5–5	0	0	0	0	4	0	0	0	0	0	登録済・品質レビュー待ち	1から 5つ すすむと、どの かずに つきますか？
 e1.n05	e1	normal	10までの かず	count	かずの ならびから、ばしょと あいだの かずの こすうを かんがえる。	教材では指定なし	文章と式・条件整理	要レビュー	bank	100	0	100	0	interval, line, position, sequence	1:27, 2:27, 3:46	0	0	0	0	5–5	0	0	0	0	4	0	0	0	0	0	登録済・品質レビュー待ち	6から 5つ もどると、どの かずに つきますか？
 e1.forest	e1	normal	9までの たしざん	addition	あわせた かずが 9までの たしざんを かんがえる。	要設計	文章と式・条件整理	要レビュー	bank	100	0	100	0	calculation, comparison, decomposition, missingPart, story	1:40, 2:40, 3:20	80	0	0	0	5–5	20	0	11	8	5	0	0	0	0	0	登録済・品質レビュー待ち	0＋3＝？
@@ -844,3 +909,133 @@ sage.s02	sage	secret	ひみつの道	sageMixed	要設計	要設計	条件探索�
 sage.s03	sage	secret	ひみつの道	sageMixed	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
 sage.s04	sage	secret	ひみつの道	sageMixed	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
 sage.s05	sage	secret	ひみつの道	sageMixed	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n01	champion	normal	整数と合同式	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n02	champion	normal	整数と合同式	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n03	champion	normal	整数と合同式	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n04	champion	normal	整数と合同式	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n05	champion	normal	整数と合同式	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n06	champion	normal	整数方程式	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n07	champion	normal	整数方程式	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n08	champion	normal	整数方程式	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n09	champion	normal	整数方程式	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n10	champion	normal	整数方程式	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n11	champion	normal	不等式と等号条件	inequality	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n12	champion	normal	不等式と等号条件	inequality	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n13	champion	normal	不等式と等号条件	inequality	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n14	champion	normal	不等式と等号条件	inequality	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n15	champion	normal	不等式と等号条件	inequality	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n16	champion	normal	極値原理	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n17	champion	normal	極値原理	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n18	champion	normal	極値原理	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n19	champion	normal	極値原理	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n20	champion	normal	極値原理	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n21	champion	normal	不変量と単調量	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n22	champion	normal	不変量と単調量	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n23	champion	normal	不変量と単調量	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n24	champion	normal	不変量と単調量	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n25	champion	normal	不変量と単調量	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n26	champion	normal	数え上げと二重計数	combinatorics	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n27	champion	normal	数え上げと二重計数	combinatorics	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n28	champion	normal	数え上げと二重計数	combinatorics	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n29	champion	normal	数え上げと二重計数	combinatorics	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n30	champion	normal	数え上げと二重計数	combinatorics	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n31	champion	normal	鳩の巣原理	combinatorics	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n32	champion	normal	鳩の巣原理	combinatorics	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n33	champion	normal	鳩の巣原理	combinatorics	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n34	champion	normal	鳩の巣原理	combinatorics	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n35	champion	normal	鳩の巣原理	combinatorics	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n36	champion	normal	平面幾何と補助線	geometry	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n37	champion	normal	平面幾何と補助線	geometry	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n38	champion	normal	平面幾何と補助線	geometry	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n39	champion	normal	平面幾何と補助線	geometry	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n40	champion	normal	平面幾何と補助線	geometry	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n41	champion	normal	数列と帰納法	sequences	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n42	champion	normal	数列と帰納法	sequences	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n43	champion	normal	数列と帰納法	sequences	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n44	champion	normal	数列と帰納法	sequences	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n45	champion	normal	数列と帰納法	sequences	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n46	champion	normal	反例と構成	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n47	champion	normal	反例と構成	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n48	champion	normal	反例と構成	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n49	champion	normal	反例と構成	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.n50	champion	normal	反例と構成	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.x01	champion	extra	整数と合同式	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.x02	champion	extra	整数方程式	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.x03	champion	extra	不等式と等号条件	inequality	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.x04	champion	extra	極値原理	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.x05	champion	extra	不変量と単調量	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.x06	champion	extra	数え上げと二重計数	combinatorics	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.x07	champion	extra	鳩の巣原理	combinatorics	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.x08	champion	extra	平面幾何と補助線	geometry	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.x09	champion	extra	数列と帰納法	sequences	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.x10	champion	extra	反例と構成	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.s01	champion	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.s02	champion	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.s03	champion	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.s04	champion	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+champion.s05	champion	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n01	cosmos	normal	集合・写像・論理	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n02	cosmos	normal	集合・写像・論理	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n03	cosmos	normal	集合・写像・論理	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n04	cosmos	normal	集合・写像・論理	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n05	cosmos	normal	集合・写像・論理	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n06	cosmos	normal	整数論	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n07	cosmos	normal	整数論	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n08	cosmos	normal	整数論	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n09	cosmos	normal	整数論	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n10	cosmos	normal	整数論	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n11	cosmos	normal	線形空間と行列	linearAlgebra	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n12	cosmos	normal	線形空間と行列	linearAlgebra	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n13	cosmos	normal	線形空間と行列	linearAlgebra	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n14	cosmos	normal	線形空間と行列	linearAlgebra	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n15	cosmos	normal	線形空間と行列	linearAlgebra	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n16	cosmos	normal	固有値と対角化	linearAlgebra	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n17	cosmos	normal	固有値と対角化	linearAlgebra	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n18	cosmos	normal	固有値と対角化	linearAlgebra	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n19	cosmos	normal	固有値と対角化	linearAlgebra	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n20	cosmos	normal	固有値と対角化	linearAlgebra	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n21	cosmos	normal	極限と連続性	analysis	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n22	cosmos	normal	極限と連続性	analysis	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n23	cosmos	normal	極限と連続性	analysis	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n24	cosmos	normal	極限と連続性	analysis	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n25	cosmos	normal	極限と連続性	analysis	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n26	cosmos	normal	級数と収束	sequences	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n27	cosmos	normal	級数と収束	sequences	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n28	cosmos	normal	級数と収束	sequences	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n29	cosmos	normal	級数と収束	sequences	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n30	cosmos	normal	級数と収束	sequences	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n31	cosmos	normal	確率とランダムウォーク	probability	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n32	cosmos	normal	確率とランダムウォーク	probability	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n33	cosmos	normal	確率とランダムウォーク	probability	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n34	cosmos	normal	確率とランダムウォーク	probability	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n35	cosmos	normal	確率とランダムウォーク	probability	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n36	cosmos	normal	微分方程式	calculus	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n37	cosmos	normal	微分方程式	calculus	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n38	cosmos	normal	微分方程式	calculus	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n39	cosmos	normal	微分方程式	calculus	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n40	cosmos	normal	微分方程式	calculus	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n41	cosmos	normal	距離と幾何	geometry	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n42	cosmos	normal	距離と幾何	geometry	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n43	cosmos	normal	距離と幾何	geometry	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n44	cosmos	normal	距離と幾何	geometry	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n45	cosmos	normal	距離と幾何	geometry	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n46	cosmos	normal	数学的探究	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n47	cosmos	normal	数学的探究	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n48	cosmos	normal	数学的探究	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n49	cosmos	normal	数学的探究	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.n50	cosmos	normal	数学的探究	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.x01	cosmos	extra	集合・写像・論理	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.x02	cosmos	extra	整数論	numberTheory	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.x03	cosmos	extra	線形空間と行列	linearAlgebra	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.x04	cosmos	extra	固有値と対角化	linearAlgebra	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.x05	cosmos	extra	極限と連続性	analysis	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.x06	cosmos	extra	級数と収束	sequences	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.x07	cosmos	extra	確率とランダムウォーク	probability	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.x08	cosmos	extra	微分方程式	calculus	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.x09	cosmos	extra	距離と幾何	geometry	要設計	要設計	図表の判断・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.x10	cosmos	extra	数学的探究	proof	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.s01	cosmos	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.s02	cosmos	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.s03	cosmos	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.s04	cosmos	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+cosmos.s05	cosmos	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { canAccessFeature, canAccessStage, freeAccess } from '../src/domain/accessPlan.ts';
+import { canAccessFeature, canAccessStage, stageAccessPlan, freeAccess } from '../src/domain/accessPlan.ts';
 import { readServerEntitlement } from '../src/domain/serverEntitlement.ts';
 import { worldStageAction } from '../src/domain/playMode.ts';
 import { emptyProgress } from '../src/domain/progress.ts';
@@ -25,12 +25,16 @@ test('通常の600地点は全学年でEXを攻略せずに進める', () => {
 
 test('有料地点と機能をテストモードや旧クリアで解放できない', () => {
   const all = worldIslands.flatMap(island => island.stages);
+  assert.equal(all.length,1040);
   assert.equal(all.filter(stage => canAccessStage(freeAccess, stage)).length, 600);
   assert.equal(all.filter(stage => canAccessStage(premium, stage)).length, 845);
-  for (const stage of all.filter(stage => !canAccessStage(freeAccess, stage))) {
+  for (const stage of all.filter(stage => stageAccessPlan(stage) === 'premium')) {
     const progress = { ...emptyProgress, stages:{ [stage.id]:{ clearedAt:'2026-11-16' } } };
     for (const mode of ['normal','test']) assert.equal(worldStageAction(mode,progress,stage,freeAccess),'premium',stage.id);
   }
+  const pending = all.filter(stage => stageAccessPlan(stage) === 'pending');
+  assert.equal(pending.length, 195);
+  for (const stage of pending) assert.equal(worldStageAction('test',emptyProgress,stage,premium),'locked',stage.id);
   assert.equal(canAccessFeature(freeAccess,'unitLessons'),true);
   assert.equal(canAccessFeature(freeAccess,'workedSolutions'),false);
   assert.equal(canAccessFeature(premium,'workedSolutions'),true);

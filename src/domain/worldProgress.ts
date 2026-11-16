@@ -1,5 +1,5 @@
 import type { Progress, StageProgress } from './progress.ts';
-import { worldIslands, worldGrades, worldStageById, sageIsland, type WorldStage } from './worldCatalog.ts';
+import { worldIslands, worldGrades, allWorldStagesById, isPlannedIsland, type WorldStage } from './worldCatalog.ts';
 
 export type FullStageProgress = StageProgress & {
   perfectAt?: string;
@@ -29,7 +29,8 @@ export function gradeProgress(progress: Progress, gradeId: string) {
 
 export function isIslandUnlocked(progress: Progress, islandId: string): boolean {
   const index = worldIslands.findIndex(island => island.id === islandId);
-  if (index < 1) return index === 0;
+  if (index < 0 || isPlannedIsland(worldIslands[index].id)) return false;
+  if (islandId === 'e1') return true;
   const previous = gradeProgress(progress, worldIslands[index - 1].id);
   // Earlier releases unlocked ordinary islands via EX clears. Honor those saves.
   return islandId === 'sage' ? previous.regularCleared === 50 && previous.extrasCleared === 10
@@ -98,5 +99,5 @@ export function unlockSummary(progress: Progress) {
 }
 
 export function getWorldStage(id: string) {
-  return worldStageById.get(id) ?? sageIsland.stages.find(stage => stage.id === id);
+  return allWorldStagesById.get(id);
 }
