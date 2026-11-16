@@ -9,13 +9,14 @@ import { dealAssessmentCycle } from '../src/domain/balancedAssessment.ts';
 const premium = { plan:'premium', verifiedUntil:Infinity };
 import { drawStageRound, decodeStageDeck } from '../src/domain/stageDeck.ts';
 
-test('13島の845ステージに、規定どおりの試験位置と出題範囲を割り当てる', () => {
-  assert.equal(assessmentIslands.length, 13);
-  assert.equal(assessmentIslands.at(-1).name, '賢者の島');
+test('16島の1,040ステージに、規定どおりの試験位置と出題範囲を割り当てる', () => {
+  assert.equal(assessmentIslands.length, 16);
+  assert.equal(assessmentIslands[0].name, '幼児の島');
+  assert.deepEqual(assessmentIslands.slice(-3).map(island => island.name), ['賢者の島', '覇王の島', '宇宙ステージ']);
   const all = assessmentIslands.flatMap(island => island.stages);
-  assert.equal(new Set(all.map(stage => stage.id)).size, 845);
-  assert.equal(all.filter(stage => stage.assessment?.kind === 'checkpoint').length, 117);
-  assert.equal(all.filter(stage => stage.assessment?.kind === 'final').length, 13);
+  assert.equal(new Set(all.map(stage => stage.id)).size, 1040);
+  assert.equal(all.filter(stage => stage.assessment?.kind === 'checkpoint').length, 144);
+  assert.equal(all.filter(stage => stage.assessment?.kind === 'final').length, 16);
   for (const island of assessmentIslands) {
     assert.equal(island.stages.length, 65);
     const ids = island.stages.map(stage => stage.id);
@@ -40,7 +41,7 @@ test('13島の845ステージに、規定どおりの試験位置と出題範囲
 });
 
 test('賢者の島は高3の通常・EX60地点が必要で、未配信地点は試験モードでも出題しない', () => {
-  assert.equal(worldIslands.length, 13);
+  assert.equal(worldIslands.length, 16);
   const grade = worldIslands.find(island => island.id === 'h3');
   const stages = Object.fromEntries(grade.stages.slice(0,60).map(stage => [stage.id, {clearedAt:'2026-11-15'}]));
   const complete = { ...emptyProgress, stages };

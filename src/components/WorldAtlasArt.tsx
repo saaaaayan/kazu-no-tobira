@@ -2,6 +2,7 @@ import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Rect, Stop } from 
 import { routeThrough, type worldMapLayout } from '../domain/worldMapLayout';
 
 const islands = [
+  { land: '#b7d990', rock: '#5b9370', light: '#ffddaa', coast: 'M-87 3Q-60-38-25-24Q-6-55 34-33Q64-30 81-3Q78 28 51 31Q19 48-7 29Q-31 41-53 22Q-82 27-87 3Z', feature: 'M-53 15Q-66-8-44-12Q-22-8-33 15ZM-16 20L2-20 22 20ZM25 19V-8H52V19Z' },
   { land: '#9dbd7d', rock: '#4e8064', light: '#fff0af', coast: 'M-77 10Q-81-17-50-25Q-31-35-9-22Q12-47 44-28Q70-27 73-7Q92 3 75 19Q52 36 9 25Q-19 46-39 29Q-68 31-77 10Z', feature: 'M-53 16l12-29 12 29Zm13 6 15-32 14 32ZM-5 21V3q15-25 30 0v18Zm8 0V6q7-12 14 0v15ZM42 17l12-27 12 27Z' },
   { land: '#7fba90', rock: '#276d60', light: '#e9dba5', coast: 'M-61 27Q-91 3-61-23Q-52-47-13-33Q7-56 24-31Q50-39 64-13Q89 11 56 24Q28 42 16 29Q-10 48-31 25Z', feature: 'M-64 13l12-25 12 25Zm18 6 16-36 16 36ZM-8 25V1L4-12l13 13v24Zm31-5V0L37-14 51 0v20ZM45 22l12-20 13 20Z' },
   { land: '#d6ae7d', rock: '#956a59', light: '#f9d5a1', coast: 'M-88-2Q-71-24-34-22L0-32Q32-38 37-19Q72-23 84 2L61 16 31 14 9 32-24 27-44 13-77 18Z', feature: 'M-69 3l22-27 15 5 21 27Zm56 5 22-33 17 8 21 25Zm45 0 18-22 16 5 16 17ZM-39 19h49v6h-49Z' },
@@ -17,6 +18,8 @@ const islands = [
   { land: '#8373b7', rock: '#34325d', light: '#ffe39d',
     coast: 'M-87 4L-61-23-30-31-16-45 16-45 31-29 63-20 88 6 70 28 31 35 0 45-31 35-70 28Z',
     feature: 'M-65 22V2L-45-12-25 2v20ZM-19 24v-32L0-39 19-8v32ZM26 22V5Q43-26 62 5v17ZM-8 24V7h16v17ZM-50 13h10v9h-10Z' },
+  { land: '#c79475', rock: '#744755', light: '#ffd682', coast: 'M-84 12L-75-13-54-27-31-23-13-39 16-53 31-37 66-26 85 1 69 23 38 26 16 40-19 32-62 28Z', feature: 'M-62 18V-7H-49V1H-36V-7H-23V18ZM-20 20V-21L-9-10 2-27 13-10 24-21V20ZM28 18V-7H42V1H53V-7H66V18Z' },
+  { land: '#a3a5d3', rock: '#444780', light: '#bffafa', coast: 'M-86 2Q-93-13-49-19Q-33-47 3-39Q34-41 48-27Q92-25 89-2Q66 25 38 26Q15 47-12 36Q-60 43-86 2Z', feature: 'M-53 12Q-16-36 20-19Q39-15 55 3Q31 29-7 25Q-36 22-53 12ZM-15 6A14 14 0 1 0 13 6A14 14 0 1 0-15 6Z' },
 ] as const;
 
 function AtlasIsland({ index, x, y, scale, available, next }: {
@@ -35,7 +38,7 @@ function AtlasIsland({ index, x, y, scale, available, next }: {
       {[[-67,-21],[59,-24],[81,20]].map(([dx, dy], detail) => (
         <Circle key={detail} cx={dx} cy={dy} r={1.8} fill={art.light} opacity={0.78} />
       ))}
-      {index === 12 && <Path d="M43-22l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1Z M-43-24l4 5-4 5-4-5Z" fill={art.light}/>}
+      {index === 13 && <Path d="M43-22l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1Z M-43-24l4 5-4 5-4-5Z" fill={art.light}/>}
       {!available && <Path d={art.coast} fill="#253552" fillOpacity={0.11} />}
     </G>
   );

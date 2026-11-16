@@ -1,7 +1,14 @@
-import type { GradeId } from './curriculum.ts';
+import { gradeIds, plannedIslandIds, type GradeId, type IslandId } from './curriculum.ts';
+export type { IslandId } from './curriculum.ts';
 
 export type StageKind = 'normal' | 'extra' | 'secret';
-export type IslandId = GradeId | 'sage';
+export function isPlannedIsland(id: IslandId): boolean {
+  return plannedIslandIds.some(island => island === id);
+}
+
+export function hasGeneratedWorldQuestions(id: IslandId): id is GradeId {
+  return gradeIds.some(grade => grade === id);
+}
 export type StageId780 = `${IslandId}.${string}`;
 
 export interface StudyUnit {
@@ -285,10 +292,65 @@ const sageDefinition: Omit<WorldGrade, 'stages'> = {
 };
 
 export const sageIsland: WorldGrade = { ...sageDefinition, stages: createStages(sageDefinition) };
-export const worldIslands: readonly WorldGrade[] = [...worldGrades, sageIsland];
+const preschool: Omit<WorldGrade, 'stages'> = {
+  id: 'preschool', title: '就学前', island: '幼児の島',
+  theme: 'みて、さわって、かずと かたちを みつけよう',
+  units: makeUnits(`
+objects|ものを かぞえる|count
+matching|かずと すうじ|count
+tracing|すうじの なぞりがき|tracing
+number-order|かずの ならび|count
+comparison|おおい・すくない|comparison
+sorting|なかまわけ|sorting
+shapes|まる・さんかく・しかく|shape
+patterns|つぎは なにかな|pattern
+position|うえ・した・となり|position
+play|かずと かたちの あそび|mixed`),
+};
+
+const champion: Omit<WorldGrade, 'stages'> = {
+  id: 'champion', title: '最難関入試・数学競技', island: '覇王の島',
+  theme: '発想と論証で 難関を切り開く',
+  units: makeUnits(`
+integer|整数と合同式|numberTheory
+diophantine|整数方程式|numberTheory
+inequality|不等式と等号条件|inequality
+extremal|極値原理|proof
+invariant|不変量と単調量|proof
+counting|数え上げと二重計数|combinatorics
+pigeonhole|鳩の巣原理|combinatorics
+geometry|平面幾何と補助線|geometry
+sequences|数列と帰納法|sequences
+counterexample|反例と構成|proof`),
+};
+
+const cosmos: Omit<WorldGrade, 'stages'> = {
+  id: 'cosmos', title: '大学数学・探究', island: '宇宙ステージ',
+  theme: '定義から出発して 数学のつながりを探る',
+  units: makeUnits(`
+logic|集合・写像・論理|proof
+number-theory|整数論|numberTheory
+linear-algebra|線形空間と行列|linearAlgebra
+eigenvalues|固有値と対角化|linearAlgebra
+analysis|極限と連続性|analysis
+series|級数と収束|sequences
+probability|確率とランダムウォーク|probability
+differential-equations|微分方程式|calculus
+geometry|距離と幾何|geometry
+exploration|数学的探究|proof`),
+};
+
+const addStages = (definition: Omit<WorldGrade, 'stages'>): WorldGrade => ({
+  ...definition, stages: createStages(definition),
+});
+export const worldIslands: readonly WorldGrade[] = [
+  addStages(preschool), ...worldGrades, sageIsland, addStages(champion), addStages(cosmos),
+];
+export const allWorldStages: readonly WorldStage[] = worldIslands.flatMap(island => island.stages);
 
 export const worldStages: readonly WorldStage[] = worldGrades.flatMap(grade => grade.stages);
 export const worldStageById: ReadonlyMap<string, WorldStage> = new Map(worldStages.map(stage => [stage.id, stage]));
+export const allWorldStagesById: ReadonlyMap<string, WorldStage> = new Map(allWorldStages.map(stage => [stage.id, stage]));
 
 export function stageClearThreshold(stage: WorldStage): number {
   return Math.ceil(stage.questions * 0.8);

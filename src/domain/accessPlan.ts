@@ -1,4 +1,4 @@
-import type { WorldStage } from './worldCatalog.ts';
+import { isPlannedIsland, type WorldStage } from './worldCatalog.ts';
 
 export type PlannedAccess = 'free' | 'premium';
 export type Entitlement = { plan: 'free' } | { plan: 'premium'; verifiedUntil: number };
@@ -13,7 +13,8 @@ export const featureAccess = {
   progressReports: 'premium',
 } as const satisfies Record<string, PlannedAccess>;
 
-export function stageAccessPlan(stage: Pick<WorldStage, 'gradeId' | 'kind'>): PlannedAccess {
+export function stageAccessPlan(stage: Pick<WorldStage, 'gradeId' | 'kind'>): PlannedAccess | 'pending' {
+  if (isPlannedIsland(stage.gradeId)) return 'pending';
   return stage.kind === 'normal' && stage.gradeId !== 'sage' ? 'free' : 'premium';
 }
 
@@ -26,5 +27,6 @@ export function canAccessFeature(access: Entitlement, feature: keyof typeof feat
 }
 
 export function canAccessStage(access: Entitlement, stage: Pick<WorldStage, 'gradeId' | 'kind'>): boolean {
-  return stageAccessPlan(stage) === 'free' || hasPremium(access);
+  const plan = stageAccessPlan(stage);
+  return plan === 'free' || (plan === 'premium' && hasPremium(access));
 }

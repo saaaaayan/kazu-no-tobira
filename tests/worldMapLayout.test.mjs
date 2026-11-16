@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import { worldMapLayout, islandStageLayout, routeThrough, islandRouteByKind } from '../src/domain/worldMapLayout.ts';
 import { worldGrades } from '../src/domain/worldCatalog.ts';
 
-test('世界地図の13島は格子に揃わず、狭い画面でも島ラベルが地図内に収まる', () => {
+test('世界地図の16島は格子に揃わず、狭い画面でも島ラベルが地図内に収まる', () => {
   for (const width of [288, 340, 430, 699, 700, 820, 1000]) {
     const map = worldMapLayout(width);
-    assert.equal(map.positions.length, 13);
-    assert.equal(new Set(map.positions.map(point => point.y)).size, 13);
-    assert.equal(new Set(map.positions.map(point => point.x)).size, 13);
+    assert.equal(map.positions.length, 16);
+    assert.equal(new Set(map.positions.map(point => point.y)).size, 16);
+    assert.equal(new Set(map.positions.map(point => point.x)).size, 16);
     for (const point of map.positions) {
       assert.ok(point.x - map.targetWidth / 2 >= 0 && point.x + map.targetWidth / 2 <= width);
       assert.ok(point.y >= 36 && point.y + 85 <= map.height);
@@ -19,7 +19,7 @@ test('世界地図の13島は格子に揃わず、狭い画面でも島ラベル
           JSON.stringify({ width, point, other }));
       }
     }
-    assert.equal((routeThrough(map.positions).match(/ Q/g) || []).length, 12);
+    assert.equal((routeThrough(map.positions).match(/ Q/g) || []).length, 15);
   }
 });
 

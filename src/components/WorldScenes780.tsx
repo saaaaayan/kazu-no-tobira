@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 import { CompanionAvatar } from './AdventureCompanion';
-import { worldIslands, type WorldGrade, type WorldStage } from '../domain/worldCatalog';
+import { allWorldStages, hasGeneratedWorldQuestions, isPlannedIsland, worldIslands, type WorldGrade, type WorldStage } from '../domain/worldCatalog';
 import { hasPremium, type Entitlement } from '../domain/accessPlan';
 import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldProgress';
 import { worldStageAction, type PlayMode } from '../domain/playMode';
@@ -14,6 +14,7 @@ import { lessonStatus, unitLessons, type UnitLesson } from '../domain/unitLesson
 import { featureAccess } from '../domain/accessPlan';
 
 const palette = [
+  { land: '#b6d793', dark: '#609d77', detail: '#306d6e', roof: '#efb6a0' },
   { land: '#8fcb86', dark: '#4e8f65', detail: '#315f5c', roof: '#cf8c63' },
   { land: '#9fcf75', dark: '#477d68', detail: '#31576a', roof: '#f3c06a' },
   { land: '#a2c3a0', dark: '#507b86', detail: '#285d73', roof: '#bf85a4' },
@@ -27,6 +28,8 @@ const palette = [
   { land: '#a8afcf', dark: '#737fb0', detail: '#465787', roof: '#a7d2c7' },
   { land: '#c5b3cd', dark: '#7375b1', detail: '#50528c', roof: '#ffe5a1' },
   { land: '#8676b6', dark: '#474066', detail: '#2c284d', roof: '#f9d28b' },
+  { land: '#cc9b76', dark: '#925a59', detail: '#57364d', roof: '#ffe2a1' },
+  { land: '#a1addc', dark: '#4f5f96', detail: '#354172', roof: '#a9ebed' },
 ] as const;
 const legacy = new Set(['e1.forest','e1.bridge','e1.tower']);
 
@@ -55,7 +58,7 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles }: {
   const testing = mode === 'test';
   const summary = unlockSummary(progress);
   const stats = worldIslands.map(grade => gradeProgress(progress, grade.id));
-  const available = worldIslands.map(grade => (grade.id !== 'sage' || hasPremium(access)) && (testing || isIslandUnlocked(progress, grade.id)));
+  const available = worldIslands.map(grade => !isPlannedIsland(grade.id) && (grade.id !== 'sage' || hasPremium(access)) && (testing || isIslandUnlocked(progress, grade.id)));
   const current = testing ? -1 : available.findIndex((open, index) => open && worldIslands[index].id !== 'sage' && stats[index].regularCleared < 50);
 
   return (
@@ -64,7 +67,7 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles }: {
         <Text accessibilityRole="header" style={styles.bannerHeading}>数の世界地図</Text>
         <Text style={styles.bannerDescription}>島をえらんで、65のステージへ。</Text>
         <View style={styles.stats}>
-          <Text style={styles.stat}>{worldIslands.length}の島 · 845地点</Text>
+          <Text style={styles.stat}>{worldIslands.length}の島 · {allWorldStages.length.toLocaleString('ja-JP')}地点</Text>
           {!testing && <Text style={styles.stat}>{summary.cleared} / 780 クリア</Text>}
         </View>
       </View>
@@ -79,7 +82,7 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles }: {
             </View>
             {worldIslands.map((grade, index) => {
               const point = layout.positions[index];
-              const label = grade.id === 'sage' && !hasPremium(access) ? 'プレミアム限定' : grade.id === 'sage' && available[index] ? '出題中の地点へ' : testing ? '自由にプレイ' : index === current ? 'つぎの目的地' : available[index] ? 'ぼうけんへ' : '未解放・地図をみる';
+              const label = isPlannedIsland(grade.id) ? '教材を準備中' : grade.id === 'sage' && !hasPremium(access) ? 'プレミアム限定' : grade.id === 'sage' && available[index] ? '出題中の地点へ' : testing ? '自由にプレイ' : index === current ? 'つぎの目的地' : available[index] ? 'ぼうけんへ' : '未解放・地図をみる';
               return (
                 <Pressable key={grade.id} accessibilityRole="button"
                   accessibilityLabel={`${grade.title}、${grade.island}、${grade.stages.length}ステージ、${label}`}
@@ -224,7 +227,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           <Text style={styles.eyebrow}>{grade.title} の ぼうけんマップ</Text>
           <Text style={styles.bannerHeading}>{grade.island}</Text>
           <Text style={styles.bannerDescription}>{grade.theme}</Text>
-          <Text style={styles.islandBannerCount}>{grade.id === 'sage' ? (testing || isIslandUnlocked(progress, grade.id)
+          <Text style={styles.islandBannerCount}>{isPlannedIsland(grade.id) ? '教材を準備中 · 65地点' : grade.id === 'sage' ? (testing || isIslandUnlocked(progress, grade.id)
             ? `${grade.stages.filter(stage => hasStageBank(stage.id)).length} / 65 地点で出題中` : '高校3年生の通常50・EX10をクリアすると解放') : testing ? (hasPremium(access) ? "65ステージ すべてプレイできるよ" : "通常50ステージを 自由に あそべるよ") : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
         </View>
         <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
@@ -298,7 +301,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           return (
             <Pressable key={stage.id} accessibilityRole="button" disabled={!selectable}
               accessibilityState={{disabled:!selectable}}
-              accessibilityLabel={stage.title+'、'+(action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':stage.gradeId === 'sage' && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
+              accessibilityLabel={stage.title+'、'+(action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
                 styles.stagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,

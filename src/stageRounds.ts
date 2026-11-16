@@ -4,7 +4,7 @@ import { dealAssessmentCycle } from './domain/balancedAssessment';
 import type { PlayMode } from './domain/playMode';
 import { decodeStageDeck, drawStageRound, stageDeckKey } from './domain/stageDeck';
 import { hasStageBank, type StageBank } from './domain/questionBank';
-import type { WorldStage } from './domain/worldCatalog';
+import { hasGeneratedWorldQuestions, type WorldStage } from './domain/worldCatalog';
 import { generateWorldQuestions } from './domain/worldQuestions';
 import { loadStageBank } from './stageBankLoader';
 
@@ -13,7 +13,7 @@ const pending = new Map<string, Promise<unknown>>();
 export async function prepareStageRound(stage: WorldStage, mode: PlayMode, legacySeed: number, access: Entitlement) {
   if (!canAccessStage(access, stage)) throw new Error('Stage requires premium access');
   if (!hasStageBank(stage.id)) {
-    if (stage.gradeId === 'sage') throw new Error('Sage stage bank is not published');
+    if (!hasGeneratedWorldQuestions(stage.gradeId)) throw new Error('Stage bank is not available');
     return generateWorldQuestions(stage, legacySeed);
   }
 

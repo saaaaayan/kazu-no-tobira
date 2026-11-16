@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ComponentRef } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { worldIslands, type WorldGrade, type WorldStage } from './domain/worldCatalog';
+import { worldGrades, worldIslands, type WorldGrade, type WorldStage } from './domain/worldCatalog';
 import { checkMathAnswer, isValidMathAnswer, type MathQuestion } from './domain/worldQuestions';
 import { isBankQuestion } from './domain/questionBank';
 import { prepareStageRound } from './stageRounds';
@@ -62,7 +62,7 @@ function AdventureWorld() {
   const [startError, setStartError] = useState('');
   const testRoundSeed = useRef(0);
   const testing = playMode === 'test';
-  const [grade, setGrade] = useState<WorldGrade>(worldIslands[0]);
+  const [grade, setGrade] = useState<WorldGrade>(worldGrades[0]);
   const [round, setRound] = useState<Round>();
   const [learning, setLearning] = useState<Learning>();
   const [lessonError, setLessonError] = useState('');

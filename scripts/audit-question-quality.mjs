@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { bankStageIds } from '../src/domain/bankStageIds.ts';
-import { worldIslands } from '../src/domain/worldCatalog.ts';
+import { hasGeneratedWorldQuestions, isPlannedIsland, worldIslands } from '../src/domain/worldCatalog.ts';
 import { generateWorldQuestions } from '../src/domain/worldQuestions.ts';
 import { lessonForStage } from '../src/domain/unitLessons.ts';
 import { inspectQuestion, questionKeys } from './question-audit-rules.mjs';
@@ -37,7 +37,7 @@ const banks=new Map(await Promise.all(files.map(async filename=>{
 for (const island of worldIslands) for (const stage of island.stages) {
   const bank=banks.get(stage.id);
   if (bank) assert.equal(bank.gradeId,island.id);
-  const source=bank?'bank':island.id==='sage'?'unavailable':'fallback';
+  const source=bank?'bank':hasGeneratedWorldQuestions(island.id)?'fallback':'unavailable';
   const rounds=bank?[bank.questions]:source==='fallback'?seeds.map(seed=>generateWorldQuestions(stage,seed)):[];
   const info={stage,island,source,bank,registered:bank?.questions.length ?? 0,sampled:0,numeric:0,choice:0,
     figure:0,figureRequired:0,missingFigure:0,figureReview:0,independent:0,defects:0,exactGroups:0,equivalentGroups:0,shapeGroups:0,
@@ -156,7 +156,7 @@ const summary={
     diagram:sum('diagramReviewed'),approvedIndependent:approved.size,revisionListed:sum('revision'),
     unlinkedLedgerIds:Object.keys(ledger).filter(id=>!matchedReviews.has(id)).sort()},
 };
-assert.equal(summary.stages,845);
+assert.equal(summary.stages,1040);
 
 const columns=['ステージID','学年・島','種別','単元','技能','目標（現行）','前提技能・教材','期待する表現（案）','思考・誤概念・難易度の設計',
   '出題元','登録数','サンプル数','数値回答','単一選択','形式','難易度別','図あり','図参照が明示された問い','参照図なし',
@@ -177,11 +177,44 @@ const allRows=infos.map(i=>{
     i.exactGroups,i.equivalentGroups,i.shapeGroups,i.mathReviewed,i.pedagogyReviewed,i.explanationReviewed,i.diagramReviewed,
     i.approved,status,i.example || '—'];
 });
+const production = {
+  status: infos.every(i => i.approved === targetPerStage) ? 'quality-reviewed' : 'incomplete',
+  target: summary.target,
+  registered: summary.registered,
+  missingQuestions: sumBy(info => Math.max(0, targetPerStage - info.registered)),
+  incompleteStages: infos.filter(info => info.registered < targetPerStage).length,
+  // Keep the production queue in curriculum order. The first incomplete stage is reproducible on every run.
+  nextStage: infos.find(info => info.registered < targetPerStage)?.stage.id ?? null,
+  stages: infos.map(i => ({
+    id: i.stage.id, islandId: i.island.id,
+    unit: i.island.units[i.stage.unitIndex].code, skill: i.stage.family,
+    target: targetPerStage, registered: i.registered,
+    source: i.source, implementation: isPlannedIsland(i.island.id) ? 'curriculum-only' : 'game',
+    formats: i.bank ? Object.fromEntries([...i.formats].sort().map(format => [
+      format, i.bank.questions.filter(q => (q.format ?? ('回答:'+q.type)) === format).length,
+    ])) : {},
+    figures: i.bank ? { requiredByPrompt: i.figureRequired, drawn: i.figure, reviewed: i.diagramReviewed } : null,
+    verifiedAnswers: i.bank ? i.independent : 0,
+    explanationReviewed: i.explanationReviewed,
+    independentQualityApproved: i.approved,
+    duplicateGroups: { exact: i.exactGroups, equivalent: i.equivalentGroups, structural: i.shapeGroups },
+    revisionListed: i.revision,
+  })),
+};
+function sumBy(project) {
+  return infos.reduce((total, info) => total + project(info), 0);
+}
+
 const outputs={
   'stages.tsv':[columns,...allRows].map(row=>row.map(cell).join('\t')).join('\n')+'\n',
   'summary.json':JSON.stringify(summary,null,2)+'\n',
 };
 const args=process.argv.slice(2);
+const progressFile = new URL('../question-production-progress.json', reportDir);
+const progressJSON = JSON.stringify(production, null, 2) + '\n';
+if (args.includes('--update')) await writeFile(progressFile, progressJSON);
+if (args.includes('--check')) assert.equal((await readFile(progressFile,'utf8')).replaceAll('\r\n','\n'), progressJSON,
+  'Stale question production progress. Run pnpm bank:audit --update.');
 if (args.includes('--update')) for (const [name,data] of Object.entries(outputs)) await writeFile(new URL(name,reportDir),data);
 if (args.includes('--check')) for (const [name,data] of Object.entries(outputs))
   assert.equal((await readFile(new URL(name,reportDir),'utf8')).replaceAll('\r\n','\n'),data,'Stale audit: '+name);
