@@ -7,6 +7,7 @@ import { hasPremium, type Entitlement } from '../domain/accessPlan';
 import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldProgress';
 import { worldStageAction, type PlayMode } from '../domain/playMode';
 import WorldAtlasArt from './WorldAtlasArt';
+import { checkpointsFor, stageDisplayTitle, stageLabels, type Checkpoint } from '../domain/stageStructure';
 import { islandRouteByKind, islandStageLayout, routeThrough, worldMapLayout } from '../domain/worldMapLayout';
 import { hasStageBank } from '../domain/questionBank';
 import type { Progress } from '../domain/progress';
@@ -200,13 +201,14 @@ function stageText(stage:WorldStage):string {
   if (stage.gradeId === 'sage' && stage.order === 49) return '♜50';
   if (stage.gradeId === 'sage' && stage.kind === 'normal' && (stage.order+1)%5 === 0) return '◇' + (stage.order+1);
   if(stage.kind==='normal') return String(stage.order+1).padStart(2,'0');
-  if(stage.kind==='extra') return 'EX'+String(stage.order-49);
-  return '秘'+String(stage.order-59);
+  if(stage.kind==='extra') return '試'+String(stage.order-49);
+  return '伝'+String(stage.order-59);
 }
 
-export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitles,onLearn}: {
+export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitles,onLearn,onCheckpoint}: {
   grade:WorldGrade;progress:Progress;mode:PlayMode;access:Entitlement;onBack:()=>void;onStart:(stage:WorldStage)=>void;onTitles:()=>void;
   onLearn:(lesson:UnitLesson)=>void;
+  onCheckpoint:(item:Checkpoint)=>void;
 }) {
   const [width,setWidth]=useState(0);
   const actual=measuredWidth(width);
@@ -228,7 +230,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           <Text style={styles.bannerHeading}>{grade.island}</Text>
           <Text style={styles.bannerDescription}>{grade.theme}</Text>
           <Text style={styles.islandBannerCount}>{isPlannedIsland(grade.id) ? '教材を準備中 · 65地点' : grade.id === 'sage' ? (testing || isIslandUnlocked(progress, grade.id)
-            ? `${grade.stages.filter(stage => hasStageBank(stage.id)).length} / 65 地点で出題中` : '高校3年生の通常50・EX10をクリアすると解放') : testing ? (hasPremium(access) ? "65ステージ すべてプレイできるよ" : "通常50ステージを 自由に あそべるよ") : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
+            ? `${grade.stages.filter(stage => hasStageBank(stage.id)).length} / 65 地点で出題中` : '高校3年生の冒険の道50・試練の道10をクリアすると解放') : testing ? (hasPremium(access) ? "65ステージ すべてプレイできるよ" : "冒険の道50ステージを 自由に あそべるよ") : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
         </View>
         <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
       </View>
@@ -281,13 +283,25 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         {Array.from({length:13},(_,row)=>{
           const y=geometry.positions[row*5]?.y??0;
           const rowUnits = [...new Set(grade.stages.slice(row * 5, row * 5 + 5).map(stage => stage.unitIndex))];
-          const label=row<10 ? grade.units[rowUnits[0]].title + (rowUnits.length > 1 ? ' など' : '') : row<12 ? '✦ エクストラの道' : '✧ ひみつの道';
+          const label=row<10 ? grade.units[rowUnits[0]].title + (rowUnits.length > 1 ? ' など' : '') : row<12 ? stageLabels.extra : stageLabels.secret;
           return (
             <View key={row} pointerEvents="none"
-              style={[styles.zoneLabel,{top:y-76,left:Math.min(14,actual*0.035)}]}>
-              <Text style={styles.zoneName}>{row<10?String(row+1).padStart(2,'0')+'  ':''}{label}</Text>
+              style={[styles.zoneLabel,{top:y-76,left:78,right:78,alignItems:'center'}]}>
+              <Text style={styles.zoneName}>{row<10?stageLabels.normal+' '+String(row+1).padStart(2,'0')+' ':''}{label}</Text>
             </View>
           );
+        })}
+        {checkpointsFor(grade).map(checkpoint=>{
+          const end=geometry.positions[checkpoint.after.order];
+          const enabled=testing || checkpoint.sourceStageIds.every(id=>Boolean(progress.stages[id]?.clearedAt));
+          const left=Math.min(actual-68,Math.max(2,end.x-33));
+          return <Pressable key={checkpoint.id} accessibilityRole="button"
+            accessibilityLabel={`確認テスト ${checkpoint.number}`} disabled={!enabled} onPress={()=>onCheckpoint(checkpoint)}
+            style={{position:'absolute',left,top:end.y+37,width:66,height:44,borderRadius:10,justifyContent:'center',
+              alignItems:'center',backgroundColor:enabled?'#fff0b5':'#d2d9e9',borderWidth:1,borderColor:'#66769a'}}>
+            <Text style={{fontSize:11,fontWeight:'800',color:'#263453'}}>確認テスト</Text>
+            <Text style={{fontSize:11,color:'#263453'}}>{checkpoint.number}</Text>
+          </Pressable>;
         })}
         {grade.stages.map((stage,index)=>{
           const position=geometry.positions[index];
@@ -301,7 +315,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           return (
             <Pressable key={stage.id} accessibilityRole="button" disabled={!selectable}
               accessibilityState={{disabled:!selectable}}
-              accessibilityLabel={stage.title+'、'+(action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
+              accessibilityLabel={stageDisplayTitle(stage)+'、'+(action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
                 styles.stagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
@@ -321,8 +335,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
       </View>
       {!testing && <View style={styles.footer}>
         <Text style={styles.footerTitle}>✦ この島には 65のステージ</Text>
-        <Text style={styles.footerInfo}>通常ステージ 50こ → EX 10こ → ひみつ 5こ。ひみつの道は通常とEXの60ステージをぜんぶパーフェクトにすると開くよ。</Text>
-        <Text style={styles.footerInfo}>ひみつの道まで パーフェクト：{grade.stages.slice(0,60).filter(stage=>{
+        <Text style={styles.footerInfo}>冒険の道 50こ → 試練の道 10こ → 伝説のトビラ 5こ。伝説のトビラは最初の60ステージをぜんぶパーフェクトにすると開くよ。</Text>
+        <Text style={styles.footerInfo}>伝説のトビラまで パーフェクト：{grade.stages.slice(0,60).filter(stage=>{
           const r=progress.stages[stage.id] as {perfectAt?:string;clearedAt?:string}|undefined;
           return Boolean(r?.perfectAt||(legacy.has(stage.id)&&r?.clearedAt));
         }).length} / 60</Text>

@@ -5,6 +5,7 @@ import { openQuestionReviewStore } from '../server/question-review-store.mjs';
 import { openSupabasePool } from '../server/supabase-postgres.mjs';
 import { createSupabaseQuestionReview } from '../server/supabase-question-review.mjs';
 import { createSupabaseOwnerAuth } from '../server/supabase-owner-auth.mjs';
+import { liveQuestionRepository,liveQuestionService } from '../server/live-question-service.mjs';
 import { questionDeck, questionRound } from '../server/question-round-selection.mjs';
 import { createQuestionReviewServer } from '../server/question-review-http.mjs';
 
@@ -44,13 +45,14 @@ const types = {
 };
 const allowed = /^\/(?:_expo\/static\/|assets\/)/;
 const server = createQuestionReviewServer({
-  store,port,adminKey:key,ownerAuth,publicOrigin,
+  store,port,adminKey:key,ownerAuth,publicOrigin,allowedGameOrigin:process.env.KAZU_GAME_WEB_ORIGIN,
+  game:pool ? liveQuestionService({...liveQuestionRepository(pool,{preview:!publicOrigin && !keyForAuth})}) : undefined,
   preview: pool && !publicOrigin && !keyForAuth ? {
     deck:stageId=>questionDeck(pool,stageId,{preview:true,premium:true}),
     round:(stageId,ids)=>questionRound(pool,stageId,ids,{preview:true,premium:true}),
   } : undefined,
   async assets(path,response) {
-    const route = path === '/admin' || path === '/' || (pool && !keyForAuth && path === '/game-preview') ? '/index.html' : decodeURIComponent(path);
+    const route = path === '/admin' || path === '/' || (pool && !keyForAuth && path==='/play-db') || (pool && !keyForAuth && path === '/game-preview') ? '/index.html' : decodeURIComponent(path);
     if (route !== '/index.html' && route !== '/version.json' && (!allowed.test(route) || !Object.hasOwn(types,extname(route)))) return false;
     try {
       const file = await realpath(resolve(root,'.'+route));

@@ -1,3 +1,4 @@
+import { stageLabels } from '../domain/stageStructure';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import Svg, { Circle, Ellipse, G, Path, Rect } from 'react-native-svg';
@@ -118,9 +119,9 @@ export function IslandStageMap({ grade, progress, onBack, onStart, onTitles }: {
       </View>
       <View style={styles.islandMenu}>
         {([
-          ['normal','ふつうの道','50'],
-          ['extra','EXの道','10'],
-          ['secret','ひみつの道','5'],
+          ['normal',stageLabels.normal,'50'],
+          ['extra',stageLabels.extra,'10'],
+          ['secret',stageLabels.secret,'5'],
         ] as const).map(([kind,label,count]) => (
           <Pressable key={kind} accessibilityRole="button" accessibilityState={{selected:tab===kind}}
             onPress={() => setTab(kind)} style={[styles.tab,tab===kind && styles.tabCurrent]}>

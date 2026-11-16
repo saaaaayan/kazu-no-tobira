@@ -3,10 +3,13 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDime
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { worldGrades, worldIslands, type WorldGrade, type WorldStage } from './domain/worldCatalog';
 import { checkMathAnswer, isValidMathAnswer, type MathQuestion } from './domain/worldQuestions';
+import { stageDisplayTitle,stageLabels, type Checkpoint } from './domain/stageStructure';
+import { liveOrigin, requestLiveRound, requestLiveGrade, requestLiveHint, type LiveMode, type LiveRound } from './domain/liveQuestions';
+import type { SkillId } from './domain/curriculum';
 import { isBankQuestion } from './domain/questionBank';
 import { prepareStageRound } from './stageRounds';
 import { QuestionDiagram, WorkedSolution, WrittenSolution } from './components/QuestionSupport';
-import type { Progress } from './domain/progress';
+import { recordAttempt, type Progress } from './domain/progress';
 import { canAccessFeature, canAccessStage, freeAccess, hasPremium, type Entitlement } from './domain/accessPlan';
 import { readServerEntitlement } from './domain/serverEntitlement';
 import { canPlayWorldStage, progressAfterWorldAnswer, worldStageAction, type PlayMode } from './domain/playMode';
@@ -27,6 +30,7 @@ import NumberPad from './components/NumberPad';
 import AdventureHome, { ModeBadge, ModeControls } from './components/AdventureHome';
 import { StudyPlanner } from './components/StudyPlanner';
 import { StudyWorkshop } from './components/StudyWorkshop';
+import { completeLiveStudy } from './domain/studyPlans';
 import { savePracticeAnswer, type PracticeItem } from './domain/studyPractice';
 import { UnitLearning } from './components/UnitLearning';
 import QuestionReviewAdmin from './components/QuestionReviewAdmin';
@@ -47,6 +51,9 @@ type Round = {
   hintLevel: number;
   feedback?: Feedback;
   complete?: boolean;
+  liveHints?: readonly string[];
+  noMoreHints?: boolean;
+  live?: {origin:string; mode:LiveMode; round:LiveRound; eventId?:string};
 };
 
 function AdventureWorld() {
@@ -62,6 +69,7 @@ function AdventureWorld() {
   const [startError, setStartError] = useState('');
   const testRoundSeed = useRef(0);
   const testing = playMode === 'test';
+  const gameOrigin=liveOrigin();
   const [grade, setGrade] = useState<WorldGrade>(worldGrades[0]);
   const [round, setRound] = useState<Round>();
   const [learning, setLearning] = useState<Learning>();
@@ -103,7 +111,7 @@ function AdventureWorld() {
   }, []);
 
   useEffect(() => {
-    if (round && !canAccessStage(access, round.stage)) {
+    if (round && (!round.live || ['stage','test'].includes(round.live.mode)) && !canAccessStage(access, round.stage)) {
       setRound(undefined);
       setScreen('island');
     }
@@ -179,6 +187,39 @@ function AdventureWorld() {
     }
   }
 
+  async function startLive(stage:WorldStage, mode:LiveMode, eventId?:string, skills?:SkillId[]) {
+    if (!progress || !gameOrigin || starting.current || submitting.current || lessonWrite.current) return;
+    starting.current=true;
+    setLoadingRound(true);
+    setStartError('');
+    try {
+      const remote=await requestLiveRound(gameOrigin,{
+        mode,stageId:mode==='checkpoint'?eventId:skills?undefined:stage.id,skills,
+        excludeIds:progress.attempts.slice(-100).map(attempt=>attempt.problemId),
+      });
+      const problems:MathQuestion[]=remote.questions.map(card=>({
+        ...card,answer:'',hint:'',explanation:'',clock:card.clock && {...card.clock,end:card.clock.start},
+      }));
+      resetAnswer();
+      setLearning(undefined);
+      setRound({stage,problems,index:0,correct:0,results:[],dialogueOffset:Math.floor(Math.random()*1000),
+        usedHint:false,hintLevel:0,live:{origin:gameOrigin,mode,round:remote,eventId}});
+    } catch (error) {
+      setStartError(error instanceof Error ? error.message : '問題を読み込めませんでした。');
+    } finally { starting.current=false; setLoadingRound(false); }
+  }
+
+  function startCheckpoint(item:Checkpoint) {
+    if (!gameOrigin) { setStartError('確認テストを準備しています。'); return; }
+    void startLive({...item.after,title:'確認テスト '+item.number},'checkpoint',item.id);
+  }
+
+  function startLiveStudy(mode:'daily'|'review'|'remediation'|'diagnosis',skills:SkillId[]) {
+    const stage=worldGrades[0].stages[0];
+    const title={daily:'毎日の学習',review:'定期復習',remediation:'克服練習',diagnosis:'基礎をたしかめる'}[mode];
+    void startLive({...stage,title},mode,undefined,skills);
+  }
+
   async function start(stage: WorldStage) {
     if (!progress || starting.current || submitting.current || lessonWrite.current) return;
     const action = worldStageAction(playMode, progress, stage, access);
@@ -189,6 +230,7 @@ function AdventureWorld() {
       if (lesson) openLesson(lesson, stage);
       return;
     }
+    if (gameOrigin) { await startLive(stage,testing?'test':'stage'); return; }
     starting.current = true;
     setLoadingRound(true);
     setStartError('');
@@ -219,21 +261,38 @@ function AdventureWorld() {
   const question = round?.problems[round.index];
   const bankQuestion = question && isBankQuestion(question) ? question : undefined;
   const canReadWorkedSolution = canAccessFeature(access, 'workedSolutions');
-  const hints = bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
-  const handwritingAllowed = question?.type === 'number' && Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0;
+  const liveCard=round?.live?.round.questions[round.index];
+  const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
+  const handwritingAllowed = question?.type === 'number' && (Boolean(liveCard) || Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0);
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
 
+  async function showHint() {
+    if (!round || !question || round.feedback || submitting.current) return;
+    if (!round.live) {
+      setRound({...round,hintLevel:round.hintLevel+1,usedHint:true});
+      return;
+    }
+    submitting.current=true;
+    setSaving(true);
+    setMessage('');
+    try {
+      const result=await requestLiveHint(round.live.origin,round.live.round.token,question.id,round.hintLevel);
+      setRound({...round,liveHints:result.hint?[...hints,result.hint]:hints,noMoreHints:!result.more,
+        hintLevel:result.hint?round.hintLevel+1:round.hintLevel,usedHint:round.usedHint||Boolean(result.hint)});
+    } catch(error) {
+      setMessage(error instanceof Error ? error.message : 'ヒントを読み込めませんでした。');
+    } finally { submitting.current=false; setSaving(false); }
+  }
+
   async function submit() {
-    if (!round || !progress || !question || !canAccessStage(access, round.stage) || round.feedback || submitting.current || saving ||
+    if (!round || !progress || !question || (!round.live && !canAccessStage(access, round.stage)) || round.feedback || submitting.current || saving ||
       (shownMode === 'handwriting' && (blockRef.current || drawing))) return;
     if (!isValidMathAnswer(question, answer)) {
       setMessage(question.type === 'choice' ? 'こたえを ひとつ えらんでね。' : 'こたえを 数字で いれてね。');
       if (shownMode === 'keyboard') keyboard.current?.focus();
       return;
     }
-    const correctAnswer = checkMathAnswer(question, answer);
-    const newCorrect = round.correct + Number(correctAnswer);
-    const result: Feedback = correctAnswer ? 'correct' : 'incorrect';
+
     const now = new Date().toISOString();
     submitting.current = true;
     setSaving(true);
@@ -241,24 +300,42 @@ function AdventureWorld() {
     const submitted = question.type === 'choice'
       ? question.choices?.indexOf(answer) ?? -1
       : Number(answer.normalize('NFKC').replaceAll('−', '-'));
-    const saved = progressAfterWorldAnswer(playMode, progress, {
-      problemId: question.id,
-      stageId: round.stage.id,
-      skillId: question.skillId,
-      submitted,
-      correct: correctAnswer,
-      answeredAt: now,
-    }, round.index === round.problems.length - 1
-      ? { stage: round.stage, correct: newCorrect, usedHint: round.usedHint }
-      : undefined);
     try {
+      const graded=round.live ? await requestLiveGrade(round.live.origin,round.live.round.token,question.id,answer) : undefined;
+      const correctAnswer=graded?.correct ?? checkMathAnswer(question,answer);
+      const newCorrect=round.correct+Number(correctAnswer);
+      const result:Feedback=correctAnswer?'correct':'incorrect';
+      const attempt = {
+        problemId: question.id,
+        stageId: liveCard?.stageId ?? round.stage.id,
+        skillId: question.skillId,
+        submitted,
+        correct: correctAnswer,
+        answeredAt: now,
+      };
+      const liveMode=round.live?.mode;
+      const activity=liveMode==='daily'||liveMode==='review'||liveMode==='remediation'||liveMode==='diagnosis' ? liveMode : undefined;
+      const last=round.index===round.problems.length-1;
+      const special=round.live && !['stage','test'].includes(round.live.mode);
+      let saved=special ? (testing ? undefined : recordAttempt(progress,{...attempt,activity},false))
+        : progressAfterWorldAnswer(playMode,progress,attempt,last
+          ? {stage:round.stage,correct:newCorrect,usedHint:round.usedHint}: undefined);
+      if (saved && last && round.live?.mode==='checkpoint' && round.live.eventId) {
+        saved={...saved,checkpoints:{...saved.checkpoints,[round.live.eventId]:{correct:newCorrect,total:round.problems.length,completedAt:now}}};
+      }
+      if (saved && last && (activity==='daily'||activity==='review')) {
+        saved=completeLiveStudy(saved,activity,question.skillId,newCorrect,round.problems.length,new Date(now));
+      }
+      const problems=graded ? round.problems.map((item,index)=>index===round.index
+        ? {...item,answer:graded.answer,explanation:graded.explanation,steps:graded.steps,clock:graded.clock??item.clock}
+        : item) : round.problems;
       if (saved) {
         await saveProgress(saved);
         setProgress(saved);
       }
-      setRound({ ...round, correct: newCorrect, results: [...round.results, result], feedback: result });
-    } catch {
-      setMessage('きろくを ほぞんできなかったよ。もういちど おしてね。');
+      setRound({ ...round, problems, correct: newCorrect, results: [...round.results, result], feedback: result });
+    } catch (error) {
+      setMessage(round.live && error instanceof Error ? error.message : 'きろくを ほぞんできなかったよ。もういちど おしてね。');
     } finally {
       submitting.current = false;
       setSaving(false);
@@ -271,7 +348,7 @@ function AdventureWorld() {
     if (round.index === round.problems.length - 1) {
       setRound({ ...round, complete: true, hintLevel: 0 });
     } else {
-      setRound({ ...round, index: round.index + 1, feedback: undefined, hintLevel: 0 });
+      setRound({ ...round, index: round.index + 1, feedback: undefined, hintLevel: 0, liveHints:undefined, noMoreHints:false });
     }
   }
 
@@ -281,7 +358,8 @@ function AdventureWorld() {
     setStartError('');
     resetAnswer();
     setRound(undefined);
-    setScreen('island');
+    setScreen(round?.live?.mode==='daily'||round?.live?.mode==='review'?'study-plan':
+      round?.live?.mode==='diagnosis'||round?.live?.mode==='remediation'?'study':'island');
   }
   function openGrade(next: WorldGrade) {
     if (next.id === 'sage' && !hasPremium(access)) { setShowPlanInfo(true); scroll.current?.scrollTo({ y: 0 }); return; }
@@ -291,8 +369,9 @@ function AdventureWorld() {
   }
 
   const perfect = Boolean(round && round.correct === round.problems.length && !round.usedHint);
-  const cleared = Boolean(round && round.correct >= Math.ceil(round.stage.questions * 0.8));
-  const nextStage = round && worldIslands.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
+  const specialRound=Boolean(round?.live && !['stage','test'].includes(round.live.mode));
+  const cleared = Boolean(round && !specialRound && round.correct >= Math.ceil(round.stage.questions * 0.8));
+  const nextStage = round && (!round.live || ['stage','test'].includes(round.live.mode)) && worldIslands.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
   const canContinue = nextStage && progress && ['play', 'learn'].includes(worldStageAction(playMode, progress, nextStage, access));
   const lessonStage = learning && (learning.target ?? grade.stages.find(stage => learning.lesson.linkedStageIds.includes(stage.id)));
   const canChallenge = lessonStage && progress && canPlayWorldStage(playMode, progress, lessonStage, access);
@@ -313,7 +392,7 @@ function AdventureWorld() {
           </View>}
           {showPlanInfo && <View style={styles.playPanel}>
             <Text accessibilityRole="header" style={styles.rewardMessage}>プレミアムのご案内</Text>
-            <Text style={styles.explanation}>EX・ひみつの道・賢者の島でのプレイと、途中式や図を使った詳しい解説はプレミアムで利用できます。通常ステージ、単元学習、基本の解説は無料です。</Text>
+            <Text style={styles.explanation}>試練の道・伝説のトビラ・賢者の島でのプレイと、途中式や図を使った詳しい解説はプレミアムで利用できます。冒険の道、単元学習、基本の解説は無料です。</Text>
             <GameButton label="とじる" secondary onPress={() => setShowPlanInfo(false)} />
           </View>}
           {loadingRound && <Text accessibilityLiveRegion="polite">もんだいを よみこんでいるよ…</Text>}
@@ -344,13 +423,13 @@ function AdventureWorld() {
           {progress && !round && screen === 'study' && <GameButton label="個別学習・復習・成長レポート"
             disabled={saving} onPress={()=>{setStudyError('');setScreen('study-plan');}}/>}
           {progress && !round && screen === 'study-plan' && <StudyPlanner access={access} progress={progress} busy={saving}
-            error={studyError} onUpdate={updateStudy} onBack={()=>setScreen('study')}/>}
+            error={studyError} onLiveStart={gameOrigin?startLiveStudy:undefined} onUpdate={updateStudy} onBack={()=>setScreen('study')}/>}
           {progress && !round && screen === 'study' && <StudyWorkshop access={access} progress={progress} busy={saving}
-            error={studyError} onAnswer={answerPractice} onBack={()=>setScreen('world')}/>}
+            error={studyError} onLiveStart={gameOrigin?startLiveStudy:undefined} onAnswer={answerPractice} onBack={()=>setScreen('world')}/>}
           {progress && !round && screen === 'world' &&
             <WorldMap780 progress={progress} mode={playMode} access={access} onGrade={openGrade} onTitles={()=>setScreen('titles')}/>}
           {progress && !round && screen === 'island' &&
-            <IslandStageMap key={grade.id} grade={grade} progress={progress} mode={playMode} access={access} onBack={()=>setScreen('world')}
+            <IslandStageMap key={grade.id} grade={grade} progress={progress} mode={playMode} access={access} onCheckpoint={startCheckpoint} onBack={()=>setScreen('world')}
               onTitles={()=>setScreen('titles')} onStart={start} onLearn={openLesson}/>}
           {progress && !round && screen === 'titles' &&
             <TitleAlbum progress={progress} onBack={()=>setScreen('world')}/>}
@@ -368,42 +447,42 @@ function AdventureWorld() {
                   <View style={styles.finishHero}>
                     {!testing && cleared && <SparkleBurst big/>}
                     {!testing && <Text style={styles.finishEmoji}>{perfect?'🌟':cleared?'✨':'🌱'}</Text>}
-                    <Text style={styles.finishStage}>{round.stage.title}</Text>
+                    <Text style={styles.finishStage}>{stageDisplayTitle(round.stage)}</Text>
                     <Text accessibilityRole="header" style={styles.finishTitle}>
-                      {testing ? 'テストの けっか' : perfect?'パーフェクト！':cleared?'ステージ クリア！':'おつかれさま！'}
+                      {testing || specialRound ? 'けっか' : perfect?'パーフェクト！':cleared?'ステージ クリア！':'おつかれさま！'}
                     </Text>
                     <Text style={styles.finishCount}>{round.problems.length}もんのうち {round.correct}もん せいかい</Text>
                   </View>
                   <CompanionMoment mood={!testing && perfect?'clear':'encourage'} variation={round.dialogueOffset + round.index}/>
-                  {testing ? <Text style={styles.hintNote}>テストの結果は 記録されません。</Text> : <WorldChest opened={cleared} perfect={perfect} stage={round.stage}/>}
-                  {!testing && round.usedHint && (
+                  {testing ? <Text style={styles.hintNote}>テストの結果は 記録されません。</Text> : !specialRound && <WorldChest opened={cleared} perfect={perfect} stage={round.stage}/>}
+                  {!testing && !specialRound && round.usedHint && (
                     <Text style={styles.hintNote}>ヒントをつかったので、パーフェクトは 次のチャレンジで めざそう！</Text>
                   )}
                   {!testing && cleared && <Text style={styles.rewardMessage}>しょうごう ずかん：{newlyEarnedTitles}こ はっけんずみ</Text>}
                   {canContinue && <GameButton label="つぎの ステージへ" onPress={()=>start(nextStage)} gold/>}
-                  <GameButton label="この ステージに もういちど ちょうせん" onPress={()=>start(round.stage)} secondary/>
-                  {lessonForStage(round.stage.id) && <GameButton label="がくしゅうを みなおす" secondary
+                  {!specialRound && <GameButton label="この ステージに もういちど ちょうせん" onPress={()=>start(round.stage)} secondary/>}
+                  {!specialRound && lessonForStage(round.stage.id) && <GameButton label="がくしゅうを みなおす" secondary
                     onPress={() => { const lesson = lessonForStage(round.stage.id); if (lesson) openLesson(lesson); }}/>}
-                  <GameButton label="島のマップへ" onPress={goToIsland}/>
+                  <GameButton label={specialRound && round.live?.mode!=='checkpoint'?'学習画面へ':'島のマップへ'} onPress={goToIsland}/>
                 </View>
               ) : (
                 <>
                   <View style={styles.questionPanel}>
                     <View style={styles.questionHeader}>
-                      <Text style={styles.stageTitle}>{round.stage.title}</Text>
+                      <Text style={styles.stageTitle}>{stageDisplayTitle(round.stage)}</Text>
                       <Text style={styles.questionIndex}>第{round.index + 1}問 / {round.problems.length}</Text>
                     </View>
                     <MagicMeter results={round.results} total={round.problems.length}/>
                     <CompanionMoment compact onDark
                       mood={round.feedback === 'correct' ? 'correct' : round.feedback === 'incorrect' ? 'incorrect' : 'ready'}
                       variation={round.dialogueOffset + round.index}/>
-                    <Text style={styles.difficulty}>{round.stage.kind==='secret'?'✦ ひみつの なぞ':round.stage.kind==='extra'?'★ EXチャレンジ':bankQuestion ? ['● きほん', '● ひょうじゅん', '★ おうよう'][bankQuestion.difficulty - 1]
+                    <Text style={styles.difficulty}>{round.stage.kind==='secret'?stageLabels.secret:round.stage.kind==='extra'?stageLabels.extra:bankQuestion ? ['● きほん', '● ひょうじゅん', '★ おうよう'][bankQuestion.difficulty - 1]
                       : round.index<3?'● きほん':round.index<8?'● ひょうじゅん':'★ おうよう'}</Text>
                     <MathText style={styles.questionText} value={question.question}/>
                     {question.figure && <StudyFigureView figure={question.figure}/>}
                     {question.clock && !round.feedback && <ClockFace time={question.clock.start} read={question.clock.read}/>}
-                    {bankQuestion?.diagram && !round.feedback && (
-                      <QuestionDiagram diagram={bankQuestion.diagram} phase={round.hintLevel ? 'hint' : 'question'} />
+                    {(bankQuestion?.diagram || liveCard?.diagram) && !round.feedback && (
+                      <QuestionDiagram diagram={(bankQuestion?.diagram ?? liveCard?.diagram)!} phase={round.hintLevel ? 'hint' : 'question'} />
                     )}
                     <MathText style={styles.prompt} value={question.prompt}/>
                   </View>
@@ -505,11 +584,9 @@ function AdventureWorld() {
                               <MathText style={styles.hintText} prefix={hints.length > 1 ? 'ヒント ' + (i + 1) + '　' : '💡 '} value={hint}/>
                             </View>
                           ))}
-                          {round.hintLevel < hints.length && (
+                          {(round.live ? !round.noMoreHints : round.hintLevel<hints.length) && (
                             <Pressable accessibilityRole="button"
-                              onPress={() => setRound(current => current && !current.feedback && current.hintLevel < hints.length
-                                ? { ...current, hintLevel: current.hintLevel + 1, usedHint: true }
-                                : current)} style={styles.hintButton}>
+                              disabled={saving} onPress={showHint} style={styles.hintButton}>
                               <Text style={styles.hintButtonText}>{hints.length > 1
                                 ? ['ヒント1を みる', 'もうすこし ヒントを みる', 'さいごの ヒントを みる'][round.hintLevel]
                                 : '💡 ヒントを みる'}</Text>

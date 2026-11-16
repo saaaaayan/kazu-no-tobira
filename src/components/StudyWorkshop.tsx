@@ -9,8 +9,8 @@ import { MathText } from './MathText';
 type Session = { purpose:'practice'|'diagnosis'; questions: PracticeItem[]; results:number[]; checked?:number };
 export type SavePractice = (item:PracticeItem, answer:number) => Promise<boolean>;
 
-export function StudyWorkshop({ access, progress, busy, error, onAnswer, onBack }: {
-  access:Entitlement; progress:Progress; busy:boolean; error:string; onAnswer:SavePractice; onBack:()=>void;
+export function StudyWorkshop({ access, progress, busy, error, onAnswer, onBack,onLiveStart }: {
+  access:Entitlement; progress:Progress; busy:boolean; error:string; onAnswer:SavePractice; onBack:()=>void; onLiveStart?:(mode:'remediation'|'diagnosis',skills:SkillId[])=>void;
 }) {
   const [session,setSession] = useState<Session>();
   const [answer,setAnswer] = useState('');
@@ -20,6 +20,7 @@ export function StudyWorkshop({ access, progress, busy, error, onAnswer, onBack 
   const completed = session && session.results.length===session.questions.length;
   function start(skill: SkillId, purpose:Session['purpose'], difficulty:1|2) {
     if (!canAccessFeature(access,'remediation')) return;
+    if (onLiveStart) { onLiveStart(purpose==='practice'?'remediation':'diagnosis',[skill]); return; }
     const questions = practiceItems(skill,difficulty,Date.now(),progress.attempts);
     if (!questions.length) return;
     setAnswer('');

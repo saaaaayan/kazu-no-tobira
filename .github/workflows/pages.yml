@@ -40,15 +40,18 @@ jobs:
       - name: Embed the source commit in the browser app
         run: |
           printf "export const BUILD_VERSION = '%s';\n" "$GITHUB_SHA" > src/buildVersion.ts
-      - run: pnpm build:web
+      - name: Build the DB-only production client
+        env:
+          EXPO_PUBLIC_KAZU_GAME_ORIGIN: ${{ vars.PRODUCTION_GAME_ORIGIN }}
+        run: node scripts/export-db-preview.mjs web .expo/pages-release --production
       - name: Publish the version manifest for update checks
         run: |
-          printf '{"version":"%s"}\n' "$GITHUB_SHA" > dist/version.json
-      - run: touch dist/.nojekyll
+          printf '{"version":"%s"}\n' "$GITHUB_SHA" > .expo/pages-release/version.json
+      - run: touch .expo/pages-release/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: dist
+          path: .expo/pages-release
       - uses: actions/deploy-pages@v4
         id: deployment
 
