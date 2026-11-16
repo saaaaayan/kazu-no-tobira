@@ -395,7 +395,7 @@ function AdventureWorld() {
         <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}
           style={[styles.shell,round && !round.complete && styles.playShell]}>
           {uiPreview && <View style={styles.playPanel} testID="kazu-sample-only-preview">
-            <Text accessibilityRole="header" style={styles.answerHeading}>開発用プレビュー</Text>
+            <Text accessibilityRole="header" style={styles.answerHeading}>数のトビラ 試作版</Text>
             <Text style={styles.explanation}>全16島の画面とサンプル問題を確認できます。回答は保存されません。</Text>
             <Text selectable style={styles.hintNote}>バージョン {process.env.EXPO_PUBLIC_KAZU_UI_PREVIEW_SHA}</Text>
           </View>}

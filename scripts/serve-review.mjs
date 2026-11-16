@@ -2,10 +2,11 @@ import { createServer } from 'node:http';
 import { readFile, realpath } from 'node:fs/promises';
 import { extname, isAbsolute, relative, resolve, sep } from 'node:path';
 
-const [directory, portArg = '8115'] = process.argv.slice(2);
+const [directory, portArg = '8115', basePath = '/'] = process.argv.slice(2);
 if (!directory) throw new Error('Specify a preview export directory.');
 const port = Number(portArg);
 if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('Invalid preview port.');
+if (!/^\/(?:[a-z0-9-]+\/)*$/.test(basePath)) throw new Error('Invalid preview base path.');
 const root = await realpath(directory);
 const types = {
   '.html': 'text/html; charset=utf-8',
@@ -28,7 +29,9 @@ const server = createServer(async (request, response) => {
   }
   try {
     const pathname = decodeURIComponent(new URL(request.url, 'http://127.0.0.1').pathname);
-    const file = await realpath(resolve(root, '.' + (pathname === '/' ? '/index.html' : pathname)));
+    if (!pathname.startsWith(basePath)) { response.writeHead(404).end(); return; }
+    const local = pathname.slice(basePath.length) || 'index.html';
+    const file = await realpath(resolve(root, './' + local));
     const location = relative(root, file);
     if (!location || location === '..' || location.startsWith('..' + sep) || isAbsolute(location)) {
       response.writeHead(404).end();

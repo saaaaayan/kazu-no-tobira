@@ -6,12 +6,14 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
+
+env:
+  RELEASE_PROFILE: ${{ vars.PAGES_RELEASE_PROFILE || 'prototype' }}
+  SITE: https://saaaaayan.github.io/kazu-no-tobira/
 
 concurrency:
   group: github-pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   explain-publish-gate:
@@ -24,17 +26,128 @@ jobs:
       - name: Record whether production deployment is eligible
         run: |
           if [[ "$MAIN_BUILD" != true ]]; then
-            echo 'Production deployment skipped because the ref is outside main.' >> "$GITHUB_STEP_SUMMARY"
+            echo 'Pages deployment skipped because the ref is outside main.' >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$RELEASE_PROFILE" == prototype ]]; then
+            echo 'Deploy the sample-only prototype after its automated checks pass.' >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$RELEASE_PROFILE" != production ]]; then
+            echo 'Invalid PAGES_RELEASE_PROFILE. Nothing will be deployed.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
           elif [[ "$ENTITLEMENTS_READY" != true ]]; then
             echo 'Production deployment skipped because PRODUCTION_ENTITLEMENTS_READY is unset or is not true.' >> "$GITHUB_STEP_SUMMARY"
           else
             echo 'Production entitlement condition passed. Content and build checks are still required.' >> "$GITHUB_STEP_SUMMARY"
           fi
 
+  build-prototype:
+    needs: explain-publish-gate
+    if: github.ref == 'refs/heads/main' && (vars.PAGES_RELEASE_PROFILE == '' || vars.PAGES_RELEASE_PROFILE == 'prototype')
+    runs-on: ubuntu-latest
+    outputs:
+      previous: ${{ steps.snapshot.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: node scripts/export-ui-preview.mjs .expo/pages-prototype --pages
+      - name: Verify the exact artifact at the Pages base path
+        run: |
+          node scripts/serve-review.mjs .expo/pages-prototype 8130 /kazu-no-tobira/ &
+          server=$!
+          trap 'kill "$server"' EXIT
+          for attempt in {1..5}; do
+            if node scripts/verify-web-release.mjs http://127.0.0.1:8130/kazu-no-tobira/ "$GITHUB_SHA" ui-preview; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1
+      - name: Prepare recovery from the current verified prototype
+        id: snapshot
+        run: node scripts/snapshot-pages-prototype.mjs "$SITE" .expo/pages-prototype-previous
+      - run: touch .expo/pages-prototype/.nojekyll
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          name: prototype-pages
+          path: .expo/pages-prototype
+      - uses: actions/upload-pages-artifact@v4
+        if: steps.snapshot.outputs.version != ''
+        with:
+          name: previous-prototype-pages
+          path: .expo/pages-prototype-previous
+
+  deploy-prototype:
+    needs: build-prototype
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.publish.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/deploy-pages@v4
+        id: publish
+        with:
+          artifact_name: prototype-pages
+      - name: Confirm the public URL serves this commit
+        id: verify
+        continue-on-error: true
+        run: |
+          for attempt in {1..18}; do
+            if node scripts/verify-web-release.mjs "$SITE" "$GITHUB_SHA" ui-preview; then
+              echo "Public prototype verified at $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 5
+          done
+          exit 1
+      - uses: actions/deploy-pages@v4
+        if: steps.verify.outcome == 'failure' && needs.build-prototype.outputs.previous != ''
+        with:
+          artifact_name: previous-prototype-pages
+      - name: Verify the recovered prototype and fail the release
+        if: steps.verify.outcome == 'failure'
+        env:
+          PREVIOUS: ${{ needs.build-prototype.outputs.previous }}
+        run: |
+          if [[ -n "$PREVIOUS" ]]; then
+            for attempt in {1..18}; do
+              if node scripts/verify-web-release.mjs "$SITE" "$PREVIOUS" ui-preview; then
+                echo "::error::New release verification failed. Restored $PREVIOUS."
+                exit 1
+              fi
+              sleep 5
+            done
+          fi
+          echo "::error::New release verification failed and automatic recovery could not be verified."
+          exit 1
+
   build-and-deploy:
     # Keep the last production deployment until purchase verification and content delivery are ready.
-    if: github.ref == 'refs/heads/main' && vars.PRODUCTION_ENTITLEMENTS_READY == 'true'
+    needs: explain-publish-gate
+    if: github.ref == 'refs/heads/main' && vars.PAGES_RELEASE_PROFILE == 'production' && vars.PRODUCTION_ENTITLEMENTS_READY == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -63,7 +176,7 @@ jobs:
         run: node scripts/export-db-preview.mjs web .expo/pages-release --production
       - name: Publish the version manifest for update checks
         run: |
-          printf '{"version":"%s"}\n' "$GITHUB_SHA" > .expo/pages-release/version.json
+          printf '{"version":"%s","profile":"production"}\n' "$GITHUB_SHA" > .expo/pages-release/version.json
       - run: touch .expo/pages-release/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
