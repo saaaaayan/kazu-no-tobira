@@ -5,9 +5,10 @@ export const betaQuestionsPerStage = 10;
 
 const nonblank = value => typeof value === 'string' && value.trim().length > 0;
 
-function playablePayload(question) {
-  return ['number','choice'].includes(question.type) && nonblank(question.question) &&
+export function playableBetaPayload(question) {
+  return ['number','choice'].includes(question?.type) && nonblank(question.question) &&
     nonblank(question.answer) && isValidMathAnswer(question,question.answer) &&
+    checkMathAnswer(question,question.answer) &&
     (question.type !== 'choice' || (
       Array.isArray(question.choices) && new Set(question.choices).size === question.choices.length &&
       question.choices.length >= 2 && question.choices.every(nonblank) &&
@@ -17,7 +18,8 @@ function playablePayload(question) {
     question.hints.length === 3 && question.hints.every(nonblank) &&
     new Set(question.hints.map(hint=>hint.trim())).size === 3 &&
     Array.isArray(question.steps) && question.steps.length > 0 &&
-    question.steps.every(step=>step && nonblank(step.title) && nonblank(step.body));
+    question.steps.every(step=>step && nonblank(step.title) && nonblank(step.body) &&
+      (step.equations===undefined || (Array.isArray(step.equations) && step.equations.every(nonblank))));
 }
 
 export async function betaReadiness(pool) {
@@ -36,7 +38,7 @@ export async function betaReadiness(pool) {
   const stages=worldIslands.flatMap(island=>island.stages.map(stage=>{
     const row=byId.get(stage.id);
     const present=row?.island===island.id && row?.kind===stage.kind;
-    const playable=present ? row.payloads.filter(playablePayload).length : 0;
+    const playable=present ? row.payloads.filter(playableBetaPayload).length : 0;
     return {stageId:stage.id,islandId:island.id,kind:stage.kind,present,
       registered:row?.registered??0,verified:row?.verified??0,ready:row?.ready??0,
       playable,missing:Math.max(0,betaQuestionsPerStage-playable)};
