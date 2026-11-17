@@ -206,11 +206,13 @@ function stageText(stage:WorldStage):string {
   return '伝'+String(stage.order-59);
 }
 
-export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitles,onLearn,onCheckpoint,preview=false}: {
+export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitles,onLearn,onCheckpoint,preview=false,draftStageIds=[]}: {
   grade:WorldGrade;progress:Progress;mode:PlayMode;access:Entitlement;onBack:()=>void;onStart:(stage:WorldStage)=>void;onTitles:()=>void;
   onLearn:(lesson:UnitLesson)=>void;
   onCheckpoint:(item:Checkpoint)=>void;
   preview?:boolean;
+  /** IDs only. No unreviewed questions are bundled into the public site. */
+  draftStageIds?: readonly string[];
 }) {
   const [width,setWidth]=useState(0);
   const actual=measuredWidth(width);
@@ -221,7 +223,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
   const next = testing ? undefined : grade.stages.find(stage => ['play', 'learn'].includes(worldStageAction(mode, progress, stage, access)) && !progress.stages[stage.id]);
   const lessons = unitLessons.filter(lesson => lesson.grade === grade.id);
   const marker=Math.max(46,Math.min(57,Math.floor(actual/5)-9));
-  const previewStage=preview ? grade.stages.find(stage=>Boolean(uiPreviewSampleKind(stage))) : undefined;
+  const previewStage=preview ? grade.stages.find(stage=>Boolean(uiPreviewSampleKind(stage)) || draftStageIds.includes(stage.id)) : undefined;
   return (
     <View style={styles.screen}>
       <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
@@ -276,8 +278,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         })}
       </View>}
       {preview && <View style={styles.legend}>
-        <Text style={styles.legendText}>✦ あそべる</Text>
-        <Text style={styles.legendText}>● じゅんびちゅう</Text>
+        <Text style={styles.legendText}>✦ {draftStageIds.length?'非公開原稿を確認 / サンプルであそぶ':'サンプルであそぶ'}</Text>
+        <Text style={styles.legendText}>● {draftStageIds.length?'原稿未読み込み・じゅんびちゅう':'じゅんびちゅう'}</Text>
       </View>}
       {!preview && !testing && <View style={styles.legend}>
         <Text style={styles.legendText}>✦ 挑戦できる</Text>
@@ -329,7 +331,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           const position=geometry.positions[index];
           const record=(testing ? undefined : progress.stages[stage.id]) as {clearedAt?:string;perfectAt?:string}|undefined;
           const action=worldStageAction(mode,progress,stage,access);
-          const unlocked=preview ? Boolean(uiPreviewSampleKind(stage)) : action === 'play' || action === 'learn';
+          const privateDraft=preview && draftStageIds.includes(stage.id);
+           const unlocked=preview ? Boolean(uiPreviewSampleKind(stage)) || privateDraft : action === 'play' || action === 'learn';
           const selectable=preview ? unlocked : unlocked || action === 'premium';
           const cleared=Boolean(record?.clearedAt);
           const perfect=Boolean(record?.perfectAt||(legacy.has(stage.id)&&cleared));
@@ -337,7 +340,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           return (
             <Pressable key={stage.id} accessibilityRole="button" disabled={!selectable}
               accessibilityState={{disabled:!selectable}}
-              accessibilityLabel={stageDisplayTitle(stage)+'、'+(preview ? (uiPreviewSampleKind(stage) ? 'サンプル問題' : '体験用問題は準備中') : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
+              accessibilityLabel={stageDisplayTitle(stage)+'、'+(preview ? (privateDraft ? '非公開原稿を確認' : uiPreviewSampleKind(stage) ? 'サンプル問題' : '体験用問題は準備中') : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
                 styles.stagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
