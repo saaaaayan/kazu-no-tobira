@@ -13,17 +13,31 @@ export function uiPreviewSampleKind(stage: SampleStage) {
 export function uiPreviewRound(stage: SampleStage): BankQuestion[] {
   const kind=uiPreviewSampleKind(stage);
   if (!kind) return [];
-  if (kind==='counting') return [1,2,3].map(count=>({
-    id:'ui-preview-'+stage.id+'-'+count,skillId:'preschool.objects',
-    type:'choice',format:'counting',difficulty:1,
-    question:'まるは いくつ？',prompt:'まるを さわって かぞえよう',
-    choices:['1','2','3'],answer:String(count),
-    hint:'ひだりから みてね。',
-    hints:['ひだりから みてね。','まるを ひとつずつ さわろう。','さいごに いった かずを えらぼう。'],
-    explanation:`まるは ${count} こだよ。`,
-    steps:[{title:'ひとつずつ かぞえる',body:`ひだりから かぞえると ${count} こ。`}],
-    mistakes:[],diagram:{kind:'countingBoard',guide:true,rows:[{tokens:Array.from({length:count},()=>'dot' as const)}]},
-  }));
+  if (kind==='counting') {
+    // 学習目標は「横一列にある1〜3個を数える」。数字や図を増やすだけで別単元へ進まない。
+    // この10問は公開サイトの操作確認専用で、実DBの審査済み教材ではない。
+    const samples=[
+      {count:1,token:'bear'}, {count:2,token:'bear'}, {count:3,token:'bear'},
+      {count:1,token:'dot'}, {count:2,token:'dot'}, {count:3,token:'dot'},
+      {count:1,token:'triangle'}, {count:2,token:'triangle'},
+      {count:3,token:'square'}, {count:2,token:'square'},
+    ] as const;
+    const names={bear:'くま',dot:'まる',triangle:'さんかく',square:'しかく'} as const;
+    return samples.map(({count,token},index)=>{
+      const name=names[token];
+      return {
+        id:'ui-preview-'+stage.id+'-'+(index+1),skillId:'preschool.objects',
+        type:'choice',format:'counting',difficulty:1,
+        question:name+'は いくつ？',prompt:name+'を さわって かぞえよう',
+        choices:['1','2','3'],answer:String(count),
+        hint:'ひだりから みてね。',
+        hints:['ひだりから みてね。','ひとつ さわったら、つぎの '+name+'へ。','さいごに いった かずを えらぼう。'],
+        explanation:name+'は '+count+' こ。ひとつずつ かぞえたよ。',
+        steps:[{title:'ひとつずつ かぞえる',body:'ひだりから かぞえると '+count+' こ。'}],
+        mistakes:[],diagram:{kind:'countingBoard',guide:true,rows:[{tokens:Array.from({length:count},()=>token)}]},
+      };
+    });
+  }
   return Array.from({ length: 10 }, (_, index) => {
     const first = index % 5 + 1;
     const second = (index * 3 + 1) % 4 + 1;
