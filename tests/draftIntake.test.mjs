@@ -54,3 +54,25 @@ test('registration only creates unreviewed records and rolls back if history fai
   await assert.rejects(intakeDraftBank(failing,bank,{write:true}),/simulated DB error/);
   assert.equal(failing.queries.at(-1).sql,'rollback');
 });
+
+
+test('draft intake accepts the illustrated preschool tokens already supported by the UI, but rejects unknown shapes',()=>{
+  const question={
+    id:'preschool.n02:illustrated-validation',
+    skillId:'preschool.objects', difficulty:1, type:'choice', format:'counting',
+    question:'はなは いくつ？', prompt:'はなを さわって かぞえよう。',
+    answer:'4',choices:['3','4','5'],
+    hint:'ひとつずつ みてね。',
+    hints:['ひとつずつ みてね。','まだの はなを みつけよう。','さいごまで かぞえよう。'],
+    explanation:'はなは 4こ。',
+    steps:[{title:'かぞえる',body:'はなを ひとつずつ さわるよ。'}],
+    diagram:{kind:'countingBoard',guide:true,rows:[{tokens:['flower','flower','flower','flower']}]},
+  };
+  const preschool={stageId:'preschool.n02',gradeId:'preschool',islandId:'preschool',version:1,questions:[question]};
+  const validated=validateDraftBank(preschool);
+  assert.equal(validated.rows.length,1);
+  assert.equal(validated.rows[0].has_figure,true);
+  assert.throws(()=>validateDraftBank({...preschool,questions:[{
+    ...question,diagram:{...question.diagram,rows:[{tokens:['unknown-picture']}]},
+  }]}),/図の構造/);
+});
