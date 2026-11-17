@@ -60,7 +60,7 @@ type Round = {
   live?: {origin:string; mode:LiveMode; round:LiveRound; eventId?:string};
 };
 
-type ReviewPreview = { stage: WorldStage; question: MathQuestion; phone: boolean; detailed: boolean; onClose: () => void };
+type ReviewPreview = { stage: WorldStage; questions: MathQuestion[]; phone: boolean; detailed: boolean; onClose: () => void };
 
 function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const isolated = uiPreview || Boolean(review);
@@ -79,7 +79,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const gameOrigin=isolated ? undefined : liveOrigin();
   const [grade, setGrade] = useState<WorldGrade>(worldGrades[0]);
   const [round, setRound] = useState<Round | undefined>(() => review ? {
-    stage:review.stage, problems:[review.question], index:0, correct:0,
+    stage:review.stage, problems:review.questions, index:0, correct:0,
     results:[], dialogueOffset:0, usedHint:false, hintLevel:0,
   } : undefined);
   const [learning, setLearning] = useState<Learning>();

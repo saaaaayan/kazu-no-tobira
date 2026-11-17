@@ -169,6 +169,9 @@ export function createQuestionReviewServer({ store, port, adminKey, ownerAuth, a
       if (request.method === 'GET' && url.pathname === '/review-api/session') return json(200,{ role:session.role });
       if (request.method === 'GET' && url.pathname === '/review-api/questions') return json(200,await store.list(url.searchParams));
       if (request.method === 'GET' && url.pathname === '/review-api/stages') return json(200,await store.stageTotals());
+      if (request.method === 'GET' && url.pathname === '/review-api/preschool-model' && store.preschoolModelPreview) {
+        return json(200,await store.preschoolModelPreview());
+      }
       if (request.method === 'GET' && url.pathname.startsWith('/review-api/questions/')) {
         const id = decodeURIComponent(url.pathname.slice('/review-api/questions/'.length));
         const revision = url.searchParams.get('revision');

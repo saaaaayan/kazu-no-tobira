@@ -1,5 +1,6 @@
 import { checkMathAnswer,isValidMathAnswer } from '../src/domain/mathAnswer.ts';
 import { inspectQuestion } from '../scripts/question-audit-rules.mjs';
+import { preschoolModelStage,validatePreschoolModelQuestion } from './preschool-model-rules.mjs';
 
 const invalid=message=>Object.assign(new Error(message),{status:400});
 const text=(value,limit)=>typeof value==='string' && value.trim() && value.length<=limit && !value.includes('\0');
@@ -33,5 +34,6 @@ export function reviseQuestion(before,content) {
   }
   const {issues}=inspectQuestion(next);
   if (issues.length) throw invalid('問題文・正答・図または選択肢の自動検査に通りません。修正してください。');
+  if (next.id.startsWith(preschoolModelStage+':') && next.diagram?.guide) validatePreschoolModelQuestion(next);
   return next;
 }
