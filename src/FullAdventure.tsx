@@ -429,8 +429,12 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {loadingRound && <Text accessibilityLiveRegion="polite">もんだいを よみこんでいるよ…</Text>}
           {!!startError && <Text accessibilityLiveRegion="polite" style={styles.error}>{startError}</Text>}
           {screen === 'home' && !round ? (
-            <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress} preview={uiPreview}
-              onStart={() => { resetAnswer(); setScreen('world'); }} />
+            <>
+              <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress} preview={uiPreview}
+                onStart={() => { resetAnswer(); setScreen('world'); }} />
+              {process.env.EXPO_PUBLIC_KAZU_ONLINE_REVIEW === '1' && typeof window !== 'undefined' &&
+                <GameButton label="管理者ログイン" secondary onPress={() => window.location.assign('/kazu-no-tobira/admin/')} />}
+            </>
           ) : (
             <View style={styles.navigation}>
               <View style={styles.navigationHeader}>

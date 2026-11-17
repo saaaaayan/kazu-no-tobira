@@ -11,7 +11,7 @@ import { drawStageRound, decodeStageDeck } from '../src/domain/stageDeck.ts';
 
 test('16島の1,040ステージに、規定どおりの試験位置と出題範囲を割り当てる', () => {
   assert.equal(assessmentIslands.length, 16);
-  assert.equal(assessmentIslands[0].name, '幼児の島');
+  assert.equal(assessmentIslands[0].name, 'ぬいぐるみの島');
   assert.deepEqual(assessmentIslands.slice(-3).map(island => island.name), ['賢者の島', '覇王の島', '宇宙ステージ']);
   const all = assessmentIslands.flatMap(island => island.stages);
   assert.equal(new Set(all.map(stage => stage.id)).size, 1040);

@@ -1,0 +1,5 @@
+project_id = "kazu-no-tobira"
+
+[functions.question-admin]
+verify_jwt = true
+entrypoint = "./functions/question-admin/index.mjs"

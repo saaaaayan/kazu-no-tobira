@@ -293,7 +293,7 @@ const sageDefinition: Omit<WorldGrade, 'stages'> = {
 
 export const sageIsland: WorldGrade = { ...sageDefinition, stages: createStages(sageDefinition) };
 const preschool: Omit<WorldGrade, 'stages'> = {
-  id: 'preschool', title: '就学前', island: '幼児の島',
+  id: 'preschool', title: '就学前', island: 'ぬいぐるみの島',
   theme: 'みて、さわって、かずと かたちを みつけよう',
   units: makeUnits(`
 objects|ものを かぞえる|count

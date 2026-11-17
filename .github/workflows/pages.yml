@@ -71,6 +71,8 @@ jobs:
             sleep 1
           done
           exit 1
+      - name: Verify the hosted review API before publishing the admin route
+        run: node scripts/verify-online-review.mjs
       - name: Prepare recovery from the current verified prototype
         id: snapshot
         run: node scripts/snapshot-pages-prototype.mjs "$SITE" .expo/pages-prototype-previous
@@ -174,9 +176,15 @@ jobs:
         env:
           EXPO_PUBLIC_KAZU_GAME_ORIGIN: ${{ vars.PRODUCTION_GAME_ORIGIN }}
         run: node scripts/export-db-preview.mjs web .expo/pages-release --production
+      - name: Verify the hosted review API before publishing the admin route
+        run: node scripts/verify-online-review.mjs
+      - name: Add the same-site administrator route
+        env:
+          EXPO_PUBLIC_KAZU_GAME_ORIGIN: ${{ vars.PRODUCTION_GAME_ORIGIN }}
+        run: node scripts/pages-admin-entry.mjs .expo/pages-release
       - name: Publish the version manifest for update checks
         run: |
-          printf '{"version":"%s","profile":"production"}\n' "$GITHUB_SHA" > .expo/pages-release/version.json
+          node --input-type=module -e 'import {readFileSync,writeFileSync} from "node:fs";import {contentDigest} from "./scripts/ui-preview-isolation.mjs";writeFileSync(".expo/pages-release/version.json",JSON.stringify({version:process.env.GITHUB_SHA,profile:"production",adminSha256:contentDigest(readFileSync(".expo/pages-release/admin/index.html"))})+"\n");'
       - run: touch .expo/pages-release/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4

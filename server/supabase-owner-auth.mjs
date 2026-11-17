@@ -1,7 +1,9 @@
+import { Buffer } from 'node:buffer';
+
 const api='https://jxitjcfgavemddlbygzx.supabase.co/auth/v1';
 
 export function createSupabaseOwnerAuth(publishableKey,isAdministratorSession) {
-  if (!/^sb_publishable_[A-Za-z0-9_-]+$/.test(publishableKey ?? '')) {
+  if (!/^(?:sb_publishable_[A-Za-z0-9_-]+|eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/.test(publishableKey ?? '')) {
     throw new Error('A publishable key for the dedicated Kazu project is required.');
   }
   async function request(path,options) {
@@ -26,6 +28,14 @@ export function createSupabaseOwnerAuth(publishableKey,isAdministratorSession) {
       if (!Number.isFinite(expires) || expires<=Date.now() || !result?.access_token || !result?.user?.id ||
           !sessionId || !await isAdministratorSession(result.user.id,sessionId)) return null;
       return {subject:result.user.id,role:'question_admin',providerToken:result.access_token,sessionId,expires};
+    },
+    async authenticate(providerToken) {
+      const sessionId = readSessionId(providerToken);
+      if (!sessionId) return null;
+      const user = await request('/user',{headers:{Authorization:'Bearer '+providerToken}});
+      if (!user?.id) return null;
+      const isAdministrator = await isAdministratorSession(user.id, sessionId);
+      return { subject:user.id, isAdministrator };
     },
     async validate(session) {
       const user=await request('/user',{headers:{Authorization:'Bearer '+session.providerToken}});
