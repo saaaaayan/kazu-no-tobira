@@ -20,18 +20,16 @@ test('legacy counting boards without child guidance keep their original sizing',
   assert.deepEqual(countingBoardSizes(1440,false),{tile:48,symbol:30,gap:8});
 });
 
-test('all guided preschool objects, including dots and bears, have no tile frame while remaining touchable',()=>{
+test('counting objects never show individual boxes, including bears in legacy diagrams',()=>{
   for(const width of [320,375,480,768,1440]) {
-    const { tile, symbol }=countingBoardSizes(width,true);
-    assert.ok(tile>=62);
-    assert.ok(symbol<tile);
-    for(const selected of [false,true]) {
-      const style=countingTileAppearance(true,selected);
-      assert.equal(style.borderWidth,0);
-      assert.equal(style.backgroundColor,'transparent');
-      assert.equal(style.borderColor,'transparent');
-    }
+    const guided=countingBoardSizes(width,true);
+    const regular=countingBoardSizes(width,false);
+    assert.ok(guided.tile>=62);
+    assert.ok(guided.symbol<guided.tile);
+    assert.ok(regular.tile>=48);
+    const style=countingTileAppearance();
+    assert.deepEqual(style,{
+      borderWidth:0, borderColor:'transparent', borderRadius:0, backgroundColor:'transparent',
+    });
   }
-  assert.equal(countingTileAppearance(false,false).borderWidth,2);
-  assert.equal(countingTileAppearance(false,true).backgroundColor,'#cce8db');
 });
