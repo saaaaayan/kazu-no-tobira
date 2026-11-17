@@ -88,6 +88,25 @@ try {
   assert.equal((await questionDeck(isolated,'sage.n01',{preview:true,premium:true})).cards.length,100);
   assert.equal((await store.list(new URLSearchParams('stage_id=preschool.n01'))).total,10);
   await assert.rejects(questionDeck(isolated,'preschool.n01',{preview:true,premium:true}),{status:404});
+  const before=await store.detail(ids[1]);
+  const {question,prompt,answer,hints,explanation,steps}=before.question;
+  const edit={id:before.id,version:before.version,note:'Rollback-only edit QA',
+    content:{question,prompt,answer,hints,explanation:explanation+'\nテスト中の修正です。',
+      steps:steps.map(step=>({...step,equations:step.equations??[]}))}};
+  assert.equal(before.status,'ready');
+  const visible=liveQuestionRepository(isolated);
+  const lookup={id:before.id,fingerprint:before.history[0].fingerprint,premium:false,readyOnly:true};
+  assert.ok(await visible.findCurrent(lookup));
+  assert.equal((await store.editQuestion(edit,'qa')).changed,true);
+  const revised=await store.detail(before.id);
+  assert.equal(revised.status,'unreviewed');
+  assert.equal(revised.version,before.version+1);
+  assert.equal(revised.history[0].event,'revision');
+  assert.equal((await store.historicalRevision(before.id,before.history[0].fingerprint)).explanation,explanation);
+  assert.equal(await visible.findCurrent(lookup),undefined);
+  assert.equal(await visible.findCurrent({...lookup,fingerprint:revised.history[0].fingerprint}),undefined);
+  await assert.rejects(store.editQuestion(edit,'qa'),{status:409});
+  await assert.rejects(store.review({items:[{id:before.id,version:revised.version}],status:'ready',note:''},'qa'),{status:409});
   console.log(JSON.stringify({total:all.total,statuses:all.counts,liveReviewTransaction:'passed-and-rolled-back'}));
 } finally {
   await connection.query('rollback');

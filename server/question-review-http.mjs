@@ -179,6 +179,9 @@ export function createQuestionReviewServer({ store, port, adminKey, ownerAuth, a
       if (request.method === 'POST' && url.pathname === '/review-api/reviews') {
         return json(200,await store.review(await readJson(request),session.subject));
       }
+      if (request.method === 'POST' && url.pathname === '/review-api/revisions' && store.editQuestion) {
+        return json(200,await store.editQuestion(await readJson(request),session.subject));
+      }
       if (request.method === 'GET' && ['/review-api/export.csv','/review-api/export.json'].includes(url.pathname)) {
         await exportQuestions(response,store,url.searchParams,url.pathname.split('.').at(-1));
         return;

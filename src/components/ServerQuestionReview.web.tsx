@@ -8,6 +8,7 @@ import { QuestionDiagram, WrittenSolution } from './QuestionSupport';
 import { StudyFigureView } from './StudyFigureView';
 import { ClockFace } from './ClockFace';
 import { ReviewQuestionPreview } from '../FullAdventure';
+import { QuestionRevisionDiff, QuestionRevisionEditor, type QuestionRevisionContent } from './QuestionRevisionEditor.web';
 
 type DiagnosticSummary = { mismatches: number; language: number; draftNotes: number };
 type Diagnostics = {
@@ -21,6 +22,7 @@ type Details = {
   id: string; stageId: string; question: BankQuestion; status: ReviewStatus; version: number;
   reason: ReviewReason | null; note: string;
   diagnostics?: Diagnostics;
+  editable?: boolean;
   history: { id: number; created: string; actor: string; event: string; previous_status: ReviewStatus | null;
     status: ReviewStatus; note: string; reason: string | null; fingerprint: string }[];
   duplicates: { id: string; stage_id: string; stem: string; kind: 'exact' | 'equivalent' | 'structural' }[];
@@ -115,6 +117,7 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
   const [phone, setPhone] = useState(true);
   const [detailed, setDetailed] = useState(false);
   const [previewReset, setPreviewReset] = useState(0);
+  const [editing, setEditing] = useState(false);
   const total = Object.values(listing?.counts ?? {}).reduce((sum,count) => sum+count,0);
 
   useEffect(() => {
@@ -155,8 +158,10 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
   }
 
   function open(id: string) {
+    if (saving) return;
     setDetail(undefined);
     setPreviousRevision(undefined);
+    setEditing(false);
     setFocusId(id);
     refresh(value => value+1);
   }
@@ -171,6 +176,23 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
       setNotice(result.updated+'問の審査を保存しました。');
     } catch (problem) { setNotice(String(problem instanceof Error ? problem.message : problem)); }
     finally { setSaving(false); refresh(value => value+1); }
+  }
+
+  async function edit(content: QuestionRevisionContent, reason: string) {
+    if (!detail || saving) return;
+    setNotice('');
+    setSaving(true);
+    try {
+      const result = await api<{ changed: boolean }>('revisions',{id:detail.id,version:detail.version,content,note:reason});
+      setEditing(false);
+      setSelection({});
+      setPreviousRevision(undefined);
+      setTotals(undefined);
+      setNextStatus('needs_work');
+      setNotice(result.changed ? '新しい版を未確認として保存しました。' : '変更はありませんでした。');
+      refresh(value=>value+1);
+    } catch (problem) { setNotice(String(problem instanceof Error ? problem.message : problem)); }
+    finally { setSaving(false); }
   }
 
   function goTo(next: number) {
@@ -277,7 +299,7 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
         </article>)}
       </section>
       <div>
-        {(detail || checked.length > 0) && <section style={panel} aria-label="審査の保存">
+        {!editing && (detail || checked.length > 0) && <section style={panel} aria-label="審査の保存">
           <h2>審査を保存</h2>
           <label style={labelStyle}>変更後の状態
             <select value={nextStatus} onChange={event => setNextStatus(event.target.value as ReviewStatus)}>
@@ -302,7 +324,12 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
           <p>{detail.id}　版 {detail.version}　<Badge status={detail.status}/></p>
           <p>{island?.title} {island?.island}　／　{stage ? stageDisplayTitle(stage) : detail.stageId}<br/>
             単元 {unit?.title ?? '要確認'}　／　技能 {stage?.family ?? '要確認'}</p>
-          <button type="button" style={button} disabled={!stage} onClick={() => setPreview(true)}>子ども向け画面を開く</button>
+          <div style={line}>
+            <button type="button" style={button} disabled={!stage || saving} onClick={() => setPreview(true)}>子ども向け画面を開く</button>
+            {detail.editable && !editing && <button type="button" style={button} disabled={saving} onClick={() => setEditing(true)}>教材を編集</button>}
+          </div>
+          {editing && <QuestionRevisionEditor key={detail.id+':'+detail.version} question={detail.question} busy={saving}
+            onSave={(content,reason)=>void edit(content,reason)} onCancel={()=>setEditing(false)}/>}
           {detail.diagnostics && <LearningChecks diagnostics={detail.diagnostics}/>}
           <h3>問題と操作案内</h3>
           <MathText value={detail.question.question} style={{ fontSize:22, fontWeight:'700' }}/>
@@ -339,6 +366,8 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
             {previousRevision.diagram && <QuestionDiagram diagram={previousRevision.diagram} phase="question"/>}
             {previousRevision.figure && <StudyFigureView figure={previousRevision.figure}/>}
             <MathText value={previousRevision.answer}/><MathText value={previousRevision.explanation}/>
+            <h4>この版と現在の版の差分</h4>
+            <QuestionRevisionDiff before={previousRevision} after={detail.question}/>
           </section>}
         </section>}
       </div>
