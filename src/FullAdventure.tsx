@@ -293,8 +293,8 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const canReadWorkedSolution = review ? review.detailed : uiPreview || canAccessFeature(access, 'workedSolutions');
   const liveCard=round?.live?.round.questions[round.index];
   const diagram=bankQuestion?.diagram ?? liveCard?.diagram;
-  const countingGuide=Boolean(round?.stage.gradeId==='preschool' &&
-    preschoolGuideTitles[round.stage.id] && diagram?.kind==='countingBoard' && diagram.guide);
+  const preschoolStage=Boolean(round?.stage.gradeId==='preschool' && preschoolGuideTitles[round.stage.id]);
+  const countingGuide=Boolean(preschoolStage && diagram?.kind==='countingBoard' && diagram.guide);
   const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && (Boolean(liveCard) || Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0);
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
@@ -526,13 +526,15 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                     {!countingGuide && <Text style={styles.difficulty}>{round.stage.kind==='secret'?stageLabels.secret:round.stage.kind==='extra'?stageLabels.extra:bankQuestion ? ['● きほん', '● ひょうじゅん', '★ おうよう'][bankQuestion.difficulty - 1]
                       : round.index<3?'● きほん':round.index<8?'● ひょうじゅん':'★ おうよう'}</Text>}
                     <MathText style={styles.questionText} value={question.question}/>
+                    {preschoolStage && !round.feedback &&
+                      <QuestionReadAloud text={[question.question,question.prompt,
+                        round.hintLevel ? hints[round.hintLevel-1] : ''].filter(Boolean).join('。')}/>}
                     {question.figure && <StudyFigureView figure={question.figure}/>}
                     {question.clock && !round.feedback && <ClockFace time={question.clock.start} read={question.clock.read}/>}
                     {diagram && !round.feedback && (
                       <QuestionDiagram diagram={diagram} phase={round.hintLevel ? 'hint' : 'question'} />
                     )}
                     <MathText style={styles.prompt} value={question.prompt}/>
-                    {countingGuide && !round.feedback && <QuestionReadAloud text={hints[round.hintLevel-1] ?? question.question+'。'+question.prompt}/>}
                     {countingGuide && !round.feedback && (
                       <View style={styles.preschoolAnswerSection}>
                         <Text style={styles.preschoolInstruction}>すうじを さわってね</Text>
@@ -588,7 +590,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                             <Text style={styles.answerHeading}>{countingGuide ? 'こたえの わけ' : '基本の かいせつ'}</Text>
                             {countingGuide && diagram && <QuestionDiagram diagram={diagram} phase="solution"/>}
                             <MathText style={styles.explanation} value={question.explanation}/>
-                            {countingGuide && <QuestionReadAloud text={question.explanation}/>}
+                            {preschoolStage && <QuestionReadAloud text={question.explanation}/>}
                             {(bankQuestion || question.steps) && <>
                               <GameButton secondary label={canReadWorkedSolution
                                 ? showWorkedSolution ? 'くわしい かいせつを とじる' : 'くわしい かいせつを みる'
