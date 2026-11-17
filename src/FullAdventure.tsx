@@ -44,6 +44,14 @@ type AnswerMode = 'keyboard' | 'panel' | 'handwriting';
 type Screen = 'home' | 'world' | 'island' | 'titles' | 'lesson' | 'study' | 'study-plan' | 'admin';
 type Learning = { lesson: UnitLesson; progress: LessonProgress; target?: WorldStage; practice: boolean };
 const uiPreview = process.env.EXPO_PUBLIC_KAZU_UI_PREVIEW === '1';
+// 幼児のステージ01〜05は、同じ「絵をさわる→大きな数字を1回さわって答える」画面を使う。
+const preschoolGuideTitles: Readonly<Record<string,string>> = {
+  'preschool.n01': '1〜3こを かぞえよう',
+  'preschool.n02': '4・5こを かぞえよう',
+  'preschool.n03': '6〜10こを かぞえよう',
+  'preschool.n04': 'おなじ ものを かぞえよう',
+  'preschool.n05': 'ならべても かずは おなじ',
+};
 type Round = {
   stage: WorldStage;
   problems: MathQuestion[];
@@ -285,7 +293,8 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const canReadWorkedSolution = review ? review.detailed : uiPreview || canAccessFeature(access, 'workedSolutions');
   const liveCard=round?.live?.round.questions[round.index];
   const diagram=bankQuestion?.diagram ?? liveCard?.diagram;
-  const countingGuide=round?.stage.id==='preschool.n01' && diagram?.kind==='countingBoard' && diagram.guide;
+  const countingGuide=Boolean(round?.stage.gradeId==='preschool' &&
+    preschoolGuideTitles[round.stage.id] && diagram?.kind==='countingBoard' && diagram.guide);
   const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && (Boolean(liveCard) || Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0);
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
@@ -507,7 +516,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                 <>
                   <View style={styles.questionPanel}>
                     <View style={styles.questionHeader}>
-                      <Text style={styles.stageTitle}>{countingGuide ? '1〜3こを かぞえよう' : stageDisplayTitle(round.stage)}</Text>
+                      <Text style={styles.stageTitle}>{countingGuide ? preschoolGuideTitles[round.stage.id] : stageDisplayTitle(round.stage)}</Text>
                       <Text style={styles.questionIndex}>{countingGuide ? round.index+1 : '第'+(round.index+1)+'問'} / {round.problems.length}</Text>
                     </View>
                     <MagicMeter results={round.results} total={round.problems.length}/>
