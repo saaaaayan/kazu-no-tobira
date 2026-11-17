@@ -6,12 +6,15 @@ import { MathDisplay, MathText } from './MathText';
 
 const tokenArt = {
   dot: ['●','まる'], triangle: ['▲','さんかく'], square: ['■','しかく'],
+  bear: ['🧸','くま'],
   marked: ['✓','しるしのついた まる'], empty: ['◯','からの おさら'],
 } as const;
 
-function CountingBoard({ diagram, interactive }: {
-  diagram: Extract<BankDiagram,{ kind:'countingBoard' }>; interactive: boolean;
+function CountingBoard({ diagram, phase }: {
+  diagram: Extract<BankDiagram,{ kind:'countingBoard' }>; phase: 'question' | 'hint' | 'solution';
 }) {
+  const interactive=phase==='question' || (diagram.guide && phase==='hint');
+  const numbered=diagram.guide && phase==='solution';
   const [taps,setTaps] = useState<{ forDiagram:BankDiagram; ids:Set<string> }>();
   const selected = taps?.forDiagram===diagram ? taps.ids : new Set<string>();
   const toggle = (id: string) => setTaps(previous => {
@@ -22,18 +25,21 @@ function CountingBoard({ diagram, interactive }: {
   return <View style={{ padding:10, backgroundColor:'#edf4ff', borderRadius:12, gap:8 }}>
     {diagram.rows.map(({label,tokens},row) => <View key={row} style={{ gap:5 }}>
       {label && <Text style={{ color:'#293f61', fontSize:18, fontWeight:'700' }}>{label}</Text>}
-      <View style={{ flexDirection:'row', flexWrap:'wrap', gap:6 }}>
+      <View style={{ flexDirection:'row', flexWrap:diagram.guide?'nowrap':'wrap', gap:diagram.spacing==='wide'?20:8 }}>
         {tokens.map((token,column) => {
           const id = row+':'+column;
           const lit = selected.has(id);
           const shape = tokenArt[token];
-          const card = { width:48, height:48, alignItems:'center', justifyContent:'center',
+          const card = { width:diagram.guide?52:48, height:diagram.guide?52:48, alignItems:'center', justifyContent:'center',
             borderRadius:10, borderWidth:2, borderColor:lit ? '#3f765b' : '#ccd8ef',
             backgroundColor:lit ? '#cce8db' : '#fff' } as const;
           const icon = <Text style={{ fontSize:30, color:token==='marked' ? '#3f765b' : '#253e70' }}>{shape[0]}</Text>;
           return interactive && token!=='empty' ? <Pressable key={id} style={card} onPress={() => toggle(id)}
             accessibilityRole="button" accessibilityLabel={shape[1]} accessibilityState={{ selected:lit }}>{icon}</Pressable>
-            : <View key={id} accessible accessibilityLabel={shape[1]} style={card}>{icon}</View>;
+            : <View key={id} style={{alignItems:'center'}}>
+              <View accessible accessibilityLabel={shape[1]} style={card}>{icon}</View>
+              {numbered && <Text style={{fontSize:20,color:'#162d48',fontWeight:'800'}}>{column+1}</Text>}
+            </View>;
         })}
       </View>
     </View>)}
@@ -41,7 +47,7 @@ function CountingBoard({ diagram, interactive }: {
 }
 
 export function QuestionDiagram({ diagram, phase }: { diagram: BankDiagram; phase: 'question' | 'hint' | 'solution' }) {
-  if (diagram.kind === 'countingBoard') return <CountingBoard diagram={diagram} interactive={phase==='question'}/>;
+  if (diagram.kind === 'countingBoard') return <CountingBoard diagram={diagram} phase={phase}/>;
   if (diagram.kind === 'tenFrame') return <TenFrame first={diagram.first} second={diagram.second ?? 0} third={diagram.third}/>;
 
   const solved = phase === 'solution';
@@ -152,7 +158,8 @@ export function WorkedSolution({ question, wrongAnswer }: { question: BankQuesti
   return (
     <View style={styles.details}>
       {reason && <MathText value={reason} style={styles.reason} />}
-      {question.diagram && <QuestionDiagram diagram={question.diagram} phase="solution" />}
+      {question.diagram && !(question.diagram.kind==='countingBoard' && question.diagram.guide) &&
+        <QuestionDiagram diagram={question.diagram} phase="solution" />}
       <WrittenSolution steps={question.steps} />
     </View>
   );

@@ -22,7 +22,7 @@ export function uiPreviewRound(stage: SampleStage): BankQuestion[] {
     hints:['ひだりから みてね。','まるを ひとつずつ さわろう。','さいごに いった かずを えらぼう。'],
     explanation:`まるは ${count} こだよ。`,
     steps:[{title:'ひとつずつ かぞえる',body:`ひだりから かぞえると ${count} こ。`}],
-    mistakes:[],diagram:{kind:'countingBoard',rows:[{tokens:Array.from({length:count},()=>'dot' as const)}]},
+    mistakes:[],diagram:{kind:'countingBoard',guide:true,rows:[{tokens:Array.from({length:count},()=>'dot' as const)}]},
   }));
   return Array.from({ length: 10 }, (_, index) => {
     const first = index % 5 + 1;
