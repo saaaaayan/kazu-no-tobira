@@ -78,7 +78,7 @@ function CountingBoard({ diagram, phase }: {
           return interactive && token!=='empty' ? <Pressable key={id} style={card} disabled={ignored}
             onPress={() => toggle(id)}
             accessibilityRole="button"
-            accessibilityLabel={ignored ? shape[1]+'、かぞえない え' : lit ? shape[1]+'、'+tapNumber+'ばんめ' : shape[1]+'、まだ かぞえていない'}
+            accessibilityLabel={lit ? shape[1]+'、'+tapNumber+'ばんめ' : ignored ? shape[1]+'、かぞえない え' : shape[1]+'、まだ かぞえていない'}
             accessibilityHint="もういちど さわると かぞえなおせるよ"
             accessibilityState={{ selected:lit }}>
               {icon}
