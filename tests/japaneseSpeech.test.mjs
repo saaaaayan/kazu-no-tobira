@@ -31,10 +31,10 @@ test('the Japanese question is spoken with natural pauses and without ?。',()=>
 test('the Japanese explanation says native counting words without changing what was counted',()=>{
   assert.equal(
     naturalJapaneseSpeechText('はなは 3 こ。ひとつずつ かぞえたよ。'),
-    'はなはみっつ。ひとつずつかぞえたよ.'
+    'はなは、みっつ。　ひとつずつかぞえたよ。'
   );
-  assert.equal(naturalJapaneseSpeechText('くまは 1 こ。'),'くまはひとつ。');
-  assert.equal(naturalJapaneseSpeechText('うさぎは 2 こ。'),'うさぎはふたつ。');
+  assert.equal(naturalJapaneseSpeechText('くまは 1 こ。'),'くまは、ひとつ。');
+  assert.equal(naturalJapaneseSpeechText('うさぎは 2 こ。'),'うさぎは、ふたつ。');
 });
 
 test('the actual listen button uses the selected Japanese voice and adjusted pace',()=>{
