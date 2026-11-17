@@ -75,7 +75,7 @@ function make(stage:number,index:number,token:CountingToken,number:number,diagra
     id:`ui-preview-preschool.n0${stage}-draft-${String(index+1).padStart(2,'0')}`,
     skillId:'preschool.objects',type:'choice',format:'counting',difficulty:stage>=4?2:1,
     question:`${name}は いくつ？`,prompt,choices,answer:String(number),
-    hint:hints[0],hints,explanation:detail?explanation:explanation,
+    hint:hints[0],hints:hints as [string,string,string],explanation,
     steps:[...steps,{title:'くわしく しる',body:detail}],
     mistakes:choices.filter(choice=>choice!==String(number)).map(choice=>({answer:choice,explanation:'えを ひとつずつ さわって たしかめよう。'})),
     diagram,
