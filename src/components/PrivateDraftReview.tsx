@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { countingTokenArt } from '../domain/countingTokens';
 import type { DraftQuestion, PrivateDraftStage } from '../domain/privateDraftReview';
+import QuestionReadAloud from './QuestionReadAloud';
 
 const pictures: Record<string, readonly [string, string]> = countingTokenArt;
 function picture(token: string) { return pictures[token]?.[0] ?? '？'; }
@@ -12,8 +13,8 @@ function Choice({value, selected, onPress}: {value:string;selected?:boolean;onPr
     <Text style={[styles.choiceText,selected&&styles.chosenText]}>{value}</Text>
   </Pressable>;
 }
-function TokenRow({tokens}: {tokens: readonly string[]}) {
-  return <View style={styles.tokens}>
+function TokenRow({tokens,wide=false}: {tokens: readonly string[];wide?:boolean}) {
+  return <View style={[styles.tokens,wide&&styles.wideTokens]}>
     {tokens.map((token,i)=><Text key={i} accessibilityLabel={pictures[token]?.[1]??token}
       style={styles.token}>{picture(token)}</Text>)}
   </View>;
@@ -30,7 +31,7 @@ function Figure({q, selectedPicture, onPicture}: {
     return <View style={styles.figure}>
       {before&&after&&<>
         <Text style={styles.caption}>さいしょ</Text>
-        <TokenRow tokens={before}/>
+        <TokenRow tokens={before} wide/>
         <Text style={styles.caption}>ならべかえた あと</Text>
         <TokenRow tokens={after}/>
       </>}
@@ -99,6 +100,9 @@ export default function PrivateDraftReview({stage,onBack}:{stage:PrivateDraftSta
     <View style={styles.questionCard} key={q.id}>
       <Text style={styles.question}>{q.question}</Text>
       {!!q.prompt&&<Text style={styles.prompt}>{q.prompt}</Text>}
+      <QuestionReadAloud text={q.diagram?.kind==='spokenNumeralPrompt'
+        ? q.diagram.spokenText??q.diagram.fallbackKana??q.question
+        : [q.question,q.prompt].filter(Boolean).join('。')} />
       <Figure q={q} selectedPicture={activePicture} onPicture={id=>{
         setActivePicture(id);setConnected(old=>{const next={...old};delete next[id];return next;});setResult(undefined);
       }}/>
@@ -131,7 +135,7 @@ export default function PrivateDraftReview({stage,onBack}:{stage:PrivateDraftSta
         <Text style={styles.prose}>{q.detailedExplanation}</Text></>}
       </View>}
     </View>
-    <Text style={styles.notice}>注：これは原稿内容を確かめる画面です。音声・アニメーション・対象だけのタップなど、本番操作の再現は未完了です。{stage.uiGap??''}</Text>
+    <Text style={styles.notice}>注：これは原稿内容を確かめる画面です。音声は端末のブラウザ機能を使います。アニメーション・対象だけのタップなど、本番操作の再現は未完了です。{stage.uiGap??''}</Text>
     <View style={styles.nav}>
       <Pressable accessibilityRole="button" disabled={index===0} onPress={()=>move(-1)}
         style={[styles.navButton,index===0&&styles.disabled]}><Text style={styles.navText}>‹ まえの もんだい</Text></Pressable>
@@ -153,6 +157,7 @@ const styles=StyleSheet.create({
   figure:{backgroundColor:'#ecf3ff',borderRadius:13,padding:14,gap:12,alignItems:'center'},
   caption:{fontSize:14,color:'#3d4c6a',fontWeight:'700'},
   tokens:{flexDirection:'row',flexWrap:'wrap',justifyContent:'center',gap:8,minHeight:30},
+  wideTokens:{gap:30},
   token:{fontSize:35,lineHeight:51},
   bigKana:{fontSize:36,fontWeight:'900',color:'#233c74'},
   bigNumeral:{fontSize:85,fontWeight:'900',color:'#233c74'},
