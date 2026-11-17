@@ -68,6 +68,6 @@ export default function QuestionReadAloud({ text }: { text: string }) {
       <Text style={{fontSize:17,fontWeight:'800',color:'#27335c'}}>🔊 きく</Text>
     </Pressable>
     {!!error && <Text accessibilityLiveRegion="polite"
-      style={{fontSize:14,color:'#ffecc0',fontWeight:'700'}}>{error}</Text>}
+      style={{fontSize:14,color:'#73384a',backgroundColor:'#fff4da',fontWeight:'700',padding:8,borderRadius:8}}>{error}</Text>}
   </View>;
 }
