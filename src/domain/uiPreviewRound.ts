@@ -8,7 +8,7 @@ type SampleStage = Pick<WorldStage,'id'|'gradeId'|'family'|'kind'>;
 export function uiPreviewSampleKind(stage: SampleStage) {
   if (stage.kind !== 'normal') return undefined;
   if (stage.id === 'preschool.n01' && stage.gradeId === 'preschool' && stage.family === 'count') return 'counting';
-  if (stage.gradeId === 'preschool' && ['preschool.n02','preschool.n03','preschool.n04','preschool.n05'].includes(stage.id)) return 'preschool-sample';
+  if (stage.gradeId === 'preschool' && stage.family === 'count' && ['preschool.n02','preschool.n03','preschool.n04','preschool.n05'].includes(stage.id)) return 'preschool-sample';
   if ((stage.id === 'e1.forest' || stage.id === 'e1.n06') && stage.gradeId === 'e1' && stage.family === 'addition') return 'addition';
 }
 
