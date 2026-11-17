@@ -14,7 +14,15 @@ test('HTTPS admin mode rejects preview, rejects regular users and expires cookie
   };
   assert.throws(()=>createQuestionReviewServer({publicOrigin,ownerAuth,preview:{}}));
   assert.throws(()=>createQuestionReviewServer({publicOrigin,adminKey:'a'.repeat(64)}));
-  const server=createQuestionReviewServer({publicOrigin,ownerAuth,store:{}});
+  let edited=0;
+  const server=createQuestionReviewServer({publicOrigin,ownerAuth,store:{
+    async editQuestion(payload,actor) {
+      assert.equal(payload.id,'fixture');
+      assert.equal(actor,'owner');
+      edited++;
+      return {changed:true};
+    },
+  }});
   server.listen(0,'127.0.0.1');
   await once(server,'listening');
   t.after(()=>new Promise(resolve=>server.close(resolve)));
@@ -33,6 +41,7 @@ test('HTTPS admin mode rejects preview, rejects regular users and expires cookie
     });
   }
   const post=(path,body,extra)=>call(path,{method:'POST',body:JSON.stringify(body),headers:{...headers,...extra}});
+  assert.equal((await post('revisions',{id:'fixture'})).status,401);
   assert.equal((await post('login',{email:'regular@example.test'})).status,401);
   assert.equal((await post('login',{email:'owner@example.test'},{origin:'https://other.example.test'})).status,403);
   assert.equal((await post('login',{email:'owner@example.test'},{'x-forwarded-proto':'http'})).status,403);
@@ -41,7 +50,11 @@ test('HTTPS admin mode rejects preview, rejects regular users and expires cookie
   assert.match(cookie,/^__Host-kazu_question_admin=.*; Path=\/; HttpOnly; SameSite=Strict; Max-Age=\d+; Secure$/);
   const session={...headers,cookie:cookie.split(';')[0]};
   assert.equal((await call('session',{headers:session})).status,200);
+  assert.equal((await post('revisions',{id:'fixture'},{cookie:session.cookie,origin:'https://other.example.test'})).status,403);
+  assert.equal((await post('revisions',{id:'fixture'},{cookie:session.cookie})).status,200);
   active=false;
+  assert.equal((await post('revisions',{id:'fixture'},{cookie:session.cookie})).status,401);
+  assert.equal(edited,1);
   assert.equal((await call('session',{headers:session})).status,401);
   active=true;
   assert.equal((await call('session',{headers:session})).status,401);

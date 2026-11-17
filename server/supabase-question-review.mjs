@@ -1,6 +1,9 @@
-import { inspectQuestion } from '../scripts/question-audit-rules.mjs';
+import { createHash } from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
+import { inspectQuestion, questionKeys } from '../scripts/question-audit-rules.mjs';
 import { diagnoseQuestion, diagnosticSummary } from './question-review-diagnostics.mjs';
 import { rejectReasons, reviewStatusLabels } from '../src/domain/reviewAdmin.ts';
+import { reviseQuestion, validateRevisionRequest } from './question-revision.mjs';
 
 const ns='question_catalog';
 const from=`from ${ns}.questions q join ${ns}.stages s on s.id=q.stage_id`;
@@ -66,7 +69,7 @@ export function createSupabaseQuestionReview(pool) {
           or (md5(equivalent)=md5($3) and equivalent=$3)
           or (md5(shape)=md5($4) and shape=$4)) order by kind,id limit 50`,[id,row.exact,row.equivalent,row.shape]);
     return {id,stageId:row.stage_id,status:row.status,version:row.version,note:row.note,reason:row.reason,
-      question:row.question,history:history.rows,duplicates:candidates.rows,diagnostics:diagnoseQuestion(row.stage_id,row.question)};
+      question:row.question,history:history.rows,duplicates:candidates.rows,diagnostics:diagnoseQuestion(row.stage_id,row.question),editable:true};
   }
 
   async function historicalRevision(id,fingerprint) {
@@ -109,6 +112,41 @@ export function createSupabaseQuestionReview(pool) {
     } finally { session.release(); }
   }
 
+  async function editQuestion(request,actor) {
+    const {id,version,note,content}=validateRevisionRequest(request);
+    const session=await pool.connect();
+    try {
+      await session.query('begin');
+      const {rows:[previous]}=await session.query(`select q.version,q.status,v.payload,s.title as stage_title,s.unit,
+          i.title as island_title,i.name as island_name
+        ${from} join ${ns}.versions v on v.fingerprint=q.fingerprint
+        join ${ns}.islands i on i.id=s.island_id where q.active and q.id=$1 for update of q`,[id]);
+      if (!previous || previous.version!==version) throw conflict('他の更新が保存されました。読み込み直してからやり直してください。');
+      const revised=reviseQuestion(previous.payload,content);
+      if (isDeepStrictEqual(revised,previous.payload)) {
+        await session.query('commit');
+        return {changed:false};
+      }
+      const payload=JSON.stringify(revised);
+      const fingerprint=createHash('sha256').update(payload).digest('hex');
+      const keys=questionKeys(revised);
+      const search=[id,previous.island_title,previous.island_name,previous.stage_title,previous.unit,payload]
+        .join(' ').normalize('NFKC').toLowerCase();
+      await session.query(`insert into ${ns}.versions (fingerprint,payload_text) values ($1,$2) on conflict do nothing`,[fingerprint,payload]);
+      await session.query(`update ${ns}.questions set stem=$2,search=$3,exact=$4,equivalent=$5,shape=$6,fingerprint=$7,
+        status='unreviewed',reason=null,note=$8,version=version+1,updated_at=transaction_timestamp() where id=$1`,
+      [id,revised.question,search,keys.exact,keys.equivalent??null,keys.shape??null,fingerprint,note]);
+      await session.query(`insert into ${ns}.history (question_id,created,actor,event,previous_status,status,note,reason,fingerprint)
+        values ($1,transaction_timestamp(),$2,'revision',$3,'unreviewed',$4,null,$5)`,
+      [id,actor,previous.status,note,fingerprint]);
+      await session.query('commit');
+      return {changed:true};
+    } catch (error) {
+      await session.query('rollback').catch(()=>{});
+      throw error;
+    } finally { session.release(); }
+  }
+
   async function* exportRows(params) {
     const {where,values}=filter(params);
     let last='';
@@ -137,7 +175,7 @@ export function createSupabaseQuestionReview(pool) {
     return [...report.values()];
   }
 
-  return {list,detail,historicalRevision,review,exportRows,stageTotals,
+  return {list,detail,historicalRevision,review,editQuestion,exportRows,stageTotals,
     async isAdministratorSession(id,sessionId) {
       return (await pool.query(`select ${ns}.active_owner_session($1,$2) as allowed`,[id,sessionId])).rows[0].allowed;
     },
