@@ -12,6 +12,7 @@ import { prepareStageRound } from './stageRounds';
 import { QuestionDiagram, WorkedSolution, WrittenSolution } from './components/QuestionSupport';
 import { emptyProgress, recordAttempt, type Progress } from './domain/progress';
 import { uiPreviewRound } from './domain/uiPreviewRound';
+import QuestionReadAloud from './components/QuestionReadAloud';
 import { canAccessFeature, canAccessStage, freeAccess, hasPremium, type Entitlement } from './domain/accessPlan';
 import { readServerEntitlement } from './domain/serverEntitlement';
 import { canPlayWorldStage, progressAfterWorldAnswer, worldStageAction, type PlayMode } from './domain/playMode';
@@ -283,6 +284,8 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const bankQuestion = question && isBankQuestion(question) ? question : undefined;
   const canReadWorkedSolution = review ? review.detailed : uiPreview || canAccessFeature(access, 'workedSolutions');
   const liveCard=round?.live?.round.questions[round.index];
+  const diagram=bankQuestion?.diagram ?? liveCard?.diagram;
+  const countingGuide=round?.stage.id==='preschool.n01' && diagram?.kind==='countingBoard' && diagram.guide;
   const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && (Boolean(liveCard) || Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0);
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
@@ -468,7 +471,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {round && question && (isolated || canAccessStage(access, round.stage)) && (
             <View style={styles.playPanel}>
               <Pressable accessibilityRole="button" disabled={saving} onPress={goToIsland} style={styles.back}>
-                <Text style={styles.backText}>{review ? '‹ 審査に戻る' : '‹ '+grade.island+'のマップへ'}</Text>
+                <Text style={styles.backText}>{review ? '‹ 審査に戻る' : countingGuide ? '‹ もどる' : '‹ '+grade.island+'のマップへ'}</Text>
               </Pressable>
               {round.complete ? (
                 <View style={styles.finish}>
@@ -497,22 +500,23 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                 <>
                   <View style={styles.questionPanel}>
                     <View style={styles.questionHeader}>
-                      <Text style={styles.stageTitle}>{stageDisplayTitle(round.stage)}</Text>
-                      <Text style={styles.questionIndex}>第{round.index + 1}問 / {round.problems.length}</Text>
+                      <Text style={styles.stageTitle}>{countingGuide ? '1〜3こを かぞえよう' : stageDisplayTitle(round.stage)}</Text>
+                      <Text style={styles.questionIndex}>{countingGuide ? round.index+1 : '第'+(round.index+1)+'問'} / {round.problems.length}</Text>
                     </View>
                     <MagicMeter results={round.results} total={round.problems.length}/>
                     <CompanionMoment compact onDark
                       mood={round.feedback === 'correct' ? 'correct' : round.feedback === 'incorrect' ? 'incorrect' : 'ready'}
                       variation={round.dialogueOffset + round.index}/>
-                    <Text style={styles.difficulty}>{round.stage.kind==='secret'?stageLabels.secret:round.stage.kind==='extra'?stageLabels.extra:bankQuestion ? ['● きほん', '● ひょうじゅん', '★ おうよう'][bankQuestion.difficulty - 1]
-                      : round.index<3?'● きほん':round.index<8?'● ひょうじゅん':'★ おうよう'}</Text>
+                    {!countingGuide && <Text style={styles.difficulty}>{round.stage.kind==='secret'?stageLabels.secret:round.stage.kind==='extra'?stageLabels.extra:bankQuestion ? ['● きほん', '● ひょうじゅん', '★ おうよう'][bankQuestion.difficulty - 1]
+                      : round.index<3?'● きほん':round.index<8?'● ひょうじゅん':'★ おうよう'}</Text>}
                     <MathText style={styles.questionText} value={question.question}/>
                     {question.figure && <StudyFigureView figure={question.figure}/>}
                     {question.clock && !round.feedback && <ClockFace time={question.clock.start} read={question.clock.read}/>}
-                    {(bankQuestion?.diagram || liveCard?.diagram) && !round.feedback && (
-                      <QuestionDiagram diagram={(bankQuestion?.diagram ?? liveCard?.diagram)!} phase={round.hintLevel ? 'hint' : 'question'} />
+                    {diagram && !round.feedback && (
+                      <QuestionDiagram diagram={diagram} phase={round.hintLevel ? 'hint' : 'question'} />
                     )}
                     <MathText style={styles.prompt} value={question.prompt}/>
+                    {countingGuide && !round.feedback && <QuestionReadAloud text={hints[round.hintLevel-1] ?? question.question+'。'+question.prompt}/>}
                   </View>
                   <View style={[styles.workArea,wide&&styles.workWide]}>
                     <View style={[styles.answerArea,wide&&styles.answerWide]}>
@@ -535,8 +539,10 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                               <ClockFace time={question.clock.start} caption={question.clock.read ? 'よみとった じこく' : 'はじめ'}/>
                               {!question.clock.read && <ClockFace time={question.clock.end} caption="はりを うごかした あと"/>}
                             </View>}
-                            <Text style={styles.answerHeading}>基本の かいせつ</Text>
+                            <Text style={styles.answerHeading}>{countingGuide ? 'こたえの わけ' : '基本の かいせつ'}</Text>
+                            {countingGuide && diagram && <QuestionDiagram diagram={diagram} phase="solution"/>}
                             <MathText style={styles.explanation} value={question.explanation}/>
+                            {countingGuide && <QuestionReadAloud text={question.explanation}/>}
                             {(bankQuestion || question.steps) && <>
                               <GameButton secondary label={canReadWorkedSolution
                                 ? showWorkedSolution ? 'くわしい かいせつを とじる' : 'くわしい かいせつを みる'
@@ -626,7 +632,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                         </>
                       )}
                     </View>
-                    <CalculationMemo key={question.id} onDrawingChange={setDrawing}/>
+                    {!countingGuide && <CalculationMemo key={question.id} onDrawingChange={setDrawing}/>}
                   </View>
                 </>
               )}
