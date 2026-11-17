@@ -15,7 +15,8 @@ function CountingBoard({ diagram, phase }: {
   // 解説は画面そのものより狭いカード内に表示される。ウィンドウ幅ではなく
   // 図の実際の表示幅でサイズを決め、横並びのオブジェクトをはみ出させない。
   const [boardWidth,setBoardWidth] = useState<number>();
-  const maxColumns=Math.max(1,...diagram.rows.map(row=>row.tokens.length));
+  const maxColumns=Math.max(1,...diagram.rows.map(row=>row.tokens.length),
+    ...(diagram.layoutComparison?.beforeRows ?? []));
   const sizes=fitCountingBoardSizes(Math.min(viewportWidth,boardWidth??320),Boolean(diagram.guide),maxColumns);
   const interactive=phase==='question' || (diagram.guide && phase==='hint');
   const numbered=diagram.guide && phase==='solution';
@@ -27,31 +28,35 @@ function CountingBoard({ diagram, phase }: {
   }));
   const comparison=diagram.layoutComparison;
   const beforeTokens=diagram.rows.flatMap(row=>row.tokens);
-  const beforeGap=comparison?.before==='wide-gaps'?19:comparison?.before==='small'?2:comparison?.before==='large'?13:7;
+  const beforeRowSizes=comparison?.beforeRows ?? [beforeTokens.length];
   return <View
     onLayout={event=>{
       const measured=Math.round(event.nativeEvent.layout.width);
       if(measured>0 && measured!==boardWidth) setBoardWidth(measured);
     }}
     style={{ width:'100%', maxWidth:'100%', minWidth:0, padding:10, backgroundColor:'#edf4ff', borderRadius:12, gap:8 }}>
-    {comparison && <View style={{gap:4,marginBottom:6}}>
-      <Text style={{color:'#263f6a',fontWeight:'800',fontSize:16}}>さいしょ</Text>
-      <View style={{
-        flexDirection:'row',flexWrap:'wrap',
-        justifyContent:comparison.before==='left-packed'?'flex-start':'center',
-        gap:beforeGap,padding:9,minHeight:64,borderRadius:10,backgroundColor:'#fff9e9',
-      }}>
-        {beforeTokens.map((token,index)=><View key={index} style={{
-          width:comparison.before==='small'?Math.max(34,sizes.tile*.65):Math.max(38,sizes.tile*.8),
-          height:comparison.before==='small'?Math.max(34,sizes.tile*.65):Math.max(38,sizes.tile*.8),
-          alignItems:'center',justifyContent:'center',
-        }}>
-          {token==='dot'
-            ? <View style={{width:sizes.symbol*.66,height:sizes.symbol*.66,borderRadius:sizes.symbol,backgroundColor:'#253e70'}}/>
-            : <Text style={{fontSize:sizes.symbol*.75}}>{tokenArt[token][0]}</Text>}
-        </View>)}
+    {comparison && <View style={{gap:7,marginBottom:7}}>
+      <Text style={{color:'#263f6a',fontWeight:'900',fontSize:20}}>① さいしょ</Text>
+      <View accessibilityLabel="ばしょを かえる まえの え。ここは さわらなくて いいよ"
+        style={{padding:10,minHeight:70,borderRadius:13,backgroundColor:'#fff9e9',gap:4}}>
+        {beforeRowSizes.map((count,row)=>{
+          const start=beforeRowSizes.slice(0,row).reduce((sum,n)=>sum+n,0);
+          return <View key={row} style={{flexDirection:'row',justifyContent:'center',gap:sizes.gap}}>
+            {beforeTokens.slice(start,start+count).map((token,index)=>
+              <View key={index} style={{width:sizes.tile,height:sizes.tile,
+                alignItems:'center',justifyContent:'center'}}>
+                {token==='dot'
+                  ? <View style={{width:sizes.symbol,height:sizes.symbol,
+                      borderRadius:sizes.symbol/2,backgroundColor:'#253e70'}}/>
+                  : <Text style={{fontSize:sizes.symbol,color:'#253e70'}}>{tokenArt[token][0]}</Text>}
+              </View>)}
+          </View>;
+        })}
       </View>
-      <Text style={{color:'#263f6a',fontWeight:'800',fontSize:16}}>ならべかえた あと</Text>
+      <Text style={{color:'#5361a1',fontSize:18,fontWeight:'900',textAlign:'center'}}>
+        ↓ ばしょを かえたよ ↓
+      </Text>
+      <Text style={{color:'#263f6a',fontWeight:'900',fontSize:20}}>② あと（こっちを さわってね）</Text>
     </View>}
     {diagram.rows.map(({label,tokens},row) => <View key={row} style={{ gap:5 }}>
       {label && <Text style={{ color:'#293f61', fontSize:18, fontWeight:'700' }}>{label}</Text>}
