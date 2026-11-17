@@ -35,20 +35,20 @@ function CountingBoard({ diagram, phase }: {
           const id = row+':'+column;
           const lit = selected.has(id);
           const shape = tokenArt[token];
-          // ガイド付きの数え上げでは、くま・丸・図形を枠で囲まない。
-          // タップ領域の幅と高さはそのまま残し、子どもが押しやすい状態を維持。
+          // くま・丸・図形のすべてで、見た目の白い枠を使わない。
+          // タップ用の透明な幅と高さは残す（小さくても48px、幼児向けは62〜112px）。
           const card = { width:sizes.tile, height:sizes.tile, alignItems:'center', justifyContent:'center',
-            position:'relative', ...countingTileAppearance(Boolean(diagram.guide),lit) } as const;
+            position:'relative', ...countingTileAppearance() } as const;
           // 「●」の文字サイズはブラウザーやフォントによって小さく見える。
-          // 幼児向けの丸は実寸の円形Viewにして、大きさを安定させる。
-          const icon = diagram.guide && token==='dot'
+          // どの数え上げ図でも、丸はフォントに依存しない円形Viewを使う。
+          const icon = token==='dot'
             ? <View style={{ width:sizes.symbol, height:sizes.symbol, borderRadius:sizes.symbol/2,
                 backgroundColor:lit?'#28735b':'#253e70' }} />
             : <Text style={{ fontSize:sizes.symbol, color:token==='marked' ? '#3f765b' : '#253e70' }}>{shape[0]}</Text>;
           return interactive && token!=='empty' ? <Pressable key={id} style={card} onPress={() => toggle(id)}
             accessibilityRole="button" accessibilityLabel={shape[1]} accessibilityState={{ selected:lit }}>
               {icon}
-              {diagram.guide && lit && <View pointerEvents="none" style={{
+              {lit && <View pointerEvents="none" style={{
                 position:'absolute',right:0,bottom:0,width:25,height:25,borderRadius:13,
                 backgroundColor:'#28735b',alignItems:'center',justifyContent:'center',
               }}><Text style={{color:'#fff',fontSize:17,fontWeight:'900'}}>✓</Text></View>}
