@@ -20,12 +20,14 @@ test('preschool 01–05 all share the stage 01 guided counting UI',()=>{
     assert.equal(questions.length,10);
     assert.ok(questions.every(q=>q.type==='choice'&&q.diagram?.kind==='countingBoard'&&q.diagram.guide===true));
   }
-  assert.match(source,/const countingGuide=Boolean\(round\?\.stage\.gradeId==='preschool' &&\s*preschoolGuideTitles\[round\.stage\.id\] && diagram\?\.kind==='countingBoard' && diagram\.guide\)/u);
+  assert.match(source,/const preschoolStage=Boolean\(round\?\.stage\.gradeId==='preschool' && preschoolGuideTitles\[round\.stage\.id\]\)/u);
+  assert.match(source,/const countingGuide=Boolean\(preschoolStage && diagram\?\.kind==='countingBoard' && diagram\.guide\)/u);
   assert.match(source,/\{countingGuide && !round\.feedback && \(\s*<View style=\{styles\.preschoolAnswerSection\}>/u);
   assert.match(source,/onPress=\{\(\)=>void submit\(option\)\}/u);
   assert.match(source,/\{\(!countingGuide \|\| round\.feedback\) && <View/u);
   assert.match(source,/\{!countingGuide && <CalculationMemo/u);
-  assert.match(source,/\{countingGuide && !round\.feedback && <QuestionReadAloud/u);
+  assert.match(source,/\{preschoolStage && !round\.feedback &&\s*<QuestionReadAloud/u);
+  assert.match(source,/\{preschoolStage && <QuestionReadAloud text=\{question\.explanation\}\/>\}/u);
   assert.match(source,/\{countingGuide && diagram && <QuestionDiagram diagram=\{diagram\} phase="solution"\/>\}/u);
 });
 

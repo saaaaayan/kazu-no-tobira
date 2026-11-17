@@ -7,7 +7,7 @@ type CountingPreviewDiagram = {
   kind:'countingBoard';guide:true;
   rows:{tokens:CountingToken[]}[];
   targetToken?:CountingToken;
-  layoutComparison?:{before:Layout;after:Layout};
+  layoutComparison?:{before:Layout;after:Layout;beforeRows?:readonly number[]};
 };
 const labels = countingTokenArt;
 const basic:readonly (readonly [CountingToken,number])[][]=[
@@ -34,22 +34,29 @@ const moved:readonly (readonly [CountingToken,number,Layout,Layout])[]=[
 const asRows=(token:CountingToken,count:number)=>count<=5?[{tokens:Array.from({length:count},()=>token)}]:[
   {tokens:Array.from({length:5},()=>token)}, {tokens:Array.from({length:count-5},()=>token)}
 ];
+// このステージでは、絵の「個数」は同じまま、並ぶ段数を実際に変える。
+const firstRowSizes=(n:number):readonly number[]=>n<=4?[n]:[Math.ceil(n/2),Math.floor(n/2)];
+const movedRowSizes=(n:number):readonly number[]=>({
+  3:[1,2],4:[2,2],5:[2,1,2],6:[2,2,2],7:[3,1,3],8:[3,2,3],
+} as Record<number,number[]>)[n] ?? [Math.ceil(n/2),Math.floor(n/2)];
+const arrangedRows=(token:CountingToken,rowSizes:readonly number[])=>
+  rowSizes.map(count=>({tokens:Array.from({length:count},()=>token)}));
 const answers=(n:number)=>n===1?['1','2','3']:n===10?['8','9','10']:[n-1,n,n+1].map(String);
 function make(stage:number,index:number,token:CountingToken,number:number,diagram:CountingPreviewDiagram):BankQuestion {
   const name=labels[token][1];
   const isMixed=stage===4;
   const isMoved=stage===5;
   const prompt=isMixed?`${name}だけを さわって かぞえよう。`
-    :isMoved?`${name}を ならべかえたよ。あとで いくつ あるかな？`
+    :isMoved?`したの えに ならんだ ${name}を さわって、かぞえよう。`
       :`${name}を ひとつずつ さわって かぞえよう。`;
   const hints=isMixed?[
     'えを よく みてね。',
     `かぞえるのは ${name}だけだよ。`,
     `ちがう えは そのまま。 ${name}を ひとつずつ さわろう。`,
   ]:isMoved?[
-    'さいしょの えと、あとの えを みてね。',
-    `ならべかえても、${name}は なくなっていないよ。`,
-    `あとの ${name}を ひとつずつ さわって たしかめよう。`,
+    'うえの えと したの えを くらべよう。',
+    `ばしょが かわっただけだよ。${name}は ふえても へっても いないよ。`,
+    `したの えの ${name}を ひとつずつ さわって かぞえよう。`,
   ]:[
     'ひだりから みてね。',
     `まだ さわっていない ${name}を みつけよう。`,
@@ -71,10 +78,11 @@ function make(stage:number,index:number,token:CountingToken,number:number,diagra
     {title:'かぞえる',body:`ひとつずつ かぞえると ${number}こだよ。`}
   ]:[{title:'ひとつずつ かぞえる',body:`ひとつに ひとつ すうじを つけるよ。 さいごは ${number}。`}];
   const choices=(stage===2?['3','4','5']:answers(number)) as [string,string,string];
+  const questionText=isMoved?`ばしょを かえた あとの ${name}は いくつ？`:`${name}は いくつ？`;
   return {
     id:`ui-preview-preschool.n0${stage}-draft-${String(index+1).padStart(2,'0')}`,
     skillId:'preschool.objects',type:'choice',format:'counting',difficulty:stage>=4?2:1,
-    question:`${name}は いくつ？`,prompt,choices,answer:String(number),
+    question:questionText,prompt,choices,answer:String(number),
     hint:hints[0],hints:hints as [string,string,string],explanation,
     steps:[...steps,{title:'くわしく しる',body:detail}],
     mistakes:choices.filter(choice=>choice!==String(number)).map(choice=>({answer:choice,explanation:'えを ひとつずつ さわって たしかめよう。'})),
@@ -92,7 +100,9 @@ export const preschoolSample02to05: Readonly<Record<string,readonly BankQuestion
           return {token,n,diagram:{kind:'countingBoard' as const,guide:true as const,rows:[{tokens}],targetToken:token}};
         })
         :moved.map(([token,n,before,after])=>({token,n,diagram:{
-          kind:'countingBoard' as const,guide:true as const,rows:asRows(token,n),layoutComparison:{before,after}
+          kind:'countingBoard' as const,guide:true as const,
+          rows:arrangedRows(token,movedRowSizes(n)),
+          layoutComparison:{before,after,beforeRows:firstRowSizes(n)}
         }}));
     return [`preschool.n0${stage}`,records.map(({token,n,diagram},index)=>make(stage,index,token,n,diagram))];
   })
