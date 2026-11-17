@@ -29,7 +29,7 @@ export function naturalJapaneseSpeechText(text:string):string {
     .replace(/([？?！!])\s*。/gu,'$1')
     .replace(/([ぁ-ゖァ-ヿ一-龥0-9])[\s　]+(?=[ぁ-ゖァ-ヿ一-龥0-9])/gu,'$1')
     .replace(/([123])こ(?![ぁ-ゖァ-ヿ一-龥0-9])/gu,(_,number:string)=>({ '1':'ひとつ', '2':'ふたつ', '3':'みっつ' }[number] ?? number+'こ'))
-    .replace(/([ぁ-ゖァ-ヿ一-龥])は(いくつ[？?])/gu,'$1は、$2')
+    .replace(/([ぁ-ゖァ-ヿ一-龥])は(いくつ[？?]|ひとつ|ふたつ|みっつ)/gu,'$1は、$2')
     .replace(/([ぁ-ゖァ-ヿ一-龥])を(さわって)/gu,'$1を、$2')
     .replace(/([。？！])(?=[^\s　])/gu,'$1　')
     .trim();
