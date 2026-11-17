@@ -84,9 +84,10 @@ test('every play samples ten different pictures in randomized order with balance
 });
 
 test('unsupported stages remain unavailable and elementary sample remains separate',()=>{
-  assert.equal(uiPreviewSampleKind(otherPreschool),undefined);
-  assert.deepEqual(uiPreviewBank(otherPreschool),[]);
-  assert.deepEqual(uiPreviewRound(otherPreschool),[]);
+  assert.equal(uiPreviewSampleKind(otherPreschool),'preschool-sample');
+  assert.equal(uiPreviewBank(otherPreschool).length,10);
+  assert.equal(uiPreviewRound(otherPreschool).length,10);
+  assert.deepEqual(uiPreviewRound({...otherPreschool,id:'preschool.n06'}),[]);
   assert.equal(uiPreviewSampleKind({...preschool,kind:'extra'}),undefined);
   assert.deepEqual(uiPreviewBank({...preschool,kind:'extra'}),[]);
   assert.deepEqual(uiPreviewRound({...preschool,kind:'extra'}),[]);
