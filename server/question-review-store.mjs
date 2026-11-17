@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { allWorldStagesById, worldIslands } from '../src/domain/worldCatalog.ts';
 import { rejectReasons, reviewStatusLabels } from '../src/domain/reviewAdmin.ts';
 import { inspectQuestion, questionKeys } from '../scripts/question-audit-rules.mjs';
+import { diagnoseQuestion, diagnosticSummary } from './question-review-diagnostics.mjs';
 
 const revision = value => createHash('sha256').update(value).digest('hex');
 const normalize = value => String(value ?? '').normalize('NFKC').toLowerCase();
@@ -159,9 +160,10 @@ export function openQuestionReviewStore(path, bankDirectory, draftDirectory) {
     const page = Math.max(0, Math.min(10400, Number.parseInt(params.get('page'),10) || 0));
     const total = db.prepare('SELECT count(*) AS n ' + source).get(...values).n;
     const rows = db.prepare(`SELECT id, stage_id, island, unit, kind, skill, difficulty, format, has_figure,
-      stem,status,version ${source} ORDER BY stage_id,id LIMIT 20 OFFSET ?`).all(...values,page*20);
+      stem,status,version,payload ${source} ORDER BY stage_id,id LIMIT 20 OFFSET ?`).all(...values,page*20);
     const counts = db.prepare('SELECT status,count(*) AS n FROM questions WHERE active=1 GROUP BY status').all();
-    return { rows,total,page,counts:Object.fromEntries(counts.map(row => [row.status,row.n])) };
+    return { rows:rows.map(({payload,...row})=>({...row,diagnostics:diagnosticSummary(diagnoseQuestion(row.stage_id,JSON.parse(payload)))})),
+      total,page,counts:Object.fromEntries(counts.map(row => [row.status,row.n])) };
   }
 
   function detail(id) {
@@ -173,8 +175,9 @@ export function openQuestionReviewStore(path, bankDirectory, draftDirectory) {
       SELECT id,stage_id,stem,CASE WHEN exact=? THEN 'exact' WHEN equivalent=? THEN 'equivalent' ELSE 'structural' END AS kind
       FROM questions WHERE active=1 AND id<>? AND (exact=? OR equivalent=? OR shape=?) ORDER BY kind,id LIMIT 50
     `).all(row.exact,row.equivalent,id,row.exact,row.equivalent,row.shape);
+    const question=JSON.parse(row.payload);
     return { id,stageId:row.stage_id,status:row.status,version:row.version,note:row.note,reason:row.reason,
-      question:JSON.parse(row.payload),history,duplicates };
+      question,history,duplicates,diagnostics:diagnoseQuestion(row.stage_id,question) };
   }
 
   function review({ items, status, reason, note }, actor) {

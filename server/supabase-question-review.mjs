@@ -1,4 +1,5 @@
 import { inspectQuestion } from '../scripts/question-audit-rules.mjs';
+import { diagnoseQuestion, diagnosticSummary } from './question-review-diagnostics.mjs';
 import { rejectReasons, reviewStatusLabels } from '../src/domain/reviewAdmin.ts';
 
 const ns='question_catalog';
@@ -39,13 +40,17 @@ export function createSupabaseQuestionReview(pool) {
     const {where,values}=filter(params);
     const page=Math.max(0,Math.min(10400,Number.parseInt(params.get('page'),10)||0));
     const result=await pool.query(`
-      select q.id,q.stage_id,s.island_id as island,s.unit,s.kind,s.skill,q.difficulty,q.format,q.has_figure,
-        q.stem,q.status,q.version,count(*) over()::int as matched
-      ${from} ${where} order by q.stage_id,q.id limit 20 offset $${values.length+1}
+      select page.*,v.payload from (
+        select q.id,q.stage_id,s.island_id as island,s.unit,s.kind,s.skill,q.difficulty,q.format,q.has_figure,
+          q.stem,q.status,q.version,q.fingerprint,count(*) over()::int as matched
+        ${from} ${where} order by q.stage_id,q.id limit 20 offset $${values.length+1}
+      ) page join ${ns}.versions v on v.fingerprint=page.fingerprint order by page.stage_id,page.id
     `,[...values,page*20]);
     const total=result.rows[0]?.matched ?? (page ? (await pool.query(`select count(*)::int as n ${from} ${where}`,values)).rows[0].n : 0);
     const {rows:counts}=await pool.query(`select status,count(*)::int as n from ${ns}.questions where active group by status`);
-    return {rows:result.rows.map(({matched,...row})=>row),total,page,counts:Object.fromEntries(counts.map(row=>[row.status,row.n]))};
+    return {rows:result.rows.map(({matched,payload,fingerprint,...row})=>({
+      ...row,diagnostics:diagnosticSummary(diagnoseQuestion(row.stage_id,payload)),
+    })),total,page,counts:Object.fromEntries(counts.map(row=>[row.status,row.n]))};
   }
 
   async function detail(id) {
@@ -61,7 +66,7 @@ export function createSupabaseQuestionReview(pool) {
           or (md5(equivalent)=md5($3) and equivalent=$3)
           or (md5(shape)=md5($4) and shape=$4)) order by kind,id limit 50`,[id,row.exact,row.equivalent,row.shape]);
     return {id,stageId:row.stage_id,status:row.status,version:row.version,note:row.note,reason:row.reason,
-      question:row.question,history:history.rows,duplicates:candidates.rows};
+      question:row.question,history:history.rows,duplicates:candidates.rows,diagnostics:diagnoseQuestion(row.stage_id,row.question)};
   }
 
   async function historicalRevision(id,fingerprint) {
