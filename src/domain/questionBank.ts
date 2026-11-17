@@ -5,7 +5,7 @@ import type { MathQuestion } from './worldQuestions.ts';
 
 import type { CountingToken } from './countingTokens.ts';
 export type { CountingToken } from './countingTokens.ts';
-export type BankDiagram = { kind: 'countingBoard'; guide?: true; spacing?: 'wide'; rows: readonly { label?: string; tokens: readonly CountingToken[] }[] }
+export type BankDiagram = { kind: 'countingBoard'; guide?: true; spacing?: 'wide'; rows: readonly { label?: string; tokens: readonly CountingToken[] }[]; targetToken?: CountingToken; layoutComparison?: { before:'wide-gaps'|'even-gaps'|'small'|'large'|'left-packed'; after:'wide-gaps'|'even-gaps'|'small'|'large'|'left-packed' } }
   | { kind: 'tenFrame'; first: number; second?: number; third?: number }
   | { kind: 'transferToTen'; inside: number; outside: number }
   | { kind: 'takeAway'; total: number; used: number }
