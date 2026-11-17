@@ -4,6 +4,7 @@ import { type BankDiagram, type BankQuestion, mistakenReason } from '../domain/q
 import type { SolutionStep } from '../domain/writtenSolution';
 import { MathDisplay, MathText } from './MathText';
 import { fitCountingBoardSizes, countingTileAppearance } from '../domain/countingBoardSizes';
+import { countingTapNumber, toggleCountingTap } from '../domain/countingTapOrder';
 
 import { countingTokenArt as tokenArt } from '../domain/countingTokens';
 
@@ -20,11 +21,10 @@ function CountingBoard({ diagram, phase }: {
   const numbered=diagram.guide && phase==='solution';
   const [taps,setTaps] = useState<{ forDiagram:BankDiagram; ids:Set<string> }>();
   const selected = taps?.forDiagram===diagram ? taps.ids : new Set<string>();
-  const toggle = (id: string) => setTaps(previous => {
-    const ids = new Set(previous?.forDiagram===diagram ? previous.ids : []);
-    if (ids.has(id)) ids.delete(id); else ids.add(id);
-    return { forDiagram:diagram, ids };
-  });
+  const toggle = (id: string) => setTaps(previous => ({
+    forDiagram:diagram,
+    ids:toggleCountingTap(previous?.forDiagram===diagram ? previous.ids : new Set<string>(),id),
+  }));
   return <View
     onLayout={event=>{
       const measured=Math.round(event.nativeEvent.layout.width);
@@ -39,7 +39,8 @@ function CountingBoard({ diagram, phase }: {
         gap:diagram.guide ? sizes.gap : diagram.spacing==='wide'?20:8 }}>
         {tokens.map((token,column) => {
           const id = row+':'+column;
-          const lit = selected.has(id);
+          const tapNumber = countingTapNumber(selected,id);
+          const lit = tapNumber!==undefined;
           const shape = tokenArt[token];
           // くま・丸・図形のすべてで、見た目の白い枠を使わない。
           // タップ用の透明な幅と高さは残す（小さくても48px、幼児向けは62〜112px）。
@@ -52,12 +53,15 @@ function CountingBoard({ diagram, phase }: {
                 backgroundColor:lit?'#28735b':'#253e70' }} />
             : <Text style={{ fontSize:sizes.symbol, color:token==='marked' ? '#3f765b' : '#253e70' }}>{shape[0]}</Text>;
           return interactive && token!=='empty' ? <Pressable key={id} style={card} onPress={() => toggle(id)}
-            accessibilityRole="button" accessibilityLabel={shape[1]} accessibilityState={{ selected:lit }}>
+            accessibilityRole="button"
+            accessibilityLabel={lit ? shape[1]+'、'+tapNumber+'ばんめ' : shape[1]+'、まだ かぞえていない'}
+            accessibilityHint="もういちど さわると かぞえなおせるよ"
+            accessibilityState={{ selected:lit }}>
               {icon}
-              {lit && <View pointerEvents="none" style={{
-                position:'absolute',right:0,bottom:0,width:25,height:25,borderRadius:13,
+              {tapNumber!==undefined && <View pointerEvents="none" style={{
+                position:'absolute',right:0,bottom:0,width:30,height:30,borderRadius:15,
                 backgroundColor:'#28735b',alignItems:'center',justifyContent:'center',
-              }}><Text style={{color:'#fff',fontSize:17,fontWeight:'900'}}>✓</Text></View>}
+              }}><Text style={{color:'#fff',fontSize:20,fontWeight:'900'}}>{tapNumber}</Text></View>}
             </Pressable>
             : <View key={id} style={{alignItems:'center'}}>
               <View accessible accessibilityLabel={shape[1]} style={card}>{icon}</View>
