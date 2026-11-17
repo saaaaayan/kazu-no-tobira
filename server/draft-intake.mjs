@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { allWorldStagesById,worldIslands } from '../src/domain/worldCatalog.ts';
 import { inspectQuestion,questionKeys } from '../scripts/question-audit-rules.mjs';
 import { playableBetaPayload } from './beta-readiness.mjs';
+import { countingTokenArt } from '../src/domain/countingTokens.ts';
 
 const schema='question_catalog';
 const isObject=value=>value && typeof value==='object' && !Array.isArray(value);
@@ -9,7 +10,8 @@ const nonblank=value=>typeof value==='string' && value.trim().length>0;
 const count=(value,max)=>Number.isSafeInteger(value) && value>=0 && value<=max;
 const point=value=>Array.isArray(value) && value.length===2 && value.every(Number.isFinite);
 const figureKinds=new Set(['countingBoard','tenFrame','transferToTen','takeAway','borrowTen','bundlesAndOnes']);
-const tokens=new Set(['dot','triangle','square','empty','marked']);
+// 教材の絵柄を実際のUIと同じ単一マスターから検証する。
+const tokens=new Set(Object.keys(countingTokenArt));
 
 function validDrawings(question) {
   const {diagram,figure,clock}=question;
