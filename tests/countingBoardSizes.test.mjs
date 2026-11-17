@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { countingBoardSizes } from '../src/domain/countingBoardSizes.ts';
+import { countingBoardSizes, countingTileAppearance } from '../src/domain/countingBoardSizes.ts';
 
 test('preschool counting objects are large and do not overflow narrow phones',()=>{
   const sampleWidths=[320,360,375,390,430,480,600,768,1440];
@@ -18,4 +18,20 @@ test('preschool counting objects are large and do not overflow narrow phones',()
 test('legacy counting boards without child guidance keep their original sizing',()=>{
   assert.deepEqual(countingBoardSizes(320,false),{tile:48,symbol:30,gap:8});
   assert.deepEqual(countingBoardSizes(1440,false),{tile:48,symbol:30,gap:8});
+});
+
+test('all guided preschool objects, including dots and bears, have no tile frame while remaining touchable',()=>{
+  for(const width of [320,375,480,768,1440]) {
+    const { tile, symbol }=countingBoardSizes(width,true);
+    assert.ok(tile>=62);
+    assert.ok(symbol<tile);
+    for(const selected of [false,true]) {
+      const style=countingTileAppearance(true,selected);
+      assert.equal(style.borderWidth,0);
+      assert.equal(style.backgroundColor,'transparent');
+      assert.equal(style.borderColor,'transparent');
+    }
+  }
+  assert.equal(countingTileAppearance(false,false).borderWidth,2);
+  assert.equal(countingTileAppearance(false,true).backgroundColor,'#cce8db');
 });
