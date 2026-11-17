@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-na
 import { type BankDiagram, type BankQuestion, mistakenReason } from '../domain/questionBank';
 import type { SolutionStep } from '../domain/writtenSolution';
 import { MathDisplay, MathText } from './MathText';
-import { countingBoardSizes, countingTileAppearance } from '../domain/countingBoardSizes';
+import { fitCountingBoardSizes, countingTileAppearance } from '../domain/countingBoardSizes';
 
 const tokenArt = {
   dot: ['●','まる'], triangle: ['▲','さんかく'], square: ['■','しかく'],
@@ -15,7 +15,11 @@ function CountingBoard({ diagram, phase }: {
   diagram: Extract<BankDiagram,{ kind:'countingBoard' }>; phase: 'question' | 'hint' | 'solution';
 }) {
   const { width: viewportWidth } = useWindowDimensions();
-  const sizes=countingBoardSizes(viewportWidth,Boolean(diagram.guide));
+  // 解説は画面そのものより狭いカード内に表示される。ウィンドウ幅ではなく
+  // 図の実際の表示幅でサイズを決め、横並びのオブジェクトをはみ出させない。
+  const [boardWidth,setBoardWidth] = useState<number>();
+  const maxColumns=Math.max(1,...diagram.rows.map(row=>row.tokens.length));
+  const sizes=fitCountingBoardSizes(Math.min(viewportWidth,boardWidth??320),Boolean(diagram.guide),maxColumns);
   const interactive=phase==='question' || (diagram.guide && phase==='hint');
   const numbered=diagram.guide && phase==='solution';
   const [taps,setTaps] = useState<{ forDiagram:BankDiagram; ids:Set<string> }>();
@@ -25,10 +29,16 @@ function CountingBoard({ diagram, phase }: {
     if (ids.has(id)) ids.delete(id); else ids.add(id);
     return { forDiagram:diagram, ids };
   });
-  return <View style={{ padding:10, backgroundColor:'#edf4ff', borderRadius:12, gap:8 }}>
+  return <View
+    onLayout={event=>{
+      const measured=Math.round(event.nativeEvent.layout.width);
+      if(measured>0 && measured!==boardWidth) setBoardWidth(measured);
+    }}
+    style={{ width:'100%', maxWidth:'100%', minWidth:0, padding:10, backgroundColor:'#edf4ff', borderRadius:12, gap:8 }}>
     {diagram.rows.map(({label,tokens},row) => <View key={row} style={{ gap:5 }}>
       {label && <Text style={{ color:'#293f61', fontSize:18, fontWeight:'700' }}>{label}</Text>}
       <View style={{ flexDirection:'row', flexWrap:diagram.guide?'nowrap':'wrap',
+        width:'100%', minWidth:0,
         justifyContent:diagram.guide?'center':'flex-start',
         gap:diagram.guide ? sizes.gap : diagram.spacing==='wide'?20:8 }}>
         {tokens.map((token,column) => {
