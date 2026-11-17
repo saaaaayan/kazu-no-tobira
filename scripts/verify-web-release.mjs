@@ -37,7 +37,14 @@ export function releaseClient(address) {
     if (profile && (version.indexSha256!==digest(index) || version.entrySha256!==digest(bundle))) {
       throw new Error('The sample HTML or JavaScript differs from the verified build.');
     }
-    return {version,index,entryPath,bundle};
+    let admin;
+    if (version.adminSha256 !== undefined) {
+      admin = Buffer.from(await (await get('admin/')).arrayBuffer());
+      if (digest(admin) !== version.adminSha256 ||
+          !admin.toString('utf8').includes('src="' + script + '"') ||
+          !js.includes('/kazu-no-tobira/admin')) throw new Error('The admin route differs from the verified build.');
+    }
+    return {version,index,entryPath,bundle,admin};
   }};
 }
 

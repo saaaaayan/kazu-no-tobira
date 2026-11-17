@@ -15,6 +15,8 @@ if (typeof document !== 'undefined') {
   if (!meta.parentNode) document.head.appendChild(meta);
 }
 
-const Root = (__DEV__ || process.env.EXPO_PUBLIC_KAZU_REVIEW_BUILD === '1') && typeof window !== 'undefined' && window.location?.pathname === '/admin'
-  ? require('./src/components/ServerQuestionReview').default : App;
+const pathname = typeof window === 'undefined' ? '' : window.location.pathname.replace(/\/$/, '');
+const hostedAdmin = process.env.EXPO_PUBLIC_KAZU_ONLINE_REVIEW === '1' && pathname === '/kazu-no-tobira/admin';
+const localAdmin = (__DEV__ || process.env.EXPO_PUBLIC_KAZU_REVIEW_BUILD === '1') && pathname === '/admin';
+const Root = hostedAdmin || localAdmin ? require('./src/components/ServerQuestionReview').default : App;
 registerRootComponent(Root);

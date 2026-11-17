@@ -3,6 +3,7 @@ import type { BankQuestion } from '../domain/questionBank';
 import { allWorldStages,worldIslands } from '../domain/worldCatalog';
 import { stageLabels, stageDisplayTitle } from '../domain/stageStructure';
 import { rejectReasons, reviewStatusLabels, type ReviewReason, type ReviewStatus } from '../domain/reviewAdmin';
+import { onlineReview, onlineReviewLogin, onlineReviewFetch, clearOnlineSession } from '../domain/onlineReview.web';
 import { MathText } from './MathText';
 import { QuestionDiagram, WrittenSolution } from './QuestionSupport';
 import { StudyFigureView } from './StudyFigureView';
@@ -85,12 +86,20 @@ function LearningChecks({ diagnostics }: { diagnostics: Diagnostics }) {
 }
 
 async function api<T>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
-  const response = await fetch('/review-api/'+path, body === undefined ? { signal, cache:'no-store' } : {
-    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body),
-  });
+  if (onlineReview && path === 'login') {
+    await onlineReviewLogin(body as { email: string; password: string });
+    return {} as T;
+  }
+  const response = onlineReview ? await onlineReviewFetch(path, body, signal)
+    : await fetch('/review-api/'+path, body === undefined ? { signal, cache:'no-store' } : {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body),
+    });
   if (!response.ok) {
-    if (response.status === 401 && path !== 'login') window.dispatchEvent(new Event('review-session-expired'));
-    const payload: { error?: string } = await response.json();
+    if ((response.status === 401 || response.status === 403) && path !== 'login') {
+      clearOnlineSession();
+      window.dispatchEvent(new Event('review-session-expired'));
+    }
+    const payload: { error?: string } = await response.json().catch(() => ({}));
     throw new Error(payload.error ?? '読み込みに失敗しました。');
   }
   return response.json() as Promise<T>;
@@ -139,6 +148,24 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
     }).catch(problem => { if (!controller.signal.aborted) setNotice(problem.message); });
     return () => controller.abort();
   },[focusId,epoch]);
+
+  async function download(format: 'csv' | 'json') {
+    try {
+      const response = await onlineReviewFetch('export.' + format + '?' + params);
+      if (response.status === 401 || response.status === 403) {
+        clearOnlineSession();
+        window.dispatchEvent(new Event('review-session-expired'));
+        return;
+      }
+      if (!response.ok) throw new Error('教材をエクスポートできませんでした。');
+      const objectUrl = URL.createObjectURL(await response.blob());
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      link.download = 'kazu-question-review.' + format;
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    } catch (problem) { setNotice(String(problem instanceof Error ? problem.message : problem)); }
+  }
 
   function search(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -226,7 +253,8 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
   </main>;
   return <main style={pageStyle}>
     <header style={{ ...line, justifyContent:'space-between' }}>
-      <h1>数のトビラ 問題審査</h1>
+      {onlineReview && <a href="/kazu-no-tobira/">数のトビラへ戻る</a>}
+    <h1>数のトビラ 問題審査</h1>
       <button type="button" style={button} onClick={() => void onLogout().catch(problem => setNotice(problem.message))}>ログアウト</button>
     </header>
     <p>専用データベースの登録問題を審査します。一般向けの配信は別途公開判定を通ります。</p>
@@ -272,8 +300,9 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
         </label>;
       })}
       <button style={button} type="submit">検索</button>
-      <a href={'/review-api/export.csv?'+params}>CSV</a>
-      <a href={'/review-api/export.json?'+params}>JSON</a>
+      {(['csv','json'] as const).map(format => onlineReview ?
+        <button key={format} style={button} onClick={() => void download(format)}>{format.toUpperCase()}</button>
+        : <a key={format} href={'/review-api/export.'+format+'?'+params}>{format.toUpperCase()}</a>)}
     </form>
     <p role="status">{notice}</p>
     <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(100%, 360px),1fr))', gap:16, alignItems:'start' }}>
@@ -387,25 +416,41 @@ export default function ServerQuestionReview() {
   const [signedIn, setSignedIn] = useState(false);
   const [key, setKey] = useState('');
   const [email, setEmail] = useState('');
-  const [mode, setMode] = useState<'local'|'supabase'>();
+  const [mode, setMode] = useState<'local'|'supabase'|undefined>(onlineReview ? 'supabase' : undefined);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   useEffect(() => {
     const controller = new AbortController();
     const expired = () => setSignedIn(false);
     window.addEventListener('review-session-expired',expired);
-    void api<{mode:'local'|'supabase'}>('login-mode',undefined,controller.signal).then(result=>setMode(result.mode)).catch(()=>{});
-    void api('session',undefined,controller.signal).then(() => setSignedIn(true)).catch(() => {});
-    return () => { window.removeEventListener('review-session-expired',expired); controller.abort(); };
+    const leave = () => { clearOnlineSession(); expired(); };
+    if (onlineReview) window.addEventListener('pagehide', leave);
+    else {
+      void api<{mode:'local'|'supabase'}>('login-mode',undefined,controller.signal).then(result=>setMode(result.mode)).catch(()=>{});
+      void api('session',undefined,controller.signal).then(() => setSignedIn(true)).catch(() => {});
+    }
+    return () => {
+      window.removeEventListener('review-session-expired',expired);
+      window.removeEventListener('pagehide', leave);
+      controller.abort();
+    };
   },[]);
   async function login(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitting) return;
     setError('');
+    setSubmitting(true);
     try { await api('login',mode==='supabase' ? {email,password:key} : {key}); setSignedIn(true); }
     catch (problem) { setError(String(problem instanceof Error ? problem.message : problem)); }
-    finally { setKey(''); }
+    finally { setKey(''); setSubmitting(false); }
   }
-  if (signedIn) return <ReviewDashboard onLogout={async () => { try { await api('logout',{}); } finally { setSignedIn(false); } }}/>;
+  if (signedIn) return <ReviewDashboard onLogout={async () => {
+    try { await api('logout',{}); }
+    catch { setError('認証サービスでのセッション終了を確認できませんでした。'); }
+    finally { clearOnlineSession(); setSignedIn(false); }
+  }}/>;
   return <main style={pageStyle}>
+    {onlineReview && <a href="/kazu-no-tobira/">数のトビラへ戻る</a>}
     <h1>数のトビラ 問題審査</h1>
     <form style={{...panel,maxWidth:420}} onSubmit={event => void login(event)}>
       <h2>管理者ログイン</h2>
@@ -416,7 +461,7 @@ export default function ServerQuestionReview() {
         <input type="password" autoComplete="current-password" maxLength={mode==='supabase' ? 1024 : 128} required value={key}
           onChange={event => setKey(event.target.value)}/>
       </label>
-      <button type="submit" disabled={!mode} style={{...button,marginTop:12}}>ログイン</button>
+      <button type="submit" disabled={!mode || submitting} style={{...button,marginTop:12}}>{submitting ? 'ログイン中…' : 'ログイン'}</button>
       <p role="status">{error}</p>
     </form>
   </main>;

@@ -23,6 +23,7 @@ const run=spawnSync(process.execPath,[cli,'export','--platform',platform,...(pro
     ...process.env,
     KAZU_DB_ONLY_PREVIEW:'1',
     EXPO_PUBLIC_KAZU_DB_ONLY:'1',
+    EXPO_PUBLIC_KAZU_ONLINE_REVIEW:production && platform==='web' ? '1' : '0',
     EXPO_PUBLIC_FOLDER:'.expo/db-preview-no-public-bank-assets',
     EXPO_PUBLIC_KAZU_NATIVE_PREVIEW_PORT:process.env.EXPO_PUBLIC_KAZU_NATIVE_PREVIEW_PORT ?? '8125',
   },

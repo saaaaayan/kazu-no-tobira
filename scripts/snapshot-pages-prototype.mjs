@@ -12,13 +12,17 @@ if (manifest.profile==='production') throw new Error('Select production explicit
 if (manifest.profile!=='ui-preview') {
   console.log('Initial prototype release. The legacy site is retained until the new artifact is verified and deployed.');
 } else {
-  const {version,index,entryPath,bundle}=await client.verify(manifest.version,'ui-preview');
-  assertSampleBundle(bundle.toString('utf8'),version.version);
+  const {version,index,entryPath,bundle,admin}=await client.verify(manifest.version,'ui-preview');
+  assertSampleBundle(bundle.toString('utf8'),version.version,Boolean(admin));
   mkdirSync(directory);
   const asset=resolve(directory,entryPath);
   mkdirSync(dirname(asset),{recursive:true});
   writeFileSync(asset,bundle);
   writeFileSync(resolve(directory,'index.html'),index);
+  if (admin) {
+    mkdirSync(resolve(directory,'admin'));
+    writeFileSync(resolve(directory,'admin/index.html'),admin);
+  }
   writeFileSync(resolve(directory,'version.json'),JSON.stringify(version)+'\n');
   writeFileSync(resolve(directory,'.nojekyll'),'');
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,'version='+version.version+'\n');

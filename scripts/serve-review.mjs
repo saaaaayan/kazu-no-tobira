@@ -30,7 +30,7 @@ const server = createServer(async (request, response) => {
   try {
     const pathname = decodeURIComponent(new URL(request.url, 'http://127.0.0.1').pathname);
     if (!pathname.startsWith(basePath)) { response.writeHead(404).end(); return; }
-    const local = pathname.slice(basePath.length) || 'index.html';
+    const local = pathname.endsWith('/') ? pathname.slice(basePath.length) + 'index.html' : pathname.slice(basePath.length);
     const file = await realpath(resolve(root, './' + local));
     const location = relative(root, file);
     if (!location || location === '..' || location.startsWith('..' + sep) || isAbsolute(location)) {
