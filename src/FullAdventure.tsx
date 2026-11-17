@@ -12,8 +12,6 @@ import { prepareStageRound } from './stageRounds';
 import { QuestionDiagram, WorkedSolution, WrittenSolution } from './components/QuestionSupport';
 import { emptyProgress, recordAttempt, type Progress } from './domain/progress';
 import { uiPreviewRound } from './domain/uiPreviewRound';
-import { validatePrivateDraftPack, type PrivateDraftPack, type PrivateDraftStage } from './domain/privateDraftReview';
-import PrivateDraftReview from './components/PrivateDraftReview';
 import QuestionReadAloud from './components/QuestionReadAloud';
 import { canAccessFeature, canAccessStage, freeAccess, hasPremium, type Entitlement } from './domain/accessPlan';
 import { readServerEntitlement } from './domain/serverEntitlement';
@@ -76,10 +74,6 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const starting = useRef(false);
   const [loadingRound, setLoadingRound] = useState(false);
   const [startError, setStartError] = useState('');
-  // Private owner files stay in memory. Never send drafts to an API or save them in browser storage.
-  const [privatePack,setPrivatePack] = useState<PrivateDraftPack>();
-  const [privateStage,setPrivateStage] = useState<PrivateDraftStage>();
-  const [privateError,setPrivateError] = useState('');
   const testRoundSeed = useRef(0);
   const testing = playMode === 'test';
   const gameOrigin=isolated ? undefined : liveOrigin();
@@ -239,38 +233,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     void startLive({...stage,title},mode,undefined,skills);
   }
 
-  function choosePrivateDraft() {
-    if (!uiPreview || typeof document === 'undefined') return;
-    const input=document.createElement('input');
-    input.type='file';
-    input.accept='.json,application/json';
-    input.onchange=()=>{
-      const file=input.files?.[0];
-      if (!file) return;
-      if (file.size>2_000_000) { setPrivateError('原稿ファイルが大きすぎます。'); return; }
-      void file.text().then(raw=>{
-        const loaded=validatePrivateDraftPack(JSON.parse(raw));
-        setPrivatePack(loaded);
-        setPrivateStage(undefined);
-        setPrivateError('');
-        setStartError('');
-      }).catch(error=>setPrivateError(error instanceof Error?error.message:'原稿を読み込めませんでした。'));
-    };
-    input.click();
-  }
-
   async function start(stage: WorldStage) {
     if (!progress || starting.current || submitting.current || lessonWrite.current) return;
     if (uiPreview) {
-      const privateDraft=privatePack?.stages.find(item=>item.stageId===stage.id);
-      if (privateDraft) {
-        setPrivateStage(privateDraft);
-        setStartError('');
-        setRound(undefined);
-        setScreen('island');
-        scroll.current?.scrollTo({y:0,animated:false});
-        return;
-      }
       const problems=uiPreviewRound(stage);
       if (!problems.length) { setStartError('このステージの体験用問題は準備中です。'); return; }
       setStartError('');
@@ -418,7 +383,6 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     if (starting.current || submitting.current || lessonWrite.current) return;
     if (review) { review.onClose(); return; }
     setLearning(undefined);
-    setPrivateStage(undefined);
     setStartError('');
     resetAnswer();
     setRound(undefined);
@@ -450,9 +414,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           style={[styles.shell,round && !round.complete && styles.playShell]}>
           {uiPreview && <View style={styles.playPanel} testID="kazu-sample-only-preview">
             <Text accessibilityRole="header" style={styles.answerHeading}>数のトビラ 試作版</Text>
-            <Text style={styles.explanation}>{privatePack
-              ? '非公開の原稿 '+privatePack.totalQuestions+'問を読み込みました。対象の島のステージを選んで確認できます。記録は保存されません。'
-              : '全16島の画面とサンプル問題を確認できます。回答は保存されません。'}</Text>
+            <Text style={styles.explanation}>全16島の画面とサンプル問題を確認できます。回答は保存されません。</Text>
             <Text selectable style={styles.hintNote}>バージョン {process.env.EXPO_PUBLIC_KAZU_UI_PREVIEW_SHA}</Text>
           </View>}
           {__DEV__ && !review && <View style={styles.navigation}>
@@ -472,13 +434,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {screen === 'home' && !round ? (
             <>
               <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress} preview={uiPreview}
-                onStart={() => { resetAnswer(); setPrivateStage(undefined); setScreen('world'); }} />
-              {uiPreview && <View style={styles.playPanel}>
-                <Text accessibilityRole="header" style={styles.answerHeading}>開発者向け・非公開原稿の確認</Text>
-                <Text style={styles.explanation}>保存した「非公開教材確認用JSON」を選ぶと、幼児の島01〜10の原稿をこの画面だけで確認できます。ファイルは送信・保存されません。</Text>
-                <GameButton label="非公開原稿のファイルをえらぶ" onPress={choosePrivateDraft}/>
-                {!!privateError && <Text accessibilityLiveRegion="polite" style={styles.error}>{privateError}</Text>}
-              </View>}
+                onStart={() => { resetAnswer(); setScreen('world'); }} />
               {process.env.EXPO_PUBLIC_KAZU_ONLINE_REVIEW === '1' && typeof window !== 'undefined' &&
                 <GameButton label="管理者ログイン" secondary onPress={() => window.location.assign('/kazu-no-tobira/admin/')} />}
             </>
@@ -487,7 +443,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
               <View style={styles.navigationHeader}>
                 {round ? <Text style={styles.logo}>数のトビラ</Text> : (
                   <Pressable accessibilityRole="button" accessibilityLabel="トップへもどる" disabled={saving}
-                    onPress={() => { resetAnswer(); setLearning(undefined); setPrivateStage(undefined); setScreen('home'); }} style={styles.homeLink}>
+                    onPress={() => { resetAnswer(); setLearning(undefined); setScreen('home'); }} style={styles.homeLink}>
                     <Text style={styles.logo}>‹ 数のトビラ</Text>
                   </Pressable>
                 )}
@@ -510,12 +466,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
             error={studyError} onLiveStart={gameOrigin?startLiveStudy:undefined} onAnswer={answerPractice} onBack={()=>setScreen('world')}/>}
           {progress && !round && screen === 'world' &&
             <WorldMap780 progress={progress} mode={playMode} access={access} onGrade={openGrade} onTitles={()=>setScreen('titles')} preview={uiPreview}/>}
-          {progress && !round && screen === 'island' && !privateStage &&
+          {progress && !round && screen === 'island' &&
             <IslandStageMap key={grade.id} grade={grade} progress={progress} mode={playMode} access={access} onCheckpoint={startCheckpoint} onBack={()=>setScreen('world')}
-              onTitles={()=>setScreen('titles')} onStart={start} onLearn={openLesson} preview={uiPreview}
-              draftStageIds={uiPreview?privatePack?.stages.map(item=>item.stageId):undefined}/>}
-          {progress && !round && screen === 'island' && privateStage && uiPreview &&
-            <PrivateDraftReview key={privateStage.stageId} stage={privateStage} onBack={()=>setPrivateStage(undefined)}/>}
+              onTitles={()=>setScreen('titles')} onStart={start} onLearn={openLesson} preview={uiPreview}/>}
           {progress && !round && screen === 'titles' &&
             <TitleAlbum progress={progress} onBack={()=>setScreen('world')}/>}
           {progress && screen === 'lesson' && !round && learning &&
