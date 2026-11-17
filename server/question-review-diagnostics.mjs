@@ -60,7 +60,7 @@ export function diagnoseQuestion(stageId,q) {
     const rows=q.diagram?.rows;
     const tokens=array(rows?.[0]?.tokens);
     if (q.diagram?.kind!=='countingBoard' || rows?.length!==1 || ![1,2,3].includes(tokens.length) ||
-        tokens.some(token=>token!==tokens[0] || !['dot','square','triangle'].includes(token)) || q.type!=='choice') {
+        tokens.some(token=>token!==tokens[0] || !['dot','square','triangle','bear'].includes(token)) || q.type!=='choice') {
       draftNotes.push('第1稿の参考条件「1〜3個を横一列で数え、数字を選ぶ」と差があります。');
     }
   }

@@ -4,6 +4,7 @@ import { inspectQuestion, questionKeys } from '../scripts/question-audit-rules.m
 import { diagnoseQuestion, diagnosticSummary } from './question-review-diagnostics.mjs';
 import { rejectReasons, reviewStatusLabels } from '../src/domain/reviewAdmin.ts';
 import { reviseQuestion, validateRevisionRequest } from './question-revision.mjs';
+import { checkPreschoolModelSet,preschoolModelSize,preschoolModelStage,validatePreschoolModelQuestion } from './preschool-model-rules.mjs';
 
 const ns='question_catalog';
 const from=`from ${ns}.questions q join ${ns}.stages s on s.id=q.stage_id`;
@@ -112,39 +113,93 @@ export function createSupabaseQuestionReview(pool) {
     } finally { session.release(); }
   }
 
-  async function editQuestion(request,actor) {
-    const {id,version,note,content}=validateRevisionRequest(request);
+  async function withRevisionSession(run,rollbackOnly=false) {
     const session=await pool.connect();
     try {
       await session.query('begin');
-      const {rows:[previous]}=await session.query(`select q.version,q.status,v.payload,s.title as stage_title,s.unit,
-          i.title as island_title,i.name as island_name
-        ${from} join ${ns}.versions v on v.fingerprint=q.fingerprint
-        join ${ns}.islands i on i.id=s.island_id where q.active and q.id=$1 for update of q`,[id]);
-      if (!previous || previous.version!==version) throw conflict('他の更新が保存されました。読み込み直してからやり直してください。');
-      const revised=reviseQuestion(previous.payload,content);
-      if (isDeepStrictEqual(revised,previous.payload)) {
-        await session.query('commit');
-        return {changed:false};
-      }
-      const payload=JSON.stringify(revised);
-      const fingerprint=createHash('sha256').update(payload).digest('hex');
-      const keys=questionKeys(revised);
-      const search=[id,previous.island_title,previous.island_name,previous.stage_title,previous.unit,payload]
-        .join(' ').normalize('NFKC').toLowerCase();
-      await session.query(`insert into ${ns}.versions (fingerprint,payload_text) values ($1,$2) on conflict do nothing`,[fingerprint,payload]);
-      await session.query(`update ${ns}.questions set stem=$2,search=$3,exact=$4,equivalent=$5,shape=$6,fingerprint=$7,
-        status='unreviewed',reason=null,note=$8,version=version+1,updated_at=transaction_timestamp() where id=$1`,
-      [id,revised.question,search,keys.exact,keys.equivalent??null,keys.shape??null,fingerprint,note]);
-      await session.query(`insert into ${ns}.history (question_id,created,actor,event,previous_status,status,note,reason,fingerprint)
-        values ($1,transaction_timestamp(),$2,'revision',$3,'unreviewed',$4,null,$5)`,
-      [id,actor,previous.status,note,fingerprint]);
-      await session.query('commit');
-      return {changed:true};
+      const result=await run(session);
+      await session.query(rollbackOnly?'rollback':'commit');
+      return result;
     } catch (error) {
       await session.query('rollback').catch(()=>{});
       throw error;
     } finally { session.release(); }
+  }
+
+  const revisionSelection=`select q.id,q.version,q.status,v.payload,s.title as stage_title,s.unit,
+    i.title as island_title,i.name as island_name ${from} join ${ns}.versions v on v.fingerprint=q.fingerprint
+    join ${ns}.islands i on i.id=s.island_id where q.active`;
+
+  async function saveRevision(session,previous,revised,note,actor,updateMetadata=false) {
+    if (isDeepStrictEqual(revised,previous.payload)) return false;
+    const payload=JSON.stringify(revised);
+    const fingerprint=createHash('sha256').update(payload).digest('hex');
+    const keys=questionKeys(revised);
+    const search=[previous.id,previous.island_title,previous.island_name,previous.stage_title,previous.unit,payload]
+      .join(' ').normalize('NFKC').toLowerCase();
+    await session.query(`insert into ${ns}.versions (fingerprint,payload_text) values ($1,$2) on conflict do nothing`,[fingerprint,payload]);
+    await session.query(`update ${ns}.questions set stem=$2,search=$3,exact=$4,equivalent=$5,shape=$6,fingerprint=$7,
+      status='unreviewed',reason=null,note=$8,version=version+1,updated_at=transaction_timestamp()
+      ${updateMetadata?', format=$9,difficulty=$10':''} where id=$1`,[
+      previous.id,revised.question,search,keys.exact,keys.equivalent??null,keys.shape??null,fingerprint,note,
+      ...(updateMetadata?[revised.format,revised.difficulty]:[]),
+    ]);
+    await session.query(`insert into ${ns}.history (question_id,created,actor,event,previous_status,status,note,reason,fingerprint)
+      values ($1,transaction_timestamp(),$2,'revision',$3,'unreviewed',$4,null,$5)`,
+    [previous.id,actor,previous.status,note,fingerprint]);
+    return true;
+  }
+
+  async function editQuestion(request,actor) {
+    const {id,version,note,content}=validateRevisionRequest(request);
+    return withRevisionSession(async session=>{
+      const {rows:[previous]}=await session.query(revisionSelection+' and q.id=$1 for update of q',[id]);
+      if (!previous || previous.version!==version) throw conflict('他の更新が保存されました。読み込み直してからやり直してください。');
+      const revised=reviseQuestion(previous.payload,content);
+      return {changed:await saveRevision(session,previous,revised,note,actor)};
+    });
+  }
+
+  async function revisePreschoolModel(draft,actor,{rollbackOnly=true}={}) {
+    if (draft?.stageId!==preschoolModelStage || !Array.isArray(draft.items) || draft.items.length!==preschoolModelSize) {
+      throw invalid('幼児の島・第1ステージの10問を指定してください。');
+    }
+    const items=draft.items.map(item=>{
+      const edit=validateRevisionRequest({...item,note:draft.note});
+      const choice=item.content;
+      const diagram=choice.diagram;
+      const revised=reviseQuestion({
+        id:edit.id,skillId:'preschool.objects',type:'choice',format:'counting',difficulty:1,
+        choices:choice.choices,
+        diagram:diagram && {kind:diagram.kind,guide:diagram.guide,rows:diagram.rows,...(diagram.spacing?{spacing:diagram.spacing}:{})},
+        mistakes:choice.mistakes,
+      },edit.content);
+      return {...edit,revised};
+    });
+    checkPreschoolModelSet(items.map(item=>item.revised));
+    return withRevisionSession(async session=>{
+      const {rows}=await session.query(revisionSelection+' and q.stage_id=$1 order by q.id for update of q',[preschoolModelStage]);
+      const requested=new Map(items.map(item=>[item.id,item]));
+      if (rows.length!==preschoolModelSize || rows.some(row=>row.version!==requested.get(row.id)?.version ||
+          !['unreviewed','needs_work'].includes(row.status))) {
+        throw conflict('既存10問の版または審査状態が変わっています。');
+      }
+      let changed=0;
+      for (const row of rows) {
+        const item=requested.get(row.id);
+        changed+=Number(await saveRevision(session,row,item.revised,item.note,actor,true));
+      }
+      return {checked:rows.length,changed};
+    },rollbackOnly);
+  }
+
+  async function preschoolModelPreview() {
+    const {rows}=await pool.query(`select v.payload from ${ns}.questions q join ${ns}.versions v on v.fingerprint=q.fingerprint
+      where q.active and q.stage_id=$1 order by q.id limit $2`,[preschoolModelStage,preschoolModelSize+1]);
+    const questions=rows.map(row=>row.payload);
+    try { checkPreschoolModelSet(questions); }
+    catch { throw conflict('モデル教材10問の登録・点検を先に行ってください。'); }
+    return {questions:questions.sort((a,b)=>validatePreschoolModelQuestion(a).count-validatePreschoolModelQuestion(b).count)};
   }
 
   async function* exportRows(params) {
@@ -175,7 +230,7 @@ export function createSupabaseQuestionReview(pool) {
     return [...report.values()];
   }
 
-  return {list,detail,historicalRevision,review,editQuestion,exportRows,stageTotals,
+  return {list,detail,historicalRevision,review,editQuestion,revisePreschoolModel,preschoolModelPreview,exportRows,stageTotals,
     async isAdministratorSession(id,sessionId) {
       return (await pool.query(`select ${ns}.active_owner_session($1,$2) as allowed`,[id,sessionId])).rows[0].allowed;
     },

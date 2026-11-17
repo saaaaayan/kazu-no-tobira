@@ -114,6 +114,7 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
   const [focusId, setFocusId] = useState<string>();
   const [previousRevision, setPreviousRevision] = useState<BankQuestion>();
   const [preview, setPreview] = useState(false);
+  const [modelQuestions,setModelQuestions] = useState<BankQuestion[]>();
   const [phone, setPhone] = useState(true);
   const [detailed, setDetailed] = useState(false);
   const [previewReset, setPreviewReset] = useState(0);
@@ -202,23 +203,25 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
   }
 
   const checked = Object.entries(selection).map(([id,version]) => ({ id,version }));
-  const stage = detail && allWorldStages.find(item => item.id === detail.stageId);
+  const stage = allWorldStages.find(item => item.id === (modelQuestions ? 'preschool.n01' : detail?.stageId));
   const island = stage && worldIslands.find(item => item.id === stage.gradeId);
   const unit = stage && island?.units[stage.unitIndex];
-  if (preview && detail && stage) return <main style={pageStyle}>
+  const previewQuestions=modelQuestions ?? (detail ? [{...detail.question,hints:questionHints(detail.question),
+    steps:detail.question.steps??[],mistakes:detail.question.mistakes??[]} as BankQuestion] : []);
+  function closePreview() { setPreview(false); setModelQuestions(undefined); }
+  if (preview && previewQuestions.length && stage) return <main style={pageStyle}>
     <h1>子ども向け画面のプレビュー</h1>
-    <p>{stageDisplayTitle(stage)}　／　版 {detail.version}　／　記録なし</p>
+    <p>{modelQuestions?'1〜3こを かぞえよう ／ 10問':stageDisplayTitle(stage)+' ／ 版 '+detail?.version}　／　記録なし</p>
     <div style={line}>
-      <button type="button" style={button} onClick={() => setPreview(false)}>レビューに戻る</button>
+      <button type="button" style={button} onClick={closePreview}>レビューに戻る</button>
       <button type="button" style={button} onClick={() => setPreviewReset(value => value+1)}>最初から試す</button>
       <label><input type="checkbox" checked={phone} onChange={event=>setPhone(event.target.checked)}/> スマホ幅</label>
       <label><input type="checkbox" checked={detailed} onChange={event=>setDetailed(event.target.checked)}/> 詳しい解説を利用できる設定</label>
     </div>
     <div style={{ width:'100%', maxWidth:phone?390:1100, height:'min(80vh, 820px)', minHeight:420,
       margin:'16px auto', display:'flex', flexDirection:'column', border:'1px solid #8495b3', borderRadius:12, overflow:'hidden' }}>
-      <ReviewQuestionPreview key={detail.id+':'+detail.version+':'+previewReset} stage={stage} phone={phone}
-        question={{...detail.question,hints:questionHints(detail.question),steps:detail.question.steps??[],mistakes:detail.question.mistakes??[]} as BankQuestion}
-        detailed={detailed} onClose={() => setPreview(false)}/>
+      <ReviewQuestionPreview key={String(previewReset)} stage={stage} phone={phone}
+        questions={previewQuestions} detailed={detailed} onClose={closePreview}/>
     </div>
   </main>;
   return <main style={pageStyle}>
@@ -326,6 +329,11 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
             単元 {unit?.title ?? '要確認'}　／　技能 {stage?.family ?? '要確認'}</p>
           <div style={line}>
             <button type="button" style={button} disabled={!stage || saving} onClick={() => setPreview(true)}>子ども向け画面を開く</button>
+            {detail.editable && detail.stageId==='preschool.n01' && <button type="button" style={button} disabled={saving} onClick={()=>{
+              void api<{questions:BankQuestion[]}>('preschool-model').then(result=>{
+                setModelQuestions(result.questions); setPreview(true);
+              }).catch(problem=>setNotice(problem.message));
+            }}>モデル10問を通して試す</button>}
             {detail.editable && !editing && <button type="button" style={button} disabled={saving} onClick={() => setEditing(true)}>教材を編集</button>}
           </div>
           {editing && <QuestionRevisionEditor key={detail.id+':'+detail.version} question={detail.question} busy={saving}
