@@ -13,8 +13,9 @@ test('only stages with a matching sample open a preview round',()=>{
     assert.deepEqual(uiPreviewRound({...stage,kind:'extra'}),[]);
     assert.deepEqual(uiPreviewRound({...stage,family:'unknown'}),[]);
     if (stage.gradeId==='preschool') {
-      assert.deepEqual(round.map(question=>question.diagram.rows.length),[1,1,1]);
-      assert.deepEqual(round.map(question=>question.diagram.rows[0].tokens.length),[1,2,3]);
+      assert.equal(round.length,10);
+      assert.ok(round.every(question=>question.diagram.rows.length===1));
+      assert.deepEqual([...new Set(round.map(question=>question.diagram.rows[0].tokens.length))].sort(),[1,2,3]);
       assert.ok(round.every(question=>!/[＋+＝=]/.test(question.question)));
     } else {
       assert.ok(round.every(question=>Number(question.answer)<=9));
