@@ -10,9 +10,7 @@ export function countingBoardSizes(viewportWidth: number, guided: boolean) {
   return { tile:112, symbol:82, gap:16 };
 }
 
-/** 枠を見せずに押しやすい「透明なボタン」を作るための表示設定。 */
-export function countingTileAppearance(guided: boolean, selected: boolean) {
-  if (guided) return { borderWidth:0, borderColor:'transparent', borderRadius:0, backgroundColor:'transparent' };
-  return { borderWidth:2, borderColor:selected ? '#3f765b' : '#ccd8ef',
-    borderRadius:10, backgroundColor:selected ? '#cce8db' : '#fff' };
+/** すべての数え上げ図で素材だけを表示する。透明タップ領域は呼び出し側で確保する。 */
+export function countingTileAppearance() {
+  return { borderWidth:0, borderColor:'transparent', borderRadius:0, backgroundColor:'transparent' };
 }
