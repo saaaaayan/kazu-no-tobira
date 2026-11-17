@@ -25,18 +25,40 @@ function CountingBoard({ diagram, phase }: {
     forDiagram:diagram,
     ids:toggleCountingTap(previous?.forDiagram===diagram ? previous.ids : new Set<string>(),id),
   }));
+  const comparison=diagram.layoutComparison;
+  const beforeTokens=diagram.rows.flatMap(row=>row.tokens);
+  const beforeGap=comparison?.before==='wide-gaps'?19:comparison?.before==='small'?2:comparison?.before==='large'?13:7;
   return <View
     onLayout={event=>{
       const measured=Math.round(event.nativeEvent.layout.width);
       if(measured>0 && measured!==boardWidth) setBoardWidth(measured);
     }}
     style={{ width:'100%', maxWidth:'100%', minWidth:0, padding:10, backgroundColor:'#edf4ff', borderRadius:12, gap:8 }}>
+    {comparison && <View style={{gap:4,marginBottom:6}}>
+      <Text style={{color:'#263f6a',fontWeight:'800',fontSize:16}}>さいしょ</Text>
+      <View style={{
+        flexDirection:'row',flexWrap:'wrap',
+        justifyContent:comparison.before==='left-packed'?'flex-start':'center',
+        gap:beforeGap,padding:9,minHeight:64,borderRadius:10,backgroundColor:'#fff9e9',
+      }}>
+        {beforeTokens.map((token,index)=><View key={index} style={{
+          width:comparison.before==='small'?Math.max(34,sizes.tile*.65):Math.max(38,sizes.tile*.8),
+          height:comparison.before==='small'?Math.max(34,sizes.tile*.65):Math.max(38,sizes.tile*.8),
+          alignItems:'center',justifyContent:'center',
+        }}>
+          {token==='dot'
+            ? <View style={{width:sizes.symbol*.66,height:sizes.symbol*.66,borderRadius:sizes.symbol,backgroundColor:'#253e70'}}/>
+            : <Text style={{fontSize:sizes.symbol*.75}}>{tokenArt[token][0]}</Text>}
+        </View>)}
+      </View>
+      <Text style={{color:'#263f6a',fontWeight:'800',fontSize:16}}>ならべかえた あと</Text>
+    </View>}
     {diagram.rows.map(({label,tokens},row) => <View key={row} style={{ gap:5 }}>
       {label && <Text style={{ color:'#293f61', fontSize:18, fontWeight:'700' }}>{label}</Text>}
       <View style={{ flexDirection:'row', flexWrap:diagram.guide?'nowrap':'wrap',
         width:'100%', minWidth:0,
-        justifyContent:diagram.guide?'center':'flex-start',
-        gap:diagram.guide ? sizes.gap : diagram.spacing==='wide'?20:8 }}>
+        justifyContent:comparison?.after==='left-packed'?'flex-start':diagram.guide?'center':'flex-start',
+        gap:comparison?.after==='wide-gaps'?Math.max(10,sizes.gap+7):comparison?.after==='small'?2:diagram.guide ? sizes.gap : diagram.spacing==='wide'?20:8 }}>
         {tokens.map((token,column) => {
           const id = row+':'+column;
           const tapNumber = countingTapNumber(selected,id);
@@ -52,9 +74,11 @@ function CountingBoard({ diagram, phase }: {
             ? <View style={{ width:sizes.symbol, height:sizes.symbol, borderRadius:sizes.symbol/2,
                 backgroundColor:lit?'#28735b':'#253e70' }} />
             : <Text style={{ fontSize:sizes.symbol, color:token==='marked' ? '#3f765b' : '#253e70' }}>{shape[0]}</Text>;
-          return interactive && token!=='empty' ? <Pressable key={id} style={card} onPress={() => toggle(id)}
+          const ignored=Boolean(diagram.targetToken && token!==diagram.targetToken);
+          return interactive && token!=='empty' ? <Pressable key={id} style={card} disabled={ignored}
+            onPress={() => toggle(id)}
             accessibilityRole="button"
-            accessibilityLabel={lit ? shape[1]+'、'+tapNumber+'ばんめ' : shape[1]+'、まだ かぞえていない'}
+            accessibilityLabel={ignored ? shape[1]+'、かぞえない え' : lit ? shape[1]+'、'+tapNumber+'ばんめ' : shape[1]+'、まだ かぞえていない'}
             accessibilityHint="もういちど さわると かぞえなおせるよ"
             accessibilityState={{ selected:lit }}>
               {icon}
@@ -65,7 +89,11 @@ function CountingBoard({ diagram, phase }: {
             </Pressable>
             : <View key={id} style={{alignItems:'center'}}>
               <View accessible accessibilityLabel={shape[1]} style={card}>{icon}</View>
-              {numbered && <Text style={{fontSize:20,color:'#162d48',fontWeight:'800'}}>{column+1}</Text>}
+              {numbered && (!diagram.targetToken || token===diagram.targetToken) &&
+                <Text style={{fontSize:20,color:'#162d48',fontWeight:'800'}}>
+                  {diagram.rows.slice(0,row).reduce((sum,other)=>sum+other.tokens.filter(t=>!diagram.targetToken||t===diagram.targetToken).length,0)
+                    +tokens.slice(0,column+1).filter(t=>!diagram.targetToken||t===diagram.targetToken).length}
+                </Text>}
             </View>;
         })}
       </View>
