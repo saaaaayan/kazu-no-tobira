@@ -44,7 +44,14 @@ test('preschool 02–05 share the correct count with diagram and targeted token'
         assert.ok(tokens.some(token=>token!==diagram.targetToken));
       }
       if(index===5){
-        assert.ok(diagram.layoutComparison);
+        const before=diagram.layoutComparison?.beforeRows;
+        const after=diagram.rows.map(row=>row.tokens.length);
+        assert.ok(before,'stage 05 must visibly rearrange the same items');
+        assert.equal(before.reduce((sum,n)=>sum+n,0),Number(q.answer),q.id);
+        assert.equal(after.reduce((sum,n)=>sum+n,0),Number(q.answer),q.id);
+        assert.notDeepEqual(before,after,'before and after must have different rows');
+        assert.match(q.question,/ばしょを かえた あとの/u);
+        assert.match(q.prompt,/したの えに/u);
         assert.notEqual(diagram.layoutComparison.before,diagram.layoutComparison.after);
       }
     }
