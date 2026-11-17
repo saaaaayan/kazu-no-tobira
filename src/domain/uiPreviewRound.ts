@@ -1,6 +1,6 @@
 import type { WorldStage } from './worldCatalog';
 import type { BankQuestion } from './questionBank';
-import { countingTokenArt, preschoolCountingTokens } from './countingTokens';
+import { countingTokenArt, preschoolCountingTokens } from './countingTokens.ts';
 
 type SampleStage = Pick<WorldStage,'id'|'gradeId'|'family'|'kind'>;
 
