@@ -9,11 +9,18 @@ import { StudyFigureView } from './StudyFigureView';
 import { ClockFace } from './ClockFace';
 import { ReviewQuestionPreview } from '../FullAdventure';
 
-type Row = { id: string; stage_id: string; stem: string; format: string; status: ReviewStatus; version: number };
+type DiagnosticSummary = { mismatches: number; language: number; draftNotes: number };
+type Diagnostics = {
+  mismatches: string[]; language: { field: string; message: string }[]; draftNotes?: string[];
+  proposal?: { goal: string; interaction: string; guard: string; difficulty: string };
+};
+type Row = { id: string; stage_id: string; stem: string; format: string; status: ReviewStatus; version: number;
+  diagnostics?: DiagnosticSummary };
 type Listing = { rows: Row[]; total: number; counts: Partial<Record<ReviewStatus, number>> };
 type Details = {
   id: string; stageId: string; question: BankQuestion; status: ReviewStatus; version: number;
   reason: ReviewReason | null; note: string;
+  diagnostics?: Diagnostics;
   history: { id: number; created: string; actor: string; event: string; previous_status: ReviewStatus | null;
     status: ReviewStatus; note: string; reason: string | null; fingerprint: string }[];
   duplicates: { id: string; stage_id: string; stem: string; kind: 'exact' | 'equivalent' | 'structural' }[];
@@ -49,6 +56,30 @@ function ReviewFigures({ question, solution = false }: { question: BankQuestion;
     {question.clock && (!solution || !question.clock.read) && <ClockFace
       time={solution ? question.clock.end : question.clock.start} read={!solution && question.clock.read}/>}
   </>;
+}
+
+function LearningChecks({ diagnostics }: { diagnostics: Diagnostics }) {
+  return <section aria-label="学習目標と日本語の点検">
+    <h3>学習目標と日本語の点検</h3>
+    <p>要人手確認。警告を手がかりに、子どもが自力で解いて理解できるか審査してください。</p>
+    {diagnostics.proposal ? <div style={{ borderLeft:'3px solid #c5964c',paddingLeft:12 }}>
+      <strong>幼児の島の第1稿（参考）</strong>
+      <dl>
+        <dt>到達目標</dt><dd>{diagnostics.proposal.goal}</dd>
+        <dt>想定操作・形式</dt><dd>{diagnostics.proposal.interaction}</dd>
+        <dt>難度・注意</dt><dd>{diagnostics.proposal.difficulty}　{diagnostics.proposal.guard}</dd>
+      </dl>
+      {diagnostics.draftNotes?.map(message=><p key={message}>{message}</p>)}
+    </div> : <p>個別の到達目標・前提技能・許容形式は、教材と現行単元の対応を確認してください。</p>}
+    <h4>単元との一致</h4>
+    {diagnostics.mismatches.length
+      ? <ul>{diagnostics.mismatches.map(message=><li key={message}>{message}</li>)}</ul>
+      : <p>機械検査で明示的な不一致は見つかりませんでした。</p>}
+    <h4>日本語・説明の警告</h4>
+    {diagnostics.language.length
+      ? <ul>{diagnostics.language.map(({field,message},i)=><li key={i}><strong>{field}</strong>　{message}</li>)}</ul>
+      : <p>読み方・語彙・説明のつながりを、実際の画面で確認してください。</p>}
+  </section>;
 }
 
 async function api<T>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
@@ -238,6 +269,11 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
               setSelection(updated);
             }}/> <Badge status={row.status}/> {row.stage_id} ／ {row.format}</label>
           <div><button type="button" style={{...button,marginTop:6,textAlign:'left'}} onClick={() => open(row.id)}>{row.stem}</button></div>
+          {row.diagnostics && <p style={{margin:'6px 0'}}>要人手確認
+            {row.diagnostics.mismatches > 0 && <> ／ 単元の不一致候補 {row.diagnostics.mismatches}件</>}
+            {row.diagnostics.language > 0 && <> ／ 日本語・説明 {row.diagnostics.language}件</>}
+            {row.diagnostics.draftNotes > 0 && <> ／ 第1稿との差 {row.diagnostics.draftNotes}件</>}
+          </p>}
         </article>)}
       </section>
       <div>
@@ -267,6 +303,7 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
           <p>{island?.title} {island?.island}　／　{stage ? stageDisplayTitle(stage) : detail.stageId}<br/>
             単元 {unit?.title ?? '要確認'}　／　技能 {stage?.family ?? '要確認'}</p>
           <button type="button" style={button} disabled={!stage} onClick={() => setPreview(true)}>子ども向け画面を開く</button>
+          {detail.diagnostics && <LearningChecks diagnostics={detail.diagnostics}/>}
           <h3>問題と操作案内</h3>
           <MathText value={detail.question.question} style={{ fontSize:22, fontWeight:'700' }}/>
           <MathText value={detail.question.prompt}/>
