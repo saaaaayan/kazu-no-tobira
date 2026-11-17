@@ -221,6 +221,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
   const next = testing ? undefined : grade.stages.find(stage => ['play', 'learn'].includes(worldStageAction(mode, progress, stage, access)) && !progress.stages[stage.id]);
   const lessons = unitLessons.filter(lesson => lesson.grade === grade.id);
   const marker=Math.max(46,Math.min(57,Math.floor(actual/5)-9));
+  const previewStage=preview ? grade.stages.find(stage=>Boolean(uiPreviewSampleKind(stage))) : undefined;
   return (
     <View style={styles.screen}>
       <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
@@ -236,6 +237,21 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         </View>
         <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
       </View>
+      {preview && <View style={styles.previewCard}>
+        {previewStage ? <>
+          <Text accessibilityRole="header" style={styles.previewHeading}>まずは ここから！</Text>
+          <Pressable accessibilityRole="button" testID="kazu-preview-first-stage"
+            accessibilityLabel={'ステージ '+stageText(previewStage)+' を はじめる'}
+            onPress={()=>onStart(previewStage)}
+            style={({pressed})=>[styles.previewStart,pressed&&styles.pressed]}>
+            <Text style={styles.previewStartText}>▶ ステージ {stageText(previewStage)} を はじめる</Text>
+          </Pressable>
+          <Text style={styles.hintText}>えを みて、さわって、かぞえてみよう。</Text>
+        </> : <>
+          <Text style={styles.previewHeading}>このしまの もんだいは じゅんびちゅう</Text>
+          <Text style={styles.hintText}>いまは ちずを みられるよ。ほかの しまも みてみよう。</Text>
+        </>}
+      </View>}
       {!preview && lessons.length > 0 && <View style={styles.studyCard}>
         <Text accessibilityRole="header" style={styles.mapTitle}>ルミと まなぶ</Text>
         {lessons.map(lesson => {
@@ -259,7 +275,11 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           </View>;
         })}
       </View>}
-      {!testing && <View style={styles.legend}>
+      {preview && <View style={styles.legend}>
+        <Text style={styles.legendText}>✦ あそべる</Text>
+        <Text style={styles.legendText}>● じゅんびちゅう</Text>
+      </View>}
+      {!preview && !testing && <View style={styles.legend}>
         <Text style={styles.legendText}>✦ 挑戦できる</Text>
         <Text style={styles.legendText}>✓ クリア</Text>
         <Text style={styles.legendText}>★ パーフェクト</Text>
@@ -295,10 +315,10 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         })}
         {checkpointsFor(grade).map(checkpoint=>{
           const end=geometry.positions[checkpoint.after.order];
-          const enabled=testing || checkpoint.sourceStageIds.every(id=>Boolean(progress.stages[id]?.clearedAt));
+          const enabled=!preview && (testing || checkpoint.sourceStageIds.every(id=>Boolean(progress.stages[id]?.clearedAt)));
           const left=Math.min(actual-68,Math.max(2,end.x-33));
           return <Pressable key={checkpoint.id} accessibilityRole="button"
-            accessibilityLabel={`確認テスト ${checkpoint.number}`} disabled={!enabled} onPress={()=>onCheckpoint(checkpoint)}
+            accessibilityLabel={preview ? '確認テスト '+checkpoint.number+' は準備中' : '確認テスト '+checkpoint.number} disabled={!enabled} onPress={()=>onCheckpoint(checkpoint)}
             style={{position:'absolute',left,top:end.y+37,width:66,height:44,borderRadius:10,justifyContent:'center',
               alignItems:'center',backgroundColor:enabled?'#fff0b5':'#d2d9e9',borderWidth:1,borderColor:'#66769a'}}>
             <Text style={{fontSize:11,fontWeight:'800',color:'#263453'}}>確認テスト</Text>
@@ -309,8 +329,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           const position=geometry.positions[index];
           const record=(testing ? undefined : progress.stages[stage.id]) as {clearedAt?:string;perfectAt?:string}|undefined;
           const action=worldStageAction(mode,progress,stage,access);
-          const unlocked=preview || action === 'play' || action === 'learn';
-          const selectable=unlocked || action === 'premium';
+          const unlocked=preview ? Boolean(uiPreviewSampleKind(stage)) : action === 'play' || action === 'learn';
+          const selectable=preview ? unlocked : unlocked || action === 'premium';
           const cleared=Boolean(record?.clearedAt);
           const perfect=Boolean(record?.perfectAt||(legacy.has(stage.id)&&cleared));
           const current=stage.id===next?.id;
@@ -378,6 +398,10 @@ const styles=StyleSheet.create({
   back:{alignSelf:'flex-start',minHeight:44,justifyContent:'center',paddingHorizontal:6},
   backText:{color:'#345d80',fontSize:15,fontWeight:'900'},
   studyCard:{borderRadius:18,backgroundColor:'#fff2ce',borderWidth:1,borderColor:'#e5c682',padding:15,gap:9},
+  previewCard:{borderRadius:17,backgroundColor:'#fff6dc',borderWidth:2,borderColor:'#d7ad5a',padding:15,gap:9},
+  previewHeading:{color:'#29446e',fontWeight:'900',fontSize:18},
+  previewStart:{minHeight:58,alignItems:'center',justifyContent:'center',borderRadius:14,backgroundColor:'#245e89',paddingHorizontal:15,paddingVertical:12},
+  previewStartText:{color:'#ffffff',fontWeight:'900',fontSize:20,textAlign:'center'},
   studyEntry:{backgroundColor:'#fffaf0',borderRadius:12,padding:12,gap:8},
   studyButtons:{flexDirection:'row',flexWrap:'wrap',gap:8},
   studyButton:{backgroundColor:'#3f548f',minHeight:46,justifyContent:'center',paddingHorizontal:12,borderRadius:10},
