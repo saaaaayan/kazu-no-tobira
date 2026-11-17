@@ -70,7 +70,7 @@ function make(stage:number,index:number,token:CountingToken,number:number,diagra
     {title:'ならべる',body:'ならびを かえても、ものは ふえていないし へっていないよ。'},
     {title:'かぞえる',body:`ひとつずつ かぞえると ${number}こだよ。`}
   ]:[{title:'ひとつずつ かぞえる',body:`ひとつに ひとつ すうじを つけるよ。 さいごは ${number}。`}];
-  const choices=stage===2?['3','4','5']:answers(number);
+  const choices=(stage===2?['3','4','5']:answers(number)) as [string,string,string];
   return {
     id:`ui-preview-preschool.n0${stage}-draft-${String(index+1).padStart(2,'0')}`,
     skillId:'preschool.objects',type:'choice',format:'counting',difficulty:stage>=4?2:1,
