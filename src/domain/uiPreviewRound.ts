@@ -1,12 +1,14 @@
 import type { WorldStage } from './worldCatalog';
 import type { BankQuestion } from './questionBank';
 import { countingTokenArt, preschoolCountingTokens } from './countingTokens.ts';
+import { preschoolSample02to05 } from './preschoolSampleStages.ts';
 
 type SampleStage = Pick<WorldStage,'id'|'gradeId'|'family'|'kind'>;
 
 export function uiPreviewSampleKind(stage: SampleStage) {
   if (stage.kind !== 'normal') return undefined;
   if (stage.id === 'preschool.n01' && stage.gradeId === 'preschool' && stage.family === 'count') return 'counting';
+  if (stage.gradeId === 'preschool' && /^preschool\\.n0[2-5]$/.test(stage.id)) return 'preschool-sample';
   if ((stage.id === 'e1.forest' || stage.id === 'e1.n06') && stage.gradeId === 'e1' && stage.family === 'addition') return 'addition';
 }
 
@@ -37,6 +39,7 @@ export function uiPreviewBank(stage: SampleStage): BankQuestion[] {
   const kind=uiPreviewSampleKind(stage);
   if (!kind) return [];
   if (kind==='counting') return [...countingPreviewBank];
+  if (kind==='preschool-sample') return [...(preschoolSample02to05[stage.id] ?? [])];
   return Array.from({ length: 10 }, (_, index) => {
     const first = index % 5 + 1;
     const second = (index * 3 + 1) % 4 + 1;
@@ -97,5 +100,5 @@ export function uiPreviewRound(stage: SampleStage, random: () => number = Math.r
   const kind=uiPreviewSampleKind(stage);
   if (!kind) return [];
   const bank=uiPreviewBank(stage);
-  return kind==='counting' ? randomCountingRound(bank,random) : shuffled(bank,random).slice(0,10);
+  return kind==='counting' ? randomCountingRound(bank,random) : kind==='preschool-sample' ? [...bank] : shuffled(bank,random).slice(0,10);
 }
