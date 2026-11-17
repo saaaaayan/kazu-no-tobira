@@ -308,10 +308,13 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     } finally { submitting.current=false; setSaving(false); }
   }
 
-  async function submit() {
+  async function submit(selectedAnswer?: string) {
     if (!round || !progress || !question || (!isolated && !round.live && !canAccessStage(access, round.stage)) || round.feedback || submitting.current || saving ||
       (shownMode === 'handwriting' && (blockRef.current || drawing))) return;
-    if (!isValidMathAnswer(question, answer)) {
+    // 幼児の1タップ回答では、setStateの完了を待たず、押された数字をそのまま採点する。
+    const submittedAnswer = selectedAnswer ?? answer;
+    if (selectedAnswer !== undefined) setAnswer(selectedAnswer);
+    if (!isValidMathAnswer(question, submittedAnswer)) {
       setMessage(question.type === 'choice' ? 'こたえを ひとつ えらんでね。' : 'こたえを 数字で いれてね。');
       if (shownMode === 'keyboard') keyboard.current?.focus();
       return;
@@ -322,11 +325,11 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     setSaving(true);
     setMessage('');
     const submitted = question.type === 'choice'
-      ? question.choices?.indexOf(answer) ?? -1
-      : Number(answer.normalize('NFKC').replaceAll('−', '-'));
+      ? question.choices?.indexOf(submittedAnswer) ?? -1
+      : Number(submittedAnswer.normalize('NFKC').replaceAll('−', '-'));
     try {
-      const graded=round.live ? await requestLiveGrade(round.live.origin,round.live.round.token,question.id,answer) : undefined;
-      const correctAnswer=graded?.correct ?? checkMathAnswer(question,answer);
+      const graded=round.live ? await requestLiveGrade(round.live.origin,round.live.round.token,question.id,submittedAnswer) : undefined;
+      const correctAnswer=graded?.correct ?? checkMathAnswer(question,submittedAnswer);
       const newCorrect=round.correct+Number(correctAnswer);
       const result:Feedback=correctAnswer?'correct':'incorrect';
       const attempt = {
@@ -521,9 +524,39 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                     )}
                     <MathText style={styles.prompt} value={question.prompt}/>
                     {countingGuide && !round.feedback && <QuestionReadAloud text={hints[round.hintLevel-1] ?? question.question+'。'+question.prompt}/>}
+                    {countingGuide && !round.feedback && (
+                      <View style={styles.preschoolAnswerSection}>
+                        <Text style={styles.preschoolInstruction}>すうじを さわってね</Text>
+                        <View style={styles.preschoolNumberRow}>
+                          {question.choices?.map(option => (
+                            <Pressable key={option} testID={'preschool-answer-'+option}
+                              accessibilityRole="button"
+                              accessibilityLabel={option+'こ と こたえる'}
+                              accessibilityHint="さわると こたえあわせを するよ"
+                              accessibilityState={{disabled:saving}}
+                              disabled={saving} onPress={()=>void submit(option)}
+                              style={({pressed})=>[styles.preschoolNumberButton,pressed&&styles.dim]}>
+                              <Text style={styles.preschoolNumberText}>{option}</Text>
+                            </Pressable>
+                          ))}
+                        </View>
+                        {hints.slice(0,round.hintLevel).map((hint,i)=>(
+                          <View key={i} style={styles.preschoolHintBox}>
+                            <MathText style={styles.preschoolHintText} value={hint}/>
+                          </View>
+                        ))}
+                        {(round.live ? !round.noMoreHints : round.hintLevel<hints.length) && (
+                          <Pressable accessibilityRole="button" disabled={saving}
+                            onPress={showHint} style={styles.preschoolHintButton}>
+                            <Text style={styles.preschoolHintButtonText}>💡 ヒントを みる</Text>
+                          </Pressable>
+                        )}
+                        {!!message && <Text accessibilityLiveRegion="polite" style={styles.preschoolError}>{message}</Text>}
+                      </View>
+                    )}
                   </View>
-                  <View style={[styles.workArea,wide&&styles.workWide]}>
-                    <View style={[styles.answerArea,wide&&styles.answerWide]}>
+                  {(!countingGuide || round.feedback) && <View style={[styles.workArea,wide&&!countingGuide&&styles.workWide]}>
+                    <View style={[styles.answerArea,wide&&!countingGuide&&styles.answerWide]}>
                       {round.feedback ? (
                         <>
                           <View accessibilityLiveRegion="polite" style={[styles.feedbackBox,round.feedback==='incorrect'&&styles.wrongBox]}>
@@ -598,7 +631,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                                   accessible accessibilityLabel="こたえ" inputMode="decimal"
                                   placeholder="すうじを いれてね" placeholderTextColor="#697188" value={answer}
                                   onChangeText={value=>{setAnswer(value);setMessage('');}}
-                                  editable={!saving} onSubmitEditing={submit}/>
+                                  editable={!saving} onSubmitEditing={()=>void submit()}/>
                               ) : shownMode==='panel' ? (
                                 <>
                                   <View style={styles.readout}><Text style={styles.readoutText}>{answer||'すうじ'}</Text></View>
@@ -631,13 +664,13 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                             </Pressable>
                           )}
                           {!!message&&<Text accessibilityLiveRegion="polite" style={styles.error}>{message}</Text>}
-                          <GameButton label={saving?'きろくしているよ…':'こたえあわせ'} onPress={submit}
+                          <GameButton label={saving?'きろくしているよ…':'こたえあわせ'} onPress={()=>void submit()}
                             disabled={saving||(shownMode==='handwriting'&&(blocked||drawing))}/>
                         </>
                       )}
                     </View>
                     {!countingGuide && <CalculationMemo key={question.id} onDrawingChange={setDrawing}/>}
-                  </View>
+                  </View>}
                 </>
               )}
             </View>
@@ -705,6 +738,21 @@ const styles = StyleSheet.create({
   optionSelected: { backgroundColor: '#dfebff', borderColor: '#4763aa' },
   optionText: { fontWeight: '800', fontSize: 17, color: '#344061' },
   optionTextSelected: { color: '#244b97' },
+  // 幼児は問題のすぐ下で「すうじを1回さわる→採点」。右下の小さな回答欄は使わない。
+  preschoolAnswerSection: { gap: 10, alignItems:'center', paddingTop: 4 },
+  preschoolInstruction: { color:'#fff4ce', fontSize:20, fontWeight:'900', textAlign:'center' },
+  preschoolNumberRow: { flexDirection:'row', width:'100%', maxWidth:440, gap:10 },
+  preschoolNumberButton: { flex:1, minWidth:0, minHeight:78, borderWidth:3,
+    borderColor:'#e8bf66', borderRadius:18, backgroundColor:'#fff2c8',
+    alignItems:'center', justifyContent:'center' },
+  preschoolNumberText: { color:'#27335c', fontSize:40, fontWeight:'900' },
+  preschoolHintButton: { minHeight:56, backgroundColor:'#fff0be',
+    borderRadius:14, paddingHorizontal:24, justifyContent:'center', alignItems:'center' },
+  preschoolHintButtonText: { color:'#29345d', fontSize:19, fontWeight:'900' },
+  preschoolHintBox: { width:'100%', maxWidth:480, backgroundColor:'#fff4d3',
+    borderRadius:12, padding:12 },
+  preschoolHintText: { color:'#34345e', fontSize:17, fontWeight:'800', textAlign:'center' },
+  preschoolError: { color:'#fff1bb', fontWeight:'800', fontSize:16 },
   hintButton: { alignSelf: 'flex-start', padding: 9, borderRadius: 9, backgroundColor: '#e9e4f6', minHeight: 40, justifyContent: 'center' },
   hintButtonText: { color: '#4d4e79', fontWeight: '800' },
   hintBox: { borderRadius: 10, backgroundColor: '#fff6d6', padding: 12 },
