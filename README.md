@@ -13,26 +13,14 @@
 - 苦手克服・個別最適化学習
 - Codexによる開発
 
-## 開発環境
+## 唯一のゲーム・管理者入口
 
-- Node.js 24.11 以降
-- pnpm 11.25.0
-- Expo SDK 58 / React Native / TypeScript
+**[数のトビラ｜公式の確認先](https://saaaaayan.github.io/kazu-no-tobira/)**
 
-```sh
-pnpm install --frozen-lockfile
-pnpm web
-```
-
-Expo が表示したローカル URL（既定では http://localhost:8081）を開きます。
-同じコードを端末で開くには `pnpm start` を使います。ローカルの Android
-エミュレーターは `pnpm android`、macOS の iOS シミュレーターは `pnpm ios` で起動できます。
-
-```sh
-pnpm test
-pnpm typecheck
-pnpm build:web
-```
+- ゲーム・世界地図・学習画面：上記URLから操作する。
+- 管理者の教材レビュー：**同じサイト内の `/admin` に統合する方針**。安全な認証付きAPIと公開サイトの統合は**未完了**。管理者にローカルURLを案内しない。
+- 開発はGitHubの `main` を正本とし、PR→自動テスト→main統合→**Pages公開と公開HTTPでのバージョン一致検証**まで行う。
+- 開発・ビルドの技術手順は[公開・検証ルール](docs/release-process.md)で管理する。一般の確認先は公開URLのみ。
 
 ## 現在の開発段階と完成目標
 
