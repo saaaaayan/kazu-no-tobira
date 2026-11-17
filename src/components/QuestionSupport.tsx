@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { type BankDiagram, type BankQuestion, mistakenReason } from '../domain/questionBank';
 import type { SolutionStep } from '../domain/writtenSolution';
 import { MathDisplay, MathText } from './MathText';
+import { countingBoardSizes } from '../domain/countingBoardSizes';
 
 const tokenArt = {
   dot: ['●','まる'], triangle: ['▲','さんかく'], square: ['■','しかく'],
@@ -13,6 +14,8 @@ const tokenArt = {
 function CountingBoard({ diagram, phase }: {
   diagram: Extract<BankDiagram,{ kind:'countingBoard' }>; phase: 'question' | 'hint' | 'solution';
 }) {
+  const { width: viewportWidth } = useWindowDimensions();
+  const sizes=countingBoardSizes(viewportWidth,Boolean(diagram.guide));
   const interactive=phase==='question' || (diagram.guide && phase==='hint');
   const numbered=diagram.guide && phase==='solution';
   const [taps,setTaps] = useState<{ forDiagram:BankDiagram; ids:Set<string> }>();
@@ -25,15 +28,22 @@ function CountingBoard({ diagram, phase }: {
   return <View style={{ padding:10, backgroundColor:'#edf4ff', borderRadius:12, gap:8 }}>
     {diagram.rows.map(({label,tokens},row) => <View key={row} style={{ gap:5 }}>
       {label && <Text style={{ color:'#293f61', fontSize:18, fontWeight:'700' }}>{label}</Text>}
-      <View style={{ flexDirection:'row', flexWrap:diagram.guide?'nowrap':'wrap', gap:diagram.spacing==='wide'?20:8 }}>
+      <View style={{ flexDirection:'row', flexWrap:diagram.guide?'nowrap':'wrap',
+        justifyContent:diagram.guide?'center':'flex-start',
+        gap:diagram.guide ? sizes.gap : diagram.spacing==='wide'?20:8 }}>
         {tokens.map((token,column) => {
           const id = row+':'+column;
           const lit = selected.has(id);
           const shape = tokenArt[token];
-          const card = { width:diagram.guide?52:48, height:diagram.guide?52:48, alignItems:'center', justifyContent:'center',
-            borderRadius:10, borderWidth:2, borderColor:lit ? '#3f765b' : '#ccd8ef',
+          const card = { width:sizes.tile, height:sizes.tile, alignItems:'center', justifyContent:'center',
+            borderRadius:diagram.guide?17:10, borderWidth:2, borderColor:lit ? '#3f765b' : '#ccd8ef',
             backgroundColor:lit ? '#cce8db' : '#fff' } as const;
-          const icon = <Text style={{ fontSize:30, color:token==='marked' ? '#3f765b' : '#253e70' }}>{shape[0]}</Text>;
+          // 「●」の文字サイズはブラウザーやフォントによって小さく見える。
+          // 幼児向けの丸は実寸の円形Viewにして、大きさを安定させる。
+          const icon = diagram.guide && token==='dot'
+            ? <View style={{ width:sizes.symbol, height:sizes.symbol, borderRadius:sizes.symbol/2,
+                backgroundColor:lit?'#28735b':'#253e70' }} />
+            : <Text style={{ fontSize:sizes.symbol, color:token==='marked' ? '#3f765b' : '#253e70' }}>{shape[0]}</Text>;
           return interactive && token!=='empty' ? <Pressable key={id} style={card} onPress={() => toggle(id)}
             accessibilityRole="button" accessibilityLabel={shape[1]} accessibilityState={{ selected:lit }}>{icon}</Pressable>
             : <View key={id} style={{alignItems:'center'}}>
