@@ -1,11 +1,13 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import type { BankQuestion } from '../domain/questionBank';
-import { worldIslands } from '../domain/worldCatalog';
-import { stageLabels } from '../domain/stageStructure';
+import { allWorldStages,worldIslands } from '../domain/worldCatalog';
+import { stageLabels, stageDisplayTitle } from '../domain/stageStructure';
 import { rejectReasons, reviewStatusLabels, type ReviewReason, type ReviewStatus } from '../domain/reviewAdmin';
 import { MathText } from './MathText';
-import { QuestionDiagram } from './QuestionSupport';
+import { QuestionDiagram, WrittenSolution } from './QuestionSupport';
 import { StudyFigureView } from './StudyFigureView';
+import { ClockFace } from './ClockFace';
+import { ReviewQuestionPreview } from '../FullAdventure';
 
 type Row = { id: string; stage_id: string; stem: string; format: string; status: ReviewStatus; version: number };
 type Listing = { rows: Row[]; total: number; counts: Partial<Record<ReviewStatus, number>> };
@@ -34,6 +36,19 @@ const badgeColors: Record<ReviewStatus,string> = {
 };
 function Badge({ status }: { status: ReviewStatus }) {
   return <span style={{ background:badgeColors[status], borderRadius:6, padding:'3px 7px' }}>{reviewStatusLabels[status]}</span>;
+}
+
+function questionHints(question: BankQuestion): readonly string[] {
+  return question.hints ?? question.guidedHints ?? (question.hint ? [question.hint] : []);
+}
+
+function ReviewFigures({ question, solution = false }: { question: BankQuestion; solution?: boolean }) {
+  return <>
+    {question.diagram && <QuestionDiagram diagram={question.diagram} phase={solution ? 'solution' : 'question'}/>}
+    {question.figure && !solution && <StudyFigureView figure={question.figure}/>}
+    {question.clock && (!solution || !question.clock.read) && <ClockFace
+      time={solution ? question.clock.end : question.clock.start} read={!solution && question.clock.read}/>}
+  </>;
 }
 
 async function api<T>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
@@ -65,6 +80,10 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
   const [totalsIsland, setTotalsIsland] = useState(worldIslands[0].id);
   const [focusId, setFocusId] = useState<string>();
   const [previousRevision, setPreviousRevision] = useState<BankQuestion>();
+  const [preview, setPreview] = useState(false);
+  const [phone, setPhone] = useState(true);
+  const [detailed, setDetailed] = useState(false);
+  const [previewReset, setPreviewReset] = useState(0);
   const total = Object.values(listing?.counts ?? {}).reduce((sum,count) => sum+count,0);
 
   useEffect(() => {
@@ -78,6 +97,7 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
     if (!focusId) return;
     const controller = new AbortController();
     void api<Details>('questions/'+encodeURIComponent(focusId),undefined,controller.signal).then(value => {
+      if (controller.signal.aborted) return;
       setDetail(value);
       setNote(value.note);
       setReason(value.reason ?? '問題不成立');
@@ -129,6 +149,25 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
   }
 
   const checked = Object.entries(selection).map(([id,version]) => ({ id,version }));
+  const stage = detail && allWorldStages.find(item => item.id === detail.stageId);
+  const island = stage && worldIslands.find(item => item.id === stage.gradeId);
+  const unit = stage && island?.units[stage.unitIndex];
+  if (preview && detail && stage) return <main style={pageStyle}>
+    <h1>子ども向け画面のプレビュー</h1>
+    <p>{stageDisplayTitle(stage)}　／　版 {detail.version}　／　記録なし</p>
+    <div style={line}>
+      <button type="button" style={button} onClick={() => setPreview(false)}>レビューに戻る</button>
+      <button type="button" style={button} onClick={() => setPreviewReset(value => value+1)}>最初から試す</button>
+      <label><input type="checkbox" checked={phone} onChange={event=>setPhone(event.target.checked)}/> スマホ幅</label>
+      <label><input type="checkbox" checked={detailed} onChange={event=>setDetailed(event.target.checked)}/> 詳しい解説を利用できる設定</label>
+    </div>
+    <div style={{ width:'100%', maxWidth:phone?390:1100, height:'min(80vh, 820px)', minHeight:420,
+      margin:'16px auto', display:'flex', flexDirection:'column', border:'1px solid #8495b3', borderRadius:12, overflow:'hidden' }}>
+      <ReviewQuestionPreview key={detail.id+':'+detail.version+':'+previewReset} stage={stage} phone={phone}
+        question={{...detail.question,hints:questionHints(detail.question),steps:detail.question.steps??[],mistakes:detail.question.mistakes??[]} as BankQuestion}
+        detailed={detailed} onClose={() => setPreview(false)}/>
+    </div>
+  </main>;
   return <main style={pageStyle}>
     <header style={{ ...line, justifyContent:'space-between' }}>
       <h1>数のトビラ 問題審査</h1>
@@ -222,23 +261,29 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
             {checked.length > 0 && <button type="button" style={button} disabled={saving} onClick={() => void save(checked)}>選択中の{checked.length}問に一括保存</button>}
           </div>
         </section>}
-        {detail && <section style={panel} aria-label="問題のプレビュー">
-          <h2>問題のプレビュー</h2>
-          <p>{detail.id}　<Badge status={detail.status}/></p>
+        {detail && <section style={panel} aria-label="教材レビュー">
+          <h2>教材レビュー</h2>
+          <p>{detail.id}　版 {detail.version}　<Badge status={detail.status}/></p>
+          <p>{island?.title} {island?.island}　／　{stage ? stageDisplayTitle(stage) : detail.stageId}<br/>
+            単元 {unit?.title ?? '要確認'}　／　技能 {stage?.family ?? '要確認'}</p>
+          <button type="button" style={button} disabled={!stage} onClick={() => setPreview(true)}>子ども向け画面を開く</button>
+          <h3>問題と操作案内</h3>
           <MathText value={detail.question.question} style={{ fontSize:22, fontWeight:'700' }}/>
-          {detail.question.diagram && <QuestionDiagram diagram={detail.question.diagram} phase="question"/>}
-          {detail.question.figure && <StudyFigureView figure={detail.question.figure}/>}
+          <MathText value={detail.question.prompt}/>
+          <ReviewFigures question={detail.question}/>
+          {!detail.question.diagram && !detail.question.figure && !detail.question.clock && <p>図の登録なし</p>}
           <h3>解答・採点</h3>
           {detail.question.choices?.map((choice,index) => <MathText key={index} value={choice}/>)}
           <MathText value={detail.question.answer}/>
-          <p>入力方式　{detail.question.type==='choice' ? '単一選択' : '数値入力'}</p>
+          <p>{detail.question.type==='choice' ? '単一選択。正答と一致する選択肢を採点します。'
+            : '数値入力。全角数字などの表記を正規化し、正答との差が 0.000001 未満なら正解にします。'}</p>
           <h3>ヒント</h3>
-          {detail.question.hints.map((hint,index) => <MathText key={index} prefix={String(index+1)+'：'} value={hint}/>)}
+          {[0,1,2].map(index => <MathText key={index} prefix={String(index+1)+'：'} value={questionHints(detail.question)[index] || '未登録'}/>)}
           <h3>基本解説</h3><MathText value={detail.question.explanation}/>
           <h3>詳しい解説</h3>
-          {detail.question.steps.map((step,index) => <div key={index}><h4>{step.title}</h4><MathText value={step.body}/></div>)}
-          {detail.question.diagram && <QuestionDiagram diagram={detail.question.diagram} phase="solution"/>}
-          {detail.question.mistakes.length > 0 && <><h3>誤答</h3>{detail.question.mistakes.map((item,index) =>
+          {detail.question.steps?.length ? <WrittenSolution steps={detail.question.steps}/> : <p>未登録</p>}
+          <ReviewFigures question={detail.question} solution/>
+          {Boolean(detail.question.mistakes?.length) && <><h3>誤答</h3>{detail.question.mistakes.map((item,index) =>
             <MathText key={index} prefix={item.answer ? item.answer+'：' : undefined} value={item.explanation}/>)}</>}
           <h3>重複候補</h3>
           {detail.duplicates.length ? <ul>{detail.duplicates.map(item => <li key={item.id}>

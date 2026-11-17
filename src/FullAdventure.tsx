@@ -59,11 +59,14 @@ type Round = {
   live?: {origin:string; mode:LiveMode; round:LiveRound; eventId?:string};
 };
 
-function AdventureWorld() {
-  const [progress, setProgress] = useState<Progress | undefined>(uiPreview ? emptyProgress : undefined);
+type ReviewPreview = { stage: WorldStage; question: MathQuestion; phone: boolean; detailed: boolean; onClose: () => void };
+
+function AdventureWorld({ review }: { review?: ReviewPreview }) {
+  const isolated = uiPreview || Boolean(review);
+  const [progress, setProgress] = useState<Progress | undefined>(isolated ? emptyProgress : undefined);
   const [loadError, setLoadError] = useState(false);
   const [screen, setScreen] = useState<Screen>('home');
-  const [playMode, setPlayMode] = useState<PlayMode>(uiPreview ? 'test' : 'normal');
+  const [playMode, setPlayMode] = useState<PlayMode>(isolated ? 'test' : 'normal');
   const [access, setAccess] = useState<Entitlement>(freeAccess);
   const [showPlanInfo, setShowPlanInfo] = useState(false);
   const [showWorkedSolution, setShowWorkedSolution] = useState(false);
@@ -72,9 +75,12 @@ function AdventureWorld() {
   const [startError, setStartError] = useState('');
   const testRoundSeed = useRef(0);
   const testing = playMode === 'test';
-  const gameOrigin=uiPreview ? undefined : liveOrigin();
+  const gameOrigin=isolated ? undefined : liveOrigin();
   const [grade, setGrade] = useState<WorldGrade>(worldGrades[0]);
-  const [round, setRound] = useState<Round>();
+  const [round, setRound] = useState<Round | undefined>(() => review ? {
+    stage:review.stage, problems:[review.question], index:0, correct:0,
+    results:[], dialogueOffset:0, usedHint:false, hintLevel:0,
+  } : undefined);
   const [learning, setLearning] = useState<Learning>();
   const [lessonError, setLessonError] = useState('');
   const lessonWrite = useRef(false);
@@ -89,20 +95,21 @@ function AdventureWorld() {
   const submitting = useRef(false);
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   const keyboard = useRef<ComponentRef<typeof TextInput>>(null);
-  const wide = useWindowDimensions().width > 800;
+  const viewport = useWindowDimensions().width;
+  const wide = !review?.phone && viewport > 800;
 
   useEffect(() => {
-    if (uiPreview) return;
+    if (isolated) return;
     let active = true;
     loadProgress().then(
       saved => { if (active) setProgress(saved); },
       () => { if (active) setLoadError(true); },
     );
     return () => { active = false; };
-  }, []);
+  }, [isolated]);
 
   useEffect(() => {
-    if (__DEV__ || uiPreview) return;
+    if (__DEV__ || isolated) return;
     const controller = new AbortController();
     const refresh = () => {
       void readServerEntitlement(process.env.EXPO_PUBLIC_ENTITLEMENT_URL, controller.signal).then(next => {
@@ -112,14 +119,14 @@ function AdventureWorld() {
     refresh();
     const interval = setInterval(refresh, 60_000);
     return () => { controller.abort(); clearInterval(interval); };
-  }, []);
+  }, [isolated]);
 
   useEffect(() => {
-    if (!uiPreview && round && (!round.live || ['stage','test'].includes(round.live.mode)) && !canAccessStage(access, round.stage)) {
+    if (!isolated && round && (!round.live || ['stage','test'].includes(round.live.mode)) && !canAccessStage(access, round.stage)) {
       setRound(undefined);
       setScreen('island');
     }
-  }, [access, round]);
+  }, [access, isolated, round]);
 
   function blockHandwriting(value: boolean) {
     blockRef.current = value;
@@ -274,7 +281,7 @@ function AdventureWorld() {
 
   const question = round?.problems[round.index];
   const bankQuestion = question && isBankQuestion(question) ? question : undefined;
-  const canReadWorkedSolution = uiPreview || canAccessFeature(access, 'workedSolutions');
+  const canReadWorkedSolution = review ? review.detailed : uiPreview || canAccessFeature(access, 'workedSolutions');
   const liveCard=round?.live?.round.questions[round.index];
   const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && (Boolean(liveCard) || Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0);
@@ -299,7 +306,7 @@ function AdventureWorld() {
   }
 
   async function submit() {
-    if (!round || !progress || !question || (!uiPreview && !round.live && !canAccessStage(access, round.stage)) || round.feedback || submitting.current || saving ||
+    if (!round || !progress || !question || (!isolated && !round.live && !canAccessStage(access, round.stage)) || round.feedback || submitting.current || saving ||
       (shownMode === 'handwriting' && (blockRef.current || drawing))) return;
     if (!isValidMathAnswer(question, answer)) {
       setMessage(question.type === 'choice' ? 'こたえを ひとつ えらんでね。' : 'こたえを 数字で いれてね。');
@@ -331,7 +338,7 @@ function AdventureWorld() {
       const activity=liveMode==='daily'||liveMode==='review'||liveMode==='remediation'||liveMode==='diagnosis' ? liveMode : undefined;
       const last=round.index===round.problems.length-1;
       const special=round.live && !['stage','test'].includes(round.live.mode);
-      let saved=uiPreview ? undefined : special ? (testing ? undefined : recordAttempt(progress,{...attempt,activity},false))
+      let saved=isolated ? undefined : special ? (testing ? undefined : recordAttempt(progress,{...attempt,activity},false))
         : progressAfterWorldAnswer(playMode,progress,attempt,last
           ? {stage:round.stage,correct:newCorrect,usedHint:round.usedHint}: undefined);
       if (saved && last && round.live?.mode==='checkpoint' && round.live.eventId) {
@@ -368,6 +375,7 @@ function AdventureWorld() {
 
   function goToIsland() {
     if (starting.current || submitting.current || lessonWrite.current) return;
+    if (review) { review.onClose(); return; }
     setLearning(undefined);
     setStartError('');
     resetAnswer();
@@ -387,7 +395,7 @@ function AdventureWorld() {
   const specialRound=Boolean(round?.live && !['stage','test'].includes(round.live.mode));
   const cleared = Boolean(round && !specialRound && round.correct >= Math.ceil(round.stage.questions * 0.8));
   const nextStage = round && (!round.live || ['stage','test'].includes(round.live.mode)) && worldIslands.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
-  const canContinue = nextStage && progress && (uiPreview || ['play', 'learn'].includes(worldStageAction(playMode, progress, nextStage, access)));
+  const canContinue = !review && nextStage && progress && (uiPreview || ['play', 'learn'].includes(worldStageAction(playMode, progress, nextStage, access)));
   const lessonStage = learning && (learning.target ?? grade.stages.find(stage => learning.lesson.linkedStageIds.includes(stage.id)));
   const canChallenge = lessonStage && progress && canPlayWorldStage(playMode, progress, lessonStage, access);
   const newlyEarnedTitles = round && progress && !testing ? adventureTitles(progress).filter(t=>t.unlocked).length : 0;
@@ -403,7 +411,7 @@ function AdventureWorld() {
             <Text style={styles.explanation}>全16島の画面とサンプル問題を確認できます。回答は保存されません。</Text>
             <Text selectable style={styles.hintNote}>バージョン {process.env.EXPO_PUBLIC_KAZU_UI_PREVIEW_SHA}</Text>
           </View>}
-          {__DEV__ && <View style={styles.navigation}>
+          {__DEV__ && !review && <View style={styles.navigation}>
             <Text style={styles.logo}>開発用プラン　{hasPremium(access) ? '有料ユーザー' : '無料ユーザー'}</Text>
             <View style={styles.navigationHeader}>
               <GameButton label="無料ユーザー" secondary disabled={loadingRound || saving} onPress={() => { setAccess(freeAccess); setShowPlanInfo(false); }} />
@@ -457,10 +465,10 @@ function AdventureWorld() {
             <UnitLearning key={learning.lesson.id} lesson={learning.lesson} progress={learning.progress}
               practice={testing} busy={saving} error={lessonError} onChange={updateLesson} onBack={goToIsland}
               onChallenge={canChallenge ? () => start(lessonStage) : undefined}/>}
-          {round && question && (uiPreview || canAccessStage(access, round.stage)) && (
+          {round && question && (isolated || canAccessStage(access, round.stage)) && (
             <View style={styles.playPanel}>
               <Pressable accessibilityRole="button" disabled={saving} onPress={goToIsland} style={styles.back}>
-                <Text style={styles.backText}>‹ {grade.island}のマップへ</Text>
+                <Text style={styles.backText}>{review ? '‹ 審査に戻る' : '‹ '+grade.island+'のマップへ'}</Text>
               </Pressable>
               {round.complete ? (
                 <View style={styles.finish}>
@@ -480,10 +488,10 @@ function AdventureWorld() {
                   )}
                   {!testing && cleared && <Text style={styles.rewardMessage}>しょうごう ずかん：{newlyEarnedTitles}こ はっけんずみ</Text>}
                   {canContinue && <GameButton label="つぎの ステージへ" onPress={()=>start(nextStage)} gold/>}
-                  {!specialRound && <GameButton label="この ステージに もういちど ちょうせん" onPress={()=>start(round.stage)} secondary/>}
-                  {!uiPreview && !specialRound && lessonForStage(round.stage.id) && <GameButton label="がくしゅうを みなおす" secondary
+                  {!review && !specialRound && <GameButton label="この ステージに もういちど ちょうせん" onPress={()=>start(round.stage)} secondary/>}
+                  {!isolated && !specialRound && lessonForStage(round.stage.id) && <GameButton label="がくしゅうを みなおす" secondary
                     onPress={() => { const lesson = lessonForStage(round.stage.id); if (lesson) openLesson(lesson); }}/>}
-                  <GameButton label={specialRound && round.live?.mode!=='checkpoint'?'学習画面へ':'島のマップへ'} onPress={goToIsland}/>
+                  <GameButton label={review ? '審査に戻る' : specialRound && round.live?.mode!=='checkpoint'?'学習画面へ':'島のマップへ'} onPress={goToIsland}/>
                 </View>
               ) : (
                 <>
@@ -640,6 +648,10 @@ function GameButton({label,onPress,disabled=false,secondary=false,gold=false}: {
 }
 export default function FullAdventure() {
   return <SafeAreaProvider><AdventureWorld/></SafeAreaProvider>;
+}
+
+export function ReviewQuestionPreview(props: ReviewPreview) {
+  return <SafeAreaProvider><AdventureWorld review={props}/></SafeAreaProvider>;
 }
 
 const styles = StyleSheet.create({
