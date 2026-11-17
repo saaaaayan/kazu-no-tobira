@@ -34,7 +34,7 @@ const moved:readonly (readonly [CountingToken,number,Layout,Layout])[]=[
 const asRows=(token:CountingToken,count:number)=>count<=5?[{tokens:Array.from({length:count},()=>token)}]:[
   {tokens:Array.from({length:5},()=>token)}, {tokens:Array.from({length:count-5},()=>token)}
 ];
-const answers=(n:number)=>[n===10?8:Math.max(n-1,1),n===10?9:n,n===10?10:n+1].map(String);
+const answers=(n:number)=>n===1?['1','2','3']:n===10?['8','9','10']:[n-1,n,n+1].map(String);
 function make(stage:number,index:number,token:CountingToken,number:number,diagram:CountingPreviewDiagram):BankQuestion {
   const name=labels[token][1];
   const isMixed=stage===4;
