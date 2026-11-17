@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-na
 import { type BankDiagram, type BankQuestion, mistakenReason } from '../domain/questionBank';
 import type { SolutionStep } from '../domain/writtenSolution';
 import { MathDisplay, MathText } from './MathText';
-import { countingBoardSizes } from '../domain/countingBoardSizes';
+import { countingBoardSizes, countingTileAppearance } from '../domain/countingBoardSizes';
 
 const tokenArt = {
   dot: ['●','まる'], triangle: ['▲','さんかく'], square: ['■','しかく'],
@@ -35,9 +35,10 @@ function CountingBoard({ diagram, phase }: {
           const id = row+':'+column;
           const lit = selected.has(id);
           const shape = tokenArt[token];
+          // ガイド付きの数え上げでは、くま・丸・図形を枠で囲まない。
+          // タップ領域の幅と高さはそのまま残し、子どもが押しやすい状態を維持。
           const card = { width:sizes.tile, height:sizes.tile, alignItems:'center', justifyContent:'center',
-            borderRadius:diagram.guide?17:10, borderWidth:2, borderColor:lit ? '#3f765b' : '#ccd8ef',
-            backgroundColor:lit ? '#cce8db' : '#fff' } as const;
+            position:'relative', ...countingTileAppearance(Boolean(diagram.guide),lit) } as const;
           // 「●」の文字サイズはブラウザーやフォントによって小さく見える。
           // 幼児向けの丸は実寸の円形Viewにして、大きさを安定させる。
           const icon = diagram.guide && token==='dot'
@@ -45,7 +46,13 @@ function CountingBoard({ diagram, phase }: {
                 backgroundColor:lit?'#28735b':'#253e70' }} />
             : <Text style={{ fontSize:sizes.symbol, color:token==='marked' ? '#3f765b' : '#253e70' }}>{shape[0]}</Text>;
           return interactive && token!=='empty' ? <Pressable key={id} style={card} onPress={() => toggle(id)}
-            accessibilityRole="button" accessibilityLabel={shape[1]} accessibilityState={{ selected:lit }}>{icon}</Pressable>
+            accessibilityRole="button" accessibilityLabel={shape[1]} accessibilityState={{ selected:lit }}>
+              {icon}
+              {diagram.guide && lit && <View pointerEvents="none" style={{
+                position:'absolute',right:0,bottom:0,width:25,height:25,borderRadius:13,
+                backgroundColor:'#28735b',alignItems:'center',justifyContent:'center',
+              }}><Text style={{color:'#fff',fontSize:17,fontWeight:'900'}}>✓</Text></View>}
+            </Pressable>
             : <View key={id} style={{alignItems:'center'}}>
               <View accessible accessibilityLabel={shape[1]} style={card}>{icon}</View>
               {numbered && <Text style={{fontSize:20,color:'#162d48',fontWeight:'800'}}>{column+1}</Text>}
