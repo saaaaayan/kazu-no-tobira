@@ -5,11 +5,7 @@ import type { SolutionStep } from '../domain/writtenSolution';
 import { MathDisplay, MathText } from './MathText';
 import { fitCountingBoardSizes, countingTileAppearance } from '../domain/countingBoardSizes';
 
-const tokenArt = {
-  dot: ['●','まる'], triangle: ['▲','さんかく'], square: ['■','しかく'],
-  bear: ['🧸','くま'],
-  marked: ['✓','しるしのついた まる'], empty: ['◯','からの おさら'],
-} as const;
+import { countingTokenArt as tokenArt } from '../domain/countingTokens';
 
 function CountingBoard({ diagram, phase }: {
   diagram: Extract<BankDiagram,{ kind:'countingBoard' }>; phase: 'question' | 'hint' | 'solution';
