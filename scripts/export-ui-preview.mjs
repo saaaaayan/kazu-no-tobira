@@ -44,17 +44,24 @@ try {
 const idMatch=readFileSync('src/domain/bankStageIds.ts','utf8').match(/export const bankStageIds = (\[[^\n]+\]) as const;/);
 if(!idMatch)throw new Error('Unable to verify public bank ID manifest.');
 const publicBankIds=JSON.parse(idMatch[1]);
+const starterMatch=readFileSync('src/domain/starterTenStageIds.ts','utf8').match(/export const starterTenStageIds = (\[[^\n]+\]) as const;/);
+if(!starterMatch)throw new Error('Missing ten-question starter stage list.');
+const starterTenStageIds=JSON.parse(starterMatch[1]);
+if(starterTenStageIds.length!==11 || new Set(starterTenStageIds).size!==11)throw new Error('Starter manifest does not have 11 unique stages.');
+const exportedIds=[...publicBankIds,...starterTenStageIds];
 if(!Array.isArray(publicBankIds)||publicBankIds.length!==43||
    new Set(publicBankIds).size!==43)throw new Error('Unexpected public bank manifest.');
 const bankFiles={};
+let exportedQuestionCount=0;
 mkdirSync(resolve(target,'question-banks'),{recursive:true});
-for(const id of publicBankIds){
-  if(typeof id!=='string'||!/^(?:e1|sage)\.[a-z0-9]+$/.test(id))throw new Error('Invalid public bank ID.');
+for(const id of exportedIds){
+  if(typeof id!=='string'||!/^(?:e1|sage|e[2-6]|j[1-3]|h[1-3])\.[a-z0-9]+$/.test(id))throw new Error('Invalid public bank ID.');
   const file=id+'.v1.json';
   const source=resolve('public/question-banks',file);
   const parsed=JSON.parse(readFileSync(source,'utf8'));
-  if(parsed.stageId!==id||!Array.isArray(parsed.questions)||parsed.questions.length!==100||
+  if(parsed.stageId!==id||!Array.isArray(parsed.questions)||parsed.questions.length!==(starterTenStageIds.includes(id)?10:100)||
      new Set(parsed.questions.map(q=>q.id)).size!==100)throw new Error('Invalid public bank '+id);
+  exportedQuestionCount+=parsed.questions.length;
   copyFileSync(source,resolve(target,'question-banks',file));
   bankFiles[file]=contentDigest(readFileSync(source));
 }
@@ -63,7 +70,7 @@ const allowed=new Set(['index.html','metadata.json']);
 const files=readdirSync(target,{recursive:true,withFileTypes:true}).filter(entry=>!entry.isDirectory())
   .map(entry=>relative(target,resolve(entry.parentPath,entry.name)).replaceAll('\\','/'));
 if (files.some(file=>!allowed.has(file) && !/^_expo\/static\/js\/web\/[A-Za-z0-9._-]+\.js$/.test(file) &&
-    !/^question-banks\/(?:e1|sage)\.[a-z0-9]+\.v1\.json$/.test(file))) {
+    !/^question-banks\/(?:e1|sage|e[2-6]|j[1-3]|h[1-3])\.[a-z0-9]+\.v1\.json$/.test(file))) {
   throw new Error('Unexpected file in the sample-only preview artifact.');
 }
 const entries=files.filter(file=>file.endsWith('.js'));
@@ -77,7 +84,7 @@ else writeFileSync(index,readFileSync(index,'utf8').replace('<head>',
   `<head><meta name="robots" content="noindex,nofollow"><meta http-equiv="Content-Security-Policy" content="connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">`));
 writeFileSync(resolve(target,'version.json'),JSON.stringify({
   version,profile:'ui-preview',indexSha256:contentDigest(readFileSync(index)),entrySha256:contentDigest(bundle),
-  publishedBankQuestions:publicBankIds.length*100,bankSha256:bankFiles,
+  publishedBankQuestions:exportedQuestionCount,bankSha256:bankFiles,
   ...(pages ? {adminSha256:contentDigest(readFileSync(resolve(target,'admin/index.html')))} : {}),
 })+'\n');
-console.log('Verified public prototype with '+(publicBankIds.length*100)+' bank questions at '+version);
+console.log('Verified public prototype with '+exportedQuestionCount+' bank questions at '+version);
