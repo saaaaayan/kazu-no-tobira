@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Rect, Stop, Text as SvgText } from 'react-native-svg';
 import { CompanionAvatar } from './AdventureCompanion';
 import { allWorldStages, hasGeneratedWorldQuestions, isPlannedIsland, worldIslands, type WorldGrade, type WorldStage } from '../domain/worldCatalog';
 import { hasPremium, type Entitlement } from '../domain/accessPlan';
 import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldProgress';
 import { worldStageAction, type PlayMode } from '../domain/playMode';
-import WorldAtlasArt from './WorldAtlasArt';
 import { checkpointsFor, stageDisplayTitle, stageLabels, type Checkpoint } from '../domain/stageStructure';
-import { islandRouteByKind, islandStageLayout, routeThrough, worldMapLayout } from '../domain/worldMapLayout';
+import { islandRouteByKind, islandStageLayout, routeThrough } from '../domain/worldMapLayout';
+import { approvedWorldMapDimensions, approvedWorldMapHotspots, approvedWorldMapImageUrl } from '../domain/approvedWorldMap';
 import { hasStageBank } from '../domain/questionBank';
 import type { Progress } from '../domain/progress';
 import { lessonStatus, unitLessons, type UnitLesson } from '../domain/unitLessons';
@@ -54,64 +54,114 @@ function OceanTexture({ width, height, seed = 0 }: { width: number; height: numb
   );
 }
 
-export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview = false }: {
-  progress: Progress; mode: PlayMode; access: Entitlement; onGrade: (grade: WorldGrade) => void; onTitles: () => void; preview?: boolean;
-}) {
-  const [width, setWidth] = useState(0);
-  const layout = worldMapLayout(width);
-  const testing = mode === 'test';
-  const summary = unlockSummary(progress);
-  const stats = worldIslands.map(grade => gradeProgress(progress, grade.id));
-  const available = worldIslands.map(grade => preview || (!isPlannedIsland(grade.id) && (grade.id !== 'sage' || hasPremium(access)) && (testing || isIslandUnlocked(progress, grade.id))));
-  const current = testing ? -1 : available.findIndex((open, index) => open && worldIslands[index].id !== 'sage' && stats[index].regularCleared < 50);
+function MutedNorthCompass({size}:{size:number}){
+  // Small navigation compass, not a glowing or decorative effect.
+  return <Svg width={size} height={size} viewBox="0 0 64 64" accessible={false}>
+    <Circle cx={32} cy={35} r={20} stroke="#e7ddc2" strokeWidth={1.5} fill="rgba(24,51,72,.5)"/>
+    <Circle cx={32} cy={35} r={14} stroke="#e7ddc2" strokeWidth={.7} opacity={.55} fill="none"/>
+    <Path d="M32 14L38 35L32 31L26 35Z" fill="#f0e4ca"/>
+    <Path d="M32 56L38 35L32 39L26 35Z" fill="#849e9b"/>
+    <Path d="M11 35H19 M45 35H53" stroke="#eadbbd" strokeWidth={1.2}/>
+    <SvgText x={32} y={10} textAnchor="middle" fill="#f0e4ca" fontSize={11} fontWeight="bold">N</SvgText>
+  </Svg>;
+}
 
-  return (
-    <View style={styles.screen}>
-      <View style={styles.worldBanner}>
-        <Text accessibilityRole="header" style={styles.bannerHeading}>数の世界地図</Text>
-        <Text style={styles.bannerDescription}>01から16へ、点線にそって進もう。島をタップすると学習マップが開くよ。</Text>
-        <View style={styles.stats}>
-          <Text style={styles.stat}>{worldIslands.length}の島 · {allWorldStages.length.toLocaleString('ja-JP')}地点</Text>
-          {!testing && <Text style={styles.stat}>{summary.cleared} / 780 クリア</Text>}
-        </View>
+export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview = false }: {
+  progress: Progress; mode: PlayMode; access: Entitlement;
+  onGrade: (grade: WorldGrade) => void; onTitles: () => void; preview?: boolean;
+}) {
+  const [width,setWidth]=useState(0);
+  const [zoomed,setZoomed]=useState(true);
+  const [showIslandList,setShowIslandList]=useState(false);
+  const {compact,imageWidth,imageHeight}=approvedWorldMapDimensions(width,zoomed);
+  const testing=mode==='test';
+  const summary=unlockSummary(progress);
+  const stats=worldIslands.map(grade=>gradeProgress(progress,grade.id));
+  const available=worldIslands.map(grade=>preview || (!isPlannedIsland(grade.id) &&
+    (grade.id!=='sage'||hasPremium(access)) && (testing||isIslandUnlocked(progress,grade.id))));
+  const current=testing?-1:available.findIndex((open,index)=>open&&worldIslands[index].id!=='sage'&&stats[index].regularCleared<50);
+  const islandAction=(grade:WorldGrade,index:number)=>{
+    if(preview)return '地図をみる';
+    if(isPlannedIsland(grade.id))return '教材を準備中';
+    if(grade.id==='sage'&&!hasPremium(access))return 'プレミアム限定';
+    if(testing)return '自由にプレイ';
+    if(index===current)return 'つぎの目的地';
+    return available[index]?'ぼうけんへ':'未解放・地図をみる';
+  };
+  return <View style={styles.screen}>
+    <View style={styles.worldBanner}>
+      <Text accessibilityRole="header" style={styles.bannerHeading}>数のトビラの世界地図</Text>
+      <Text style={styles.bannerDescription}>01から16へ、点線にそって進もう。島をタップすると学習マップが開くよ。</Text>
+      <View style={styles.stats}>
+        <Text style={styles.stat}>{worldIslands.length}の島 · {allWorldStages.length.toLocaleString('ja-JP')}地点</Text>
+        {!testing&&<Text style={styles.stat}>{summary.cleared} / 780 クリア</Text>}
       </View>
-      <View style={[styles.atlas, { height: layout.height }]} onLayout={event => {
-        const next = Math.round(event.nativeEvent.layout.width);
-        if (next > 0 && next !== width) setWidth(next);
-      }}>
-        {width > 0 && (
-          <>
-            <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-              <WorldAtlasArt layout={layout} available={available} current={current} />
-            </View>
-            {worldIslands.map((grade, index) => {
-              const point = layout.positions[index];
-              const label = preview ? '地図をみる' : isPlannedIsland(grade.id) ? '教材を準備中' : grade.id === 'sage' && !hasPremium(access) ? 'プレミアム限定' : grade.id === 'sage' && available[index] ? '出題中の地点へ' : testing ? '自由にプレイ' : index === current ? 'つぎの目的地' : available[index] ? 'ぼうけんへ' : '未解放・地図をみる';
-              return (
-                <Pressable key={grade.id} accessibilityRole="button"
-                  accessibilityLabel={`${grade.title}、${grade.island}、${grade.stages.length}ステージ、${label}`}
-                  onPress={() => onGrade(grade)}
-                  style={({ pressed }) => [styles.atlasTarget, {
-                    width: layout.targetWidth,
-                    left: point.x - layout.targetWidth / 2,
-                    top: point.y - 36,
-                  }, pressed && styles.pressed]}>
-                  <View style={[styles.islandTag, index === current && styles.islandTagCurrent]}>
-                    <Text style={styles.gradeName}>{String(index+1).padStart(2,'0')}　{grade.title}</Text>
-                    <Text style={styles.islandName}>{grade.island}</Text>
-                    <Text style={styles.islandCount}>{label} ›</Text>
-                  </View>
-                </Pressable>
-              );
-            })}
-          </>
-        )}
-      </View>
-      {!testing && <Pressable accessibilityRole="button" onPress={onTitles} style={styles.book}>
-        <Text style={styles.bookText}>しょうごう ずかんを みる</Text>
+    </View>
+    <View style={styles.worldMapControls}>
+      <Text style={styles.hintText}>{compact
+        ? zoomed?'地図を左右にスワイプして島を見つけよう。':'16島の全体図。島をタップして進もう。'
+        : '地図のイラストや島の名前をクリックして進もう。'}</Text>
+      {compact&&<Pressable accessibilityRole="button" accessibilityLabel={zoomed?'地図全体を表示する':'地図を拡大する'}
+        onPress={()=>setZoomed(value=>!value)} style={styles.mapZoomToggle}>
+        <Text style={styles.mapZoomText}>{zoomed?'全体を見る':'拡大して見る'}</Text>
       </Pressable>}
     </View>
-  );
+    <View style={[styles.atlas,{height:imageHeight}]} onLayout={event=>{
+      const next=Math.round(event.nativeEvent.layout.width);
+      if(next>0&&next!==width)setWidth(next);
+    }}>
+      <ScrollView horizontal scrollEnabled={compact&&zoomed}
+        showsHorizontalScrollIndicator={compact&&zoomed}
+        contentContainerStyle={{width:imageWidth,height:imageHeight}}
+        style={{height:imageHeight}} nestedScrollEnabled>
+        <View style={{width:imageWidth,height:imageHeight}}>
+          <Image source={{uri:approvedWorldMapImageUrl}} resizeMode="stretch"
+            accessibilityLabel="16島それぞれのテーマを幾何学的な線画で描いた、数のトビラの世界地図"
+            style={{width:imageWidth,height:imageHeight}} />
+          <View pointerEvents="none" style={[styles.northCompass,{
+            left:Math.max(3,imageWidth*.005),top:Math.max(3,imageHeight*.008),
+          }]}>
+            <MutedNorthCompass size={Math.max(27,Math.min(36,imageWidth*.032))}/>
+          </View>
+          {worldIslands.map((grade,index)=>{
+            const spot=approvedWorldMapHotspots[index];
+            const label=islandAction(grade,index);
+            return <Pressable key={grade.id} testID={'approved-world-island-'+grade.id}
+              accessibilityRole="button"
+              accessibilityLabel={String(index+1).padStart(2,'0')+' '+grade.title+' '+grade.island+'、'+label}
+              onPress={()=>onGrade(grade)}
+              style={({pressed})=>[styles.approvedMapTarget,{
+                left:imageWidth*(spot.x-.099),
+                top:imageHeight*(spot.y-.094),
+                width:imageWidth*.198,
+                height:imageHeight*.188,
+              },pressed&&styles.approvedMapTargetPressed]}>
+              <View />
+            </Pressable>;
+          })}
+        </View>
+      </ScrollView>
+    </View>
+    {compact&&<View style={styles.mobileWorldList}>
+      <Pressable accessibilityRole="button" testID="approved-world-list-toggle"
+        onPress={()=>setShowIslandList(value=>!value)}
+        accessibilityState={{expanded:showIslandList}} style={styles.worldListToggle}>
+        <Text style={styles.worldListToggleText}>{showIslandList?'島の一覧をとじる ▲':'16島の一覧から選ぶ ▼'}</Text>
+      </Pressable>
+      {showIslandList&&<View style={styles.worldListGrid}>
+        {worldIslands.map((grade,index)=><Pressable key={grade.id} accessibilityRole="button"
+          testID={'world-list-'+grade.id}
+          accessibilityLabel={String(index+1).padStart(2,'0')+' '+grade.title+' '+grade.island}
+          onPress={()=>onGrade(grade)} style={styles.worldListItem}>
+          <Text style={styles.worldListItemText}>{String(index+1).padStart(2,'0')}　{grade.island}</Text>
+          <Text style={styles.worldListGradeText}>{grade.title}</Text>
+        </Pressable>)}
+      </View>}
+    </View>}
+    {!testing&&<Pressable accessibilityRole="button" onPress={onTitles} style={styles.book}>
+      <Text style={styles.bookText}>しょうごう ずかんを みる</Text>
+    </Pressable>}
+  </View>;
 }
 
 function longIslandCoast(width:number,height:number): string {
@@ -418,6 +468,21 @@ const styles=StyleSheet.create({
   hintText:{color:'#5c657d',fontSize:13,lineHeight:20},
   ocean:{borderRadius:22,backgroundColor:'#548cab',overflow:'hidden',position:'relative',borderWidth:3,borderColor:'#d1dbdd'},
   atlas:{borderRadius:22,backgroundColor:'#244e68',overflow:'hidden',position:'relative',borderWidth:1,borderColor:'#4e7180'},
+  worldMapControls:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:10,paddingHorizontal:4},
+  mapZoomToggle:{paddingVertical:9,paddingHorizontal:11,minHeight:39,borderRadius:10,backgroundColor:'#e7e6db',
+    borderWidth:1,borderColor:'#a3afad'},
+  mapZoomText:{color:'#30516a',fontWeight:'900',fontSize:12},
+  northCompass:{position:'absolute',zIndex:2},
+  approvedMapTarget:{position:'absolute',borderRadius:10,minWidth:35,minHeight:39},
+  approvedMapTargetPressed:{backgroundColor:'rgba(244,236,206,.25)',borderWidth:2,borderColor:'#eadbbd'},
+  mobileWorldList:{gap:8},
+  worldListToggle:{padding:12,minHeight:44,backgroundColor:'#e4e9e9',borderRadius:10,alignItems:'center'},
+  worldListToggleText:{color:'#304c65',fontWeight:'900',fontSize:14},
+  worldListGrid:{flexDirection:'row',flexWrap:'wrap',gap:7},
+  worldListItem:{width:'48%',minHeight:56,flexGrow:1,borderRadius:10,
+    backgroundColor:'#f2efe1',borderColor:'#b6c3c1',borderWidth:1,padding:10,justifyContent:'center',gap:4},
+  worldListItemText:{color:'#25445c',fontWeight:'900',fontSize:13},
+  worldListGradeText:{color:'#6a7580',fontWeight:'700',fontSize:11},
   atlasTarget:{position:'absolute',minHeight:114,paddingTop:61,alignItems:'stretch'},
   islandTag:{backgroundColor:'#f3f1e5',borderRadius:9,paddingVertical:6,paddingHorizontal:5,alignItems:'center',borderWidth:1,
     borderColor:'#bbb7a5',shadowColor:'#0e2d48',shadowOpacity:0.14,shadowRadius:3,shadowOffset:{width:0,height:2}},
