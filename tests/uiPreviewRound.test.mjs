@@ -4,7 +4,9 @@ import { checkMathAnswer } from '../src/domain/mathAnswer.ts';
 import { uiPreviewBank, uiPreviewRound } from '../src/domain/uiPreviewRound.ts';
 import { allWorldStages } from '../src/domain/worldCatalog.ts';
 
-const expected = ['e1.forest','e1.n06','preschool.n01','preschool.n02','preschool.n03','preschool.n04','preschool.n05'];
+const expected = ['e1.forest','e1.n06','preschool.n01','preschool.n02','preschool.n03','preschool.n04','preschool.n05',
+  'e2.n01','e3.n01','e4.n01','e5.n01','e6.n01','j1.n01','j2.n01','j3.n01',
+  'h1.n01','h2.n01','h3.n01','champion.n01','cosmos.n01'].sort();
 test('public prototype exposes exactly preschool 01–05 and the original elementary demos',()=>{
   const playable=allWorldStages.map(stage=>[stage,uiPreviewRound(stage)]).filter(([,round])=>round.length);
   assert.deepEqual(playable.map(([stage])=>stage.id).sort(),expected);
@@ -18,7 +20,7 @@ test('public prototype exposes exactly preschool 01–05 and the original elemen
     if (stage.gradeId==='preschool') {
       assert.ok(round.every(q=>q.diagram.kind==='countingBoard'));
       assert.ok(round.every(q=>!/[＋+＝=]/.test(q.question)));
-    } else assert.ok(round.every(q=>Number(q.answer)<=9));
+    } else if(stage.gradeId==='e1') assert.ok(round.every(q=>Number(q.answer)<=9));
   }
 });
 
