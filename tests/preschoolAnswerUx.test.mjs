@@ -10,7 +10,7 @@ test('preschool counting numbers are large, accessible, and directly under the p
   const sidePanel=code.indexOf('{(!countingGuide || round.feedback) && <View');
   assert.ok(diagram>0 && inline>diagram && sidePanel>inline,'place answer buttons under counting diagram, before side panel');
   assert.match(code,/testID=\{'preschool-answer-'\+option\}/u);
-  assert.match(code,/accessibilityLabel=\{option\+'こ と こたえる'\}/u);
+  assert.match(code,/accessibilityLabel=\{option\+' と こたえる'\}/u);
   assert.match(code,/preschoolNumberButton: \{[^\n]*minHeight:78/u);
   assert.match(code,/preschoolNumberText: \{[^\n]*fontSize:40/u);
   assert.match(code,/preschoolNumberRow: \{[^\n]*maxWidth:440/u);
