@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { approvedWorldMapImageUrl } from '../domain/approvedWorldMap';
 
 type Island = { number: number; grade: string; name: string; column: number; row: number };
 
@@ -24,7 +25,7 @@ const islands: Island[] = [
 
 const COLUMN_LEFT = [2, 26, 50, 74];
 const ROW_TOP = [10, 31, 52, 73];
-const MAP_ASPECT_RATIO = 1448 / 1086;
+const MAP_ASPECT_RATIO = 1452 / 1083;
 
 export default function WorldMap({ onEnterFirstGrade }: { onEnterFirstGrade: () => void }) {
   const [availableWidth, setAvailableWidth] = useState(0);
@@ -45,7 +46,7 @@ export default function WorldMap({ onEnterFirstGrade }: { onEnterFirstGrade: () 
       {showScrollHint && <Text style={styles.hint}>ちずは よこに うごかせるよ。しまを タップしてね。</Text>}
       <ScrollView horizontal showsHorizontalScrollIndicator={showScrollHint} contentContainerStyle={styles.scrollContent}>
         <View style={[styles.map, { width: imageWidth, height: imageWidth / MAP_ASPECT_RATIO }]}>
-          <Image source={require('../../assets/world-map.jpg')} resizeMode="stretch" style={styles.image}
+          <Image source={Platform.OS === 'web' ? { uri: approvedWorldMapImageUrl } : require('../../assets/world-map.jpg')} resizeMode="stretch" style={styles.image}
             accessibilityLabel="数のトビラ 世界地図。方位マーク付きの全16島が、点線の道でつながっているよ。" />
           {islands.map(island => (
             <Pressable
