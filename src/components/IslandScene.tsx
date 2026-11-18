@@ -1,4 +1,4 @@
-import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Stop } from 'react-native-svg';
+import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Stop, Text as SvgText } from 'react-native-svg';
 
 export const islandHeight = 540;
 export const islandWidth = (compact: boolean) => compact ? 420 : 900;
@@ -48,6 +48,13 @@ export default function IslandScene({ compact, nextIndex }: { compact: boolean; 
 
   return (
     <Svg width="100%" height="100%" viewBox={`0 0 ${w} ${islandHeight}`} preserveAspectRatio="none" accessible={false}>
+      {/* Subtle north indicator, intentionally flat and without decorative sparkles. */}
+      <G transform="translate(39 40)" opacity={0.78}>
+        <Circle r={24} fill="#e9edf0" fillOpacity={0.12} stroke="#e3e9e8" strokeOpacity={0.55} strokeWidth={1} />
+        <Path d="M0-18L-6 7L0 3L6 7Z" fill="#eef0e7" stroke="#536a77" strokeWidth={0.9} strokeLinejoin="round" />
+        <Path d="M0 3L-6 7L0 18L6 7Z" fill="#718696" stroke="#e1e7e5" strokeWidth={0.7} strokeLinejoin="round" />
+        <SvgText x={0} y={-29} fontSize={10} fontWeight="700" fill="#f2f2eb" textAnchor="middle">N</SvgText>
+      </G>
       <Defs>
         <LinearGradient id="islandSea" x1="0" y1="0" x2="0" y2="1">
           <Stop offset="0" stopColor="#424d83" /><Stop offset=".47" stopColor="#6996bb" /><Stop offset="1" stopColor="#92c8c8" />
