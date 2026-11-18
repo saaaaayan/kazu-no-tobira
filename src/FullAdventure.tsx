@@ -5,6 +5,7 @@ import { worldGrades, worldIslands, type WorldGrade, type WorldStage } from './d
 import type { MathQuestion } from './domain/worldQuestions';
 import { checkMathAnswer, isValidMathAnswer } from './domain/mathAnswer';
 import { stageDisplayTitle,stageLabels, type Checkpoint } from './domain/stageStructure';
+import { stageCategoryName } from './domain/islandCurriculumView';
 import { liveOrigin, requestLiveRound, requestLiveGrade, requestLiveHint, type LiveMode, type LiveRound } from './domain/liveQuestions';
 import type { SkillId } from './domain/curriculum';
 import { hasStageBank,isBankQuestion } from './domain/questionBank';
@@ -558,6 +559,10 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                       <Text style={styles.stageTitle}>{round.checkpoint ? 'かくにんテスト '+round.checkpoint.number : countingGuide ? preschoolGuideTitles[round.stage.id] : stageDisplayTitle(round.stage)}</Text>
                       <Text style={styles.questionIndex}>{countingGuide ? round.index+1 : '第'+(round.index+1)+'問'} / {round.problems.length}</Text>
                     </View>
+                    <Text style={styles.stageCategory}>{round.checkpoint
+                      ? '学習範囲：直前の冒険5ステージ'
+                      : '単元・カテゴリ：'+stageCategoryName(
+                          worldIslands.find(island=>island.id===round.stage.gradeId)!,round.stage)}</Text>
                     <MagicMeter results={round.results} total={round.problems.length}/>
                     <CompanionMoment compact onDark
                       mood={round.feedback === 'correct' ? 'correct' : round.feedback === 'incorrect' ? 'incorrect' : 'ready'}
@@ -763,6 +768,7 @@ const styles = StyleSheet.create({
   questionPanel: { backgroundColor: '#27335c', borderRadius: 19, padding: 17, gap: 9, overflow: 'hidden' },
   questionHeader: { flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap', gap: 7, alignItems: 'center' },
   stageTitle: { color: '#f9e3b7', fontWeight: '900', fontSize: 17 },
+  stageCategory: { color:'#f2e2ad',fontSize:14,fontWeight:'800',lineHeight:20 },
   questionIndex: { color: '#e1e7ff', fontWeight: '800', fontSize: 13 },
   difficulty: { color: '#ffe09f', fontSize: 12, fontWeight: '800', paddingTop: 4 },
   questionText: { color: 'white', fontWeight: '900', fontSize: 29, lineHeight: 40 },
