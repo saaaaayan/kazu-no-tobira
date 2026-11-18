@@ -18118,7 +18118,7 @@
     {
       "id": "sage.n01",
       "islandId": "sage",
-      "unit": "sage-mixed-1",
+      "unit": "sage-intro",
       "skill": "sageMixed",
       "target": 100,
       "registered": 100,
@@ -18145,7 +18145,7 @@
     {
       "id": "sage.n02",
       "islandId": "sage",
-      "unit": "sage-mixed-1",
+      "unit": "sage-intro",
       "skill": "sageMixed",
       "target": 100,
       "registered": 100,
@@ -18172,7 +18172,7 @@
     {
       "id": "sage.n03",
       "islandId": "sage",
-      "unit": "sage-mixed-1",
+      "unit": "sage-intro",
       "skill": "sageMixed",
       "target": 100,
       "registered": 100,
@@ -18199,7 +18199,7 @@
     {
       "id": "sage.n04",
       "islandId": "sage",
-      "unit": "sage-mixed-1",
+      "unit": "sage-intro",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18220,7 +18220,7 @@
     {
       "id": "sage.n05",
       "islandId": "sage",
-      "unit": "sage-mixed-1",
+      "unit": "sage-intro",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18241,7 +18241,7 @@
     {
       "id": "sage.n06",
       "islandId": "sage",
-      "unit": "sage-mixed-2",
+      "unit": "sage-equation",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18262,7 +18262,7 @@
     {
       "id": "sage.n07",
       "islandId": "sage",
-      "unit": "sage-mixed-2",
+      "unit": "sage-equation",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18283,7 +18283,7 @@
     {
       "id": "sage.n08",
       "islandId": "sage",
-      "unit": "sage-mixed-2",
+      "unit": "sage-equation",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18304,7 +18304,7 @@
     {
       "id": "sage.n09",
       "islandId": "sage",
-      "unit": "sage-mixed-2",
+      "unit": "sage-equation",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18325,7 +18325,7 @@
     {
       "id": "sage.n10",
       "islandId": "sage",
-      "unit": "sage-mixed-2",
+      "unit": "sage-equation",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18346,7 +18346,7 @@
     {
       "id": "sage.n11",
       "islandId": "sage",
-      "unit": "sage-mixed-3",
+      "unit": "sage-function",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18367,7 +18367,7 @@
     {
       "id": "sage.n12",
       "islandId": "sage",
-      "unit": "sage-mixed-3",
+      "unit": "sage-function",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18388,7 +18388,7 @@
     {
       "id": "sage.n13",
       "islandId": "sage",
-      "unit": "sage-mixed-3",
+      "unit": "sage-function",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18409,7 +18409,7 @@
     {
       "id": "sage.n14",
       "islandId": "sage",
-      "unit": "sage-mixed-3",
+      "unit": "sage-function",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18430,7 +18430,7 @@
     {
       "id": "sage.n15",
       "islandId": "sage",
-      "unit": "sage-mixed-3",
+      "unit": "sage-function",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18451,7 +18451,7 @@
     {
       "id": "sage.n16",
       "islandId": "sage",
-      "unit": "sage-mixed-4",
+      "unit": "sage-counting",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18472,7 +18472,7 @@
     {
       "id": "sage.n17",
       "islandId": "sage",
-      "unit": "sage-mixed-4",
+      "unit": "sage-counting",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18493,7 +18493,7 @@
     {
       "id": "sage.n18",
       "islandId": "sage",
-      "unit": "sage-mixed-4",
+      "unit": "sage-counting",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18514,7 +18514,7 @@
     {
       "id": "sage.n19",
       "islandId": "sage",
-      "unit": "sage-mixed-4",
+      "unit": "sage-counting",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18535,7 +18535,7 @@
     {
       "id": "sage.n20",
       "islandId": "sage",
-      "unit": "sage-mixed-4",
+      "unit": "sage-counting",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18556,7 +18556,7 @@
     {
       "id": "sage.n21",
       "islandId": "sage",
-      "unit": "sage-mixed-5",
+      "unit": "sage-geometry",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18577,7 +18577,7 @@
     {
       "id": "sage.n22",
       "islandId": "sage",
-      "unit": "sage-mixed-5",
+      "unit": "sage-geometry",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18598,7 +18598,7 @@
     {
       "id": "sage.n23",
       "islandId": "sage",
-      "unit": "sage-mixed-5",
+      "unit": "sage-geometry",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18619,7 +18619,7 @@
     {
       "id": "sage.n24",
       "islandId": "sage",
-      "unit": "sage-mixed-5",
+      "unit": "sage-geometry",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18640,7 +18640,7 @@
     {
       "id": "sage.n25",
       "islandId": "sage",
-      "unit": "sage-mixed-5",
+      "unit": "sage-geometry",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18661,7 +18661,7 @@
     {
       "id": "sage.n26",
       "islandId": "sage",
-      "unit": "sage-mixed-6",
+      "unit": "sage-sequence",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18682,7 +18682,7 @@
     {
       "id": "sage.n27",
       "islandId": "sage",
-      "unit": "sage-mixed-6",
+      "unit": "sage-sequence",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18703,7 +18703,7 @@
     {
       "id": "sage.n28",
       "islandId": "sage",
-      "unit": "sage-mixed-6",
+      "unit": "sage-sequence",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18724,7 +18724,7 @@
     {
       "id": "sage.n29",
       "islandId": "sage",
-      "unit": "sage-mixed-6",
+      "unit": "sage-sequence",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18745,7 +18745,7 @@
     {
       "id": "sage.n30",
       "islandId": "sage",
-      "unit": "sage-mixed-6",
+      "unit": "sage-sequence",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18766,7 +18766,7 @@
     {
       "id": "sage.n31",
       "islandId": "sage",
-      "unit": "sage-mixed-7",
+      "unit": "sage-derivative",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18787,7 +18787,7 @@
     {
       "id": "sage.n32",
       "islandId": "sage",
-      "unit": "sage-mixed-7",
+      "unit": "sage-derivative",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18808,7 +18808,7 @@
     {
       "id": "sage.n33",
       "islandId": "sage",
-      "unit": "sage-mixed-7",
+      "unit": "sage-derivative",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18829,7 +18829,7 @@
     {
       "id": "sage.n34",
       "islandId": "sage",
-      "unit": "sage-mixed-7",
+      "unit": "sage-derivative",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18850,7 +18850,7 @@
     {
       "id": "sage.n35",
       "islandId": "sage",
-      "unit": "sage-mixed-7",
+      "unit": "sage-derivative",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18871,7 +18871,7 @@
     {
       "id": "sage.n36",
       "islandId": "sage",
-      "unit": "sage-mixed-8",
+      "unit": "sage-integral",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18892,7 +18892,7 @@
     {
       "id": "sage.n37",
       "islandId": "sage",
-      "unit": "sage-mixed-8",
+      "unit": "sage-integral",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18913,7 +18913,7 @@
     {
       "id": "sage.n38",
       "islandId": "sage",
-      "unit": "sage-mixed-8",
+      "unit": "sage-integral",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18934,7 +18934,7 @@
     {
       "id": "sage.n39",
       "islandId": "sage",
-      "unit": "sage-mixed-8",
+      "unit": "sage-integral",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18955,7 +18955,7 @@
     {
       "id": "sage.n40",
       "islandId": "sage",
-      "unit": "sage-mixed-8",
+      "unit": "sage-integral",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18976,7 +18976,7 @@
     {
       "id": "sage.n41",
       "islandId": "sage",
-      "unit": "sage-mixed-9",
+      "unit": "sage-vector",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -18997,7 +18997,7 @@
     {
       "id": "sage.n42",
       "islandId": "sage",
-      "unit": "sage-mixed-9",
+      "unit": "sage-vector",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19018,7 +19018,7 @@
     {
       "id": "sage.n43",
       "islandId": "sage",
-      "unit": "sage-mixed-9",
+      "unit": "sage-vector",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19039,7 +19039,7 @@
     {
       "id": "sage.n44",
       "islandId": "sage",
-      "unit": "sage-mixed-9",
+      "unit": "sage-vector",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19060,7 +19060,7 @@
     {
       "id": "sage.n45",
       "islandId": "sage",
-      "unit": "sage-mixed-9",
+      "unit": "sage-vector",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19081,7 +19081,7 @@
     {
       "id": "sage.n46",
       "islandId": "sage",
-      "unit": "sage-mixed-10",
+      "unit": "sage-synthesis",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19102,7 +19102,7 @@
     {
       "id": "sage.n47",
       "islandId": "sage",
-      "unit": "sage-mixed-10",
+      "unit": "sage-synthesis",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19123,7 +19123,7 @@
     {
       "id": "sage.n48",
       "islandId": "sage",
-      "unit": "sage-mixed-10",
+      "unit": "sage-synthesis",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19144,7 +19144,7 @@
     {
       "id": "sage.n49",
       "islandId": "sage",
-      "unit": "sage-mixed-10",
+      "unit": "sage-synthesis",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19165,7 +19165,7 @@
     {
       "id": "sage.n50",
       "islandId": "sage",
-      "unit": "sage-mixed-10",
+      "unit": "sage-synthesis",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19186,7 +19186,7 @@
     {
       "id": "sage.x01",
       "islandId": "sage",
-      "unit": "sage-mixed-1",
+      "unit": "sage-intro",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19207,7 +19207,7 @@
     {
       "id": "sage.x02",
       "islandId": "sage",
-      "unit": "sage-mixed-2",
+      "unit": "sage-equation",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19228,7 +19228,7 @@
     {
       "id": "sage.x03",
       "islandId": "sage",
-      "unit": "sage-mixed-3",
+      "unit": "sage-function",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19249,7 +19249,7 @@
     {
       "id": "sage.x04",
       "islandId": "sage",
-      "unit": "sage-mixed-4",
+      "unit": "sage-counting",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19270,7 +19270,7 @@
     {
       "id": "sage.x05",
       "islandId": "sage",
-      "unit": "sage-mixed-5",
+      "unit": "sage-geometry",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19291,7 +19291,7 @@
     {
       "id": "sage.x06",
       "islandId": "sage",
-      "unit": "sage-mixed-6",
+      "unit": "sage-sequence",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19312,7 +19312,7 @@
     {
       "id": "sage.x07",
       "islandId": "sage",
-      "unit": "sage-mixed-7",
+      "unit": "sage-derivative",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19333,7 +19333,7 @@
     {
       "id": "sage.x08",
       "islandId": "sage",
-      "unit": "sage-mixed-8",
+      "unit": "sage-integral",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19354,7 +19354,7 @@
     {
       "id": "sage.x09",
       "islandId": "sage",
-      "unit": "sage-mixed-9",
+      "unit": "sage-vector",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19375,7 +19375,7 @@
     {
       "id": "sage.x10",
       "islandId": "sage",
-      "unit": "sage-mixed-10",
+      "unit": "sage-synthesis",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19396,7 +19396,7 @@
     {
       "id": "sage.s01",
       "islandId": "sage",
-      "unit": "sage-mixed-1",
+      "unit": "sage-intro",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19417,7 +19417,7 @@
     {
       "id": "sage.s02",
       "islandId": "sage",
-      "unit": "sage-mixed-2",
+      "unit": "sage-equation",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19438,7 +19438,7 @@
     {
       "id": "sage.s03",
       "islandId": "sage",
-      "unit": "sage-mixed-3",
+      "unit": "sage-function",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19459,7 +19459,7 @@
     {
       "id": "sage.s04",
       "islandId": "sage",
-      "unit": "sage-mixed-4",
+      "unit": "sage-counting",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
@@ -19480,7 +19480,7 @@
     {
       "id": "sage.s05",
       "islandId": "sage",
-      "unit": "sage-mixed-5",
+      "unit": "sage-geometry",
       "skill": "sageMixed",
       "target": 100,
       "registered": 0,
