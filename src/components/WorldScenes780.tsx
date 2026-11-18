@@ -69,7 +69,7 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
     <View style={styles.screen}>
       <View style={styles.worldBanner}>
         <Text accessibilityRole="header" style={styles.bannerHeading}>数の世界地図</Text>
-        <Text style={styles.bannerDescription}>島をえらんで、65のステージへ。</Text>
+        <Text style={styles.bannerDescription}>01から16へ、点線にそって進もう。島をタップすると学習マップが開くよ。</Text>
         <View style={styles.stats}>
           <Text style={styles.stat}>{worldIslands.length}の島 · {allWorldStages.length.toLocaleString('ja-JP')}地点</Text>
           {!testing && <Text style={styles.stat}>{summary.cleared} / 780 クリア</Text>}
@@ -97,7 +97,7 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
                     top: point.y - 36,
                   }, pressed && styles.pressed]}>
                   <View style={[styles.islandTag, index === current && styles.islandTagCurrent]}>
-                    <Text style={styles.gradeName}>{grade.title}</Text>
+                    <Text style={styles.gradeName}>{String(index+1).padStart(2,'0')}　{grade.title}</Text>
                     <Text style={styles.islandName}>{grade.island}</Text>
                     <Text style={styles.islandCount}>{label} ›</Text>
                   </View>
@@ -404,7 +404,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
 
 const styles=StyleSheet.create({
   screen:{gap:13},
-  worldBanner:{borderRadius:20,padding:18,gap:8,backgroundColor:'#253354'},
+  worldBanner:{borderRadius:20,padding:18,gap:8,backgroundColor:'#263b51'},
   islandBanner:{borderRadius:20,padding:16,flexDirection:'row',alignItems:'center',backgroundColor:'#283d69',gap:8},
   islandBannerText:{flex:1,gap:5},
   eyebrow:{color:'#f7d799',fontWeight:'900',fontSize:13},
@@ -417,13 +417,13 @@ const styles=StyleSheet.create({
   mapTitle:{color:'#2b395e',fontWeight:'900',fontSize:19},
   hintText:{color:'#5c657d',fontSize:13,lineHeight:20},
   ocean:{borderRadius:22,backgroundColor:'#548cab',overflow:'hidden',position:'relative',borderWidth:3,borderColor:'#d1dbdd'},
-  atlas:{borderRadius:22,backgroundColor:'#244e68',overflow:'hidden',position:'relative'},
+  atlas:{borderRadius:22,backgroundColor:'#244e68',overflow:'hidden',position:'relative',borderWidth:1,borderColor:'#4e7180'},
   atlasTarget:{position:'absolute',minHeight:114,paddingTop:61,alignItems:'stretch'},
-  islandTag:{backgroundColor:'#f9f4e3',borderRadius:9,paddingVertical:5,paddingHorizontal:5,alignItems:'center',borderWidth:1,
-    borderColor:'#babfa9',shadowColor:'#0e2d48',shadowOpacity:0.33,shadowRadius:5,shadowOffset:{width:0,height:3}},
-  islandTagCurrent:{backgroundColor:'#ffe8a8',borderColor:'#f6cf72',borderWidth:2},
-  gradeName:{fontSize:10,color:'#514c59',fontWeight:'900',lineHeight:13},
-  islandName:{fontSize:12,color:'#233b4f',fontWeight:'900',textAlign:'center',lineHeight:16},
+  islandTag:{backgroundColor:'#f3f1e5',borderRadius:9,paddingVertical:6,paddingHorizontal:5,alignItems:'center',borderWidth:1,
+    borderColor:'#bbb7a5',shadowColor:'#0e2d48',shadowOpacity:0.14,shadowRadius:3,shadowOffset:{width:0,height:2}},
+  islandTagCurrent:{backgroundColor:'#eee8cb',borderColor:'#c1ae79',borderWidth:2},
+  gradeName:{fontSize:10,color:'#566471',fontWeight:'800',lineHeight:14,textAlign:'center'},
+  islandName:{fontSize:13,color:'#213950',fontWeight:'900',textAlign:'center',lineHeight:18},
   islandCount:{fontSize:10,color:'#3c625b',fontWeight:'800',textAlign:'center',lineHeight:14},
   book:{minHeight:47,padding:12,alignItems:'center',justifyContent:'center',borderRadius:13,backgroundColor:'#f1d18b'},
   bookText:{color:'#433d60',fontSize:15,fontWeight:'900'},
