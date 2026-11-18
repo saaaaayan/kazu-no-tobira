@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "selection": "balanced",
+  "stageId": "j1.n01",
+  "gradeId": "j1",
+  "islandId": "j1",
+  "unit": "正の数・負の数",
+  "objective": "符号を持つ数の加減乗算を説明する",
+  "questions": [
+    {
+      "id": "draft-j1.n01-01",
+      "skillId": "j1.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "(-3) + 2 = ?",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "-1",
+      "hint": "正の数と負の数の和を考えよう。",
+      "hints": [
+        "正の数と負の数の和を考えよう。",
+        "絶対値の大きい数の符号に注目する。",
+        "数直線の0から左右に移動した結果を考えよう。"
+      ],
+      "explanation": "答えは -1 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "絶対値の大きい数の符号に注目する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "-3＋2＝-1。"
+        },
+        {
+          "title": "確認",
+          "body": "答えは -1 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-j1.n01-02",
+      "skillId": "j1.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "(-4) - 5 = ?",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "-9",
+      "hint": "引き算を足し算に直そう。",
+      "hints": [
+        "引き算を足し算に直そう。",
+        "正の数を引くと負の向きへ進む。",
+        "負の値どうしを合計した符号を確認しよう。"
+      ],
+      "explanation": "答えは -9 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "正の数を引くと負の向きへ進む。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "-4－5＝－(4＋5)＝-9。"
+        },
+        {
+          "title": "確認",
+          "body": "答えは -9 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-j1.n01-03",
+      "skillId": "j1.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "(-5) × (-8) = ?",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "40",
+      "hint": "積の符号を先に決めよう。",
+      "hints": [
+        "積の符号を先に決めよう。",
+        "負×負は正。",
+        "絶対値どうしをかけ算しよう。"
+      ],
+      "explanation": "負の数どうしの積なので正の 40 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "負×負は正。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "(-5)×(-8)＝40。"
+        },
+        {
+          "title": "確認",
+          "body": "負の数どうしの積なので正の 40 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-j1.n01-04",
+      "skillId": "j1.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "(-6) + 2 = ?",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "-4",
+      "hint": "正の数と負の数の和を考えよう。",
+      "hints": [
+        "正の数と負の数の和を考えよう。",
+        "絶対値の大きい数の符号に注目する。",
+        "数直線の0から左右に移動した結果を考えよう。"
+      ],
+      "explanation": "答えは -4 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "絶対値の大きい数の符号に注目する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "-6＋2＝-4。"
+        },
+        {
+          "title": "確認",
+          "body": "答えは -4 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-j1.n01-05",
+      "skillId": "j1.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "(-7) - 5 = ?",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "-12",
+      "hint": "引き算を足し算に直そう。",
+      "hints": [
+        "引き算を足し算に直そう。",
+        "正の数を引くと負の向きへ進む。",
+        "負の値どうしを合計した符号を確認しよう。"
+      ],
+      "explanation": "答えは -12 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "正の数を引くと負の向きへ進む。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "-7－5＝－(7＋5)＝-12。"
+        },
+        {
+          "title": "確認",
+          "body": "答えは -12 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-j1.n01-06",
+      "skillId": "j1.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "(-8) × (-8) = ?",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "64",
+      "hint": "積の符号を先に決めよう。",
+      "hints": [
+        "積の符号を先に決めよう。",
+        "負×負は正。",
+        "絶対値どうしをかけ算しよう。"
+      ],
+      "explanation": "負の数どうしの積なので正の 64 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "負×負は正。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "(-8)×(-8)＝64。"
+        },
+        {
+          "title": "確認",
+          "body": "負の数どうしの積なので正の 64 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-j1.n01-07",
+      "skillId": "j1.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "(-9) + 2 = ?",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "-7",
+      "hint": "正の数と負の数の和を考えよう。",
+      "hints": [
+        "正の数と負の数の和を考えよう。",
+        "絶対値の大きい数の符号に注目する。",
+        "数直線の0から左右に移動した結果を考えよう。"
+      ],
+      "explanation": "答えは -7 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "絶対値の大きい数の符号に注目する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "-9＋2＝-7。"
+        },
+        {
+          "title": "確認",
+          "body": "答えは -7 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-j1.n01-08",
+      "skillId": "j1.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "(-10) - 5 = ?",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "-15",
+      "hint": "引き算を足し算に直そう。",
+      "hints": [
+        "引き算を足し算に直そう。",
+        "正の数を引くと負の向きへ進む。",
+        "負の値どうしを合計した符号を確認しよう。"
+      ],
+      "explanation": "答えは -15 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "正の数を引くと負の向きへ進む。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "-10－5＝－(10＋5)＝-15。"
+        },
+        {
+          "title": "確認",
+          "body": "答えは -15 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-j1.n01-09",
+      "skillId": "j1.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "(-11) × (-8) = ?",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "88",
+      "hint": "積の符号を先に決めよう。",
+      "hints": [
+        "積の符号を先に決めよう。",
+        "負×負は正。",
+        "絶対値どうしをかけ算しよう。"
+      ],
+      "explanation": "負の数どうしの積なので正の 88 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "負×負は正。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "(-11)×(-8)＝88。"
+        },
+        {
+          "title": "確認",
+          "body": "負の数どうしの積なので正の 88 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-j1.n01-10",
+      "skillId": "j1.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "(-12) + 2 = ?",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "-10",
+      "hint": "正の数と負の数の和を考えよう。",
+      "hints": [
+        "正の数と負の数の和を考えよう。",
+        "絶対値の大きい数の符号に注目する。",
+        "数直線の0から左右に移動した結果を考えよう。"
+      ],
+      "explanation": "答えは -10 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "絶対値の大きい数の符号に注目する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "-12＋2＝-10。"
+        },
+        {
+          "title": "確認",
+          "body": "答えは -10 です。"
+        }
+      ],
+      "mistakes": []
+    }
+  ]
+}
