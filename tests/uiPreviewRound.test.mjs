@@ -6,7 +6,8 @@ import { allWorldStages } from '../src/domain/worldCatalog.ts';
 
 const expected = ['e1.forest','e1.n06','preschool.n01','preschool.n02','preschool.n03','preschool.n04','preschool.n05',
   'e2.n01','e3.n01','e4.n01','e5.n01','e6.n01','j1.n01','j2.n01','j3.n01',
-  'h1.n01','h2.n01','h3.n01','champion.n01','cosmos.n01'].sort();
+  'h1.n01','h2.n01','h3.n01','champion.n01','cosmos.n01',
+  ...['e2','e3','e4','e5','e6'].flatMap(g=>[2,3,4,5].map(n=>g+'.n0'+n))].sort();
 test('public prototype exposes exactly preschool 01–05 and the original elementary demos',()=>{
   const playable=allWorldStages.map(stage=>[stage,uiPreviewRound(stage)]).filter(([,round])=>round.length);
   assert.deepEqual(playable.map(([stage])=>stage.id).sort(),expected);
