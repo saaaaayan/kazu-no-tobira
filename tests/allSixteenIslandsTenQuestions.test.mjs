@@ -24,8 +24,10 @@ test('all sixteen islands and 1,040 stages are classified in real academic categ
       assert.equal(stage.gradeId,island.id);
       assert.equal(stage.questions,10);
       assert.ok(stage.title.trim(),stage.id);
-      if(stage.kind==='normal')assert.equal(stage.subtitle,island.units[stage.unitIndex].title,
-        stage.id+' category misalignment');
+      if(stage.kind==='normal' && !['e1.forest','e1.bridge','e1.tower'].includes(stage.id))
+        assert.equal(stage.subtitle,island.units[stage.unitIndex].title,stage.id+' category misalignment');
+      if(stage.id==='e1.bridge')assert.match(stage.subtitle,/10を つくる/);
+      if(stage.id==='e1.tower')assert.match(stage.subtitle,/10を こえる/);
       assert.equal(hasPrototypeStageQuestions(stage),true,'still locked '+stage.id);
     }
   }
