@@ -221,7 +221,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
   const next = testing ? undefined : grade.stages.find(stage => ['play', 'learn'].includes(worldStageAction(mode, progress, stage, access)) && !progress.stages[stage.id]);
   const lessons = unitLessons.filter(lesson => lesson.grade === grade.id);
   const marker=Math.max(46,Math.min(57,Math.floor(actual/5)-9));
-  const previewStage=preview ? grade.stages.find(stage=>Boolean(uiPreviewSampleKind(stage))) : undefined;
+  const previewStage=preview ? grade.stages.find(stage=>Boolean(uiPreviewSampleKind(stage)) || hasStageBank(stage.id)) : undefined;
   return (
     <View style={styles.screen}>
       <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
@@ -232,7 +232,9 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           <Text style={styles.eyebrow}>{grade.title} の ぼうけんマップ</Text>
           <Text style={styles.bannerHeading}>{grade.island}</Text>
           <Text style={styles.bannerDescription}>{grade.theme}</Text>
-          <Text style={styles.islandBannerCount}>{preview ? '65ステージと10か所の確認テスト · サンプル表示' : isPlannedIsland(grade.id) ? '教材を準備中 · 65地点' : grade.id === 'sage' ? (testing || isIslandUnlocked(progress, grade.id)
+          <Text style={styles.islandBannerCount}>{preview ? (grade.stages.some(stage=>hasStageBank(stage.id))
+            ? '問題バンクあり '+grade.stages.filter(stage=>hasStageBank(stage.id)).length+'ステージ · 管理者テストで確認'
+            : '65ステージと10か所の確認テスト · サンプル表示') : isPlannedIsland(grade.id) ? '教材を準備中 · 65地点' : grade.id === 'sage' ? (testing || isIslandUnlocked(progress, grade.id)
             ? `${grade.stages.filter(stage => hasStageBank(stage.id)).length} / 65 地点で出題中` : '高校3年生の冒険の道50・試練の道10をクリアすると解放') : testing ? (hasPremium(access) ? "65ステージ すべてプレイできるよ" : "冒険の道50ステージを 自由に あそべるよ") : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
         </View>
         <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
@@ -276,7 +278,9 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         })}
       </View>}
       {preview && <View style={styles.legend}>
-        <Text style={styles.legendText}>✦ あそべる</Text>
+        <Text style={styles.legendText}>✦ サンプルであそべる</Text>
+        {grade.stages.some(stage=>hasStageBank(stage.id)) &&
+          <Text style={styles.legendText}>◆ 管理者テスト（ログインが必要）</Text>}
         <Text style={styles.legendText}>● じゅんびちゅう</Text>
       </View>}
       {!preview && !testing && <View style={styles.legend}>
@@ -331,7 +335,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           const position=geometry.positions[index];
           const record=(testing ? undefined : progress.stages[stage.id]) as {clearedAt?:string;perfectAt?:string}|undefined;
           const action=worldStageAction(mode,progress,stage,access);
-          const unlocked=preview ? Boolean(uiPreviewSampleKind(stage)) : action === 'play' || action === 'learn';
+          const reviewBank=preview && hasStageBank(stage.id);
+          const unlocked=preview ? Boolean(uiPreviewSampleKind(stage)) || reviewBank : action === 'play' || action === 'learn';
           const selectable=preview ? unlocked : unlocked || action === 'premium';
           const cleared=Boolean(record?.clearedAt);
           const perfect=Boolean(record?.perfectAt||(legacy.has(stage.id)&&cleared));
@@ -339,11 +344,11 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           return (
             <Pressable key={stage.id} accessibilityRole="button" disabled={!selectable}
               accessibilityState={{disabled:!selectable}}
-              accessibilityLabel={stageDisplayTitle(stage)+'、'+(preview ? (uiPreviewSampleKind(stage) ? 'サンプル問題' : '体験用問題は準備中') : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
+              accessibilityLabel={stageDisplayTitle(stage)+'、'+(preview ? (reviewBank ? '管理者テスト・ログインが必要' : uiPreviewSampleKind(stage) ? 'サンプル問題' : '体験用問題は準備中') : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
                 styles.stagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
-                !unlocked&&styles.lockedPin,cleared&&styles.clearedPin,perfect&&styles.perfectPin,
+                reviewBank&&styles.reviewBankPin,!unlocked&&styles.lockedPin,cleared&&styles.clearedPin,perfect&&styles.perfectPin,
                 current&&styles.currentPin,pressed&&styles.pressed,
                 {width:marker,height:marker,left:position.x-marker/2,top:position.y-marker/2},
               ]}>
@@ -420,6 +425,7 @@ const styles=StyleSheet.create({
   extraPin:{backgroundColor:'#f5e6ff',borderColor:'#8b75c0'},
   secretPin:{backgroundColor:'#fce4ed',borderColor:'#d89bba'},
   lockedPin:{backgroundColor:'#d1d5dc',borderColor:'#899ba8',opacity:0.9},
+  reviewBankPin:{backgroundColor:'#d5f6ef',borderColor:'#23857b'},
   clearedPin:{backgroundColor:'#c1eedc',borderColor:'#3b9985'},
   perfectPin:{backgroundColor:'#ffeda5',borderColor:'#d7a444'},
   currentPin:{borderColor:'#ffdf8c',backgroundColor:'#fff9d6',borderWidth:4},
