@@ -1,0 +1,464 @@
+{
+  "version": 1,
+  "selection": "balanced",
+  "stageId": "j2.n01",
+  "gradeId": "j2",
+  "islandId": "j2",
+  "unit": "式の 計算",
+  "objective": "同類項と分配法則を用いて文字式を整理する",
+  "questions": [
+    {
+      "id": "draft-j2.n01-01",
+      "skillId": "j2.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "2x + 3x を整理すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "5x",
+        "6x",
+        "5x²",
+        "-1x"
+      ],
+      "answer": "5x",
+      "hint": "同類項かどうかを確認しよう。",
+      "hints": [
+        "同類項かどうかを確認しよう。",
+        "同じ文字部分xをくくる。",
+        "係数だけを足して文字部分は変えない。"
+      ],
+      "explanation": "5x です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "同じ文字部分xをくくる。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "2x＋3x＝(2＋3)x＝5x。"
+        },
+        {
+          "title": "確認",
+          "body": "5x です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "6x",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "5x²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "-1x",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j2.n01-02",
+      "skillId": "j2.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "3(x + 4) を展開すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "3x+12",
+        "7x",
+        "3x+4",
+        "12x+3"
+      ],
+      "answer": "3x+12",
+      "hint": "括弧の中の両方にかける。",
+      "hints": [
+        "括弧の中の両方にかける。",
+        "xの項と定数項を別々に計算する。",
+        "定数項は2つの整数の積になる。"
+      ],
+      "explanation": "3x+12 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "xの項と定数項を別々に計算する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "3×x＋3×4＝3x+12。"
+        },
+        {
+          "title": "確認",
+          "body": "3x+12 です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "7x",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "3x+4",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "12x+3",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j2.n01-03",
+      "skillId": "j2.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "x=-4 のとき 4x+5 の値は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "-11",
+      "hint": "文字に数を代入しよう。",
+      "hints": [
+        "文字に数を代入しよう。",
+        "負の数をかけると符号が変わる。",
+        "かけ算を先に計算してから足そう。"
+      ],
+      "explanation": "-11 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "負の数をかけると符号が変わる。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "4×(-4)＋5＝-11。"
+        },
+        {
+          "title": "確認",
+          "body": "-11 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-j2.n01-04",
+      "skillId": "j2.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "5x + 6x を整理すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "11x",
+        "30x",
+        "11x²",
+        "-1x"
+      ],
+      "answer": "11x",
+      "hint": "同類項かどうかを確認しよう。",
+      "hints": [
+        "同類項かどうかを確認しよう。",
+        "同じ文字部分xをくくる。",
+        "係数だけを足して文字部分は変えない。"
+      ],
+      "explanation": "11x です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "同じ文字部分xをくくる。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "5x＋6x＝(5＋6)x＝11x。"
+        },
+        {
+          "title": "確認",
+          "body": "11x です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "30x",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "11x²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "-1x",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j2.n01-05",
+      "skillId": "j2.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "6(x + 7) を展開すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "6x+42",
+        "13x",
+        "6x+7",
+        "42x+6"
+      ],
+      "answer": "6x+42",
+      "hint": "括弧の中の両方にかける。",
+      "hints": [
+        "括弧の中の両方にかける。",
+        "xの項と定数項を別々に計算する。",
+        "定数項は2つの整数の積になる。"
+      ],
+      "explanation": "6x+42 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "xの項と定数項を別々に計算する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "6×x＋6×7＝6x+42。"
+        },
+        {
+          "title": "確認",
+          "body": "6x+42 です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "13x",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "6x+7",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "42x+6",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j2.n01-06",
+      "skillId": "j2.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "x=-3 のとき 7x+3 の値は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "-18",
+      "hint": "文字に数を代入しよう。",
+      "hints": [
+        "文字に数を代入しよう。",
+        "負の数をかけると符号が変わる。",
+        "かけ算を先に計算してから足そう。"
+      ],
+      "explanation": "-18 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "負の数をかけると符号が変わる。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "7×(-3)＋3＝-18。"
+        },
+        {
+          "title": "確認",
+          "body": "-18 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-j2.n01-07",
+      "skillId": "j2.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "8x + 4x を整理すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "12x",
+        "32x",
+        "12x²",
+        "4x"
+      ],
+      "answer": "12x",
+      "hint": "同類項かどうかを確認しよう。",
+      "hints": [
+        "同類項かどうかを確認しよう。",
+        "同じ文字部分xをくくる。",
+        "係数だけを足して文字部分は変えない。"
+      ],
+      "explanation": "12x です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "同じ文字部分xをくくる。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "8x＋4x＝(8＋4)x＝12x。"
+        },
+        {
+          "title": "確認",
+          "body": "12x です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "32x",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "12x²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "4x",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j2.n01-08",
+      "skillId": "j2.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "9(x + 5) を展開すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "9x+45",
+        "14x",
+        "9x+5",
+        "45x+9"
+      ],
+      "answer": "9x+45",
+      "hint": "括弧の中の両方にかける。",
+      "hints": [
+        "括弧の中の両方にかける。",
+        "xの項と定数項を別々に計算する。",
+        "定数項は2つの整数の積になる。"
+      ],
+      "explanation": "9x+45 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "xの項と定数項を別々に計算する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "9×x＋9×5＝9x+45。"
+        },
+        {
+          "title": "確認",
+          "body": "9x+45 です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "14x",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "9x+5",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "45x+9",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j2.n01-09",
+      "skillId": "j2.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "x=-2 のとき 10x+6 の値は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "-14",
+      "hint": "文字に数を代入しよう。",
+      "hints": [
+        "文字に数を代入しよう。",
+        "負の数をかけると符号が変わる。",
+        "かけ算を先に計算してから足そう。"
+      ],
+      "explanation": "-14 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "負の数をかけると符号が変わる。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "10×(-2)＋6＝-14。"
+        },
+        {
+          "title": "確認",
+          "body": "-14 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-j2.n01-10",
+      "skillId": "j2.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "11x + 7x を整理すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "18x",
+        "77x",
+        "18x²",
+        "4x"
+      ],
+      "answer": "18x",
+      "hint": "同類項かどうかを確認しよう。",
+      "hints": [
+        "同類項かどうかを確認しよう。",
+        "同じ文字部分xをくくる。",
+        "係数だけを足して文字部分は変えない。"
+      ],
+      "explanation": "18x です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "同じ文字部分xをくくる。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "11x＋7x＝(11＋7)x＝18x。"
+        },
+        {
+          "title": "確認",
+          "body": "18x です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "77x",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "18x²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "4x",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    }
+  ]
+}
