@@ -23,9 +23,9 @@ export type StageProductionEntry = {
   updated_at:string;
   updated_by:string;
 };
-export function productionStatusMinimum(status:StageProductionStatus):number {
+export function productionStatusMinimum(status:StageProductionStatus,isCheckpoint=false):number {
   return status==='hundred_created'||status==='final_creator_reviewed'||status==='child_tested'
-    ? 100 : status==='ten_created'||status==='creator_reviewed' ? 10 : 0;
+    ? (isCheckpoint?10:100) : status==='ten_created'||status==='creator_reviewed' ? 10 : 0;
 }
 export function productionStageIsReviewed(status:StageProductionStatus):boolean {
   return status==='creator_reviewed'||status==='final_creator_reviewed'||status==='child_tested';
