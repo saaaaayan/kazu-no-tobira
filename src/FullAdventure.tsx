@@ -12,6 +12,7 @@ import { prepareStageRound } from './stageRounds';
 import { QuestionDiagram, WorkedSolution, WrittenSolution } from './components/QuestionSupport';
 import { emptyProgress, recordAttempt, type Progress } from './domain/progress';
 import { uiPreviewRound, uiPreviewPreschoolCheckpointOne } from './domain/uiPreviewRound';
+import { publicBankStageRound } from './domain/publicBankStageRound';
 import QuestionReadAloud from './components/QuestionReadAloud';
 import { canAccessFeature, canAccessStage, freeAccess, hasPremium, type Entitlement } from './domain/accessPlan';
 import { readServerEntitlement } from './domain/serverEntitlement';
@@ -259,13 +260,24 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   async function start(stage: WorldStage) {
     if (!progress || starting.current || submitting.current || lessonWrite.current) return;
     if (uiPreview) {
-      // The public prototype contains no unreviewed question text. A stage with a
-      // stored bank opens the authenticated admin game preview for that exact ID.
       if (hasStageBank(stage.id)) {
-        if (typeof window !== 'undefined') {
-          window.location.assign('/kazu-no-tobira/admin/?stage='+encodeURIComponent(stage.id)+'&play=10');
-        } else {
-          setStartError('管理者の問題確認画面をひらけません。');
+        // Public trial: these existing banks are now playable in the normal
+        // adventure screen, without a login or a separate admin route.
+        starting.current=true;
+        setLoadingRound(true);
+        setStartError('');
+        try {
+          const problems=await publicBankStageRound(stage);
+          resetAnswer();
+          setLearning(undefined);
+          setScreen('island');
+          setRound({stage,problems,index:0,correct:0,results:[],
+            dialogueOffset:Math.floor(Math.random()*1000),usedHint:false,hintLevel:0});
+        } catch(error) {
+          setStartError(error instanceof Error ? error.message : '問題を読み込めませんでした。');
+        } finally {
+          starting.current=false;
+          setLoadingRound(false);
         }
         return;
       }
@@ -435,7 +447,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const specialRound=Boolean(round?.checkpoint || (round?.live && !['stage','test'].includes(round.live.mode)));
   const cleared = Boolean(round && !specialRound && round.correct >= Math.ceil(round.stage.questions * 0.8));
   const nextStage = round && !round.checkpoint && (!round.live || ['stage','test'].includes(round.live.mode)) && worldIslands.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
-  const canContinue = !review && nextStage && progress && (uiPreview || ['play', 'learn'].includes(worldStageAction(playMode, progress, nextStage, access)));
+  const canContinue = !review && nextStage && progress && (uiPreview
+    ? (hasStageBank(nextStage.id)||Boolean(uiPreviewRound(nextStage).length))
+    : ['play', 'learn'].includes(worldStageAction(playMode, progress, nextStage, access)));
   const lessonStage = learning && (learning.target ?? grade.stages.find(stage => learning.lesson.linkedStageIds.includes(stage.id)));
   const canChallenge = lessonStage && progress && canPlayWorldStage(playMode, progress, lessonStage, access);
   const newlyEarnedTitles = round && progress && !testing ? adventureTitles(progress).filter(t=>t.unlocked).length : 0;
@@ -448,7 +462,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           style={[styles.shell,round && !round.complete && styles.playShell]}>
           {uiPreview && <View style={styles.playPanel} testID="kazu-sample-only-preview">
             <Text accessibilityRole="header" style={styles.answerHeading}>数のトビラ 試作版</Text>
-            <Text style={styles.explanation}>全16島の画面とサンプル問題を確認できます。回答は保存されません。</Text>
+            <Text style={styles.explanation}>小学1年生・賢者の島の43ステージで4,300問を公開中。各ステージ100問から10問ずつ挑戦できます。幼児01〜05も遊べます。試作版の回答記録は保存されません。</Text>
             <Text selectable style={styles.hintNote}>バージョン {process.env.EXPO_PUBLIC_KAZU_UI_PREVIEW_SHA}</Text>
           </View>}
           {__DEV__ && !review && <View style={styles.navigation}>
