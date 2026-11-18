@@ -53,14 +53,16 @@ function preschoolQuestion(stage:WorldStage,index:number):BankQuestion {
       explanation='「'+n+'」が ただしい すうじだよ。せんに そって なぞってみよう。';
     }
   } else if(unit===3) {
-    n=1+variant;answer=String(n+1);options=choices(n+1);
-    stem=n+'、'+(n+1)+'、'+(n+2)+' の じゅんばんで、'+n+' の つぎは？';
-    prompt='ひとつ すすんだ すうじを えらぼう。';
-    hints=['かずの じゅんばんを みよう。','つぎの かずは ひとつ おおきいよ。','ひとつ すすんだ ところを えらぼう。'];
-    explanation=n+' の つぎは '+(n+1)+' だよ。';
+    n=1+((index+stage.part)%9);
+    const before=index===9;
+    answer=String(before?n-1:n+1);options=choices(Number(answer),true);
+    stem=n+'、'+(n+1)+'、'+(n+2)+' の じゅんばんで、'+n+' の '+(before?'ひとつまえ':'つぎ')+'は？';
+    prompt='ひとつ '+(before?'もどった':'すすんだ')+' すうじを えらぼう。';
+    hints=['かずの じゅんばんを みよう。','かずは ひとつずつ ならんでいるよ。','ひとつ '+(before?'もどった':'すすんだ')+' ところを えらぼう。'];
+    explanation=n+' の '+(before?'ひとつまえ':'つぎ')+'は '+answer+' だよ。';
   } else if(unit===4) {
     const other:CountingToken=shapes[(index+stage.order*7+4)%shapes.length];
-    const a=2+variant, b=1+((variant+3)%7);
+    const a=1+variant, b=1+((variant+3)%7);
     n=Math.max(a,b);answer=String(n);options=choices(n);
     stem=name+'と '+countingTokenArt[other][1]+'、おおい ほうは なんこ？';
     prompt='それぞれ かぞえて くらべてね。';
