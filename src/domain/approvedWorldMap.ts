@@ -1,14 +1,14 @@
 /**
- * Coordinates measured from the user-approved 1448×1086 world map artwork.
+ * Coordinates measured from the user-approved 1452×1083 world map artwork.
  * These are the clickable island centers, in the same order as worldIslands.
  * All values are normalized; render dimensions can be scaled without changing
  * the route, the image artwork, or island names.
  */
 export const approvedWorldMap = {
-  width: 1448,
-  height: 1086,
-  filename: 'world-map-approved.avif',
-  sha256: '04b55a4204f9891954a7f85c64a748547f4c8a88a0515fffbcd35b80122bbbcb',
+  width: 1452,
+  height: 1083,
+  filename: 'world-map-approved.png',
+  sha256: 'c8f621c995ef97cab28dc8f2e423718ee0f355a1b468de2ec7dc8624d5712e68',
 } as const;
 export const approvedWorldMapHotspots = [
   {x:.118,y:.180}, // 01 preschool – plush toys
@@ -30,7 +30,7 @@ export const approvedWorldMapHotspots = [
 ] as const;
 
 export const approvedWorldMapImageUrl =
-  '/kazu-no-tobira/world-map-approved.avif?v=04b55a42';
+  '/kazu-no-tobira/world-map-approved.png?v=c8f621c9';
 
 export function approvedWorldMapDimensions(viewWidth:number,zoomed:boolean) {
   const actualWidth=Math.max(244,viewWidth||360);

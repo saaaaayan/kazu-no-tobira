@@ -60,14 +60,14 @@ for(const id of publicBankIds){
 }
 
 // Keep the exact user-approved world image as a separate, cacheable public asset.
-const mapSource=resolve('public/world-map-approved.avif');
+const mapSource=resolve('public/world-map-approved.png');
 const mapBytes=readFileSync(mapSource);
-if(mapBytes.length<50_000||mapBytes.length>2_000_000||
-   mapBytes.toString('ascii',4,12)!=='ftypavif')
-  throw new Error('The approved 16-island map is not a valid AVIF asset.');
-copyFileSync(mapSource,resolve(target,'world-map-approved.avif'));
+if(mapBytes.length<1_000_000||mapBytes.length>3_000_000||
+   !mapBytes.subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex')))
+  throw new Error('The approved 16-island map is not a valid PNG asset.');
+copyFileSync(mapSource,resolve(target,'world-map-approved.png'));
 
-const allowed=new Set(['index.html','metadata.json','world-map-approved.avif']);
+const allowed=new Set(['index.html','metadata.json','world-map-approved.png']);
 const files=readdirSync(target,{recursive:true,withFileTypes:true}).filter(entry=>!entry.isDirectory())
   .map(entry=>relative(target,resolve(entry.parentPath,entry.name)).replaceAll('\\','/'));
 if (files.some(file=>!allowed.has(file) && !/^_expo\/static\/js\/web\/[A-Za-z0-9._-]+\.js$/.test(file) &&
