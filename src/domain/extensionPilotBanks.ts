@@ -1,4 +1,4 @@
-import {pilotBank,type PilotSeed} from './pilotBankHelpers';
+import {pilotBank,type PilotSeed} from './pilotBankHelpers.ts';
 
 /** 覇王：合同式／宇宙：集合・写像の第一歩。 */
 const champion:PilotSeed[]=[
