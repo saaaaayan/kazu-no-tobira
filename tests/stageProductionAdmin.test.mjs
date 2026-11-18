@@ -121,11 +121,11 @@ test('all 43 public bank pins are ordinary direct-play destinations, no admin re
   const game=read('src/FullAdventure.tsx');
   const exporter=read('scripts/export-ui-preview.mjs');
   const isolation=read('scripts/ui-preview-isolation.mjs');
-  assert.match(map,/const unlocked=preview \? Boolean\(uiPreviewSampleKind\(stage\)\) \|\| hasStageBank\(stage\.id\)/);
+  assert.match(map,/const unlocked=preview \? hasPrototypeStageQuestions\(stage\)/);
   assert.match(map,/hasStageBank\(stage\.id\) \? '100問のなかから10問ずつ あそべる'/);
   assert.doesNotMatch(map,/管理者テスト・ログインが必要|reviewBankPin/);
-  assert.match(game,/if \(hasStageBank\(stage\.id\)\) \{/);
-  assert.match(game,/await publicBankStageRound\(stage\)/);
+  assert.match(read('src/domain/everyIslandStageRound.ts'),/if\(hasStageBank\(stage\.id\)\)return publicBankStageRound\(stage\)/);
+  assert.match(game,/await everyIslandStageRound\(stage\)/);
   assert.doesNotMatch(game,/window\.location\.assign\('\/kazu-no-tobira\/admin\/\?stage='/);
   assert.match(exporter,/publishedBankQuestions:publicBankIds\.length\*100/);
   assert.match(exporter,/bankSha256:bankFiles/);

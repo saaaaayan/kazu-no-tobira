@@ -13,6 +13,7 @@ import { QuestionDiagram, WorkedSolution, WrittenSolution } from './components/Q
 import { emptyProgress, recordAttempt, type Progress } from './domain/progress';
 import { uiPreviewRound, uiPreviewPreschoolCheckpointOne } from './domain/uiPreviewRound';
 import { publicBankStageRound } from './domain/publicBankStageRound';
+import {everyIslandStageRound,hasPrototypeStageQuestions} from './domain/everyIslandStageRound';
 import QuestionReadAloud from './components/QuestionReadAloud';
 import { canAccessFeature, canAccessStage, freeAccess, hasPremium, type Entitlement } from './domain/accessPlan';
 import { readServerEntitlement } from './domain/serverEntitlement';
@@ -260,33 +261,22 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   async function start(stage: WorldStage) {
     if (!progress || starting.current || submitting.current || lessonWrite.current) return;
     if (uiPreview) {
-      if (hasStageBank(stage.id)) {
-        // Public trial: these existing banks are now playable in the normal
-        // adventure screen, without a login or a separate admin route.
-        starting.current=true;
-        setLoadingRound(true);
-        setStartError('');
-        try {
-          const problems=await publicBankStageRound(stage);
-          resetAnswer();
-          setLearning(undefined);
-          setScreen('island');
-          setRound({stage,problems,index:0,correct:0,results:[],
-            dialogueOffset:Math.floor(Math.random()*1000),usedHint:false,hintLevel:0});
-        } catch(error) {
-          setStartError(error instanceof Error ? error.message : '問題を読み込めませんでした。');
-        } finally {
-          starting.current=false;
-          setLoadingRound(false);
-        }
-        return;
-      }
-      const problems=uiPreviewRound(stage);
-      if (!problems.length) { setStartError('このステージの体験用問題は準備中です。'); return; }
+      starting.current=true;
+      setLoadingRound(true);
       setStartError('');
-      resetAnswer();
-      setScreen('island');
-      setRound({stage,problems,index:0,correct:0,results:[],dialogueOffset:0,usedHint:false,hintLevel:0});
+      try {
+        const problems=await everyIslandStageRound(stage);
+        resetAnswer();
+        setLearning(undefined);
+        setScreen('island');
+        setRound({stage,problems,index:0,correct:0,results:[],
+          dialogueOffset:Math.floor(Math.random()*1000),usedHint:false,hintLevel:0});
+      } catch(error) {
+        setStartError(error instanceof Error ? error.message : 'もんだいを ひらけなかったよ。');
+      } finally {
+        starting.current=false;
+        setLoadingRound(false);
+      }
       return;
     }
     const action = worldStageAction(playMode, progress, stage, access);
@@ -330,8 +320,8 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const canReadWorkedSolution = review ? review.detailed : uiPreview || canAccessFeature(access, 'workedSolutions');
   const liveCard=round?.live?.round.questions[round.index];
   const diagram=bankQuestion?.diagram ?? liveCard?.diagram;
-  const preschoolStage=Boolean(round?.stage.gradeId==='preschool' && preschoolGuideTitles[round.stage.id]);
-  const countingGuide=Boolean(preschoolStage && diagram?.kind==='countingBoard' && diagram.guide);
+  const preschoolStage=Boolean(round?.stage.gradeId==='preschool');
+  const countingGuide=Boolean(preschoolStage && question?.type==='choice');
   const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && (Boolean(liveCard) || Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0);
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
@@ -448,7 +438,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const cleared = Boolean(round && !specialRound && round.correct >= Math.ceil(round.stage.questions * 0.8));
   const nextStage = round && !round.checkpoint && (!round.live || ['stage','test'].includes(round.live.mode)) && worldIslands.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
   const canContinue = !review && nextStage && progress && (uiPreview
-    ? (hasStageBank(nextStage.id)||Boolean(uiPreviewRound(nextStage).length))
+    ? hasPrototypeStageQuestions(nextStage)
     : ['play', 'learn'].includes(worldStageAction(playMode, progress, nextStage, access)));
   const lessonStage = learning && (learning.target ?? grade.stages.find(stage => learning.lesson.linkedStageIds.includes(stage.id)));
   const canChallenge = lessonStage && progress && canPlayWorldStage(playMode, progress, lessonStage, access);
@@ -555,7 +545,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                 <>
                   <View style={styles.questionPanel}>
                     <View style={styles.questionHeader}>
-                      <Text style={styles.stageTitle}>{round.checkpoint ? 'かくにんテスト '+round.checkpoint.number : countingGuide ? preschoolGuideTitles[round.stage.id] : stageDisplayTitle(round.stage)}</Text>
+                      <Text style={styles.stageTitle}>{round.checkpoint ? 'かくにんテスト '+round.checkpoint.number : countingGuide ? (preschoolGuideTitles[round.stage.id]??stageDisplayTitle(round.stage)) : stageDisplayTitle(round.stage)}</Text>
                       <Text style={styles.questionIndex}>{countingGuide ? round.index+1 : '第'+(round.index+1)+'問'} / {round.problems.length}</Text>
                     </View>
                     <MagicMeter results={round.results} total={round.problems.length}/>
@@ -574,17 +564,23 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                       <QuestionDiagram diagram={diagram} phase={round.hintLevel ? 'hint' : 'question'} />
                     )}
                     <MathText style={styles.prompt} value={question.prompt}/>
+                    {countingGuide && round.stage.family==='tracing' && !round.feedback && (
+                      <View style={{gap:8,padding:10,backgroundColor:'#faf5ff',borderRadius:14}}>
+                        <Text style={{fontSize:19,fontWeight:'800',color:'#25345c'}}>ゆびで すうじを なぞろう</Text>
+                        <CalculationMemo key={question.id} onDrawingChange={setDrawing}/>
+                      </View>
+                    )}
                     {countingGuide && !round.feedback && (
                       <View style={styles.preschoolAnswerSection}>
-                        <Text style={styles.preschoolInstruction}>すうじを さわってね</Text>
+                        <Text style={styles.preschoolInstruction}>{question.choices?.every(option=>/^\d+$/.test(option))?'すうじを さわってね':'えを えらんで さわってね'}</Text>
                         <View style={styles.preschoolNumberRow}>
                           {question.choices?.map(option => (
                             <Pressable key={option} testID={'preschool-answer-'+option}
                               accessibilityRole="button"
-                              accessibilityLabel={option+'こ と こたえる'}
+                              accessibilityLabel={option+' と こたえる'}
                               accessibilityHint="さわると こたえあわせを するよ"
                               accessibilityState={{disabled:saving}}
-                              disabled={saving} onPress={()=>void submit(option)}
+                              disabled={saving||drawing} onPress={()=>void submit(option)}
                               style={({pressed})=>[styles.preschoolNumberButton,pressed&&styles.dim]}>
                               <Text style={styles.preschoolNumberText}>{option}</Text>
                             </Pressable>

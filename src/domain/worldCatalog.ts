@@ -288,7 +288,20 @@ const sageDefinition: Omit<WorldGrade, 'stages'> = {
   title: '理系大学入試',
   island: '賢者の島',
   theme: '大図書館と天文台をめぐる 分野横断の総合演習',
-  units: Array.from({length:10}, (_, i) => ({ code: 'sage-mixed-' + (i+1), title: '総合演習', family: 'sageMixed' })),
+  // Normal route: 10 distinct high-school / entrance-exam fields, 5 stages each.
+  // The existing sage.n01–03 legacy banks remain untouched and are introduced
+  // under a deliberately broad introductory mixed-problem category.
+  units: makeUnits(`
+sage-intro|分野横断・入試総合の入口|sageMixed
+sage-equation|方程式と 不等式|sageMixed
+sage-function|関数と グラフ|sageMixed
+sage-counting|場合の数と 確率|sageMixed
+sage-geometry|図形と 三角比|sageMixed
+sage-sequence|数列と 漸化式|sageMixed
+sage-derivative|微分と 極値|sageMixed
+sage-integral|積分と 面積|sageMixed
+sage-vector|ベクトルと 複素数|sageMixed
+sage-synthesis|分野横断と 証明|sageMixed`),
 };
 
 export const sageIsland: WorldGrade = { ...sageDefinition, stages: createStages(sageDefinition) };
