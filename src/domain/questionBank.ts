@@ -46,6 +46,12 @@ export function hasStageBank(id: string): id is BankStageId {
   return bankStageIds.some(stageId => stageId === id) || starterTenStageIds.some(stageId => stageId === id);
 }
 
+export function stageBankQuestionCount(id: string): 0 | 10 | 100 {
+  if (starterTenStageIds.some(stageId=>stageId===id)) return 10;
+  if (bankStageIds.some(stageId=>stageId===id)) return 100;
+  return 0;
+}
+
 export function isBankQuestion(question: MathQuestion): question is BankQuestion {
   return 'hints' in question;
 }
