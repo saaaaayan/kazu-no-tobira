@@ -1,4 +1,4 @@
-import {pilotBank,type PilotSeed} from './pilotBankHelpers';
+import {pilotBank,type PilotSeed} from './pilotBankHelpers.ts';
 
 /** 小学2〜6年：各学年「冒険の道01」10問。 */
 const e2: PilotSeed[]=[
