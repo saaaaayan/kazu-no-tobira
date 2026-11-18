@@ -116,20 +116,19 @@ test('admin dashboard defaults to populated question banks, not more than 1,100 
   assert.match(component,/setEdit\(previous=>previous\?\?data\.find\(item=>item\.id===selectedId\)\)/);
 });
 
-test('tapping a bank-backed pin uses authenticated map deep link and keeps real questions out of public bundle',()=>{
+test('all 43 public bank pins are ordinary direct-play destinations, no admin redirection',()=>{
   const map=read('src/components/WorldScenes780.tsx');
   const game=read('src/FullAdventure.tsx');
-  const admin=read('src/components/StageProductionDashboard.web.tsx');
+  const exporter=read('scripts/export-ui-preview.mjs');
   const isolation=read('scripts/ui-preview-isolation.mjs');
-  assert.match(map,/const reviewBank=preview && hasStageBank\(stage\.id\)/);
-  assert.match(map,/const unlocked=preview \? Boolean\(uiPreviewSampleKind\(stage\)\) \|\| reviewBank/);
-  assert.match(map,/reviewBank&&styles\.reviewBankPin/);
-  assert.match(map,/管理者テスト・ログインが必要/);
+  assert.match(map,/const unlocked=preview \? Boolean\(uiPreviewSampleKind\(stage\)\) \|\| hasStageBank\(stage\.id\)/);
+  assert.match(map,/hasStageBank\(stage\.id\) \? '100問のなかから10問ずつ あそべる'/);
+  assert.doesNotMatch(map,/管理者テスト・ログインが必要|reviewBankPin/);
   assert.match(game,/if \(hasStageBank\(stage\.id\)\) \{/);
-  assert.match(game,/window\.location\.assign\('\/kazu-no-tobira\/admin\/\?stage='/);
-  assert.match(admin,/params\.get\('play'\)!=='10'/);
-  assert.match(admin,/questionSource!=='database'/);
-  assert.match(admin,/onPreview\(selectedId,shuffle\(questions\)\.slice\(0,10\),'random'\)/);
-  assert.match(admin,/window\.history\.replaceState\(window\.history\.state,'',window\.location\.pathname\)/);
+  assert.match(game,/await publicBankStageRound\(stage\)/);
+  assert.doesNotMatch(game,/window\.location\.assign\('\/kazu-no-tobira\/admin\/\?stage='/);
+  assert.match(exporter,/publishedBankQuestions:publicBankIds\.length\*100/);
+  assert.match(exporter,/bankSha256:bankFiles/);
+  assert.match(exporter,/copyFileSync\(source,resolve\(target,'question-banks',file\)\)/);
   assert.match(isolation,/bankIds\.some\(id=>bundle\.includes/);
 });
