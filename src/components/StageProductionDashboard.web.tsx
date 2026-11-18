@@ -1,5 +1,5 @@
-import {useEffect,useMemo,useState} from 'react';
-import type {BankQuestion} from '../domain/questionBank';
+import {useEffect,useMemo,useRef,useState} from 'react';
+import {hasStageBank,type BankQuestion} from '../domain/questionBank';
 import {allWorldStages,worldIslands} from '../domain/worldCatalog';
 import {uiPreviewBank,uiPreviewPreschoolCheckpointOne} from '../domain/uiPreviewRound';
 import {stageProductionLabels,stageProductionOptions,type StageProductionEntry,
@@ -31,7 +31,13 @@ function previewBank(id:string):BankQuestion[] {
   return uiPreviewBank(stage);
 }
 
+function mapStageRequest(): string {
+  if(typeof window==='undefined') return 'e1.forest';
+  const stage=new URLSearchParams(window.location.search).get('stage')??'';
+  return hasStageBank(stage)?stage:'e1.forest';
+}
 export default function StageProductionDashboard({api,onPreview,onInspectQuestion}:Props) {
+  const launchedMapRound=useRef(false);
   const [rows,setRows]=useState<ProductionStage[]>([]);
   const [fetching,setFetching]=useState(true);
   const [island,setIsland]=useState('all');
@@ -39,7 +45,7 @@ export default function StageProductionDashboard({api,onPreview,onInspectQuestio
   // The first view must show the stages that ACTUALLY contain questions, not the 1,100+ empty placeholders.
   const [contentFilter,setContentFilter]=useState<'registered'|'authored'|'all'>('registered');
   const [term,setTerm]=useState('');
-  const [selectedId,setSelectedId]=useState('e1.forest');
+  const [selectedId,setSelectedId]=useState(mapStageRequest);
   const [questions,setQuestions]=useState<BankQuestion[]>([]);
   const [questionSource,setQuestionSource]=useState<'database'|'prototype'|'none'>('none');
   const [questionLoading,setQuestionLoading]=useState(false);
@@ -59,7 +65,7 @@ export default function StageProductionDashboard({api,onPreview,onInspectQuestio
         if(controller.signal.aborted)return;
         setRows(data);
         // Present a real 100-question bank on first login.
-        setEdit(previous=>previous??data.find(item=>item.id==='e1.forest'));
+        setEdit(previous=>previous??data.find(item=>item.id===selectedId));
       })
       .catch(e=>{if(!controller.signal.aborted)setNotice('進捗を読み込めませんでした: '+String(e.message??e));})
       .finally(()=>{if(!controller.signal.aborted)setFetching(false);});
@@ -92,6 +98,18 @@ export default function StageProductionDashboard({api,onPreview,onInspectQuestio
       }).finally(()=>{if(!controller.signal.aborted)setQuestionLoading(false);});
     return ()=>controller.abort();
   },[selectedId,api,reload]);
+
+  // Map → administrator login → immediately start a private ten-question game.
+  // Consume the URL on first use so returning from the game doesn't launch it again.
+  useEffect(()=>{
+    if(launchedMapRound.current || typeof window==='undefined' || questionLoading ||
+       questionSource!=='database' || !questions.length)return;
+    const params=new URLSearchParams(window.location.search);
+    if(params.get('stage')!==selectedId || params.get('play')!=='10' || !hasStageBank(selectedId))return;
+    launchedMapRound.current=true;
+    window.history.replaceState(window.history.state,'',window.location.pathname);
+    onPreview(selectedId,shuffle(questions).slice(0,10),'random');
+  },[selectedId,questions,questionLoading,questionSource,onPreview]);
 
   const totals=useMemo(()=>{
     const counts=Object.fromEntries(stageProductionOptions.map(key=>[key,0])) as Record<StageProductionStatus,number>;
