@@ -1,0 +1,445 @@
+{
+  "version": 1,
+  "selection": "balanced",
+  "stageId": "h2.n01",
+  "gradeId": "h2",
+  "islandId": "h2",
+  "unit": "式と 証明",
+  "objective": "剰余の定理と和・差の立方を式の変形で説明する",
+  "questions": [
+    {
+      "id": "draft-h2.n01-01",
+      "skillId": "h2.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "P(x)=x³+2x²+1x+3 を x-2 で割った余りは？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "21",
+      "hint": "剰余の定理を確認しよう。",
+      "hints": [
+        "剰余の定理を確認しよう。",
+        "x-2 で割る余りは P(2) になる。",
+        "代入するだけで余りが求められる理由を考えよう。"
+      ],
+      "explanation": "余りは 21 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "x-2 で割る余りは P(2) になる。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "P(2)=8+8+2+3=21。"
+        },
+        {
+          "title": "確認",
+          "body": "余りは 21 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-h2.n01-02",
+      "skillId": "h2.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "x³-27 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x-3)(x²+3x+9)",
+        "(x-3)(x²-3x+9)",
+        "(x+3)(x²-3x+9)",
+        "(x-3)³"
+      ],
+      "answer": "(x-3)(x²+3x+9)",
+      "hint": "2つの立方の差に分けよう。",
+      "hints": [
+        "2つの立方の差に分けよう。",
+        "a³-b³ の公式を適用する。",
+        "展開して二次・一次の項が消えることを確かめる。"
+      ],
+      "explanation": "(x-3)(x²+3x+9) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "a³-b³ の公式を適用する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "a³-b³=(a-b)(a²+ab+b²), a=x,b=3。"
+        },
+        {
+          "title": "確認",
+          "body": "(x-3)(x²+3x+9) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x-3)(x²-3x+9)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+3)(x²-3x+9)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-3)³",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h2.n01-03",
+      "skillId": "h2.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "x³+64 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x+4)(x²-4x+16)",
+        "(x+4)(x²+4x+16)",
+        "(x-4)(x²+4x+16)",
+        "(x+4)³"
+      ],
+      "answer": "(x+4)(x²-4x+16)",
+      "hint": "2つの立方の和に分けよう。",
+      "hints": [
+        "2つの立方の和に分けよう。",
+        "a³+b³ の公式を適用する。",
+        "中の二次式の一次項の符号に注意。"
+      ],
+      "explanation": "(x+4)(x²-4x+16) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "a³+b³ の公式を適用する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "a³+b³=(a+b)(a²-ab+b²), a=x,b=4。"
+        },
+        {
+          "title": "確認",
+          "body": "(x+4)(x²-4x+16) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x+4)(x²+4x+16)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-4)(x²+4x+16)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+4)³",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h2.n01-04",
+      "skillId": "h2.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "P(x)=x³+5x²+4x+3 を x-2 で割った余りは？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "39",
+      "hint": "剰余の定理を確認しよう。",
+      "hints": [
+        "剰余の定理を確認しよう。",
+        "x-2 で割る余りは P(2) になる。",
+        "代入するだけで余りが求められる理由を考えよう。"
+      ],
+      "explanation": "余りは 39 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "x-2 で割る余りは P(2) になる。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "P(2)=8+20+8+3=39。"
+        },
+        {
+          "title": "確認",
+          "body": "余りは 39 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-h2.n01-05",
+      "skillId": "h2.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "x³-216 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x-6)(x²+6x+36)",
+        "(x-6)(x²-6x+36)",
+        "(x+6)(x²-6x+36)",
+        "(x-6)³"
+      ],
+      "answer": "(x-6)(x²+6x+36)",
+      "hint": "2つの立方の差に分けよう。",
+      "hints": [
+        "2つの立方の差に分けよう。",
+        "a³-b³ の公式を適用する。",
+        "展開して二次・一次の項が消えることを確かめる。"
+      ],
+      "explanation": "(x-6)(x²+6x+36) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "a³-b³ の公式を適用する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "a³-b³=(a-b)(a²+ab+b²), a=x,b=6。"
+        },
+        {
+          "title": "確認",
+          "body": "(x-6)(x²+6x+36) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x-6)(x²-6x+36)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+6)(x²-6x+36)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-6)³",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h2.n01-06",
+      "skillId": "h2.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "x³+343 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x+7)(x²-7x+49)",
+        "(x+7)(x²+7x+49)",
+        "(x-7)(x²+7x+49)",
+        "(x+7)³"
+      ],
+      "answer": "(x+7)(x²-7x+49)",
+      "hint": "2つの立方の和に分けよう。",
+      "hints": [
+        "2つの立方の和に分けよう。",
+        "a³+b³ の公式を適用する。",
+        "中の二次式の一次項の符号に注意。"
+      ],
+      "explanation": "(x+7)(x²-7x+49) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "a³+b³ の公式を適用する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "a³+b³=(a+b)(a²-ab+b²), a=x,b=7。"
+        },
+        {
+          "title": "確認",
+          "body": "(x+7)(x²-7x+49) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x+7)(x²+7x+49)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-7)(x²+7x+49)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+7)³",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h2.n01-07",
+      "skillId": "h2.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "P(x)=x³+8x²+2x+3 を x-2 で割った余りは？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "47",
+      "hint": "剰余の定理を確認しよう。",
+      "hints": [
+        "剰余の定理を確認しよう。",
+        "x-2 で割る余りは P(2) になる。",
+        "代入するだけで余りが求められる理由を考えよう。"
+      ],
+      "explanation": "余りは 47 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "x-2 で割る余りは P(2) になる。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "P(2)=8+32+4+3=47。"
+        },
+        {
+          "title": "確認",
+          "body": "余りは 47 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-h2.n01-08",
+      "skillId": "h2.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "x³-729 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x-9)(x²+9x+81)",
+        "(x-9)(x²-9x+81)",
+        "(x+9)(x²-9x+81)",
+        "(x-9)³"
+      ],
+      "answer": "(x-9)(x²+9x+81)",
+      "hint": "2つの立方の差に分けよう。",
+      "hints": [
+        "2つの立方の差に分けよう。",
+        "a³-b³ の公式を適用する。",
+        "展開して二次・一次の項が消えることを確かめる。"
+      ],
+      "explanation": "(x-9)(x²+9x+81) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "a³-b³ の公式を適用する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "a³-b³=(a-b)(a²+ab+b²), a=x,b=9。"
+        },
+        {
+          "title": "確認",
+          "body": "(x-9)(x²+9x+81) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x-9)(x²-9x+81)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+9)(x²-9x+81)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-9)³",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h2.n01-09",
+      "skillId": "h2.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "x³+1000 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x+10)(x²-10x+100)",
+        "(x+10)(x²+10x+100)",
+        "(x-10)(x²+10x+100)",
+        "(x+10)³"
+      ],
+      "answer": "(x+10)(x²-10x+100)",
+      "hint": "2つの立方の和に分けよう。",
+      "hints": [
+        "2つの立方の和に分けよう。",
+        "a³+b³ の公式を適用する。",
+        "中の二次式の一次項の符号に注意。"
+      ],
+      "explanation": "(x+10)(x²-10x+100) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "a³+b³ の公式を適用する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "a³+b³=(a+b)(a²-ab+b²), a=x,b=10。"
+        },
+        {
+          "title": "確認",
+          "body": "(x+10)(x²-10x+100) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x+10)(x²+10x+100)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-10)(x²+10x+100)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+10)³",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h2.n01-10",
+      "skillId": "h2.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "P(x)=x³+11x²+5x+3 を x-2 で割った余りは？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "65",
+      "hint": "剰余の定理を確認しよう。",
+      "hints": [
+        "剰余の定理を確認しよう。",
+        "x-2 で割る余りは P(2) になる。",
+        "代入するだけで余りが求められる理由を考えよう。"
+      ],
+      "explanation": "余りは 65 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "x-2 で割る余りは P(2) になる。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "P(2)=8+44+10+3=65。"
+        },
+        {
+          "title": "確認",
+          "body": "余りは 65 です。"
+        }
+      ],
+      "mistakes": []
+    }
+  ]
+}
