@@ -12,6 +12,7 @@ import { prepareStageRound } from './stageRounds';
 import { QuestionDiagram, WorkedSolution, WrittenSolution } from './components/QuestionSupport';
 import { emptyProgress, recordAttempt, type Progress } from './domain/progress';
 import { uiPreviewRound, uiPreviewPreschoolCheckpointOne } from './domain/uiPreviewRound';
+import { publicBankStageRound } from './domain/publicBankStageRound';
 import QuestionReadAloud from './components/QuestionReadAloud';
 import { canAccessFeature, canAccessStage, freeAccess, hasPremium, type Entitlement } from './domain/accessPlan';
 import { readServerEntitlement } from './domain/serverEntitlement';
@@ -259,13 +260,24 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   async function start(stage: WorldStage) {
     if (!progress || starting.current || submitting.current || lessonWrite.current) return;
     if (uiPreview) {
-      // The public prototype contains no unreviewed question text. A stage with a
-      // stored bank opens the authenticated admin game preview for that exact ID.
       if (hasStageBank(stage.id)) {
-        if (typeof window !== 'undefined') {
-          window.location.assign('/kazu-no-tobira/admin/?stage='+encodeURIComponent(stage.id)+'&play=10');
-        } else {
-          setStartError('管理者の問題確認画面をひらけません。');
+        // Public trial: these existing banks are now playable in the normal
+        // adventure screen, without a login or a separate admin route.
+        starting.current=true;
+        setLoadingRound(true);
+        setStartError('');
+        try {
+          const problems=await publicBankStageRound(stage);
+          resetAnswer();
+          setLearning(undefined);
+          setScreen('island');
+          setRound({stage,problems,index:0,correct:0,results:[],
+            dialogueOffset:Math.floor(Math.random()*1000),usedHint:false,hintLevel:0});
+        } catch(error) {
+          setStartError(error instanceof Error ? error.message : '問題を読み込めませんでした。');
+        } finally {
+          starting.current=false;
+          setLoadingRound(false);
         }
         return;
       }
