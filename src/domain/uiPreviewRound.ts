@@ -16,7 +16,8 @@ export const additionalStageLessonBanks:Readonly<Record<string,readonly BankQues
 
 export function uiPreviewSampleKind(stage: SampleStage) {
   if (stage.kind !== 'normal') return undefined;
-  if (additionalStageLessonBanks[stage.id] && stage.id.startsWith(stage.gradeId+'.')) return 'foundation-stage';
+  if (additionalStageLessonBanks[stage.id] && stage.id.startsWith(stage.gradeId+'.') &&
+      stage.family === (stage.gradeId==='e5'?'decimal':stage.gradeId==='e6'?'fraction':'place')) return 'foundation-stage';
   if (firstStageLessonBanks[stage.id] && stage.id.startsWith(stage.gradeId+'.') && stage.family!== 'unknown') return 'island-first-stage';
   if (stage.id === 'preschool.n01' && stage.gradeId === 'preschool' && stage.family === 'count') return 'counting';
   if (stage.gradeId === 'preschool' && stage.family === 'count' && ['preschool.n02','preschool.n03','preschool.n04','preschool.n05'].includes(stage.id)) return 'preschool-sample';
