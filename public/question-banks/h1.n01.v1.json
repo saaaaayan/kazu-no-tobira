@@ -1,0 +1,521 @@
+{
+  "version": 1,
+  "selection": "balanced",
+  "stageId": "h1.n01",
+  "gradeId": "h1",
+  "islandId": "h1",
+  "unit": "数と式・展開と因数分解",
+  "objective": "乗法公式と因数分解を等式として理解する",
+  "questions": [
+    {
+      "id": "draft-h1.n01-01",
+      "skillId": "h1.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "x²-3x+2 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x-2)(x-1)",
+        "(x+2)(x+1)",
+        "(x-2)(x+1)",
+        "(x-3)(x-2)"
+      ],
+      "answer": "(x-2)(x-1)",
+      "hint": "定数項が正で一次係数が負。",
+      "hints": [
+        "定数項が正で一次係数が負。",
+        "2数の積と和の符号を確認する。",
+        "解となる2つの値から一次因子を作る。"
+      ],
+      "explanation": "(x-2)(x-1) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "2数の積と和の符号を確認する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "(-2)＋(-1)＝-3, (-2)(-1)＝2。"
+        },
+        {
+          "title": "確認",
+          "body": "(x-2)(x-1) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x+2)(x+1)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-2)(x+1)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-3)(x-2)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h1.n01-02",
+      "skillId": "h1.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "4x²-9 の因数分解は？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(2x-3)(2x+3)",
+        "(2x-3)²",
+        "(4x-3)(x+3)",
+        "(2x+3)²"
+      ],
+      "answer": "(2x-3)(2x+3)",
+      "hint": "4x² を平方とみよう。",
+      "hints": [
+        "4x² を平方とみよう。",
+        "(2x)² と定数の平方の差。",
+        "a²-b²=(a-b)(a+b) を利用する。"
+      ],
+      "explanation": "(2x-3)(2x+3) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "(2x)² と定数の平方の差。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "4x²-9=(2x)²-3²。"
+        },
+        {
+          "title": "確認",
+          "body": "(2x-3)(2x+3) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(2x-3)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(4x-3)(x+3)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(2x+3)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h1.n01-03",
+      "skillId": "h1.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "x²+8x+16 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x+4)²",
+        "(x-4)²",
+        "(x+8)²",
+        "(x+4)(x-4)"
+      ],
+      "answer": "(x+4)²",
+      "hint": "一次係数と定数項の関係を調べる。",
+      "hints": [
+        "一次係数と定数項の関係を調べる。",
+        "中央の項は2×x×定数の形。",
+        "平方公式 (a+b)² を使う。"
+      ],
+      "explanation": "(x+4)² です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "中央の項は2×x×定数の形。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "x²+2×4x+4²＝(x+4)²。"
+        },
+        {
+          "title": "確認",
+          "body": "(x+4)² です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x-4)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+8)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+4)(x-4)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h1.n01-04",
+      "skillId": "h1.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "x²-9x+20 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x-5)(x-4)",
+        "(x+5)(x+4)",
+        "(x-5)(x+4)",
+        "(x-9)(x-20)"
+      ],
+      "answer": "(x-5)(x-4)",
+      "hint": "定数項が正で一次係数が負。",
+      "hints": [
+        "定数項が正で一次係数が負。",
+        "2数の積と和の符号を確認する。",
+        "解となる2つの値から一次因子を作る。"
+      ],
+      "explanation": "(x-5)(x-4) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "2数の積と和の符号を確認する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "(-5)＋(-4)＝-9, (-5)(-4)＝20。"
+        },
+        {
+          "title": "確認",
+          "body": "(x-5)(x-4) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x+5)(x+4)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-5)(x+4)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-9)(x-20)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h1.n01-05",
+      "skillId": "h1.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "4x²-36 の因数分解は？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(2x-6)(2x+6)",
+        "(2x-6)²",
+        "(4x-6)(x+6)",
+        "(2x+6)²"
+      ],
+      "answer": "(2x-6)(2x+6)",
+      "hint": "4x² を平方とみよう。",
+      "hints": [
+        "4x² を平方とみよう。",
+        "(2x)² と定数の平方の差。",
+        "a²-b²=(a-b)(a+b) を利用する。"
+      ],
+      "explanation": "(2x-6)(2x+6) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "(2x)² と定数の平方の差。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "4x²-36=(2x)²-6²。"
+        },
+        {
+          "title": "確認",
+          "body": "(2x-6)(2x+6) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(2x-6)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(4x-6)(x+6)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(2x+6)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h1.n01-06",
+      "skillId": "h1.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "x²+14x+49 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x+7)²",
+        "(x-7)²",
+        "(x+14)²",
+        "(x+7)(x-7)"
+      ],
+      "answer": "(x+7)²",
+      "hint": "一次係数と定数項の関係を調べる。",
+      "hints": [
+        "一次係数と定数項の関係を調べる。",
+        "中央の項は2×x×定数の形。",
+        "平方公式 (a+b)² を使う。"
+      ],
+      "explanation": "(x+7)² です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "中央の項は2×x×定数の形。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "x²+2×7x+7²＝(x+7)²。"
+        },
+        {
+          "title": "確認",
+          "body": "(x+7)² です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x-7)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+14)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+7)(x-7)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h1.n01-07",
+      "skillId": "h1.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "x²-10x+16 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x-8)(x-2)",
+        "(x+8)(x+2)",
+        "(x-8)(x+2)",
+        "(x-10)(x-16)"
+      ],
+      "answer": "(x-8)(x-2)",
+      "hint": "定数項が正で一次係数が負。",
+      "hints": [
+        "定数項が正で一次係数が負。",
+        "2数の積と和の符号を確認する。",
+        "解となる2つの値から一次因子を作る。"
+      ],
+      "explanation": "(x-8)(x-2) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "2数の積と和の符号を確認する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "(-8)＋(-2)＝-10, (-8)(-2)＝16。"
+        },
+        {
+          "title": "確認",
+          "body": "(x-8)(x-2) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x+8)(x+2)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-8)(x+2)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-10)(x-16)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h1.n01-08",
+      "skillId": "h1.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "4x²-81 の因数分解は？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(2x-9)(2x+9)",
+        "(2x-9)²",
+        "(4x-9)(x+9)",
+        "(2x+9)²"
+      ],
+      "answer": "(2x-9)(2x+9)",
+      "hint": "4x² を平方とみよう。",
+      "hints": [
+        "4x² を平方とみよう。",
+        "(2x)² と定数の平方の差。",
+        "a²-b²=(a-b)(a+b) を利用する。"
+      ],
+      "explanation": "(2x-9)(2x+9) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "(2x)² と定数の平方の差。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "4x²-81=(2x)²-9²。"
+        },
+        {
+          "title": "確認",
+          "body": "(2x-9)(2x+9) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(2x-9)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(4x-9)(x+9)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(2x+9)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h1.n01-09",
+      "skillId": "h1.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "x²+20x+100 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x+10)²",
+        "(x-10)²",
+        "(x+20)²",
+        "(x+10)(x-10)"
+      ],
+      "answer": "(x+10)²",
+      "hint": "一次係数と定数項の関係を調べる。",
+      "hints": [
+        "一次係数と定数項の関係を調べる。",
+        "中央の項は2×x×定数の形。",
+        "平方公式 (a+b)² を使う。"
+      ],
+      "explanation": "(x+10)² です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "中央の項は2×x×定数の形。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "x²+2×10x+10²＝(x+10)²。"
+        },
+        {
+          "title": "確認",
+          "body": "(x+10)² です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x-10)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+20)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+10)(x-10)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h1.n01-10",
+      "skillId": "h1.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "x²-16x+55 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x-11)(x-5)",
+        "(x+11)(x+5)",
+        "(x-11)(x+5)",
+        "(x-16)(x-55)"
+      ],
+      "answer": "(x-11)(x-5)",
+      "hint": "定数項が正で一次係数が負。",
+      "hints": [
+        "定数項が正で一次係数が負。",
+        "2数の積と和の符号を確認する。",
+        "解となる2つの値から一次因子を作る。"
+      ],
+      "explanation": "(x-11)(x-5) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "2数の積と和の符号を確認する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "(-11)＋(-5)＝-16, (-11)(-5)＝55。"
+        },
+        {
+          "title": "確認",
+          "body": "(x-11)(x-5) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x+11)(x+5)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-11)(x+5)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-16)(x-55)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    }
+  ]
+}
