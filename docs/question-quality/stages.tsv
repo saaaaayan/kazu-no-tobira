@@ -844,66 +844,66 @@ h3.s02	h3	secret	ひみつの道	discovery	要設計	要設計	条件探索・�
 h3.s03	h3	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	fallback	0	30	18	12	回答:choice, 回答:number	未定義:30	0	0	0	0	3–4	0	0	12	0	1	0	0	0	0	0	生成サンプルのみ	1から10までの整数の和は？
 h3.s04	h3	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	fallback	0	30	18	12	回答:choice, 回答:number	未定義:30	0	0	0	0	3–4	0	0	12	0	1	0	0	0	0	0	生成サンプルのみ	lim[n→∞] (1＋1/n)^n は？
 h3.s05	h3	secret	ひみつの道	discovery	要設計	要設計	条件探索・規則性・説明	要レビュー	fallback	0	30	18	12	回答:choice, 回答:number	未定義:30	0	0	0	0	3–4	0	0	11	0	1	0	0	0	0	0	生成サンプルのみ	無限に続く素数は存在する？
-sage.n01	sage	normal	総合演習	sageMixed	問題に応じて代数・微分・場合の数・整数・ベクトルの考え方を選ぶ。	要設計	文章と式・条件整理	要レビュー	bank	100	0	100	0	calculation	2:100	0	0	0	0	5–5	0	0	0	0	5	0	0	0	0	0	登録済・品質レビュー待ち	実数 a,b が a＋b＝5、ab＝6 を満たす。a²＋b² の値を求めよ。
-sage.n02	sage	normal	総合演習	sageMixed	問題に応じて代数・微分・場合の数・整数・ベクトルの考え方を選ぶ。	要設計	文章と式・条件整理	要レビュー	bank	100	0	100	0	calculation	2:100	0	0	0	0	5–5	0	0	0	0	5	0	0	0	0	0	登録済・品質レビュー待ち	実数 a,b が a＋b＝15、ab＝56 を満たす。a²＋b² の値を求めよ。
-sage.n03	sage	normal	総合演習	sageMixed	問題に応じて代数・微分・場合の数・整数・ベクトルの考え方を選ぶ。	要設計	文章と式・条件整理	要レビュー	bank	100	0	100	0	calculation	2:100	0	0	0	0	5–5	0	0	0	0	5	0	0	0	0	0	登録済・品質レビュー待ち	実数 a,b が a＋b＝17、ab＝66 を満たす。a²＋b² の値を求めよ。
-sage.n04	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n05	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n06	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n07	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n08	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n09	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n10	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n11	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n12	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n13	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n14	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n15	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n16	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n17	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n18	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n19	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n20	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n21	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n22	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n23	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n24	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n25	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n26	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n27	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n28	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n29	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n30	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n31	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n32	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n33	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n34	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n35	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n36	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n37	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n38	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n39	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n40	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n41	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n42	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n43	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n44	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n45	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n46	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n47	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n48	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n49	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.n50	sage	normal	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.x01	sage	extra	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.x02	sage	extra	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.x03	sage	extra	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.x04	sage	extra	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.x05	sage	extra	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.x06	sage	extra	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.x07	sage	extra	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.x08	sage	extra	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.x09	sage	extra	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
-sage.x10	sage	extra	総合演習	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n01	sage	normal	分野横断・入試総合の入口	sageMixed	問題に応じて代数・微分・場合の数・整数・ベクトルの考え方を選ぶ。	要設計	文章と式・条件整理	要レビュー	bank	100	0	100	0	calculation	2:100	0	0	0	0	5–5	0	0	0	0	5	0	0	0	0	0	登録済・品質レビュー待ち	実数 a,b が a＋b＝5、ab＝6 を満たす。a²＋b² の値を求めよ。
+sage.n02	sage	normal	分野横断・入試総合の入口	sageMixed	問題に応じて代数・微分・場合の数・整数・ベクトルの考え方を選ぶ。	要設計	文章と式・条件整理	要レビュー	bank	100	0	100	0	calculation	2:100	0	0	0	0	5–5	0	0	0	0	5	0	0	0	0	0	登録済・品質レビュー待ち	実数 a,b が a＋b＝15、ab＝56 を満たす。a²＋b² の値を求めよ。
+sage.n03	sage	normal	分野横断・入試総合の入口	sageMixed	問題に応じて代数・微分・場合の数・整数・ベクトルの考え方を選ぶ。	要設計	文章と式・条件整理	要レビュー	bank	100	0	100	0	calculation	2:100	0	0	0	0	5–5	0	0	0	0	5	0	0	0	0	0	登録済・品質レビュー待ち	実数 a,b が a＋b＝17、ab＝66 を満たす。a²＋b² の値を求めよ。
+sage.n04	sage	normal	分野横断・入試総合の入口	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n05	sage	normal	分野横断・入試総合の入口	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n06	sage	normal	方程式と 不等式	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n07	sage	normal	方程式と 不等式	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n08	sage	normal	方程式と 不等式	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n09	sage	normal	方程式と 不等式	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n10	sage	normal	方程式と 不等式	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n11	sage	normal	関数と グラフ	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n12	sage	normal	関数と グラフ	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n13	sage	normal	関数と グラフ	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n14	sage	normal	関数と グラフ	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n15	sage	normal	関数と グラフ	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n16	sage	normal	場合の数と 確率	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n17	sage	normal	場合の数と 確率	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n18	sage	normal	場合の数と 確率	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n19	sage	normal	場合の数と 確率	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n20	sage	normal	場合の数と 確率	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n21	sage	normal	図形と 三角比	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n22	sage	normal	図形と 三角比	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n23	sage	normal	図形と 三角比	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n24	sage	normal	図形と 三角比	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n25	sage	normal	図形と 三角比	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n26	sage	normal	数列と 漸化式	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n27	sage	normal	数列と 漸化式	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n28	sage	normal	数列と 漸化式	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n29	sage	normal	数列と 漸化式	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n30	sage	normal	数列と 漸化式	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n31	sage	normal	微分と 極値	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n32	sage	normal	微分と 極値	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n33	sage	normal	微分と 極値	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n34	sage	normal	微分と 極値	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n35	sage	normal	微分と 極値	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n36	sage	normal	積分と 面積	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n37	sage	normal	積分と 面積	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n38	sage	normal	積分と 面積	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n39	sage	normal	積分と 面積	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n40	sage	normal	積分と 面積	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n41	sage	normal	ベクトルと 複素数	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n42	sage	normal	ベクトルと 複素数	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n43	sage	normal	ベクトルと 複素数	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n44	sage	normal	ベクトルと 複素数	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n45	sage	normal	ベクトルと 複素数	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n46	sage	normal	分野横断と 証明	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n47	sage	normal	分野横断と 証明	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n48	sage	normal	分野横断と 証明	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n49	sage	normal	分野横断と 証明	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.n50	sage	normal	分野横断と 証明	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.x01	sage	extra	分野横断・入試総合の入口	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.x02	sage	extra	方程式と 不等式	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.x03	sage	extra	関数と グラフ	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.x04	sage	extra	場合の数と 確率	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.x05	sage	extra	図形と 三角比	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.x06	sage	extra	数列と 漸化式	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.x07	sage	extra	微分と 極値	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.x08	sage	extra	積分と 面積	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.x09	sage	extra	ベクトルと 複素数	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
+sage.x10	sage	extra	分野横断と 証明	sageMixed	要設計	要設計	文章と式・条件整理	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
 sage.s01	sage	secret	ひみつの道	sageMixed	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
 sage.s02	sage	secret	ひみつの道	sageMixed	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
 sage.s03	sage	secret	ひみつの道	sageMixed	要設計	要設計	条件探索・規則性・説明	要レビュー	unavailable	0	0	0	0			0	0	0	0	—	0	0	0	0	0	0	0	0	0	0	未出題	—
