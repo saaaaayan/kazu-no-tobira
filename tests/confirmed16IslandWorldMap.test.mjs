@@ -3,7 +3,7 @@ import test from 'node:test';
 import {readFileSync} from 'node:fs';
 import {worldIslands,allWorldStages} from '../src/domain/worldCatalog.ts';
 import {worldMapLayout} from '../src/domain/worldMapLayout.ts';
-import {atlasIslandSymbols} from '../src/components/WorldAtlasArt.tsx';
+import {atlasIslandSymbols} from '../src/domain/worldAtlasSymbols.ts';
 
 const confirmedNames=[
   'ぬいぐるみの島','おもちゃの島','どうぶつの島','おかしの島',
