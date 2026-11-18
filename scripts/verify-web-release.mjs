@@ -37,6 +37,17 @@ export function releaseClient(address) {
     if (profile && (version.indexSha256!==digest(index) || version.entrySha256!==digest(bundle))) {
       throw new Error('The sample HTML or JavaScript differs from the verified build.');
     }
+    // The approved background and the 16 interactive islands are deployed together.
+    if(version.approvedWorldMapSha256!==undefined){
+      if(!/^[a-f0-9]{64}$/.test(version.approvedWorldMapSha256))
+        throw new Error('The approved world map digest is invalid.');
+      const art=Buffer.from(await (await get('world-map-approved.avif')).arrayBuffer());
+      if(art.subarray(4,12).toString('ascii')!=='ftypavif' ||
+         digest(art)!==version.approvedWorldMapSha256)
+        throw new Error('The published 16-island world map differs from the approved asset.');
+      if(!js.includes('world-map-approved.avif'))
+        throw new Error('The game bundle does not use the approved world map.');
+    }
     // For the 4,300-question public trial, verify that each of the 43 data
     // files is actually accessible at the hosted site, not merely in GitHub.
     if (version.bankSha256 !== undefined) {
