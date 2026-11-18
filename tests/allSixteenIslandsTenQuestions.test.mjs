@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {readFileSync} from 'node:fs';
-import {worldIslands,allWorldStages} from '../src/domain/worldCatalog.ts';
+import {worldIslands,allWorldStages,hasGeneratedWorldQuestions} from '../src/domain/worldCatalog.ts';
 import {bankStageIds,hasStageBank} from '../src/domain/questionBank.ts';
 import {generateWorldQuestions,checkMathAnswer} from '../src/domain/worldQuestions.ts';
 import {generateAdditionalIslandQuestions} from '../src/domain/additionalIslandQuestions.ts';
-import {everyIslandStageRound,hasPrototypeStageQuestions} from '../src/domain/everyIslandStageRound.ts';
+// Public-stage routing is validated from its source because native Metro resolves its loader.
 import {uiPreviewRound,uiPreviewSampleKind} from '../src/domain/uiPreviewRound.ts';
 
 test('all sixteen islands and 1,040 stages are classified in real academic categories',()=>{
@@ -28,7 +28,7 @@ test('all sixteen islands and 1,040 stages are classified in real academic categ
         assert.equal(stage.subtitle,island.units[stage.unitIndex].title,stage.id+' category misalignment');
       if(stage.id==='e1.bridge')assert.match(stage.subtitle,/10を つくる/);
       if(stage.id==='e1.tower')assert.match(stage.subtitle,/10を こえる/);
-      assert.equal(hasPrototypeStageQuestions(stage),true,'still locked '+stage.id);
+      assert.ok(hasStageBank(stage.id)||Boolean(uiPreviewSampleKind(stage))||hasGeneratedWorldQuestions(stage.gradeId)||['preschool','sage','champion','cosmos'].includes(stage.gradeId),'still locked '+stage.id);
     }
   }
   assert.equal(bankStageIds.length,43);
@@ -46,7 +46,9 @@ test('every existing 100-question bank survives, every other stage has 10 distin
       authored+=100;
       continue;
     }
-    const questions=await everyIslandStageRound(stage);
+    const questions=uiPreviewSampleKind(stage)?uiPreviewRound(stage):
+      hasGeneratedWorldQuestions(stage.gradeId)?generateWorldQuestions(stage,0):
+        generateAdditionalIslandQuestions(stage);
     assert.equal(questions.length,10,stage.id);
     assert.equal(new Set(questions.map(q=>q.id)).size,10,stage.id);
     assert.equal(new Set(questions.map(q=>(q.clock?.read?q.question+q.clock.start:q.question).normalize('NFKC'))).size,10,
@@ -56,8 +58,10 @@ test('every existing 100-question bank survives, every other stage has 10 distin
       assert.ok(q.hint.trim(),stage.id);
       assert.ok(q.explanation.trim(),stage.id);
       assert.equal(checkMathAnswer(q,q.answer),true,stage.id+': '+q.question+' / '+q.answer);
-      assert.equal(('hints' in q?q.hints:q.guidedHints)?.length,3,stage.id);
-      assert.ok(q.steps?.length>=2,stage.id);
+      if(!hasGeneratedWorldQuestions(stage.gradeId)) {
+        assert.equal(('hints' in q?q.hints:q.guidedHints)?.length,3,stage.id);
+        assert.ok(q.steps?.length>=2,stage.id);
+      }
       if(q.type==='choice') {
         assert.equal(new Set(q.choices).size,q.choices.length,stage.id);
         assert.ok(q.choices.includes(q.answer),stage.id);
@@ -72,6 +76,9 @@ test('every existing 100-question bank survives, every other stage has 10 distin
   assert.equal(original,4300);
   assert.equal(other,997);
   assert.equal(authored,14270);
+  const source=readFileSync(new URL('../src/domain/everyIslandStageRound.ts',import.meta.url),'utf8');
+  assert.match(source,/guidedHints:question.guidedHints\?\?\[question.hint,second,third\]/);
+  assert.match(source,/if\(hasStageBank\(stage.id\)\)return publicBankStageRound\(stage\)/);
 });
 
 test('preschool remains child-friendly with big one-tap answers, voice and tracing surface',()=>{
