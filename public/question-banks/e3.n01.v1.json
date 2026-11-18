@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "selection": "balanced",
+  "stageId": "e3.n01",
+  "gradeId": "e3",
+  "islandId": "e3",
+  "unit": "一万までの 数",
+  "objective": "千・百・十・一の位と、数の増減を説明する",
+  "questions": [
+    {
+      "id": "draft-e3.n01-01",
+      "skillId": "e3.unit1",
+      "type": "number",
+      "format": "decomposition",
+      "difficulty": 1,
+      "question": "千が2こ、百が1こ、十が2こ、一が3こある数は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "2123",
+      "hint": "千のまとまりをたしかめよう。",
+      "hints": [
+        "千のまとまりをたしかめよう。",
+        "千・百・十・一の位に分けよう。",
+        "それぞれの位の数をたして考えよう。"
+      ],
+      "explanation": "数は2123です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "千・百・十・一の位に分けよう。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "2×1000＋1×100＋2×10＋3＝2123。"
+        },
+        {
+          "title": "確認",
+          "body": "数は2123です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-e3.n01-02",
+      "skillId": "e3.unit1",
+      "type": "number",
+      "format": "sequence",
+      "difficulty": 1,
+      "question": "5550より100大きい数は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "5650",
+      "hint": "百の位に注目しよう。",
+      "hints": [
+        "百の位に注目しよう。",
+        "100は百のまとまり1つ分。",
+        "くり上がりがあっても百を1つ加えるよ。"
+      ],
+      "explanation": "5650です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "100は百のまとまり1つ分。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "5550＋100＝5650。"
+        },
+        {
+          "title": "確認",
+          "body": "5650です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-e3.n01-03",
+      "skillId": "e3.unit1",
+      "type": "number",
+      "format": "position",
+      "difficulty": 1,
+      "question": "8987の千の位の数字は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "8",
+      "hint": "四けたの数を考えよう。",
+      "hints": [
+        "四けたの数を考えよう。",
+        "右から一・十・百・千の順。",
+        "千の位にある数字を答えよう。"
+      ],
+      "explanation": "8です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "右から一・十・百・千の順。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "8987＝8×1000＋9×100＋8×10＋7。"
+        },
+        {
+          "title": "確認",
+          "body": "8です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-e3.n01-04",
+      "skillId": "e3.unit1",
+      "type": "number",
+      "format": "decomposition",
+      "difficulty": 2,
+      "question": "千が4こ、百が3こ、十が1こ、一が4こある数は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "4314",
+      "hint": "千のまとまりをたしかめよう。",
+      "hints": [
+        "千のまとまりをたしかめよう。",
+        "千・百・十・一の位に分けよう。",
+        "それぞれの位の数をたして考えよう。"
+      ],
+      "explanation": "数は4314です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "千・百・十・一の位に分けよう。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "4×1000＋3×100＋1×10＋4＝4314。"
+        },
+        {
+          "title": "確認",
+          "body": "数は4314です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-e3.n01-05",
+      "skillId": "e3.unit1",
+      "type": "number",
+      "format": "sequence",
+      "difficulty": 2,
+      "question": "7741より100大きい数は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "7841",
+      "hint": "百の位に注目しよう。",
+      "hints": [
+        "百の位に注目しよう。",
+        "100は百のまとまり1つ分。",
+        "くり上がりがあっても百を1つ加えるよ。"
+      ],
+      "explanation": "7841です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "100は百のまとまり1つ分。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "7741＋100＝7841。"
+        },
+        {
+          "title": "確認",
+          "body": "7841です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-e3.n01-06",
+      "skillId": "e3.unit1",
+      "type": "number",
+      "format": "position",
+      "difficulty": 2,
+      "question": "3178の千の位の数字は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "3",
+      "hint": "四けたの数を考えよう。",
+      "hints": [
+        "四けたの数を考えよう。",
+        "右から一・十・百・千の順。",
+        "千の位にある数字を答えよう。"
+      ],
+      "explanation": "3です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "右から一・十・百・千の順。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "3178＝3×1000＋1×100＋7×10＋8。"
+        },
+        {
+          "title": "確認",
+          "body": "3です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-e3.n01-07",
+      "skillId": "e3.unit1",
+      "type": "number",
+      "format": "decomposition",
+      "difficulty": 2,
+      "question": "千が6こ、百が5こ、十が0こ、一が5こある数は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "6505",
+      "hint": "千のまとまりをたしかめよう。",
+      "hints": [
+        "千のまとまりをたしかめよう。",
+        "千・百・十・一の位に分けよう。",
+        "それぞれの位の数をたして考えよう。"
+      ],
+      "explanation": "数は6505です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "千・百・十・一の位に分けよう。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "6×1000＋5×100＋0×10＋5＝6505。"
+        },
+        {
+          "title": "確認",
+          "body": "数は6505です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-e3.n01-08",
+      "skillId": "e3.unit1",
+      "type": "number",
+      "format": "sequence",
+      "difficulty": 3,
+      "question": "2932より100大きい数は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "3032",
+      "hint": "百の位に注目しよう。",
+      "hints": [
+        "百の位に注目しよう。",
+        "100は百のまとまり1つ分。",
+        "くり上がりがあっても百を1つ加えるよ。"
+      ],
+      "explanation": "3032です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "100は百のまとまり1つ分。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "2932＋100＝3032。"
+        },
+        {
+          "title": "確認",
+          "body": "3032です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-e3.n01-09",
+      "skillId": "e3.unit1",
+      "type": "number",
+      "format": "position",
+      "difficulty": 3,
+      "question": "5369の千の位の数字は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "5",
+      "hint": "四けたの数を考えよう。",
+      "hints": [
+        "四けたの数を考えよう。",
+        "右から一・十・百・千の順。",
+        "千の位にある数字を答えよう。"
+      ],
+      "explanation": "5です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "右から一・十・百・千の順。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "5369＝5×1000＋3×100＋6×10＋9。"
+        },
+        {
+          "title": "確認",
+          "body": "5です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-e3.n01-10",
+      "skillId": "e3.unit1",
+      "type": "number",
+      "format": "decomposition",
+      "difficulty": 3,
+      "question": "千が8こ、百が7こ、十が9こ、一が6こある数は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "8796",
+      "hint": "千のまとまりをたしかめよう。",
+      "hints": [
+        "千のまとまりをたしかめよう。",
+        "千・百・十・一の位に分けよう。",
+        "それぞれの位の数をたして考えよう。"
+      ],
+      "explanation": "数は8796です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "千・百・十・一の位に分けよう。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "8×1000＋7×100＋9×10＋6＝8796。"
+        },
+        {
+          "title": "確認",
+          "body": "数は8796です。"
+        }
+      ],
+      "mistakes": []
+    }
+  ]
+}
