@@ -36,8 +36,10 @@ export default function StageProductionDashboard({api,onPreview,onInspectQuestio
   const [fetching,setFetching]=useState(true);
   const [island,setIsland]=useState('all');
   const [statusFilter,setStatusFilter]=useState('all');
+  // The first view must show the stages that ACTUALLY contain questions, not the 1,100+ empty placeholders.
+  const [contentFilter,setContentFilter]=useState<'registered'|'authored'|'all'>('registered');
   const [term,setTerm]=useState('');
-  const [selectedId,setSelectedId]=useState('');
+  const [selectedId,setSelectedId]=useState('e1.forest');
   const [questions,setQuestions]=useState<BankQuestion[]>([]);
   const [questionSource,setQuestionSource]=useState<'database'|'prototype'|'none'>('none');
   const [questionLoading,setQuestionLoading]=useState(false);
@@ -53,7 +55,12 @@ export default function StageProductionDashboard({api,onPreview,onInspectQuestio
     const controller=new AbortController();
     setFetching(true);
     void api<ProductionStage[]>('stage-production',undefined,controller.signal)
-      .then(data=>{if(!controller.signal.aborted)setRows(data);})
+      .then(data=>{
+        if(controller.signal.aborted)return;
+        setRows(data);
+        // Present a real 100-question bank on first login.
+        setEdit(previous=>previous??data.find(item=>item.id==='e1.forest'));
+      })
       .catch(e=>{if(!controller.signal.aborted)setNotice('進捗を読み込めませんでした: '+String(e.message??e));})
       .finally(()=>{if(!controller.signal.aborted)setFetching(false);});
     return ()=>controller.abort();
@@ -99,14 +106,25 @@ export default function StageProductionDashboard({api,onPreview,onInspectQuestio
     return {counts,authored,registered,reviewed,childTests};
   },[rows]);
   const filtered=useMemo(()=>rows.filter(stage=>
+    (contentFilter==='all'||(contentFilter==='registered'&&stage.registered_count>0)||
+      (contentFilter==='authored'&&stage.authored_count>0))&&
     (island==='all'||stage.island_id===island)&&
     (statusFilter==='all'||stage.status===statusFilter)&&
     (!term.trim()||(stage.id+' '+stage.stage_title).toLowerCase().includes(term.toLowerCase().trim()))
-  ),[rows,island,statusFilter,term]);
+  ),[rows,contentFilter,island,statusFilter,term]);
   const shown=filtered.slice(page*pageSize,(page+1)*pageSize);
   const maxPage=Math.max(0,Math.ceil(filtered.length/pageSize)-1);
   const setFilter=(fn:()=>void)=>{fn();setPage(0);};
 
+  function focusIsland(value:'e1'|'sage',first:string) {
+    setContentFilter('registered');
+    setIsland(value);
+    setStatusFilter('all');
+    setTerm('');
+    setPage(0);
+    const row=rows.find(item=>item.id===first);
+    if(row) select(row);
+  }
   function select(row:ProductionStage) {
     setSelectedId(row.id);
     setEdit({...row});
@@ -158,6 +176,15 @@ export default function StageProductionDashboard({api,onPreview,onInspectQuestio
       </div>
       <p style={{fontSize:13}}>制作済み数には非公開の下書きと試作問題も含みます。DB登録数とは異なります。
         ステージの制作・評価状況は、問題ごとの審査・公開可否と別管理です。</p>
+      <div style={{background:'#fff7dc',border:'1px solid #d9b76a',borderRadius:12,padding:13,margin:'12px 0'}}>
+        <strong>登録済み4,300問の確認はこちらから</strong>
+        <p style={{margin:'8px 0',fontSize:13}}>小学1年生：40ステージ×100問＝4,000問／賢者の島：3ステージ×100問＝300問。
+          まだ制作者の確認前であり、一般向けゲームへの公開済みという意味ではありません。</p>
+        <div style={{display:'flex',gap:9,flexWrap:'wrap'}}>
+          <button type="button" style={control} onClick={()=>focusIsland('e1','e1.forest')}>小学1年生の4,000問を開く</button>
+          <button type="button" style={control} onClick={()=>focusIsland('sage','sage.n01')}>賢者の島の300問を開く</button>
+        </div>
+      </div>
       <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
         {stageProductionOptions.map(key=><span key={key} style={{background:'#f3f4f6',borderRadius:8,padding:'8px 10px'}}>
           {stageProductionLabels[key]} <strong>{totals.counts[key]}</strong>
@@ -167,6 +194,14 @@ export default function StageProductionDashboard({api,onPreview,onInspectQuestio
     <section style={section} aria-label="ステージ検索と一覧">
       <h2 style={{marginTop:0}}>ステージ・確認テスト一覧</h2>
       <div style={{display:'flex',flexWrap:'wrap',gap:9}}>
+        <label>表示するステージ
+          <select style={{...control,display:'block'}} value={contentFilter}
+            onChange={e=>setFilter(()=>setContentFilter(e.target.value as 'registered'|'authored'|'all'))}>
+            <option value="registered">DB登録問題あり（最初はこちら）</option>
+            <option value="authored">制作原稿あり</option>
+            <option value="all">全1,200件（未作成を含む）</option>
+          </select>
+        </label>
         <label>島
           <select style={{...control,display:'block'}} value={island}
             onChange={e=>setFilter(()=>setIsland(e.target.value))}>
@@ -188,7 +223,8 @@ export default function StageProductionDashboard({api,onPreview,onInspectQuestio
         <button type="button" style={control} onClick={exportCsv}>一覧をCSVで保存</button>
         <button type="button" style={control} onClick={()=>setReload(n=>n+1)}>再読み込み</button>
       </div>
-      <p>{fetching?'読み込み中…':filtered.length+'件'}　{page+1}/{maxPage+1}ページ</p>
+      <p>{fetching?'読み込み中…':filtered.length+'件'}　{page+1}/{maxPage+1}ページ
+        {contentFilter==='registered'&&' ／ 問題が実際に登録されているステージだけを表示中'}</p>
       <div className="kazu-admin-stage-table" style={{maxHeight:410,overflow:'auto'}}>
         <table style={{width:'100%',borderCollapse:'collapse',fontSize:13}}>
           <thead><tr><th align="left">ステージ</th><th align="left">進捗ステータス</th><th align="right">制作済み</th><th align="right">DB登録</th><th align="right">確認済み</th><th>開く</th></tr></thead>
