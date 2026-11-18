@@ -54,18 +54,6 @@ function OceanTexture({ width, height, seed = 0 }: { width: number; height: numb
   );
 }
 
-function MutedNorthCompass({size}:{size:number}){
-  // Small navigation compass, not a glowing or decorative effect.
-  return <Svg width={size} height={size} viewBox="0 0 64 64" accessible={false}>
-    <Circle cx={32} cy={35} r={20} stroke="#e7ddc2" strokeWidth={1.5} fill="rgba(24,51,72,.5)"/>
-    <Circle cx={32} cy={35} r={14} stroke="#e7ddc2" strokeWidth={.7} opacity={.55} fill="none"/>
-    <Path d="M32 14L38 35L32 31L26 35Z" fill="#f0e4ca"/>
-    <Path d="M32 56L38 35L32 39L26 35Z" fill="#849e9b"/>
-    <Path d="M11 35H19 M45 35H53" stroke="#eadbbd" strokeWidth={1.2}/>
-    <SvgText x={32} y={10} textAnchor="middle" fill="#f0e4ca" fontSize={11} fontWeight="bold">N</SvgText>
-  </Svg>;
-}
-
 export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview = false }: {
   progress: Progress; mode: PlayMode; access: Entitlement;
   onGrade: (grade: WorldGrade) => void; onTitles: () => void; preview?: boolean;
@@ -118,11 +106,6 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
           <Image source={{uri:approvedWorldMapImageUrl}} resizeMode="stretch"
             accessibilityLabel="16島それぞれのテーマを幾何学的な線画で描いた、数のトビラの世界地図"
             style={{width:imageWidth,height:imageHeight}} />
-          <View pointerEvents="none" style={[styles.northCompass,{
-            left:Math.max(3,imageWidth*.005),top:Math.max(3,imageHeight*.008),
-          }]}>
-            <MutedNorthCompass size={Math.max(27,Math.min(36,imageWidth*.032))}/>
-          </View>
           {worldIslands.map((grade,index)=>{
             const spot=approvedWorldMapHotspots[index];
             const label=islandAction(grade,index);
@@ -472,7 +455,6 @@ const styles=StyleSheet.create({
   mapZoomToggle:{paddingVertical:9,paddingHorizontal:11,minHeight:39,borderRadius:10,backgroundColor:'#e7e6db',
     borderWidth:1,borderColor:'#a3afad'},
   mapZoomText:{color:'#30516a',fontWeight:'900',fontSize:12},
-  northCompass:{position:'absolute',zIndex:2},
   approvedMapTarget:{position:'absolute',borderRadius:10,minWidth:35,minHeight:39},
   approvedMapTargetPressed:{backgroundColor:'rgba(244,236,206,.25)',borderWidth:2,borderColor:'#eadbbd'},
   mobileWorldList:{gap:8},
