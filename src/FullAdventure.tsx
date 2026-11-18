@@ -7,7 +7,7 @@ import { checkMathAnswer, isValidMathAnswer } from './domain/mathAnswer';
 import { stageDisplayTitle,stageLabels, type Checkpoint } from './domain/stageStructure';
 import { liveOrigin, requestLiveRound, requestLiveGrade, requestLiveHint, type LiveMode, type LiveRound } from './domain/liveQuestions';
 import type { SkillId } from './domain/curriculum';
-import { isBankQuestion } from './domain/questionBank';
+import { hasStageBank,isBankQuestion } from './domain/questionBank';
 import { prepareStageRound } from './stageRounds';
 import { QuestionDiagram, WorkedSolution, WrittenSolution } from './components/QuestionSupport';
 import { emptyProgress, recordAttempt, type Progress } from './domain/progress';
@@ -259,6 +259,16 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   async function start(stage: WorldStage) {
     if (!progress || starting.current || submitting.current || lessonWrite.current) return;
     if (uiPreview) {
+      // The public prototype contains no unreviewed question text. A stage with a
+      // stored bank opens the authenticated admin game preview for that exact ID.
+      if (hasStageBank(stage.id)) {
+        if (typeof window !== 'undefined') {
+          window.location.assign('/kazu-no-tobira/admin/?stage='+encodeURIComponent(stage.id)+'&play=10');
+        } else {
+          setStartError('管理者の問題確認画面をひらけません。');
+        }
+        return;
+      }
       const problems=uiPreviewRound(stage);
       if (!problems.length) { setStartError('このステージの体験用問題は準備中です。'); return; }
       setStartError('');
