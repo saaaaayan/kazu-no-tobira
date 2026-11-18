@@ -1,0 +1,521 @@
+{
+  "version": 1,
+  "selection": "balanced",
+  "stageId": "j3.n01",
+  "gradeId": "j3",
+  "islandId": "j3",
+  "unit": "展開と 因数分解",
+  "objective": "展開との関係を使って因数分解する",
+  "questions": [
+    {
+      "id": "draft-j3.n01-01",
+      "skillId": "j3.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "x²+3x+2 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x+2)(x+1)",
+        "(x+3)(x+2)",
+        "(x-2)(x-1)",
+        "(x+2)(x-1)"
+      ],
+      "answer": "(x+2)(x+1)",
+      "hint": "積が定数項になる2数を探そう。",
+      "hints": [
+        "積が定数項になる2数を探そう。",
+        "和がxの係数になることも条件。",
+        "2つの一次式の積を展開して確かめよう。"
+      ],
+      "explanation": "(x+2)(x+1) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "和がxの係数になることも条件。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "積は2、和は3。"
+        },
+        {
+          "title": "確認",
+          "body": "(x+2)(x+1) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x+3)(x+2)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-2)(x-1)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+2)(x-1)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j3.n01-02",
+      "skillId": "j3.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "x²-9 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x-3)(x+3)",
+        "(x-3)²",
+        "(x+3)²",
+        "(x-3)(x-3)"
+      ],
+      "answer": "(x-3)(x+3)",
+      "hint": "2つの平方の差と見よう。",
+      "hints": [
+        "2つの平方の差と見よう。",
+        "a²-b² の形を思い出す。",
+        "(a-b)(a+b) を展開して確かめよう。"
+      ],
+      "explanation": "(x-3)(x+3) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "a²-b² の形を思い出す。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "x²-9＝x²-3²＝(x-3)(x+3)。"
+        },
+        {
+          "title": "確認",
+          "body": "(x-3)(x+3) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x-3)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+3)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-3)(x-3)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j3.n01-03",
+      "skillId": "j3.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "4x²+12x を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "4x(x+3)",
+        "4(x+3)",
+        "x(x+12)",
+        "4x(x-3)"
+      ],
+      "answer": "4x(x+3)",
+      "hint": "共通している因数を見つけよう。",
+      "hints": [
+        "共通している因数を見つけよう。",
+        "数の公約数と共通文字を探す。",
+        "共通因数でくくり、展開して元に戻るか確かめる。"
+      ],
+      "explanation": "4x(x+3) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "数の公約数と共通文字を探す。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "4x²+12x＝4x(x+3)。"
+        },
+        {
+          "title": "確認",
+          "body": "4x(x+3) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "4(x+3)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "x(x+12)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "4x(x-3)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j3.n01-04",
+      "skillId": "j3.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "x²+9x+20 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x+5)(x+4)",
+        "(x+9)(x+20)",
+        "(x-5)(x-4)",
+        "(x+5)(x-4)"
+      ],
+      "answer": "(x+5)(x+4)",
+      "hint": "積が定数項になる2数を探そう。",
+      "hints": [
+        "積が定数項になる2数を探そう。",
+        "和がxの係数になることも条件。",
+        "2つの一次式の積を展開して確かめよう。"
+      ],
+      "explanation": "(x+5)(x+4) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "和がxの係数になることも条件。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "積は20、和は9。"
+        },
+        {
+          "title": "確認",
+          "body": "(x+5)(x+4) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x+9)(x+20)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-5)(x-4)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+5)(x-4)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j3.n01-05",
+      "skillId": "j3.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "x²-36 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x-6)(x+6)",
+        "(x-6)²",
+        "(x+6)²",
+        "(x-6)(x-6)"
+      ],
+      "answer": "(x-6)(x+6)",
+      "hint": "2つの平方の差と見よう。",
+      "hints": [
+        "2つの平方の差と見よう。",
+        "a²-b² の形を思い出す。",
+        "(a-b)(a+b) を展開して確かめよう。"
+      ],
+      "explanation": "(x-6)(x+6) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "a²-b² の形を思い出す。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "x²-36＝x²-6²＝(x-6)(x+6)。"
+        },
+        {
+          "title": "確認",
+          "body": "(x-6)(x+6) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x-6)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+6)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-6)(x-6)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j3.n01-06",
+      "skillId": "j3.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "7x²+14x を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "7x(x+2)",
+        "7(x+2)",
+        "x(x+14)",
+        "7x(x-2)"
+      ],
+      "answer": "7x(x+2)",
+      "hint": "共通している因数を見つけよう。",
+      "hints": [
+        "共通している因数を見つけよう。",
+        "数の公約数と共通文字を探す。",
+        "共通因数でくくり、展開して元に戻るか確かめる。"
+      ],
+      "explanation": "7x(x+2) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "数の公約数と共通文字を探す。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "7x²+14x＝7x(x+2)。"
+        },
+        {
+          "title": "確認",
+          "body": "7x(x+2) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "7(x+2)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "x(x+14)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "7x(x-2)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j3.n01-07",
+      "skillId": "j3.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "x²+11x+24 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x+8)(x+3)",
+        "(x+11)(x+24)",
+        "(x-8)(x-3)",
+        "(x+8)(x-3)"
+      ],
+      "answer": "(x+8)(x+3)",
+      "hint": "積が定数項になる2数を探そう。",
+      "hints": [
+        "積が定数項になる2数を探そう。",
+        "和がxの係数になることも条件。",
+        "2つの一次式の積を展開して確かめよう。"
+      ],
+      "explanation": "(x+8)(x+3) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "和がxの係数になることも条件。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "積は24、和は11。"
+        },
+        {
+          "title": "確認",
+          "body": "(x+8)(x+3) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x+11)(x+24)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-8)(x-3)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+8)(x-3)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j3.n01-08",
+      "skillId": "j3.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "x²-81 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x-9)(x+9)",
+        "(x-9)²",
+        "(x+9)²",
+        "(x-9)(x-9)"
+      ],
+      "answer": "(x-9)(x+9)",
+      "hint": "2つの平方の差と見よう。",
+      "hints": [
+        "2つの平方の差と見よう。",
+        "a²-b² の形を思い出す。",
+        "(a-b)(a+b) を展開して確かめよう。"
+      ],
+      "explanation": "(x-9)(x+9) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "a²-b² の形を思い出す。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "x²-81＝x²-9²＝(x-9)(x+9)。"
+        },
+        {
+          "title": "確認",
+          "body": "(x-9)(x+9) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x-9)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+9)²",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-9)(x-9)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j3.n01-09",
+      "skillId": "j3.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "10x²+10x を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "10x(x+1)",
+        "10(x+1)",
+        "x(x+10)",
+        "10x(x-1)"
+      ],
+      "answer": "10x(x+1)",
+      "hint": "共通している因数を見つけよう。",
+      "hints": [
+        "共通している因数を見つけよう。",
+        "数の公約数と共通文字を探す。",
+        "共通因数でくくり、展開して元に戻るか確かめる。"
+      ],
+      "explanation": "10x(x+1) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "数の公約数と共通文字を探す。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "10x²+10x＝10x(x+1)。"
+        },
+        {
+          "title": "確認",
+          "body": "10x(x+1) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "10(x+1)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "x(x+10)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "10x(x-1)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-j3.n01-10",
+      "skillId": "j3.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "x²+13x+22 を因数分解すると？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "(x+11)(x+2)",
+        "(x+13)(x+22)",
+        "(x-11)(x-2)",
+        "(x+11)(x-2)"
+      ],
+      "answer": "(x+11)(x+2)",
+      "hint": "積が定数項になる2数を探そう。",
+      "hints": [
+        "積が定数項になる2数を探そう。",
+        "和がxの係数になることも条件。",
+        "2つの一次式の積を展開して確かめよう。"
+      ],
+      "explanation": "(x+11)(x+2) です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "和がxの係数になることも条件。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "積は22、和は13。"
+        },
+        {
+          "title": "確認",
+          "body": "(x+11)(x+2) です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "(x+13)(x+22)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x-11)(x-2)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "(x+11)(x-2)",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    }
+  ]
+}
