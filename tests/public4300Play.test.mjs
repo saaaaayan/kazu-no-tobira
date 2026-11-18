@@ -61,9 +61,10 @@ test('normal map stages fetch public banks and start the same answer/feedback ga
   const loader=read('src/stageBankLoader.web.ts');
   const exporter=read('scripts/export-ui-preview.mjs');
   const verify=read('scripts/verify-web-release.mjs');
-  assert.match(app,/await publicBankStageRound\(stage\)/);
+  assert.match(app,/await everyIslandStageRound\(stage\)/);
+  assert.match(read('src/domain/everyIslandStageRound.ts'),/if\(hasStageBank\(stage\.id\)\)return publicBankStageRound\(stage\)/);
   assert.match(app,/setRound\(\{stage,problems,index:0,correct:0/);
-  assert.match(map,/Boolean\(uiPreviewSampleKind\(stage\)\) \|\| hasStageBank\(stage\.id\)/);
+  assert.match(map,/const unlocked=preview \? hasPrototypeStageQuestions\(stage\)/);
   assert.doesNotMatch(map,/管理者テスト・ログインが必要/);
   assert.match(bank,/const decks=new Map<string,StageDeck>\(\)/);
   assert.match(bank,/drawStageRound\(\[\.\.\.byId\.keys\(\)\],stage\.questions,bank\.version,previous\)/);
