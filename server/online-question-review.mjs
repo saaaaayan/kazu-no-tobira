@@ -101,6 +101,7 @@ export function onlineQuestionReview({ store, auth }) {
         if (path === 'questions') return json(200, await store.list(params));
         if (path === 'stages') return json(200, await store.stageTotals());
         if (path === 'stage-production') return json(200, await store.stageProduction());
+        if (path === 'stage-questions') return json(200, await store.stageQuestions(params.get('id')));
         if (path === 'preschool-model') return json(200, await store.preschoolModelPreview());
         if (path === 'export.csv' || path === 'export.json') {
           return exportQuestions(store, params, path.slice(7), headers);
