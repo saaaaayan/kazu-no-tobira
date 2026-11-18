@@ -100,6 +100,8 @@ export function onlineQuestionReview({ store, auth }) {
         if (path === 'session') return json(200, { role: 'question_admin' });
         if (path === 'questions') return json(200, await store.list(params));
         if (path === 'stages') return json(200, await store.stageTotals());
+        if (path === 'stage-production') return json(200, await store.stageProduction());
+        if (path === 'stage-questions') return json(200, await store.stageQuestions(params.get('id')));
         if (path === 'preschool-model') return json(200, await store.preschoolModelPreview());
         if (path === 'export.csv' || path === 'export.json') {
           return exportQuestions(store, params, path.slice(7), headers);
@@ -116,6 +118,7 @@ export function onlineQuestionReview({ store, auth }) {
           return json(200, { signedOut: true });
         }
         if (path === 'reviews') return json(200, await store.review(await readJson(request), identity.subject));
+        if (path === 'stage-production') return json(200, await store.updateStageProduction(await readJson(request), identity.subject));
         if (path === 'revisions') return json(200, await store.editQuestion(await readJson(request), identity.subject));
       }
       throw fail(404, 'ページが見つかりません。');

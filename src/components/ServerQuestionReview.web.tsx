@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import type { BankQuestion } from '../domain/questionBank';
-import { allWorldStages,worldIslands } from '../domain/worldCatalog';
+import { allWorldStages,worldIslands,type WorldStage } from '../domain/worldCatalog';
+import StageProductionDashboard, {type PreviewMode} from './StageProductionDashboard.web';
 import { stageLabels, stageDisplayTitle } from '../domain/stageStructure';
 import { rejectReasons, reviewStatusLabels, type ReviewReason, type ReviewStatus } from '../domain/reviewAdmin';
 import { onlineReview, onlineReviewLogin, onlineReviewFetch, clearOnlineSession } from '../domain/onlineReview.web';
@@ -106,6 +107,8 @@ async function api<T>(path: string, body?: unknown, signal?: AbortSignal): Promi
 }
 
 function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
+  const [section,setSection]=useState<'stages'|'questions'>('stages');
+  const [stageGame,setStageGame]=useState<{stage:WorldStage;questions:BankQuestion[];mode:PreviewMode}>();
   const [listing, setListing] = useState<Listing>();
   const [selection, setSelection] = useState<Record<string, number>>({});
   const [detail, setDetail] = useState<Details>();
@@ -235,10 +238,29 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
   const unit = stage && island?.units[stage.unitIndex];
   const previewQuestions=modelQuestions ?? (detail ? [{...detail.question,hints:questionHints(detail.question),
     steps:detail.question.steps??[],mistakes:detail.question.mistakes??[]} as BankQuestion] : []);
-  function closePreview() { setPreview(false); setModelQuestions(undefined); }
-  if (preview && previewQuestions.length && stage) return <main style={pageStyle}>
+  function closePreview() { setPreview(false); setModelQuestions(undefined); setStageGame(undefined); }
+  function openStageGame(id:string,questions:BankQuestion[],mode:PreviewMode) {
+    const stage=allWorldStages.find(item=>item.id===id) ??
+      (id==='preschool.checkpoint1' ? {
+        ...allWorldStages.find(item=>item.id==='preschool.n01')!,
+        title:'かくにんテスト１'
+      } : undefined);
+    if(!stage||!questions.length){setNotice('確認する問題がありません。');return;}
+    setStageGame({stage,questions,mode});
+    setPreviewReset(n=>n+1);
+  }
+  const menu=<nav aria-label="管理者メニュー" style={{...line,margin:'12px 0'}}>
+    <button type="button" style={{...button,background:section==='stages'?'#cadbf9':'#f4f7fc'}}
+      onClick={()=>setSection('stages')}>制作状況・ステージ管理</button>
+    <button type="button" style={{...button,background:section==='questions'?'#cadbf9':'#f4f7fc'}}
+      onClick={()=>setSection('questions')}>全問題の検索・審査</button>
+    <a href="/kazu-no-tobira/" style={{...button,textDecoration:'none'}}>ゲーム公式サイト</a>
+  </nav>;
+  if (stageGame || (preview && previewQuestions.length && stage)) return <main style={pageStyle}>
     <h1>子ども向け画面のプレビュー</h1>
-    <p>{modelQuestions?'1〜3こを かぞえよう ／ 10問':stageDisplayTitle(stage)+' ／ 版 '+detail?.version}　／　記録なし</p>
+    <p>{stageGame
+      ? (stageGame.stage.title+' ／ '+({single:'1問だけ',sequential:'登録順に全問',random:'ランダム抽選'}[stageGame.mode])+' ／ '+stageGame.questions.length+'問')
+      : modelQuestions?'1〜3こを かぞえよう ／ 10問':stageDisplayTitle(stage!)+' ／ 版 '+detail?.version}　／　記録なし</p>
     <div style={line}>
       <button type="button" style={button} onClick={closePreview}>レビューに戻る</button>
       <button type="button" style={button} onClick={() => setPreviewReset(value => value+1)}>最初から試す</button>
@@ -247,9 +269,18 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
     </div>
     <div style={{ width:'100%', maxWidth:phone?390:1100, height:'min(80vh, 820px)', minHeight:420,
       margin:'16px auto', display:'flex', flexDirection:'column', border:'1px solid #8495b3', borderRadius:12, overflow:'hidden' }}>
-      <ReviewQuestionPreview key={String(previewReset)} stage={stage} phone={phone}
-        questions={previewQuestions} detailed={detailed} onClose={closePreview}/>
+      <ReviewQuestionPreview key={String(previewReset)} stage={stageGame?.stage ?? stage!} phone={phone}
+        questions={stageGame?.questions ?? previewQuestions} detailed={detailed} onClose={closePreview}/>
     </div>
+  </main>;
+  if (section==='stages') return <main style={pageStyle}>
+    <header style={{...line,justifyContent:'space-between'}}>
+      <h1>数のトビラ 管理者ダッシュボード</h1>
+      <button type="button" style={button} onClick={()=>void onLogout().catch(problem=>setNotice(problem.message))}>ログアウト</button>
+    </header>
+    {menu}
+    <StageProductionDashboard api={api} onPreview={openStageGame}
+      onInspectQuestion={id=>{setSection('questions');open(id);}}/>
   </main>;
   return <main style={pageStyle}>
     <header style={{ ...line, justifyContent:'space-between' }}>
@@ -257,6 +288,7 @@ function ReviewDashboard({ onLogout }: { onLogout: () => Promise<void> }) {
     <h1>数のトビラ 問題審査</h1>
       <button type="button" style={button} onClick={() => void onLogout().catch(problem => setNotice(problem.message))}>ログアウト</button>
     </header>
+    {menu}
     <p>専用データベースの登録問題を審査します。一般向けの配信は別途公開判定を通ります。</p>
     <section aria-label="審査集計" style={{ ...panel, ...line }}>
       <strong>実登録 {total.toLocaleString('ja-JP')} / 104,000問</strong>
