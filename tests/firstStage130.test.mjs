@@ -69,6 +69,7 @@ test('ten-question rollout remains scoped to 13 specific first stages and leaves
     const stage=allWorldStages.find(s=>s.id===id);
     const later=allWorldStages.find(s=>s.id===id.replace('.n01','.n02'));
     assert.ok(stage&&later);
-    assert.equal(uiPreviewRound(later).length,0,'do not mark unmade lessons ready: '+later.id);
+    assert.equal(uiPreviewRound(later).length,['e2','e3','e4','e5','e6'].includes(stage.gradeId)?10:0,
+      'only newly authored second stages may become available: '+later.id);
   }
 });
