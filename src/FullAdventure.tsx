@@ -11,7 +11,7 @@ import { isBankQuestion } from './domain/questionBank';
 import { prepareStageRound } from './stageRounds';
 import { QuestionDiagram, WorkedSolution, WrittenSolution } from './components/QuestionSupport';
 import { emptyProgress, recordAttempt, type Progress } from './domain/progress';
-import { uiPreviewRound } from './domain/uiPreviewRound';
+import { uiPreviewRound, uiPreviewPreschoolCheckpointOne } from './domain/uiPreviewRound';
 import QuestionReadAloud from './components/QuestionReadAloud';
 import { canAccessFeature, canAccessStage, freeAccess, hasPremium, type Entitlement } from './domain/accessPlan';
 import { readServerEntitlement } from './domain/serverEntitlement';
@@ -66,6 +66,7 @@ type Round = {
   liveHints?: readonly string[];
   noMoreHints?: boolean;
   live?: {origin:string; mode:LiveMode; round:LiveRound; eventId?:string};
+  checkpoint?: {id:string; number:number};
 };
 
 type ReviewPreview = { stage: WorldStage; questions: MathQuestion[]; phone: boolean; detailed: boolean; onClose: () => void };
@@ -230,7 +231,21 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   }
 
   function startCheckpoint(item:Checkpoint) {
-    if (uiPreview) { setStartError('確認テストの体験用問題は準備中です。'); return; }
+    if (uiPreview) {
+      if (item.id!=='preschool.checkpoint1') {
+        setStartError('この かくにんテストは じゅんびちゅうだよ。'); return;
+      }
+      const problems=uiPreviewPreschoolCheckpointOne();
+      if (problems.length!==10) {
+        setStartError('かくにんテストの もんだいを ひらけなかったよ。'); return;
+      }
+      resetAnswer();
+      setStartError('');
+      setScreen('island');
+      setRound({stage:{...item.after,title:'かくにんテスト 1'},checkpoint:{id:item.id,number:item.number},
+        problems,index:0,correct:0,results:[],dialogueOffset:0,usedHint:false,hintLevel:0});
+      return;
+    }
     if (!gameOrigin) { setStartError('確認テストを準備しています。'); return; }
     void startLive({...item.after,title:'確認テスト '+item.number},'checkpoint',item.id);
   }
@@ -407,9 +422,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   }
 
   const perfect = Boolean(round && round.correct === round.problems.length && !round.usedHint);
-  const specialRound=Boolean(round?.live && !['stage','test'].includes(round.live.mode));
+  const specialRound=Boolean(round?.checkpoint || (round?.live && !['stage','test'].includes(round.live.mode)));
   const cleared = Boolean(round && !specialRound && round.correct >= Math.ceil(round.stage.questions * 0.8));
-  const nextStage = round && (!round.live || ['stage','test'].includes(round.live.mode)) && worldIslands.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
+  const nextStage = round && !round.checkpoint && (!round.live || ['stage','test'].includes(round.live.mode)) && worldIslands.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
   const canContinue = !review && nextStage && progress && (uiPreview || ['play', 'learn'].includes(worldStageAction(playMode, progress, nextStage, access)));
   const lessonStage = learning && (learning.target ?? grade.stages.find(stage => learning.lesson.linkedStageIds.includes(stage.id)));
   const canChallenge = lessonStage && progress && canPlayWorldStage(playMode, progress, lessonStage, access);
@@ -516,7 +531,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                 <>
                   <View style={styles.questionPanel}>
                     <View style={styles.questionHeader}>
-                      <Text style={styles.stageTitle}>{countingGuide ? preschoolGuideTitles[round.stage.id] : stageDisplayTitle(round.stage)}</Text>
+                      <Text style={styles.stageTitle}>{round.checkpoint ? 'かくにんテスト '+round.checkpoint.number : countingGuide ? preschoolGuideTitles[round.stage.id] : stageDisplayTitle(round.stage)}</Text>
                       <Text style={styles.questionIndex}>{countingGuide ? round.index+1 : '第'+(round.index+1)+'問'} / {round.problems.length}</Text>
                     </View>
                     <MagicMeter results={round.results} total={round.problems.length}/>

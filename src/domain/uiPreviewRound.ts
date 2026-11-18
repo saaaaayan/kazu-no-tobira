@@ -102,3 +102,20 @@ export function uiPreviewRound(stage: SampleStage, random: () => number = Math.r
   const bank=uiPreviewBank(stage);
   return kind==='counting' ? randomCountingRound(bank,random) : kind==='preschool-sample' ? [...bank] : shuffled(bank,random).slice(0,10);
 }
+
+
+/**
+ * 幼児・確認テスト1（公開試作版）。
+ * 01→05の順に各2問ずつ選ぶ。ステージ間のシャッフルは禁止。
+ * ステージ内では前半を易しい個数、後半を大きい個数に並べる。
+ * 本番DBの審査・進捗とは独立した教材サンプルのみを使う。
+ */
+export function uiPreviewPreschoolCheckpointOne(random: () => number = Math.random): BankQuestion[] {
+  const stageIds=['preschool.n01','preschool.n02','preschool.n03','preschool.n04','preschool.n05'] as const;
+  return stageIds.flatMap(id => {
+    const source:SampleStage={id,gradeId:'preschool',family:'count',kind:'normal'};
+    const bank=uiPreviewBank(source);
+    if(bank.length<2) throw new Error('確認テストのもんだいが たりません。');
+    return shuffled(bank,random).slice(0,2).sort((a,b)=>Number(a.answer)-Number(b.answer));
+  });
+}
