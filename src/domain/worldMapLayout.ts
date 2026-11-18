@@ -2,15 +2,24 @@ import type { WorldStage } from './worldCatalog.ts';
 
 export type MapPoint = { x: number; y: number };
 
+// World route: 01→16 follows a simple, non-crossing serpentine path.
+// Four clear rows on desktop; two columns and eight rows on phones.
+// Small coordinate offsets prevent labels from stacking on top of one another.
 const atlasLandscape = [
-  [105, 646], [128, 493], [125, 300], [252, 153], [403, 278], [345, 467], [528, 590],
-  [701, 463], [863, 351], [658, 274], [505, 124], [720, 91], [899, 150], [879, 540],
-  [724, 662], [382, 675],
+  [120,145],[371,148],[621,151],[871,154],
+  [868,317],[617,321],[366,325],[115,329],
+  [119,479],[370,483],[620,487],[870,491],
+  [865,645],[614,649],[363,653],[112,657],
 ] as const;
 const atlasPortrait = [
-  [111, 100], [302, 182], [211, 294], [105, 401], [300, 472], [270, 590],
-  [106, 666], [188, 781], [312, 887], [124, 963], [164, 1085], [306, 1172], [182, 1305],
-  [100, 1420], [295, 1499], [217, 1620],
+  [114,112],[306,124],
+  [303,317],[117,329],
+  [120,522],[300,534],
+  [297,727],[123,739],
+  [126,932],[294,944],
+  [291,1137],[129,1149],
+  [132,1342],[288,1354],
+  [285,1547],[135,1559],
 ] as const;
 
 export function worldMapLayout(width: number) {
