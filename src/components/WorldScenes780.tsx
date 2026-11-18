@@ -14,6 +14,8 @@ import type { Progress } from '../domain/progress';
 import { lessonStatus, unitLessons, type UnitLesson } from '../domain/unitLessons';
 import { featureAccess } from '../domain/accessPlan';
 import { uiPreviewSampleKind } from '../domain/uiPreviewRound';
+import { stageCategoryName } from '../domain/islandCurriculumView';
+import { IslandCurriculumPanel } from './IslandCurriculumPanel';
 
 const palette = [
   { land: '#b6d793', dark: '#609d77', detail: '#306d6e', roof: '#efb6a0' },
@@ -222,6 +224,16 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
   const lessons = unitLessons.filter(lesson => lesson.grade === grade.id);
   const marker=Math.max(46,Math.min(57,Math.floor(actual/5)-9));
   const previewStage=preview ? grade.stages.find(stage=>Boolean(uiPreviewSampleKind(stage)) || hasStageBank(stage.id)) : undefined;
+  const curriculumAvailability=(stage:WorldStage)=>{
+    const action=worldStageAction(mode,progress,stage,access);
+    if(preview){
+      const ready=Boolean(uiPreviewSampleKind(stage))||hasStageBank(stage.id);
+      return {enabled:ready,label:ready?'▶ あそぶ':'準備中'};
+    }
+    return {enabled:['play','learn','premium'].includes(action),
+      label:action==='premium'?'プレミアム':action==='play'?'▶ あそぶ'
+        :action==='learn'?'まず学ぶ':'未解放'};
+  };
   return (
     <View style={styles.screen}>
       <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
@@ -239,6 +251,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         </View>
         <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
       </View>
+      <IslandCurriculumPanel grade={grade} onStart={onStart} availability={curriculumAvailability}/>
       {preview && <View style={styles.previewCard}>
         {previewStage ? <>
           <Text accessibilityRole="header" style={styles.previewHeading}>{hasStageBank(previewStage.id)
@@ -320,6 +333,16 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
             </View>
           );
         })}
+        {grade.stages.map((stage,index)=>{
+          const position=geometry.positions[index];
+          return <View key={'category-'+stage.id} pointerEvents="none"
+            style={[styles.pinCategoryBox,{
+              width:84,left:Math.max(1,Math.min(actual-85,position.x-42)),
+              top:position.y+marker/2+4,
+            }]}>
+            <Text numberOfLines={2} style={styles.pinCategoryText}>{stageCategoryName(grade,stage)}</Text>
+          </View>;
+        })}
         {checkpointsFor(grade).map(checkpoint=>{
           const end=geometry.positions[checkpoint.after.order];
           // 試作版は幼児の確認テスト1のみ選択可。ほかは従来どおり。
@@ -346,7 +369,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           return (
             <Pressable key={stage.id} accessibilityRole="button" disabled={!selectable}
               accessibilityState={{disabled:!selectable}}
-              accessibilityLabel={stageDisplayTitle(stage)+'、'+(preview ? (hasStageBank(stage.id) ? '100問のなかから10問ずつ あそべる' : uiPreviewSampleKind(stage) ? 'サンプル問題' : '体験用問題は準備中') : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
+              accessibilityLabel={stageDisplayTitle(stage)+'、単元 '+stageCategoryName(grade,stage)+'、'+(preview ? (hasStageBank(stage.id) ? '100問のなかから10問ずつ あそべる' : uiPreviewSampleKind(stage) ? 'サンプル問題' : '体験用問題は準備中') : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
                 styles.stagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
@@ -422,6 +445,9 @@ const styles=StyleSheet.create({
   nextText:{color:'#544268',fontWeight:'900',fontSize:15,textAlign:'center'},
   zoneLabel:{position:'absolute',paddingVertical:5,paddingHorizontal:9,backgroundColor:'#fff8dd',borderRadius:9,borderWidth:1,borderColor:'#ecdfb3',maxWidth:'90%'},
   zoneName:{color:'#545078',fontWeight:'900',fontSize:13},
+  pinCategoryBox:{position:'absolute',borderRadius:5,paddingHorizontal:2,paddingVertical:1,
+    backgroundColor:'rgba(255,250,228,0.92)',alignItems:'center',justifyContent:'center'},
+  pinCategoryText:{fontSize:10,fontWeight:'800',color:'#314661',textAlign:'center',lineHeight:12},
   stagePin:{position:'absolute',borderRadius:50,backgroundColor:'#fffaf0',borderWidth:3,borderColor:'#d2ae66',
     alignItems:'center',justifyContent:'center',shadowColor:'#24445b',shadowOpacity:0.25,shadowRadius:3,shadowOffset:{width:0,height:2}},
   extraPin:{backgroundColor:'#f5e6ff',borderColor:'#8b75c0'},
