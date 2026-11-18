@@ -315,10 +315,12 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         })}
         {checkpointsFor(grade).map(checkpoint=>{
           const end=geometry.positions[checkpoint.after.order];
-          const enabled=!preview && (testing || checkpoint.sourceStageIds.every(id=>Boolean(progress.stages[id]?.clearedAt)));
+          // 試作版は幼児の確認テスト1のみ選択可。ほかは従来どおり。
+          const enabled=preview ? grade.id==='preschool' && checkpoint.number===1
+            : testing || checkpoint.sourceStageIds.every(id=>Boolean(progress.stages[id]?.clearedAt));
           const left=Math.min(actual-68,Math.max(2,end.x-33));
           return <Pressable key={checkpoint.id} accessibilityRole="button"
-            accessibilityLabel={preview ? '確認テスト '+checkpoint.number+' は準備中' : '確認テスト '+checkpoint.number} disabled={!enabled} onPress={()=>onCheckpoint(checkpoint)}
+            accessibilityLabel={'確認テスト '+checkpoint.number+(enabled?' を はじめる':' は準備中')} disabled={!enabled} onPress={()=>onCheckpoint(checkpoint)}
             style={{position:'absolute',left,top:end.y+37,width:66,height:44,borderRadius:10,justifyContent:'center',
               alignItems:'center',backgroundColor:enabled?'#fff0b5':'#d2d9e9',borderWidth:1,borderColor:'#66769a'}}>
             <Text style={{fontSize:11,fontWeight:'800',color:'#263453'}}>確認テスト</Text>
