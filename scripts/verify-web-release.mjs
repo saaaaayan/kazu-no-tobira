@@ -41,12 +41,12 @@ export function releaseClient(address) {
     // files is actually accessible at the hosted site, not merely in GitHub.
     if (version.bankSha256 !== undefined) {
       const entries=Object.entries(version.bankSha256);
-      if (entries.length!==43 || version.publishedBankQuestions!==4300) {
+      if (entries.length!==54 || version.publishedBankQuestions!==4410) {
         throw new Error('The hosted public bank manifest is incomplete.');
       }
       for (let offset=0;offset<entries.length;offset+=8) {
         await Promise.all(entries.slice(offset,offset+8).map(async([file,hash])=>{
-          if(!/^(?:e1|sage)\.[a-z0-9]+\.v1\.json$/.test(file) ||
+          if(!/^(?:e1|sage|e[2-6]|j[1-3]|h[1-3])\.[a-z0-9]+\.v1\.json$/.test(file) ||
              !/^[a-f0-9]{64}$/.test(hash)) {
             throw new Error('Unexpected public bank file or digest.');
           }
@@ -54,7 +54,7 @@ export function releaseClient(address) {
           if (digest(data)!==hash)throw new Error('The published question bank differs: '+file);
           const bank=JSON.parse(data.toString('utf8'));
           if(bank.stageId!==file.slice(0,-'.v1.json'.length)||
-             !Array.isArray(bank.questions)||bank.questions.length!==100||
+             !Array.isArray(bank.questions)||bank.questions.length!==(file.startsWith('e1.')||file.startsWith('sage.')?100:10)||
              new Set(bank.questions.map(q=>q.id)).size!==100) {
             throw new Error('The published bank has invalid questions: '+file);
           }
