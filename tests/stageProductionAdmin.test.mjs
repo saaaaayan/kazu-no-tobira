@@ -102,3 +102,15 @@ test('new stage endpoints are protected by existing admin authentication',async(
   assert.equal((await handler(req('stage-production','owner',{id:'e1.n01'}))).status,200);
   assert.equal(calls,3);
 });
+
+test('admin dashboard defaults to populated question banks, not more than 1,100 empty placeholders',()=>{
+  const component=read('src/components/StageProductionDashboard.web.tsx');
+  assert.match(component,/useState<'registered'\|'authored'\|'all'>\('registered'\)/);
+  assert.match(component,/useState\('e1\.forest'\)/);
+  assert.match(component,/contentFilter==='registered'&&stage\.registered_count>0/);
+  assert.match(component,/DB登録問題あり（最初はこちら）/);
+  assert.match(component,/全1,200件（未作成を含む）/);
+  assert.match(component,/小学1年生の4,000問を開く/);
+  assert.match(component,/賢者の島の300問を開く/);
+  assert.match(component,/setEdit\(previous=>previous\?\?data\.find\(item=>item\.id==='e1\.forest'\)\)/);
+});
