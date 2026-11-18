@@ -1,0 +1,1041 @@
+島番号	島ID	位置	ステージID	区分	単元分類	技能分類	ステージ名	制作者の制作状況	制作済み件数	登録件数	最低10問への不足	確認済み件数
+0	preschool	1	preschool.n01	normal	objects	count	ものを かぞえる・はじめの一歩	creator_reviewed	100	10	0	10
+0	preschool	2	preschool.n02	normal	objects	count	ものを かぞえる・れんしゅうの道	creator_reviewed	10	0	10	10
+0	preschool	3	preschool.n03	normal	objects	count	ものを かぞえる・ひらめきの門	creator_reviewed	10	0	10	10
+0	preschool	4	preschool.n04	normal	objects	count	ものを かぞえる・チャレンジの丘	creator_reviewed	10	0	10	10
+0	preschool	5	preschool.n05	normal	objects	count	ものを かぞえる・マスターの宝箱	creator_reviewed	10	0	10	10
+0	preschool	6	preschool.n06	normal	matching	count	かずと すうじ・はじめの一歩	ten_created	10	0	10	0
+0	preschool	7	preschool.n07	normal	matching	count	かずと すうじ・れんしゅうの道	ten_created	10	0	10	0
+0	preschool	8	preschool.n08	normal	matching	count	かずと すうじ・ひらめきの門	ten_created	10	0	10	0
+0	preschool	9	preschool.n09	normal	matching	count	かずと すうじ・チャレンジの丘	ten_created	10	0	10	0
+0	preschool	10	preschool.n10	normal	matching	count	かずと すうじ・マスターの宝箱	ten_created	10	0	10	0
+0	preschool	11	preschool.n11	normal	tracing	tracing	すうじの なぞりがき・はじめの一歩	not_started	0	0	10	0
+0	preschool	12	preschool.n12	normal	tracing	tracing	すうじの なぞりがき・れんしゅうの道	not_started	0	0	10	0
+0	preschool	13	preschool.n13	normal	tracing	tracing	すうじの なぞりがき・ひらめきの門	not_started	0	0	10	0
+0	preschool	14	preschool.n14	normal	tracing	tracing	すうじの なぞりがき・チャレンジの丘	not_started	0	0	10	0
+0	preschool	15	preschool.n15	normal	tracing	tracing	すうじの なぞりがき・マスターの宝箱	not_started	0	0	10	0
+0	preschool	16	preschool.n16	normal	number-order	count	かずの ならび・はじめの一歩	not_started	0	0	10	0
+0	preschool	17	preschool.n17	normal	number-order	count	かずの ならび・れんしゅうの道	not_started	0	0	10	0
+0	preschool	18	preschool.n18	normal	number-order	count	かずの ならび・ひらめきの門	not_started	0	0	10	0
+0	preschool	19	preschool.n19	normal	number-order	count	かずの ならび・チャレンジの丘	not_started	0	0	10	0
+0	preschool	20	preschool.n20	normal	number-order	count	かずの ならび・マスターの宝箱	not_started	0	0	10	0
+0	preschool	21	preschool.n21	normal	comparison	comparison	おおい・すくない・はじめの一歩	not_started	0	0	10	0
+0	preschool	22	preschool.n22	normal	comparison	comparison	おおい・すくない・れんしゅうの道	not_started	0	0	10	0
+0	preschool	23	preschool.n23	normal	comparison	comparison	おおい・すくない・ひらめきの門	not_started	0	0	10	0
+0	preschool	24	preschool.n24	normal	comparison	comparison	おおい・すくない・チャレンジの丘	not_started	0	0	10	0
+0	preschool	25	preschool.n25	normal	comparison	comparison	おおい・すくない・マスターの宝箱	not_started	0	0	10	0
+0	preschool	26	preschool.n26	normal	sorting	sorting	なかまわけ・はじめの一歩	not_started	0	0	10	0
+0	preschool	27	preschool.n27	normal	sorting	sorting	なかまわけ・れんしゅうの道	not_started	0	0	10	0
+0	preschool	28	preschool.n28	normal	sorting	sorting	なかまわけ・ひらめきの門	not_started	0	0	10	0
+0	preschool	29	preschool.n29	normal	sorting	sorting	なかまわけ・チャレンジの丘	not_started	0	0	10	0
+0	preschool	30	preschool.n30	normal	sorting	sorting	なかまわけ・マスターの宝箱	not_started	0	0	10	0
+0	preschool	31	preschool.n31	normal	shapes	shape	まる・さんかく・しかく・はじめの一歩	not_started	0	0	10	0
+0	preschool	32	preschool.n32	normal	shapes	shape	まる・さんかく・しかく・れんしゅうの道	not_started	0	0	10	0
+0	preschool	33	preschool.n33	normal	shapes	shape	まる・さんかく・しかく・ひらめきの門	not_started	0	0	10	0
+0	preschool	34	preschool.n34	normal	shapes	shape	まる・さんかく・しかく・チャレンジの丘	not_started	0	0	10	0
+0	preschool	35	preschool.n35	normal	shapes	shape	まる・さんかく・しかく・マスターの宝箱	not_started	0	0	10	0
+0	preschool	36	preschool.n36	normal	patterns	pattern	つぎは なにかな・はじめの一歩	not_started	0	0	10	0
+0	preschool	37	preschool.n37	normal	patterns	pattern	つぎは なにかな・れんしゅうの道	not_started	0	0	10	0
+0	preschool	38	preschool.n38	normal	patterns	pattern	つぎは なにかな・ひらめきの門	not_started	0	0	10	0
+0	preschool	39	preschool.n39	normal	patterns	pattern	つぎは なにかな・チャレンジの丘	not_started	0	0	10	0
+0	preschool	40	preschool.n40	normal	patterns	pattern	つぎは なにかな・マスターの宝箱	not_started	0	0	10	0
+0	preschool	41	preschool.n41	normal	position	position	うえ・した・となり・はじめの一歩	not_started	0	0	10	0
+0	preschool	42	preschool.n42	normal	position	position	うえ・した・となり・れんしゅうの道	not_started	0	0	10	0
+0	preschool	43	preschool.n43	normal	position	position	うえ・した・となり・ひらめきの門	not_started	0	0	10	0
+0	preschool	44	preschool.n44	normal	position	position	うえ・した・となり・チャレンジの丘	not_started	0	0	10	0
+0	preschool	45	preschool.n45	normal	position	position	うえ・した・となり・マスターの宝箱	not_started	0	0	10	0
+0	preschool	46	preschool.n46	normal	play	mixed	かずと かたちの あそび・はじめの一歩	not_started	0	0	10	0
+0	preschool	47	preschool.n47	normal	play	mixed	かずと かたちの あそび・れんしゅうの道	not_started	0	0	10	0
+0	preschool	48	preschool.n48	normal	play	mixed	かずと かたちの あそび・ひらめきの門	not_started	0	0	10	0
+0	preschool	49	preschool.n49	normal	play	mixed	かずと かたちの あそび・チャレンジの丘	not_started	0	0	10	0
+0	preschool	50	preschool.n50	normal	play	mixed	かずと かたちの あそび・マスターの宝箱	not_started	0	0	10	0
+0	preschool	51	preschool.x01	extra	objects	count	EX・ものを かぞえる	not_started	0	0	10	0
+0	preschool	52	preschool.x02	extra	matching	count	EX・かずと すうじ	not_started	0	0	10	0
+0	preschool	53	preschool.x03	extra	tracing	tracing	EX・すうじの なぞりがき	not_started	0	0	10	0
+0	preschool	54	preschool.x04	extra	number-order	count	EX・かずの ならび	not_started	0	0	10	0
+0	preschool	55	preschool.x05	extra	comparison	comparison	EX・おおい・すくない	not_started	0	0	10	0
+0	preschool	56	preschool.x06	extra	sorting	sorting	EX・なかまわけ	not_started	0	0	10	0
+0	preschool	57	preschool.x07	extra	shapes	shape	EX・まる・さんかく・しかく	not_started	0	0	10	0
+0	preschool	58	preschool.x08	extra	patterns	pattern	EX・つぎは なにかな	not_started	0	0	10	0
+0	preschool	59	preschool.x09	extra	position	position	EX・うえ・した・となり	not_started	0	0	10	0
+0	preschool	60	preschool.x10	extra	play	mixed	EX・かずと かたちの あそび	not_started	0	0	10	0
+0	preschool	61	preschool.s01	secret	objects	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+0	preschool	62	preschool.s02	secret	matching	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+0	preschool	63	preschool.s03	secret	tracing	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+0	preschool	64	preschool.s04	secret	number-order	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+0	preschool	65	preschool.s05	secret	comparison	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
+1	e1	1	e1.n04	normal	number-order	count	10までの かず・かずの みち	hundred_created	100	100	0	0
+1	e1	2	e1.n05	normal	number-order	count	10までの かず・ならびの たんけん	hundred_created	100	100	0	0
+1	e1	3	e1.forest	normal	add-small	addition	はじまりの森	hundred_created	100	100	0	0
+1	e1	4	e1.n06	normal	add-small	addition	9までの たしざん・はじめの一歩	hundred_created	100	100	0	0
+1	e1	5	e1.n07	normal	add-small	addition	9までの たしざん・れんしゅうの道	hundred_created	100	100	0	0
+1	e1	6	e1.n08	normal	add-small	addition	9までの たしざん・ひらめきの門	hundred_created	100	100	0	0
+1	e1	7	e1.n09	normal	add-small	addition	9までの たしざん・チャレンジの丘	hundred_created	100	100	0	0
+1	e1	8	e1.n10	normal	add-small	addition	9までの たしざん・マスターの宝箱	hundred_created	100	100	0	0
+1	e1	9	e1.n11	normal	sub-small	subtraction	9までの ひきざん・はじめの一歩	hundred_created	100	100	0	0
+1	e1	10	e1.n12	normal	sub-small	subtraction	9までの ひきざん・れんしゅうの道	hundred_created	100	100	0	0
+1	e1	11	e1.n13	normal	sub-small	subtraction	9までの ひきざん・ひらめきの門	hundred_created	100	100	0	0
+1	e1	12	e1.n14	normal	sub-small	subtraction	9までの ひきざん・チャレンジの丘	hundred_created	100	100	0	0
+1	e1	13	e1.n15	normal	sub-small	subtraction	9までの ひきざん・マスターの宝箱	hundred_created	100	100	0	0
+1	e1	14	e1.bridge	normal	make-ten	addition	月あかりの橋	hundred_created	100	100	0	0
+1	e1	15	e1.n16	normal	make-ten	addition	10を つくろう・はじめの一歩	hundred_created	100	100	0	0
+1	e1	16	e1.n17	normal	make-ten	addition	10を つくろう・れんしゅうの道	hundred_created	100	100	0	0
+1	e1	17	e1.n18	normal	make-ten	addition	10を つくろう・ひらめきの門	hundred_created	100	100	0	0
+1	e1	18	e1.n19	normal	make-ten	addition	10を つくろう・チャレンジの丘	hundred_created	100	100	0	0
+1	e1	19	e1.n20	normal	make-ten	addition	10を つくろう・マスターの宝箱	hundred_created	100	100	0	0
+1	e1	20	e1.n21	normal	count-twenty	count	20までの かず・はじめの一歩	hundred_created	100	100	0	0
+1	e1	21	e1.n22	normal	count-twenty	count	20までの かず・れんしゅうの道	hundred_created	100	100	0	0
+1	e1	22	e1.n23	normal	count-twenty	count	20までの かず・ひらめきの門	hundred_created	100	100	0	0
+1	e1	23	e1.n24	normal	count-twenty	count	20までの かず・チャレンジの丘	hundred_created	100	100	0	0
+1	e1	24	e1.n25	normal	count-twenty	count	20までの かず・マスターの宝箱	hundred_created	100	100	0	0
+1	e1	25	e1.tower	normal	cross-ten	addition	星の塔	hundred_created	100	100	0	0
+1	e1	26	e1.n26	normal	cross-ten	addition	くりあがりの たしざん・はじめの一歩	hundred_created	100	100	0	0
+1	e1	27	e1.n27	normal	cross-ten	addition	くりあがりの たしざん・れんしゅうの道	hundred_created	100	100	0	0
+1	e1	28	e1.n28	normal	cross-ten	addition	くりあがりの たしざん・ひらめきの門	hundred_created	100	100	0	0
+1	e1	29	e1.n29	normal	cross-ten	addition	くりあがりの たしざん・チャレンジの丘	hundred_created	100	100	0	0
+1	e1	30	e1.n30	normal	cross-ten	addition	くりあがりの たしざん・マスターの宝箱	hundred_created	100	100	0	0
+1	e1	31	e1.n31	normal	borrow-ten	subtraction	くりさがりの ひきざん・はじめの一歩	hundred_created	100	100	0	0
+1	e1	32	e1.n32	normal	borrow-ten	subtraction	くりさがりの ひきざん・れんしゅうの道	hundred_created	100	100	0	0
+1	e1	33	e1.n33	normal	borrow-ten	subtraction	くりさがりの ひきざん・ひらめきの門	hundred_created	100	100	0	0
+1	e1	34	e1.n34	normal	borrow-ten	subtraction	くりさがりの ひきざん・チャレンジの丘	hundred_created	100	100	0	0
+1	e1	35	e1.n35	normal	borrow-ten	subtraction	くりさがりの ひきざん・マスターの宝箱	hundred_created	100	100	0	0
+1	e1	36	e1.n36	normal	count-hundred	place	100までの かず・はじめの一歩	hundred_created	100	100	0	0
+1	e1	37	e1.n37	normal	count-hundred	place	100までの かず・れんしゅうの道	hundred_created	100	100	0	0
+1	e1	38	e1.n38	normal	count-hundred	place	100までの かず・ひらめきの門	hundred_created	100	100	0	0
+1	e1	39	e1.n39	normal	count-hundred	place	100までの かず・チャレンジの丘	hundred_created	100	100	0	0
+1	e1	40	e1.n40	normal	count-hundred	place	100までの かず・マスターの宝箱	hundred_created	100	100	0	0
+1	e1	41	e1.n41	normal	shapes1	shape	かたちと おおきさ・はじめの一歩	not_started	4	4	6	0
+1	e1	42	e1.n42	normal	shapes1	shape	かたちと おおきさ・れんしゅうの道	not_started	0	0	10	0
+1	e1	43	e1.n43	normal	shapes1	shape	かたちと おおきさ・ひらめきの門	not_started	0	0	10	0
+1	e1	44	e1.n44	normal	shapes1	shape	かたちと おおきさ・チャレンジの丘	not_started	0	0	10	0
+1	e1	45	e1.n45	normal	shapes1	shape	かたちと おおきさ・マスターの宝箱	not_started	0	0	10	0
+1	e1	46	e1.n46	normal	clock1	time	とけいと おはなし・はじめの一歩	not_started	0	0	10	0
+1	e1	47	e1.n47	normal	clock1	time	とけいと おはなし・れんしゅうの道	not_started	0	0	10	0
+1	e1	48	e1.n48	normal	clock1	time	とけいと おはなし・ひらめきの門	not_started	0	0	10	0
+1	e1	49	e1.n49	normal	clock1	time	とけいと おはなし・チャレンジの丘	not_started	0	0	10	0
+1	e1	50	e1.n50	normal	clock1	time	とけいと おはなし・マスターの宝箱	not_started	0	0	10	0
+1	e1	51	e1.x01	extra	number-order	count	EX・10までの かず	not_started	0	0	10	0
+1	e1	52	e1.x02	extra	add-small	addition	EX・9までの たしざん	not_started	0	0	10	0
+1	e1	53	e1.x03	extra	sub-small	subtraction	EX・9までの ひきざん	not_started	0	0	10	0
+1	e1	54	e1.x04	extra	make-ten	addition	EX・10を つくろう	not_started	0	0	10	0
+1	e1	55	e1.x05	extra	count-twenty	count	EX・20までの かず	not_started	0	0	10	0
+1	e1	56	e1.x06	extra	cross-ten	addition	EX・くりあがりの たしざん	not_started	0	0	10	0
+1	e1	57	e1.x07	extra	borrow-ten	subtraction	EX・くりさがりの ひきざん	not_started	0	0	10	0
+1	e1	58	e1.x08	extra	count-hundred	place	EX・100までの かず	not_started	0	0	10	0
+1	e1	59	e1.x09	extra	shapes1	shape	EX・かたちと おおきさ	not_started	0	0	10	0
+1	e1	60	e1.x10	extra	clock1	time	EX・とけいと おはなし	not_started	0	0	10	0
+1	e1	61	e1.s01	secret	number-order	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+1	e1	62	e1.s02	secret	add-small	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+1	e1	63	e1.s03	secret	sub-small	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+1	e1	64	e1.s04	secret	make-ten	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+1	e1	65	e1.s05	secret	count-twenty	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
+2	e2	1	e2.n01	normal	numbers1000	place	1000までの かず・はじめの一歩	not_started	0	0	10	0
+2	e2	2	e2.n02	normal	numbers1000	place	1000までの かず・れんしゅうの道	not_started	0	0	10	0
+2	e2	3	e2.n03	normal	numbers1000	place	1000までの かず・ひらめきの門	not_started	0	0	10	0
+2	e2	4	e2.n04	normal	numbers1000	place	1000までの かず・チャレンジの丘	not_started	0	0	10	0
+2	e2	5	e2.n05	normal	numbers1000	place	1000までの かず・マスターの宝箱	not_started	0	0	10	0
+2	e2	6	e2.n06	normal	addition2	addition	2けたの たしざん・はじめの一歩	not_started	0	0	10	0
+2	e2	7	e2.n07	normal	addition2	addition	2けたの たしざん・れんしゅうの道	not_started	0	0	10	0
+2	e2	8	e2.n08	normal	addition2	addition	2けたの たしざん・ひらめきの門	not_started	0	0	10	0
+2	e2	9	e2.n09	normal	addition2	addition	2けたの たしざん・チャレンジの丘	not_started	0	0	10	0
+2	e2	10	e2.n10	normal	addition2	addition	2けたの たしざん・マスターの宝箱	not_started	0	0	10	0
+2	e2	11	e2.n11	normal	subtraction2	subtraction	2けたの ひきざん・はじめの一歩	not_started	0	0	10	0
+2	e2	12	e2.n12	normal	subtraction2	subtraction	2けたの ひきざん・れんしゅうの道	not_started	0	0	10	0
+2	e2	13	e2.n13	normal	subtraction2	subtraction	2けたの ひきざん・ひらめきの門	not_started	0	0	10	0
+2	e2	14	e2.n14	normal	subtraction2	subtraction	2けたの ひきざん・チャレンジの丘	not_started	0	0	10	0
+2	e2	15	e2.n15	normal	subtraction2	subtraction	2けたの ひきざん・マスターの宝箱	not_started	0	0	10	0
+2	e2	16	e2.n16	normal	multiplication2	multiplication	かけざん 九九・はじめの一歩	not_started	0	0	10	0
+2	e2	17	e2.n17	normal	multiplication2	multiplication	かけざん 九九・れんしゅうの道	not_started	0	0	10	0
+2	e2	18	e2.n18	normal	multiplication2	multiplication	かけざん 九九・ひらめきの門	not_started	0	0	10	0
+2	e2	19	e2.n19	normal	multiplication2	multiplication	かけざん 九九・チャレンジの丘	not_started	0	0	10	0
+2	e2	20	e2.n20	normal	multiplication2	multiplication	かけざん 九九・マスターの宝箱	not_started	0	0	10	0
+2	e2	21	e2.n21	normal	mult-story	multiplication	かけざんの おはなし・はじめの一歩	not_started	0	0	10	0
+2	e2	22	e2.n22	normal	mult-story	multiplication	かけざんの おはなし・れんしゅうの道	not_started	0	0	10	0
+2	e2	23	e2.n23	normal	mult-story	multiplication	かけざんの おはなし・ひらめきの門	not_started	0	0	10	0
+2	e2	24	e2.n24	normal	mult-story	multiplication	かけざんの おはなし・チャレンジの丘	not_started	0	0	10	0
+2	e2	25	e2.n25	normal	mult-story	multiplication	かけざんの おはなし・マスターの宝箱	not_started	0	0	10	0
+2	e2	26	e2.n26	normal	clock2	time	時こくと 時間・はじめの一歩	not_started	0	0	10	0
+2	e2	27	e2.n27	normal	clock2	time	時こくと 時間・れんしゅうの道	not_started	0	0	10	0
+2	e2	28	e2.n28	normal	clock2	time	時こくと 時間・ひらめきの門	not_started	0	0	10	0
+2	e2	29	e2.n29	normal	clock2	time	時こくと 時間・チャレンジの丘	not_started	0	0	10	0
+2	e2	30	e2.n30	normal	clock2	time	時こくと 時間・マスターの宝箱	not_started	0	0	10	0
+2	e2	31	e2.n31	normal	length2	unit	長さを はかろう・はじめの一歩	not_started	0	0	10	0
+2	e2	32	e2.n32	normal	length2	unit	長さを はかろう・れんしゅうの道	not_started	0	0	10	0
+2	e2	33	e2.n33	normal	length2	unit	長さを はかろう・ひらめきの門	not_started	0	0	10	0
+2	e2	34	e2.n34	normal	length2	unit	長さを はかろう・チャレンジの丘	not_started	0	0	10	0
+2	e2	35	e2.n35	normal	length2	unit	長さを はかろう・マスターの宝箱	not_started	0	0	10	0
+2	e2	36	e2.n36	normal	capacity2	unit	かさを はかろう・はじめの一歩	not_started	0	0	10	0
+2	e2	37	e2.n37	normal	capacity2	unit	かさを はかろう・れんしゅうの道	not_started	0	0	10	0
+2	e2	38	e2.n38	normal	capacity2	unit	かさを はかろう・ひらめきの門	not_started	0	0	10	0
+2	e2	39	e2.n39	normal	capacity2	unit	かさを はかろう・チャレンジの丘	not_started	0	0	10	0
+2	e2	40	e2.n40	normal	capacity2	unit	かさを はかろう・マスターの宝箱	not_started	0	0	10	0
+2	e2	41	e2.n41	normal	shapes2	shape	三角形と 四角形・はじめの一歩	not_started	0	0	10	0
+2	e2	42	e2.n42	normal	shapes2	shape	三角形と 四角形・れんしゅうの道	not_started	0	0	10	0
+2	e2	43	e2.n43	normal	shapes2	shape	三角形と 四角形・ひらめきの門	not_started	0	0	10	0
+2	e2	44	e2.n44	normal	shapes2	shape	三角形と 四角形・チャレンジの丘	not_started	0	0	10	0
+2	e2	45	e2.n45	normal	shapes2	shape	三角形と 四角形・マスターの宝箱	not_started	0	0	10	0
+2	e2	46	e2.n46	normal	fraction2	fraction	分数と ひょう・グラフ・はじめの一歩	not_started	0	0	10	0
+2	e2	47	e2.n47	normal	fraction2	fraction	分数と ひょう・グラフ・れんしゅうの道	not_started	0	0	10	0
+2	e2	48	e2.n48	normal	fraction2	fraction	分数と ひょう・グラフ・ひらめきの門	not_started	0	0	10	0
+2	e2	49	e2.n49	normal	fraction2	fraction	分数と ひょう・グラフ・チャレンジの丘	not_started	0	0	10	0
+2	e2	50	e2.n50	normal	fraction2	fraction	分数と ひょう・グラフ・マスターの宝箱	not_started	0	0	10	0
+2	e2	51	e2.x01	extra	numbers1000	place	EX・1000までの かず	not_started	0	0	10	0
+2	e2	52	e2.x02	extra	addition2	addition	EX・2けたの たしざん	not_started	0	0	10	0
+2	e2	53	e2.x03	extra	subtraction2	subtraction	EX・2けたの ひきざん	not_started	0	0	10	0
+2	e2	54	e2.x04	extra	multiplication2	multiplication	EX・かけざん 九九	not_started	0	0	10	0
+2	e2	55	e2.x05	extra	mult-story	multiplication	EX・かけざんの おはなし	not_started	0	0	10	0
+2	e2	56	e2.x06	extra	clock2	time	EX・時こくと 時間	not_started	0	0	10	0
+2	e2	57	e2.x07	extra	length2	unit	EX・長さを はかろう	not_started	0	0	10	0
+2	e2	58	e2.x08	extra	capacity2	unit	EX・かさを はかろう	not_started	0	0	10	0
+2	e2	59	e2.x09	extra	shapes2	shape	EX・三角形と 四角形	not_started	0	0	10	0
+2	e2	60	e2.x10	extra	fraction2	fraction	EX・分数と ひょう・グラフ	not_started	0	0	10	0
+2	e2	61	e2.s01	secret	numbers1000	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+2	e2	62	e2.s02	secret	addition2	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+2	e2	63	e2.s03	secret	subtraction2	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+2	e2	64	e2.s04	secret	multiplication2	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+2	e2	65	e2.s05	secret	mult-story	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
+3	e3	1	e3.n01	normal	numbers10000	place	一万までの 数・はじめの一歩	not_started	0	0	10	0
+3	e3	2	e3.n02	normal	numbers10000	place	一万までの 数・れんしゅうの道	not_started	0	0	10	0
+3	e3	3	e3.n03	normal	numbers10000	place	一万までの 数・ひらめきの門	not_started	0	0	10	0
+3	e3	4	e3.n04	normal	numbers10000	place	一万までの 数・チャレンジの丘	not_started	0	0	10	0
+3	e3	5	e3.n05	normal	numbers10000	place	一万までの 数・マスターの宝箱	not_started	0	0	10	0
+3	e3	6	e3.n06	normal	addition3	addition	3けたの たし算・はじめの一歩	not_started	0	0	10	0
+3	e3	7	e3.n07	normal	addition3	addition	3けたの たし算・れんしゅうの道	not_started	0	0	10	0
+3	e3	8	e3.n08	normal	addition3	addition	3けたの たし算・ひらめきの門	not_started	0	0	10	0
+3	e3	9	e3.n09	normal	addition3	addition	3けたの たし算・チャレンジの丘	not_started	0	0	10	0
+3	e3	10	e3.n10	normal	addition3	addition	3けたの たし算・マスターの宝箱	not_started	0	0	10	0
+3	e3	11	e3.n11	normal	subtraction3	subtraction	3けたの ひき算・はじめの一歩	not_started	0	0	10	0
+3	e3	12	e3.n12	normal	subtraction3	subtraction	3けたの ひき算・れんしゅうの道	not_started	0	0	10	0
+3	e3	13	e3.n13	normal	subtraction3	subtraction	3けたの ひき算・ひらめきの門	not_started	0	0	10	0
+3	e3	14	e3.n14	normal	subtraction3	subtraction	3けたの ひき算・チャレンジの丘	not_started	0	0	10	0
+3	e3	15	e3.n15	normal	subtraction3	subtraction	3けたの ひき算・マスターの宝箱	not_started	0	0	10	0
+3	e3	16	e3.n16	normal	multiplication3	multiplication	2けたの かけ算・はじめの一歩	not_started	0	0	10	0
+3	e3	17	e3.n17	normal	multiplication3	multiplication	2けたの かけ算・れんしゅうの道	not_started	0	0	10	0
+3	e3	18	e3.n18	normal	multiplication3	multiplication	2けたの かけ算・ひらめきの門	not_started	0	0	10	0
+3	e3	19	e3.n19	normal	multiplication3	multiplication	2けたの かけ算・チャレンジの丘	not_started	0	0	10	0
+3	e3	20	e3.n20	normal	multiplication3	multiplication	2けたの かけ算・マスターの宝箱	not_started	0	0	10	0
+3	e3	21	e3.n21	normal	division3	division	わり算と あまり・はじめの一歩	not_started	0	0	10	0
+3	e3	22	e3.n22	normal	division3	division	わり算と あまり・れんしゅうの道	not_started	0	0	10	0
+3	e3	23	e3.n23	normal	division3	division	わり算と あまり・ひらめきの門	not_started	0	0	10	0
+3	e3	24	e3.n24	normal	division3	division	わり算と あまり・チャレンジの丘	not_started	0	0	10	0
+3	e3	25	e3.n25	normal	division3	division	わり算と あまり・マスターの宝箱	not_started	0	0	10	0
+3	e3	26	e3.n26	normal	decimal3	decimal	小数の はじめ・はじめの一歩	not_started	0	0	10	0
+3	e3	27	e3.n27	normal	decimal3	decimal	小数の はじめ・れんしゅうの道	not_started	0	0	10	0
+3	e3	28	e3.n28	normal	decimal3	decimal	小数の はじめ・ひらめきの門	not_started	0	0	10	0
+3	e3	29	e3.n29	normal	decimal3	decimal	小数の はじめ・チャレンジの丘	not_started	0	0	10	0
+3	e3	30	e3.n30	normal	decimal3	decimal	小数の はじめ・マスターの宝箱	not_started	0	0	10	0
+3	e3	31	e3.n31	normal	fraction3	fraction	分数の はじめ・はじめの一歩	not_started	0	0	10	0
+3	e3	32	e3.n32	normal	fraction3	fraction	分数の はじめ・れんしゅうの道	not_started	0	0	10	0
+3	e3	33	e3.n33	normal	fraction3	fraction	分数の はじめ・ひらめきの門	not_started	0	0	10	0
+3	e3	34	e3.n34	normal	fraction3	fraction	分数の はじめ・チャレンジの丘	not_started	0	0	10	0
+3	e3	35	e3.n35	normal	fraction3	fraction	分数の はじめ・マスターの宝箱	not_started	0	0	10	0
+3	e3	36	e3.n36	normal	measure3	unit	重さ・長さ・時間・はじめの一歩	not_started	0	0	10	0
+3	e3	37	e3.n37	normal	measure3	unit	重さ・長さ・時間・れんしゅうの道	not_started	0	0	10	0
+3	e3	38	e3.n38	normal	measure3	unit	重さ・長さ・時間・ひらめきの門	not_started	0	0	10	0
+3	e3	39	e3.n39	normal	measure3	unit	重さ・長さ・時間・チャレンジの丘	not_started	0	0	10	0
+3	e3	40	e3.n40	normal	measure3	unit	重さ・長さ・時間・マスターの宝箱	not_started	0	0	10	0
+3	e3	41	e3.n41	normal	circle3	geometry	円と 球・はじめの一歩	not_started	0	0	10	0
+3	e3	42	e3.n42	normal	circle3	geometry	円と 球・れんしゅうの道	not_started	0	0	10	0
+3	e3	43	e3.n43	normal	circle3	geometry	円と 球・ひらめきの門	not_started	0	0	10	0
+3	e3	44	e3.n44	normal	circle3	geometry	円と 球・チャレンジの丘	not_started	0	0	10	0
+3	e3	45	e3.n45	normal	circle3	geometry	円と 球・マスターの宝箱	not_started	0	0	10	0
+3	e3	46	e3.n46	normal	data3	data	表と 棒グラフ・はじめの一歩	not_started	0	0	10	0
+3	e3	47	e3.n47	normal	data3	data	表と 棒グラフ・れんしゅうの道	not_started	0	0	10	0
+3	e3	48	e3.n48	normal	data3	data	表と 棒グラフ・ひらめきの門	not_started	0	0	10	0
+3	e3	49	e3.n49	normal	data3	data	表と 棒グラフ・チャレンジの丘	not_started	0	0	10	0
+3	e3	50	e3.n50	normal	data3	data	表と 棒グラフ・マスターの宝箱	not_started	0	0	10	0
+3	e3	51	e3.x01	extra	numbers10000	place	EX・一万までの 数	not_started	0	0	10	0
+3	e3	52	e3.x02	extra	addition3	addition	EX・3けたの たし算	not_started	0	0	10	0
+3	e3	53	e3.x03	extra	subtraction3	subtraction	EX・3けたの ひき算	not_started	0	0	10	0
+3	e3	54	e3.x04	extra	multiplication3	multiplication	EX・2けたの かけ算	not_started	0	0	10	0
+3	e3	55	e3.x05	extra	division3	division	EX・わり算と あまり	not_started	0	0	10	0
+3	e3	56	e3.x06	extra	decimal3	decimal	EX・小数の はじめ	not_started	0	0	10	0
+3	e3	57	e3.x07	extra	fraction3	fraction	EX・分数の はじめ	not_started	0	0	10	0
+3	e3	58	e3.x08	extra	measure3	unit	EX・重さ・長さ・時間	not_started	0	0	10	0
+3	e3	59	e3.x09	extra	circle3	geometry	EX・円と 球	not_started	0	0	10	0
+3	e3	60	e3.x10	extra	data3	data	EX・表と 棒グラフ	not_started	0	0	10	0
+3	e3	61	e3.s01	secret	numbers10000	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+3	e3	62	e3.s02	secret	addition3	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+3	e3	63	e3.s03	secret	subtraction3	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+3	e3	64	e3.s04	secret	multiplication3	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+3	e3	65	e3.s05	secret	division3	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
+4	e4	1	e4.n01	normal	large4	place	大きな数と しくみ・はじめの一歩	not_started	0	0	10	0
+4	e4	2	e4.n02	normal	large4	place	大きな数と しくみ・れんしゅうの道	not_started	0	0	10	0
+4	e4	3	e4.n03	normal	large4	place	大きな数と しくみ・ひらめきの門	not_started	0	0	10	0
+4	e4	4	e4.n04	normal	large4	place	大きな数と しくみ・チャレンジの丘	not_started	0	0	10	0
+4	e4	5	e4.n05	normal	large4	place	大きな数と しくみ・マスターの宝箱	not_started	0	0	10	0
+4	e4	6	e4.n06	normal	expressions4	operation	計算の きまり・はじめの一歩	not_started	0	0	10	0
+4	e4	7	e4.n07	normal	expressions4	operation	計算の きまり・れんしゅうの道	not_started	0	0	10	0
+4	e4	8	e4.n08	normal	expressions4	operation	計算の きまり・ひらめきの門	not_started	0	0	10	0
+4	e4	9	e4.n09	normal	expressions4	operation	計算の きまり・チャレンジの丘	not_started	0	0	10	0
+4	e4	10	e4.n10	normal	expressions4	operation	計算の きまり・マスターの宝箱	not_started	0	0	10	0
+4	e4	11	e4.n11	normal	division4	division	2けたで わる計算・はじめの一歩	not_started	0	0	10	0
+4	e4	12	e4.n12	normal	division4	division	2けたで わる計算・れんしゅうの道	not_started	0	0	10	0
+4	e4	13	e4.n13	normal	division4	division	2けたで わる計算・ひらめきの門	not_started	0	0	10	0
+4	e4	14	e4.n14	normal	division4	division	2けたで わる計算・チャレンジの丘	not_started	0	0	10	0
+4	e4	15	e4.n15	normal	division4	division	2けたで わる計算・マスターの宝箱	not_started	0	0	10	0
+4	e4	16	e4.n16	normal	decimal4	decimal	小数の たし算・ひき算・はじめの一歩	not_started	0	0	10	0
+4	e4	17	e4.n17	normal	decimal4	decimal	小数の たし算・ひき算・れんしゅうの道	not_started	0	0	10	0
+4	e4	18	e4.n18	normal	decimal4	decimal	小数の たし算・ひき算・ひらめきの門	not_started	0	0	10	0
+4	e4	19	e4.n19	normal	decimal4	decimal	小数の たし算・ひき算・チャレンジの丘	not_started	0	0	10	0
+4	e4	20	e4.n20	normal	decimal4	decimal	小数の たし算・ひき算・マスターの宝箱	not_started	0	0	10	0
+4	e4	21	e4.n21	normal	fraction4	fraction	同じ分母の 分数・はじめの一歩	not_started	0	0	10	0
+4	e4	22	e4.n22	normal	fraction4	fraction	同じ分母の 分数・れんしゅうの道	not_started	0	0	10	0
+4	e4	23	e4.n23	normal	fraction4	fraction	同じ分母の 分数・ひらめきの門	not_started	0	0	10	0
+4	e4	24	e4.n24	normal	fraction4	fraction	同じ分母の 分数・チャレンジの丘	not_started	0	0	10	0
+4	e4	25	e4.n25	normal	fraction4	fraction	同じ分母の 分数・マスターの宝箱	not_started	0	0	10	0
+4	e4	26	e4.n26	normal	area4	area	面積を もとめよう・はじめの一歩	not_started	0	0	10	0
+4	e4	27	e4.n27	normal	area4	area	面積を もとめよう・れんしゅうの道	not_started	0	0	10	0
+4	e4	28	e4.n28	normal	area4	area	面積を もとめよう・ひらめきの門	not_started	0	0	10	0
+4	e4	29	e4.n29	normal	area4	area	面積を もとめよう・チャレンジの丘	not_started	0	0	10	0
+4	e4	30	e4.n30	normal	area4	area	面積を もとめよう・マスターの宝箱	not_started	0	0	10	0
+4	e4	31	e4.n31	normal	angle4	angle	角度と 分度器・はじめの一歩	not_started	0	0	10	0
+4	e4	32	e4.n32	normal	angle4	angle	角度と 分度器・れんしゅうの道	not_started	0	0	10	0
+4	e4	33	e4.n33	normal	angle4	angle	角度と 分度器・ひらめきの門	not_started	0	0	10	0
+4	e4	34	e4.n34	normal	angle4	angle	角度と 分度器・チャレンジの丘	not_started	0	0	10	0
+4	e4	35	e4.n35	normal	angle4	angle	角度と 分度器・マスターの宝箱	not_started	0	0	10	0
+4	e4	36	e4.n36	normal	solid4	geometry	立方体と 直方体・はじめの一歩	not_started	0	0	10	0
+4	e4	37	e4.n37	normal	solid4	geometry	立方体と 直方体・れんしゅうの道	not_started	0	0	10	0
+4	e4	38	e4.n38	normal	solid4	geometry	立方体と 直方体・ひらめきの門	not_started	0	0	10	0
+4	e4	39	e4.n39	normal	solid4	geometry	立方体と 直方体・チャレンジの丘	not_started	0	0	10	0
+4	e4	40	e4.n40	normal	solid4	geometry	立方体と 直方体・マスターの宝箱	not_started	0	0	10	0
+4	e4	41	e4.n41	normal	chart4	data	折れ線グラフ・はじめの一歩	not_started	0	0	10	0
+4	e4	42	e4.n42	normal	chart4	data	折れ線グラフ・れんしゅうの道	not_started	0	0	10	0
+4	e4	43	e4.n43	normal	chart4	data	折れ線グラフ・ひらめきの門	not_started	0	0	10	0
+4	e4	44	e4.n44	normal	chart4	data	折れ線グラフ・チャレンジの丘	not_started	0	0	10	0
+4	e4	45	e4.n45	normal	chart4	data	折れ線グラフ・マスターの宝箱	not_started	0	0	10	0
+4	e4	46	e4.n46	normal	patterns4	pattern	変わり方を しらべよう・はじめの一歩	not_started	0	0	10	0
+4	e4	47	e4.n47	normal	patterns4	pattern	変わり方を しらべよう・れんしゅうの道	not_started	0	0	10	0
+4	e4	48	e4.n48	normal	patterns4	pattern	変わり方を しらべよう・ひらめきの門	not_started	0	0	10	0
+4	e4	49	e4.n49	normal	patterns4	pattern	変わり方を しらべよう・チャレンジの丘	not_started	0	0	10	0
+4	e4	50	e4.n50	normal	patterns4	pattern	変わり方を しらべよう・マスターの宝箱	not_started	0	0	10	0
+4	e4	51	e4.x01	extra	large4	place	EX・大きな数と しくみ	not_started	0	0	10	0
+4	e4	52	e4.x02	extra	expressions4	operation	EX・計算の きまり	not_started	0	0	10	0
+4	e4	53	e4.x03	extra	division4	division	EX・2けたで わる計算	not_started	0	0	10	0
+4	e4	54	e4.x04	extra	decimal4	decimal	EX・小数の たし算・ひき算	not_started	0	0	10	0
+4	e4	55	e4.x05	extra	fraction4	fraction	EX・同じ分母の 分数	not_started	0	0	10	0
+4	e4	56	e4.x06	extra	area4	area	EX・面積を もとめよう	not_started	0	0	10	0
+4	e4	57	e4.x07	extra	angle4	angle	EX・角度と 分度器	not_started	0	0	10	0
+4	e4	58	e4.x08	extra	solid4	geometry	EX・立方体と 直方体	not_started	0	0	10	0
+4	e4	59	e4.x09	extra	chart4	data	EX・折れ線グラフ	not_started	0	0	10	0
+4	e4	60	e4.x10	extra	patterns4	pattern	EX・変わり方を しらべよう	not_started	0	0	10	0
+4	e4	61	e4.s01	secret	large4	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+4	e4	62	e4.s02	secret	expressions4	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+4	e4	63	e4.s03	secret	division4	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+4	e4	64	e4.s04	secret	decimal4	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+4	e4	65	e4.s05	secret	fraction4	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
+5	e5	1	e5.n01	normal	decimalmult5	decimal	小数の かけ算・わり算・はじめの一歩	not_started	0	0	10	0
+5	e5	2	e5.n02	normal	decimalmult5	decimal	小数の かけ算・わり算・れんしゅうの道	not_started	0	0	10	0
+5	e5	3	e5.n03	normal	decimalmult5	decimal	小数の かけ算・わり算・ひらめきの門	not_started	0	0	10	0
+5	e5	4	e5.n04	normal	decimalmult5	decimal	小数の かけ算・わり算・チャレンジの丘	not_started	0	0	10	0
+5	e5	5	e5.n05	normal	decimalmult5	decimal	小数の かけ算・わり算・マスターの宝箱	not_started	0	0	10	0
+5	e5	6	e5.n06	normal	fractionadd5	fraction	異なる分母の 分数・はじめの一歩	not_started	0	0	10	0
+5	e5	7	e5.n07	normal	fractionadd5	fraction	異なる分母の 分数・れんしゅうの道	not_started	0	0	10	0
+5	e5	8	e5.n08	normal	fractionadd5	fraction	異なる分母の 分数・ひらめきの門	not_started	0	0	10	0
+5	e5	9	e5.n09	normal	fractionadd5	fraction	異なる分母の 分数・チャレンジの丘	not_started	0	0	10	0
+5	e5	10	e5.n10	normal	fractionadd5	fraction	異なる分母の 分数・マスターの宝箱	not_started	0	0	10	0
+5	e5	11	e5.n11	normal	integers5	divisor	倍数・約数と 偶数奇数・はじめの一歩	not_started	0	0	10	0
+5	e5	12	e5.n12	normal	integers5	divisor	倍数・約数と 偶数奇数・れんしゅうの道	not_started	0	0	10	0
+5	e5	13	e5.n13	normal	integers5	divisor	倍数・約数と 偶数奇数・ひらめきの門	not_started	0	0	10	0
+5	e5	14	e5.n14	normal	integers5	divisor	倍数・約数と 偶数奇数・チャレンジの丘	not_started	0	0	10	0
+5	e5	15	e5.n15	normal	integers5	divisor	倍数・約数と 偶数奇数・マスターの宝箱	not_started	0	0	10	0
+5	e5	16	e5.n16	normal	percent5	percent	割合と 百分率・はじめの一歩	not_started	0	0	10	0
+5	e5	17	e5.n17	normal	percent5	percent	割合と 百分率・れんしゅうの道	not_started	0	0	10	0
+5	e5	18	e5.n18	normal	percent5	percent	割合と 百分率・ひらめきの門	not_started	0	0	10	0
+5	e5	19	e5.n19	normal	percent5	percent	割合と 百分率・チャレンジの丘	not_started	0	0	10	0
+5	e5	20	e5.n20	normal	percent5	percent	割合と 百分率・マスターの宝箱	not_started	0	0	10	0
+5	e5	21	e5.n21	normal	proportion5	ratio	比例の 考え・はじめの一歩	not_started	0	0	10	0
+5	e5	22	e5.n22	normal	proportion5	ratio	比例の 考え・れんしゅうの道	not_started	0	0	10	0
+5	e5	23	e5.n23	normal	proportion5	ratio	比例の 考え・ひらめきの門	not_started	0	0	10	0
+5	e5	24	e5.n24	normal	proportion5	ratio	比例の 考え・チャレンジの丘	not_started	0	0	10	0
+5	e5	25	e5.n25	normal	proportion5	ratio	比例の 考え・マスターの宝箱	not_started	0	0	10	0
+5	e5	26	e5.n26	normal	area5	area	三角形・平行四辺形の 面積・はじめの一歩	not_started	0	0	10	0
+5	e5	27	e5.n27	normal	area5	area	三角形・平行四辺形の 面積・れんしゅうの道	not_started	0	0	10	0
+5	e5	28	e5.n28	normal	area5	area	三角形・平行四辺形の 面積・ひらめきの門	not_started	0	0	10	0
+5	e5	29	e5.n29	normal	area5	area	三角形・平行四辺形の 面積・チャレンジの丘	not_started	0	0	10	0
+5	e5	30	e5.n30	normal	area5	area	三角形・平行四辺形の 面積・マスターの宝箱	not_started	0	0	10	0
+5	e5	31	e5.n31	normal	volume5	volume	直方体と 体積・はじめの一歩	not_started	0	0	10	0
+5	e5	32	e5.n32	normal	volume5	volume	直方体と 体積・れんしゅうの道	not_started	0	0	10	0
+5	e5	33	e5.n33	normal	volume5	volume	直方体と 体積・ひらめきの門	not_started	0	0	10	0
+5	e5	34	e5.n34	normal	volume5	volume	直方体と 体積・チャレンジの丘	not_started	0	0	10	0
+5	e5	35	e5.n35	normal	volume5	volume	直方体と 体積・マスターの宝箱	not_started	0	0	10	0
+5	e5	36	e5.n36	normal	average5	average	平均と 単位量・はじめの一歩	not_started	0	0	10	0
+5	e5	37	e5.n37	normal	average5	average	平均と 単位量・れんしゅうの道	not_started	0	0	10	0
+5	e5	38	e5.n38	normal	average5	average	平均と 単位量・ひらめきの門	not_started	0	0	10	0
+5	e5	39	e5.n39	normal	average5	average	平均と 単位量・チャレンジの丘	not_started	0	0	10	0
+5	e5	40	e5.n40	normal	average5	average	平均と 単位量・マスターの宝箱	not_started	0	0	10	0
+5	e5	41	e5.n41	normal	circle5	circle	円周と 円周率・はじめの一歩	not_started	0	0	10	0
+5	e5	42	e5.n42	normal	circle5	circle	円周と 円周率・れんしゅうの道	not_started	0	0	10	0
+5	e5	43	e5.n43	normal	circle5	circle	円周と 円周率・ひらめきの門	not_started	0	0	10	0
+5	e5	44	e5.n44	normal	circle5	circle	円周と 円周率・チャレンジの丘	not_started	0	0	10	0
+5	e5	45	e5.n45	normal	circle5	circle	円周と 円周率・マスターの宝箱	not_started	0	0	10	0
+5	e5	46	e5.n46	normal	congruence5	geometry	合同な図形と 多角形・はじめの一歩	not_started	0	0	10	0
+5	e5	47	e5.n47	normal	congruence5	geometry	合同な図形と 多角形・れんしゅうの道	not_started	0	0	10	0
+5	e5	48	e5.n48	normal	congruence5	geometry	合同な図形と 多角形・ひらめきの門	not_started	0	0	10	0
+5	e5	49	e5.n49	normal	congruence5	geometry	合同な図形と 多角形・チャレンジの丘	not_started	0	0	10	0
+5	e5	50	e5.n50	normal	congruence5	geometry	合同な図形と 多角形・マスターの宝箱	not_started	0	0	10	0
+5	e5	51	e5.x01	extra	decimalmult5	decimal	EX・小数の かけ算・わり算	not_started	0	0	10	0
+5	e5	52	e5.x02	extra	fractionadd5	fraction	EX・異なる分母の 分数	not_started	0	0	10	0
+5	e5	53	e5.x03	extra	integers5	divisor	EX・倍数・約数と 偶数奇数	not_started	0	0	10	0
+5	e5	54	e5.x04	extra	percent5	percent	EX・割合と 百分率	not_started	0	0	10	0
+5	e5	55	e5.x05	extra	proportion5	ratio	EX・比例の 考え	not_started	0	0	10	0
+5	e5	56	e5.x06	extra	area5	area	EX・三角形・平行四辺形の 面積	not_started	0	0	10	0
+5	e5	57	e5.x07	extra	volume5	volume	EX・直方体と 体積	not_started	0	0	10	0
+5	e5	58	e5.x08	extra	average5	average	EX・平均と 単位量	not_started	0	0	10	0
+5	e5	59	e5.x09	extra	circle5	circle	EX・円周と 円周率	not_started	0	0	10	0
+5	e5	60	e5.x10	extra	congruence5	geometry	EX・合同な図形と 多角形	not_started	0	0	10	0
+5	e5	61	e5.s01	secret	decimalmult5	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+5	e5	62	e5.s02	secret	fractionadd5	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+5	e5	63	e5.s03	secret	integers5	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+5	e5	64	e5.s04	secret	percent5	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+5	e5	65	e5.s05	secret	proportion5	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
+6	e6	1	e6.n01	normal	fractionmult6	fraction	分数の かけ算・わり算・はじめの一歩	not_started	0	0	10	0
+6	e6	2	e6.n02	normal	fractionmult6	fraction	分数の かけ算・わり算・れんしゅうの道	not_started	0	0	10	0
+6	e6	3	e6.n03	normal	fractionmult6	fraction	分数の かけ算・わり算・ひらめきの門	not_started	0	0	10	0
+6	e6	4	e6.n04	normal	fractionmult6	fraction	分数の かけ算・わり算・チャレンジの丘	not_started	0	0	10	0
+6	e6	5	e6.n05	normal	fractionmult6	fraction	分数の かけ算・わり算・マスターの宝箱	not_started	0	0	10	0
+6	e6	6	e6.n06	normal	letters6	equation	文字を 使った 式・はじめの一歩	not_started	0	0	10	0
+6	e6	7	e6.n07	normal	letters6	equation	文字を 使った 式・れんしゅうの道	not_started	0	0	10	0
+6	e6	8	e6.n08	normal	letters6	equation	文字を 使った 式・ひらめきの門	not_started	0	0	10	0
+6	e6	9	e6.n09	normal	letters6	equation	文字を 使った 式・チャレンジの丘	not_started	0	0	10	0
+6	e6	10	e6.n10	normal	letters6	equation	文字を 使った 式・マスターの宝箱	not_started	0	0	10	0
+6	e6	11	e6.n11	normal	ratio6	ratio	比と 比の値・はじめの一歩	not_started	0	0	10	0
+6	e6	12	e6.n12	normal	ratio6	ratio	比と 比の値・れんしゅうの道	not_started	0	0	10	0
+6	e6	13	e6.n13	normal	ratio6	ratio	比と 比の値・ひらめきの門	not_started	0	0	10	0
+6	e6	14	e6.n14	normal	ratio6	ratio	比と 比の値・チャレンジの丘	not_started	0	0	10	0
+6	e6	15	e6.n15	normal	ratio6	ratio	比と 比の値・マスターの宝箱	not_started	0	0	10	0
+6	e6	16	e6.n16	normal	functions6	function	比例と 反比例・はじめの一歩	not_started	0	0	10	0
+6	e6	17	e6.n17	normal	functions6	function	比例と 反比例・れんしゅうの道	not_started	0	0	10	0
+6	e6	18	e6.n18	normal	functions6	function	比例と 反比例・ひらめきの門	not_started	0	0	10	0
+6	e6	19	e6.n19	normal	functions6	function	比例と 反比例・チャレンジの丘	not_started	0	0	10	0
+6	e6	20	e6.n20	normal	functions6	function	比例と 反比例・マスターの宝箱	not_started	0	0	10	0
+6	e6	21	e6.n21	normal	scale6	geometry	拡大図と 縮図・はじめの一歩	not_started	0	0	10	0
+6	e6	22	e6.n22	normal	scale6	geometry	拡大図と 縮図・れんしゅうの道	not_started	0	0	10	0
+6	e6	23	e6.n23	normal	scale6	geometry	拡大図と 縮図・ひらめきの門	not_started	0	0	10	0
+6	e6	24	e6.n24	normal	scale6	geometry	拡大図と 縮図・チャレンジの丘	not_started	0	0	10	0
+6	e6	25	e6.n25	normal	scale6	geometry	拡大図と 縮図・マスターの宝箱	not_started	0	0	10	0
+6	e6	26	e6.n26	normal	symmetry6	shape	線対称と 点対称・はじめの一歩	not_started	0	0	10	0
+6	e6	27	e6.n27	normal	symmetry6	shape	線対称と 点対称・れんしゅうの道	not_started	0	0	10	0
+6	e6	28	e6.n28	normal	symmetry6	shape	線対称と 点対称・ひらめきの門	not_started	0	0	10	0
+6	e6	29	e6.n29	normal	symmetry6	shape	線対称と 点対称・チャレンジの丘	not_started	0	0	10	0
+6	e6	30	e6.n30	normal	symmetry6	shape	線対称と 点対称・マスターの宝箱	not_started	0	0	10	0
+6	e6	31	e6.n31	normal	circlearea6	circle	円の 面積・はじめの一歩	not_started	0	0	10	0
+6	e6	32	e6.n32	normal	circlearea6	circle	円の 面積・れんしゅうの道	not_started	0	0	10	0
+6	e6	33	e6.n33	normal	circlearea6	circle	円の 面積・ひらめきの門	not_started	0	0	10	0
+6	e6	34	e6.n34	normal	circlearea6	circle	円の 面積・チャレンジの丘	not_started	0	0	10	0
+6	e6	35	e6.n35	normal	circlearea6	circle	円の 面積・マスターの宝箱	not_started	0	0	10	0
+6	e6	36	e6.n36	normal	prism6	volume	角柱と 円柱の 体積・はじめの一歩	not_started	0	0	10	0
+6	e6	37	e6.n37	normal	prism6	volume	角柱と 円柱の 体積・れんしゅうの道	not_started	0	0	10	0
+6	e6	38	e6.n38	normal	prism6	volume	角柱と 円柱の 体積・ひらめきの門	not_started	0	0	10	0
+6	e6	39	e6.n39	normal	prism6	volume	角柱と 円柱の 体積・チャレンジの丘	not_started	0	0	10	0
+6	e6	40	e6.n40	normal	prism6	volume	角柱と 円柱の 体積・マスターの宝箱	not_started	0	0	10	0
+6	e6	41	e6.n41	normal	data6	data	データと 度数分布・はじめの一歩	not_started	0	0	10	0
+6	e6	42	e6.n42	normal	data6	data	データと 度数分布・れんしゅうの道	not_started	0	0	10	0
+6	e6	43	e6.n43	normal	data6	data	データと 度数分布・ひらめきの門	not_started	0	0	10	0
+6	e6	44	e6.n44	normal	data6	data	データと 度数分布・チャレンジの丘	not_started	0	0	10	0
+6	e6	45	e6.n45	normal	data6	data	データと 度数分布・マスターの宝箱	not_started	0	0	10	0
+6	e6	46	e6.n46	normal	speed6	speed	速さと まとめ・はじめの一歩	not_started	0	0	10	0
+6	e6	47	e6.n47	normal	speed6	speed	速さと まとめ・れんしゅうの道	not_started	0	0	10	0
+6	e6	48	e6.n48	normal	speed6	speed	速さと まとめ・ひらめきの門	not_started	0	0	10	0
+6	e6	49	e6.n49	normal	speed6	speed	速さと まとめ・チャレンジの丘	not_started	0	0	10	0
+6	e6	50	e6.n50	normal	speed6	speed	速さと まとめ・マスターの宝箱	not_started	0	0	10	0
+6	e6	51	e6.x01	extra	fractionmult6	fraction	EX・分数の かけ算・わり算	not_started	0	0	10	0
+6	e6	52	e6.x02	extra	letters6	equation	EX・文字を 使った 式	not_started	0	0	10	0
+6	e6	53	e6.x03	extra	ratio6	ratio	EX・比と 比の値	not_started	0	0	10	0
+6	e6	54	e6.x04	extra	functions6	function	EX・比例と 反比例	not_started	0	0	10	0
+6	e6	55	e6.x05	extra	scale6	geometry	EX・拡大図と 縮図	not_started	0	0	10	0
+6	e6	56	e6.x06	extra	symmetry6	shape	EX・線対称と 点対称	not_started	0	0	10	0
+6	e6	57	e6.x07	extra	circlearea6	circle	EX・円の 面積	not_started	0	0	10	0
+6	e6	58	e6.x08	extra	prism6	volume	EX・角柱と 円柱の 体積	not_started	0	0	10	0
+6	e6	59	e6.x09	extra	data6	data	EX・データと 度数分布	not_started	0	0	10	0
+6	e6	60	e6.x10	extra	speed6	speed	EX・速さと まとめ	not_started	0	0	10	0
+6	e6	61	e6.s01	secret	fractionmult6	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+6	e6	62	e6.s02	secret	letters6	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+6	e6	63	e6.s03	secret	ratio6	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+6	e6	64	e6.s04	secret	functions6	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+6	e6	65	e6.s05	secret	scale6	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
+7	j1	1	j1.n01	normal	signed1	signed	正の数・負の数・はじめの一歩	not_started	0	0	10	0
+7	j1	2	j1.n02	normal	signed1	signed	正の数・負の数・れんしゅうの道	not_started	0	0	10	0
+7	j1	3	j1.n03	normal	signed1	signed	正の数・負の数・ひらめきの門	not_started	0	0	10	0
+7	j1	4	j1.n04	normal	signed1	signed	正の数・負の数・チャレンジの丘	not_started	0	0	10	0
+7	j1	5	j1.n05	normal	signed1	signed	正の数・負の数・マスターの宝箱	not_started	0	0	10	0
+7	j1	6	j1.n06	normal	expressions1	expression	文字式の 計算・はじめの一歩	not_started	0	0	10	0
+7	j1	7	j1.n07	normal	expressions1	expression	文字式の 計算・れんしゅうの道	not_started	0	0	10	0
+7	j1	8	j1.n08	normal	expressions1	expression	文字式の 計算・ひらめきの門	not_started	0	0	10	0
+7	j1	9	j1.n09	normal	expressions1	expression	文字式の 計算・チャレンジの丘	not_started	0	0	10	0
+7	j1	10	j1.n10	normal	expressions1	expression	文字式の 計算・マスターの宝箱	not_started	0	0	10	0
+7	j1	11	j1.n11	normal	equation1	equation	一次方程式・はじめの一歩	not_started	0	0	10	0
+7	j1	12	j1.n12	normal	equation1	equation	一次方程式・れんしゅうの道	not_started	0	0	10	0
+7	j1	13	j1.n13	normal	equation1	equation	一次方程式・ひらめきの門	not_started	0	0	10	0
+7	j1	14	j1.n14	normal	equation1	equation	一次方程式・チャレンジの丘	not_started	0	0	10	0
+7	j1	15	j1.n15	normal	equation1	equation	一次方程式・マスターの宝箱	not_started	0	0	10	0
+7	j1	16	j1.n16	normal	ratiofunction1	function	比例・反比例・はじめの一歩	not_started	0	0	10	0
+7	j1	17	j1.n17	normal	ratiofunction1	function	比例・反比例・れんしゅうの道	not_started	0	0	10	0
+7	j1	18	j1.n18	normal	ratiofunction1	function	比例・反比例・ひらめきの門	not_started	0	0	10	0
+7	j1	19	j1.n19	normal	ratiofunction1	function	比例・反比例・チャレンジの丘	not_started	0	0	10	0
+7	j1	20	j1.n20	normal	ratiofunction1	function	比例・反比例・マスターの宝箱	not_started	0	0	10	0
+7	j1	21	j1.n21	normal	coordinates1	function	座標と グラフ・はじめの一歩	not_started	0	0	10	0
+7	j1	22	j1.n22	normal	coordinates1	function	座標と グラフ・れんしゅうの道	not_started	0	0	10	0
+7	j1	23	j1.n23	normal	coordinates1	function	座標と グラフ・ひらめきの門	not_started	0	0	10	0
+7	j1	24	j1.n24	normal	coordinates1	function	座標と グラフ・チャレンジの丘	not_started	0	0	10	0
+7	j1	25	j1.n25	normal	coordinates1	function	座標と グラフ・マスターの宝箱	not_started	0	0	10	0
+7	j1	26	j1.n26	normal	plane1	geometry	平面図形と 作図・はじめの一歩	not_started	0	0	10	0
+7	j1	27	j1.n27	normal	plane1	geometry	平面図形と 作図・れんしゅうの道	not_started	0	0	10	0
+7	j1	28	j1.n28	normal	plane1	geometry	平面図形と 作図・ひらめきの門	not_started	0	0	10	0
+7	j1	29	j1.n29	normal	plane1	geometry	平面図形と 作図・チャレンジの丘	not_started	0	0	10	0
+7	j1	30	j1.n30	normal	plane1	geometry	平面図形と 作図・マスターの宝箱	not_started	0	0	10	0
+7	j1	31	j1.n31	normal	space1	volume	空間図形と 体積・はじめの一歩	not_started	0	0	10	0
+7	j1	32	j1.n32	normal	space1	volume	空間図形と 体積・れんしゅうの道	not_started	0	0	10	0
+7	j1	33	j1.n33	normal	space1	volume	空間図形と 体積・ひらめきの門	not_started	0	0	10	0
+7	j1	34	j1.n34	normal	space1	volume	空間図形と 体積・チャレンジの丘	not_started	0	0	10	0
+7	j1	35	j1.n35	normal	space1	volume	空間図形と 体積・マスターの宝箱	not_started	0	0	10	0
+7	j1	36	j1.n36	normal	dataj1	data	資料の 整理と 代表値・はじめの一歩	not_started	0	0	10	0
+7	j1	37	j1.n37	normal	dataj1	data	資料の 整理と 代表値・れんしゅうの道	not_started	0	0	10	0
+7	j1	38	j1.n38	normal	dataj1	data	資料の 整理と 代表値・ひらめきの門	not_started	0	0	10	0
+7	j1	39	j1.n39	normal	dataj1	data	資料の 整理と 代表値・チャレンジの丘	not_started	0	0	10	0
+7	j1	40	j1.n40	normal	dataj1	data	資料の 整理と 代表値・マスターの宝箱	not_started	0	0	10	0
+7	j1	41	j1.n41	normal	primej1	divisor	素数・約数・倍数・はじめの一歩	not_started	0	0	10	0
+7	j1	42	j1.n42	normal	primej1	divisor	素数・約数・倍数・れんしゅうの道	not_started	0	0	10	0
+7	j1	43	j1.n43	normal	primej1	divisor	素数・約数・倍数・ひらめきの門	not_started	0	0	10	0
+7	j1	44	j1.n44	normal	primej1	divisor	素数・約数・倍数・チャレンジの丘	not_started	0	0	10	0
+7	j1	45	j1.n45	normal	primej1	divisor	素数・約数・倍数・マスターの宝箱	not_started	0	0	10	0
+7	j1	46	j1.n46	normal	wordj1	equation	方程式の 利用・はじめの一歩	not_started	0	0	10	0
+7	j1	47	j1.n47	normal	wordj1	equation	方程式の 利用・れんしゅうの道	not_started	0	0	10	0
+7	j1	48	j1.n48	normal	wordj1	equation	方程式の 利用・ひらめきの門	not_started	0	0	10	0
+7	j1	49	j1.n49	normal	wordj1	equation	方程式の 利用・チャレンジの丘	not_started	0	0	10	0
+7	j1	50	j1.n50	normal	wordj1	equation	方程式の 利用・マスターの宝箱	not_started	0	0	10	0
+7	j1	51	j1.x01	extra	signed1	signed	EX・正の数・負の数	not_started	0	0	10	0
+7	j1	52	j1.x02	extra	expressions1	expression	EX・文字式の 計算	not_started	0	0	10	0
+7	j1	53	j1.x03	extra	equation1	equation	EX・一次方程式	not_started	0	0	10	0
+7	j1	54	j1.x04	extra	ratiofunction1	function	EX・比例・反比例	not_started	0	0	10	0
+7	j1	55	j1.x05	extra	coordinates1	function	EX・座標と グラフ	not_started	0	0	10	0
+7	j1	56	j1.x06	extra	plane1	geometry	EX・平面図形と 作図	not_started	0	0	10	0
+7	j1	57	j1.x07	extra	space1	volume	EX・空間図形と 体積	not_started	0	0	10	0
+7	j1	58	j1.x08	extra	dataj1	data	EX・資料の 整理と 代表値	not_started	0	0	10	0
+7	j1	59	j1.x09	extra	primej1	divisor	EX・素数・約数・倍数	not_started	0	0	10	0
+7	j1	60	j1.x10	extra	wordj1	equation	EX・方程式の 利用	not_started	0	0	10	0
+7	j1	61	j1.s01	secret	signed1	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+7	j1	62	j1.s02	secret	expressions1	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+7	j1	63	j1.s03	secret	equation1	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+7	j1	64	j1.s04	secret	ratiofunction1	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+7	j1	65	j1.s05	secret	coordinates1	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
+8	j2	1	j2.n01	normal	polynomial2	expression	式の 計算・はじめの一歩	not_started	0	0	10	0
+8	j2	2	j2.n02	normal	polynomial2	expression	式の 計算・れんしゅうの道	not_started	0	0	10	0
+8	j2	3	j2.n03	normal	polynomial2	expression	式の 計算・ひらめきの門	not_started	0	0	10	0
+8	j2	4	j2.n04	normal	polynomial2	expression	式の 計算・チャレンジの丘	not_started	0	0	10	0
+8	j2	5	j2.n05	normal	polynomial2	expression	式の 計算・マスターの宝箱	not_started	0	0	10	0
+8	j2	6	j2.n06	normal	systems2	system	連立方程式・はじめの一歩	not_started	0	0	10	0
+8	j2	7	j2.n07	normal	systems2	system	連立方程式・れんしゅうの道	not_started	0	0	10	0
+8	j2	8	j2.n08	normal	systems2	system	連立方程式・ひらめきの門	not_started	0	0	10	0
+8	j2	9	j2.n09	normal	systems2	system	連立方程式・チャレンジの丘	not_started	0	0	10	0
+8	j2	10	j2.n10	normal	systems2	system	連立方程式・マスターの宝箱	not_started	0	0	10	0
+8	j2	11	j2.n11	normal	linearfunction2	function	一次関数・はじめの一歩	not_started	0	0	10	0
+8	j2	12	j2.n12	normal	linearfunction2	function	一次関数・れんしゅうの道	not_started	0	0	10	0
+8	j2	13	j2.n13	normal	linearfunction2	function	一次関数・ひらめきの門	not_started	0	0	10	0
+8	j2	14	j2.n14	normal	linearfunction2	function	一次関数・チャレンジの丘	not_started	0	0	10	0
+8	j2	15	j2.n15	normal	linearfunction2	function	一次関数・マスターの宝箱	not_started	0	0	10	0
+8	j2	16	j2.n16	normal	triangle2	proof	三角形の 合同・はじめの一歩	not_started	0	0	10	0
+8	j2	17	j2.n17	normal	triangle2	proof	三角形の 合同・れんしゅうの道	not_started	0	0	10	0
+8	j2	18	j2.n18	normal	triangle2	proof	三角形の 合同・ひらめきの門	not_started	0	0	10	0
+8	j2	19	j2.n19	normal	triangle2	proof	三角形の 合同・チャレンジの丘	not_started	0	0	10	0
+8	j2	20	j2.n20	normal	triangle2	proof	三角形の 合同・マスターの宝箱	not_started	0	0	10	0
+8	j2	21	j2.n21	normal	quadrilateral2	geometry	平行四辺形の 性質・はじめの一歩	not_started	0	0	10	0
+8	j2	22	j2.n22	normal	quadrilateral2	geometry	平行四辺形の 性質・れんしゅうの道	not_started	0	0	10	0
+8	j2	23	j2.n23	normal	quadrilateral2	geometry	平行四辺形の 性質・ひらめきの門	not_started	0	0	10	0
+8	j2	24	j2.n24	normal	quadrilateral2	geometry	平行四辺形の 性質・チャレンジの丘	not_started	0	0	10	0
+8	j2	25	j2.n25	normal	quadrilateral2	geometry	平行四辺形の 性質・マスターの宝箱	not_started	0	0	10	0
+8	j2	26	j2.n26	normal	probability2	probability	確率・はじめの一歩	not_started	0	0	10	0
+8	j2	27	j2.n27	normal	probability2	probability	確率・れんしゅうの道	not_started	0	0	10	0
+8	j2	28	j2.n28	normal	probability2	probability	確率・ひらめきの門	not_started	0	0	10	0
+8	j2	29	j2.n29	normal	probability2	probability	確率・チャレンジの丘	not_started	0	0	10	0
+8	j2	30	j2.n30	normal	probability2	probability	確率・マスターの宝箱	not_started	0	0	10	0
+8	j2	31	j2.n31	normal	boxplot2	data	箱ひげ図と 四分位数・はじめの一歩	not_started	0	0	10	0
+8	j2	32	j2.n32	normal	boxplot2	data	箱ひげ図と 四分位数・れんしゅうの道	not_started	0	0	10	0
+8	j2	33	j2.n33	normal	boxplot2	data	箱ひげ図と 四分位数・ひらめきの門	not_started	0	0	10	0
+8	j2	34	j2.n34	normal	boxplot2	data	箱ひげ図と 四分位数・チャレンジの丘	not_started	0	0	10	0
+8	j2	35	j2.n35	normal	boxplot2	data	箱ひげ図と 四分位数・マスターの宝箱	not_started	0	0	10	0
+8	j2	36	j2.n36	normal	angles2	angle	多角形と 角・はじめの一歩	not_started	0	0	10	0
+8	j2	37	j2.n37	normal	angles2	angle	多角形と 角・れんしゅうの道	not_started	0	0	10	0
+8	j2	38	j2.n38	normal	angles2	angle	多角形と 角・ひらめきの門	not_started	0	0	10	0
+8	j2	39	j2.n39	normal	angles2	angle	多角形と 角・チャレンジの丘	not_started	0	0	10	0
+8	j2	40	j2.n40	normal	angles2	angle	多角形と 角・マスターの宝箱	not_started	0	0	10	0
+8	j2	41	j2.n41	normal	proof2	proof	図形の 証明・はじめの一歩	not_started	0	0	10	0
+8	j2	42	j2.n42	normal	proof2	proof	図形の 証明・れんしゅうの道	not_started	0	0	10	0
+8	j2	43	j2.n43	normal	proof2	proof	図形の 証明・ひらめきの門	not_started	0	0	10	0
+8	j2	44	j2.n44	normal	proof2	proof	図形の 証明・チャレンジの丘	not_started	0	0	10	0
+8	j2	45	j2.n45	normal	proof2	proof	図形の 証明・マスターの宝箱	not_started	0	0	10	0
+8	j2	46	j2.n46	normal	wordj2	system	連立方程式の 利用・はじめの一歩	not_started	0	0	10	0
+8	j2	47	j2.n47	normal	wordj2	system	連立方程式の 利用・れんしゅうの道	not_started	0	0	10	0
+8	j2	48	j2.n48	normal	wordj2	system	連立方程式の 利用・ひらめきの門	not_started	0	0	10	0
+8	j2	49	j2.n49	normal	wordj2	system	連立方程式の 利用・チャレンジの丘	not_started	0	0	10	0
+8	j2	50	j2.n50	normal	wordj2	system	連立方程式の 利用・マスターの宝箱	not_started	0	0	10	0
+8	j2	51	j2.x01	extra	polynomial2	expression	EX・式の 計算	not_started	0	0	10	0
+8	j2	52	j2.x02	extra	systems2	system	EX・連立方程式	not_started	0	0	10	0
+8	j2	53	j2.x03	extra	linearfunction2	function	EX・一次関数	not_started	0	0	10	0
+8	j2	54	j2.x04	extra	triangle2	proof	EX・三角形の 合同	not_started	0	0	10	0
+8	j2	55	j2.x05	extra	quadrilateral2	geometry	EX・平行四辺形の 性質	not_started	0	0	10	0
+8	j2	56	j2.x06	extra	probability2	probability	EX・確率	not_started	0	0	10	0
+8	j2	57	j2.x07	extra	boxplot2	data	EX・箱ひげ図と 四分位数	not_started	0	0	10	0
+8	j2	58	j2.x08	extra	angles2	angle	EX・多角形と 角	not_started	0	0	10	0
+8	j2	59	j2.x09	extra	proof2	proof	EX・図形の 証明	not_started	0	0	10	0
+8	j2	60	j2.x10	extra	wordj2	system	EX・連立方程式の 利用	not_started	0	0	10	0
+8	j2	61	j2.s01	secret	polynomial2	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+8	j2	62	j2.s02	secret	systems2	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+8	j2	63	j2.s03	secret	linearfunction2	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+8	j2	64	j2.s04	secret	triangle2	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+8	j2	65	j2.s05	secret	quadrilateral2	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
+9	j3	1	j3.n01	normal	factor3	factor	展開と 因数分解・はじめの一歩	not_started	0	0	10	0
+9	j3	2	j3.n02	normal	factor3	factor	展開と 因数分解・れんしゅうの道	not_started	0	0	10	0
+9	j3	3	j3.n03	normal	factor3	factor	展開と 因数分解・ひらめきの門	not_started	0	0	10	0
+9	j3	4	j3.n04	normal	factor3	factor	展開と 因数分解・チャレンジの丘	not_started	0	0	10	0
+9	j3	5	j3.n05	normal	factor3	factor	展開と 因数分解・マスターの宝箱	not_started	0	0	10	0
+9	j3	6	j3.n06	normal	radical3	radical	平方根・はじめの一歩	not_started	0	0	10	0
+9	j3	7	j3.n07	normal	radical3	radical	平方根・れんしゅうの道	not_started	0	0	10	0
+9	j3	8	j3.n08	normal	radical3	radical	平方根・ひらめきの門	not_started	0	0	10	0
+9	j3	9	j3.n09	normal	radical3	radical	平方根・チャレンジの丘	not_started	0	0	10	0
+9	j3	10	j3.n10	normal	radical3	radical	平方根・マスターの宝箱	not_started	0	0	10	0
+9	j3	11	j3.n11	normal	quadratic3	quadratic	二次方程式・はじめの一歩	not_started	0	0	10	0
+9	j3	12	j3.n12	normal	quadratic3	quadratic	二次方程式・れんしゅうの道	not_started	0	0	10	0
+9	j3	13	j3.n13	normal	quadratic3	quadratic	二次方程式・ひらめきの門	not_started	0	0	10	0
+9	j3	14	j3.n14	normal	quadratic3	quadratic	二次方程式・チャレンジの丘	not_started	0	0	10	0
+9	j3	15	j3.n15	normal	quadratic3	quadratic	二次方程式・マスターの宝箱	not_started	0	0	10	0
+9	j3	16	j3.n16	normal	parabola3	quadraticFunction	二次関数・はじめの一歩	not_started	0	0	10	0
+9	j3	17	j3.n17	normal	parabola3	quadraticFunction	二次関数・れんしゅうの道	not_started	0	0	10	0
+9	j3	18	j3.n18	normal	parabola3	quadraticFunction	二次関数・ひらめきの門	not_started	0	0	10	0
+9	j3	19	j3.n19	normal	parabola3	quadraticFunction	二次関数・チャレンジの丘	not_started	0	0	10	0
+9	j3	20	j3.n20	normal	parabola3	quadraticFunction	二次関数・マスターの宝箱	not_started	0	0	10	0
+9	j3	21	j3.n21	normal	similar3	geometry	相似な図形・はじめの一歩	not_started	0	0	10	0
+9	j3	22	j3.n22	normal	similar3	geometry	相似な図形・れんしゅうの道	not_started	0	0	10	0
+9	j3	23	j3.n23	normal	similar3	geometry	相似な図形・ひらめきの門	not_started	0	0	10	0
+9	j3	24	j3.n24	normal	similar3	geometry	相似な図形・チャレンジの丘	not_started	0	0	10	0
+9	j3	25	j3.n25	normal	similar3	geometry	相似な図形・マスターの宝箱	not_started	0	0	10	0
+9	j3	26	j3.n26	normal	circleangle3	angle	円周角の 定理・はじめの一歩	not_started	0	0	10	0
+9	j3	27	j3.n27	normal	circleangle3	angle	円周角の 定理・れんしゅうの道	not_started	0	0	10	0
+9	j3	28	j3.n28	normal	circleangle3	angle	円周角の 定理・ひらめきの門	not_started	0	0	10	0
+9	j3	29	j3.n29	normal	circleangle3	angle	円周角の 定理・チャレンジの丘	not_started	0	0	10	0
+9	j3	30	j3.n30	normal	circleangle3	angle	円周角の 定理・マスターの宝箱	not_started	0	0	10	0
+9	j3	31	j3.n31	normal	pythagoras3	pythagoras	三平方の 定理・はじめの一歩	not_started	0	0	10	0
+9	j3	32	j3.n32	normal	pythagoras3	pythagoras	三平方の 定理・れんしゅうの道	not_started	0	0	10	0
+9	j3	33	j3.n33	normal	pythagoras3	pythagoras	三平方の 定理・ひらめきの門	not_started	0	0	10	0
+9	j3	34	j3.n34	normal	pythagoras3	pythagoras	三平方の 定理・チャレンジの丘	not_started	0	0	10	0
+9	j3	35	j3.n35	normal	pythagoras3	pythagoras	三平方の 定理・マスターの宝箱	not_started	0	0	10	0
+9	j3	36	j3.n36	normal	sampling3	data	標本調査・はじめの一歩	not_started	0	0	10	0
+9	j3	37	j3.n37	normal	sampling3	data	標本調査・れんしゅうの道	not_started	0	0	10	0
+9	j3	38	j3.n38	normal	sampling3	data	標本調査・ひらめきの門	not_started	0	0	10	0
+9	j3	39	j3.n39	normal	sampling3	data	標本調査・チャレンジの丘	not_started	0	0	10	0
+9	j3	40	j3.n40	normal	sampling3	data	標本調査・マスターの宝箱	not_started	0	0	10	0
+9	j3	41	j3.n41	normal	proof3	proof	数と 図形の 論証・はじめの一歩	not_started	0	0	10	0
+9	j3	42	j3.n42	normal	proof3	proof	数と 図形の 論証・れんしゅうの道	not_started	0	0	10	0
+9	j3	43	j3.n43	normal	proof3	proof	数と 図形の 論証・ひらめきの門	not_started	0	0	10	0
+9	j3	44	j3.n44	normal	proof3	proof	数と 図形の 論証・チャレンジの丘	not_started	0	0	10	0
+9	j3	45	j3.n45	normal	proof3	proof	数と 図形の 論証・マスターの宝箱	not_started	0	0	10	0
+9	j3	46	j3.n46	normal	reviewj3	mixed	中学数学の 総合・はじめの一歩	not_started	0	0	10	0
+9	j3	47	j3.n47	normal	reviewj3	mixed	中学数学の 総合・れんしゅうの道	not_started	0	0	10	0
+9	j3	48	j3.n48	normal	reviewj3	mixed	中学数学の 総合・ひらめきの門	not_started	0	0	10	0
+9	j3	49	j3.n49	normal	reviewj3	mixed	中学数学の 総合・チャレンジの丘	not_started	0	0	10	0
+9	j3	50	j3.n50	normal	reviewj3	mixed	中学数学の 総合・マスターの宝箱	not_started	0	0	10	0
+9	j3	51	j3.x01	extra	factor3	factor	EX・展開と 因数分解	not_started	0	0	10	0
+9	j3	52	j3.x02	extra	radical3	radical	EX・平方根	not_started	0	0	10	0
+9	j3	53	j3.x03	extra	quadratic3	quadratic	EX・二次方程式	not_started	0	0	10	0
+9	j3	54	j3.x04	extra	parabola3	quadraticFunction	EX・二次関数	not_started	0	0	10	0
+9	j3	55	j3.x05	extra	similar3	geometry	EX・相似な図形	not_started	0	0	10	0
+9	j3	56	j3.x06	extra	circleangle3	angle	EX・円周角の 定理	not_started	0	0	10	0
+9	j3	57	j3.x07	extra	pythagoras3	pythagoras	EX・三平方の 定理	not_started	0	0	10	0
+9	j3	58	j3.x08	extra	sampling3	data	EX・標本調査	not_started	0	0	10	0
+9	j3	59	j3.x09	extra	proof3	proof	EX・数と 図形の 論証	not_started	0	0	10	0
+9	j3	60	j3.x10	extra	reviewj3	mixed	EX・中学数学の 総合	not_started	0	0	10	0
+9	j3	61	j3.s01	secret	factor3	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+9	j3	62	j3.s02	secret	radical3	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+9	j3	63	j3.s03	secret	quadratic3	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+9	j3	64	j3.s04	secret	parabola3	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+9	j3	65	j3.s05	secret	similar3	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
+10	h1	1	h1.n01	normal	algebra1	factor	数と式・展開と因数分解・はじめの一歩	not_started	0	0	10	0
+10	h1	2	h1.n02	normal	algebra1	factor	数と式・展開と因数分解・れんしゅうの道	not_started	0	0	10	0
+10	h1	3	h1.n03	normal	algebra1	factor	数と式・展開と因数分解・ひらめきの門	not_started	0	0	10	0
+10	h1	4	h1.n04	normal	algebra1	factor	数と式・展開と因数分解・チャレンジの丘	not_started	0	0	10	0
+10	h1	5	h1.n05	normal	algebra1	factor	数と式・展開と因数分解・マスターの宝箱	not_started	0	0	10	0
+10	h1	6	h1.n06	normal	logic1	logic	集合と 命題・はじめの一歩	not_started	0	0	10	0
+10	h1	7	h1.n07	normal	logic1	logic	集合と 命題・れんしゅうの道	not_started	0	0	10	0
+10	h1	8	h1.n08	normal	logic1	logic	集合と 命題・ひらめきの門	not_started	0	0	10	0
+10	h1	9	h1.n09	normal	logic1	logic	集合と 命題・チャレンジの丘	not_started	0	0	10	0
+10	h1	10	h1.n10	normal	logic1	logic	集合と 命題・マスターの宝箱	not_started	0	0	10	0
+10	h1	11	h1.n11	normal	quadraticfunction1	quadraticFunction	二次関数の グラフ・はじめの一歩	not_started	0	0	10	0
+10	h1	12	h1.n12	normal	quadraticfunction1	quadraticFunction	二次関数の グラフ・れんしゅうの道	not_started	0	0	10	0
+10	h1	13	h1.n13	normal	quadraticfunction1	quadraticFunction	二次関数の グラフ・ひらめきの門	not_started	0	0	10	0
+10	h1	14	h1.n14	normal	quadraticfunction1	quadraticFunction	二次関数の グラフ・チャレンジの丘	not_started	0	0	10	0
+10	h1	15	h1.n15	normal	quadraticfunction1	quadraticFunction	二次関数の グラフ・マスターの宝箱	not_started	0	0	10	0
+10	h1	16	h1.n16	normal	inequality1	inequality	二次不等式・はじめの一歩	not_started	0	0	10	0
+10	h1	17	h1.n17	normal	inequality1	inequality	二次不等式・れんしゅうの道	not_started	0	0	10	0
+10	h1	18	h1.n18	normal	inequality1	inequality	二次不等式・ひらめきの門	not_started	0	0	10	0
+10	h1	19	h1.n19	normal	inequality1	inequality	二次不等式・チャレンジの丘	not_started	0	0	10	0
+10	h1	20	h1.n20	normal	inequality1	inequality	二次不等式・マスターの宝箱	not_started	0	0	10	0
+10	h1	21	h1.n21	normal	trig1	trig	三角比と 図形・はじめの一歩	not_started	0	0	10	0
+10	h1	22	h1.n22	normal	trig1	trig	三角比と 図形・れんしゅうの道	not_started	0	0	10	0
+10	h1	23	h1.n23	normal	trig1	trig	三角比と 図形・ひらめきの門	not_started	0	0	10	0
+10	h1	24	h1.n24	normal	trig1	trig	三角比と 図形・チャレンジの丘	not_started	0	0	10	0
+10	h1	25	h1.n25	normal	trig1	trig	三角比と 図形・マスターの宝箱	not_started	0	0	10	0
+10	h1	26	h1.n26	normal	data1	data	データ分析・はじめの一歩	not_started	0	0	10	0
+10	h1	27	h1.n27	normal	data1	data	データ分析・れんしゅうの道	not_started	0	0	10	0
+10	h1	28	h1.n28	normal	data1	data	データ分析・ひらめきの門	not_started	0	0	10	0
+10	h1	29	h1.n29	normal	data1	data	データ分析・チャレンジの丘	not_started	0	0	10	0
+10	h1	30	h1.n30	normal	data1	data	データ分析・マスターの宝箱	not_started	0	0	10	0
+10	h1	31	h1.n31	normal	counting1	combinatorics	場合の数・はじめの一歩	not_started	0	0	10	0
+10	h1	32	h1.n32	normal	counting1	combinatorics	場合の数・れんしゅうの道	not_started	0	0	10	0
+10	h1	33	h1.n33	normal	counting1	combinatorics	場合の数・ひらめきの門	not_started	0	0	10	0
+10	h1	34	h1.n34	normal	counting1	combinatorics	場合の数・チャレンジの丘	not_started	0	0	10	0
+10	h1	35	h1.n35	normal	counting1	combinatorics	場合の数・マスターの宝箱	not_started	0	0	10	0
+10	h1	36	h1.n36	normal	probabilityh1	probability	確率と 期待値・はじめの一歩	not_started	0	0	10	0
+10	h1	37	h1.n37	normal	probabilityh1	probability	確率と 期待値・れんしゅうの道	not_started	0	0	10	0
+10	h1	38	h1.n38	normal	probabilityh1	probability	確率と 期待値・ひらめきの門	not_started	0	0	10	0
+10	h1	39	h1.n39	normal	probabilityh1	probability	確率と 期待値・チャレンジの丘	not_started	0	0	10	0
+10	h1	40	h1.n40	normal	probabilityh1	probability	確率と 期待値・マスターの宝箱	not_started	0	0	10	0
+10	h1	41	h1.n41	normal	integers1	divisor	整数の 性質・はじめの一歩	not_started	0	0	10	0
+10	h1	42	h1.n42	normal	integers1	divisor	整数の 性質・れんしゅうの道	not_started	0	0	10	0
+10	h1	43	h1.n43	normal	integers1	divisor	整数の 性質・ひらめきの門	not_started	0	0	10	0
+10	h1	44	h1.n44	normal	integers1	divisor	整数の 性質・チャレンジの丘	not_started	0	0	10	0
+10	h1	45	h1.n45	normal	integers1	divisor	整数の 性質・マスターの宝箱	not_started	0	0	10	0
+10	h1	46	h1.n46	normal	geometryh1	geometry	図形の 性質・はじめの一歩	not_started	0	0	10	0
+10	h1	47	h1.n47	normal	geometryh1	geometry	図形の 性質・れんしゅうの道	not_started	0	0	10	0
+10	h1	48	h1.n48	normal	geometryh1	geometry	図形の 性質・ひらめきの門	not_started	0	0	10	0
+10	h1	49	h1.n49	normal	geometryh1	geometry	図形の 性質・チャレンジの丘	not_started	0	0	10	0
+10	h1	50	h1.n50	normal	geometryh1	geometry	図形の 性質・マスターの宝箱	not_started	0	0	10	0
+10	h1	51	h1.x01	extra	algebra1	factor	EX・数と式・展開と因数分解	not_started	0	0	10	0
+10	h1	52	h1.x02	extra	logic1	logic	EX・集合と 命題	not_started	0	0	10	0
+10	h1	53	h1.x03	extra	quadraticfunction1	quadraticFunction	EX・二次関数の グラフ	not_started	0	0	10	0
+10	h1	54	h1.x04	extra	inequality1	inequality	EX・二次不等式	not_started	0	0	10	0
+10	h1	55	h1.x05	extra	trig1	trig	EX・三角比と 図形	not_started	0	0	10	0
+10	h1	56	h1.x06	extra	data1	data	EX・データ分析	not_started	0	0	10	0
+10	h1	57	h1.x07	extra	counting1	combinatorics	EX・場合の数	not_started	0	0	10	0
+10	h1	58	h1.x08	extra	probabilityh1	probability	EX・確率と 期待値	not_started	0	0	10	0
+10	h1	59	h1.x09	extra	integers1	divisor	EX・整数の 性質	not_started	0	0	10	0
+10	h1	60	h1.x10	extra	geometryh1	geometry	EX・図形の 性質	not_started	0	0	10	0
+10	h1	61	h1.s01	secret	algebra1	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+10	h1	62	h1.s02	secret	logic1	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+10	h1	63	h1.s03	secret	quadraticfunction1	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+10	h1	64	h1.s04	secret	inequality1	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+10	h1	65	h1.s05	secret	trig1	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
+11	h2	1	h2.n01	normal	polynomialh2	expression	式と 証明・はじめの一歩	not_started	0	0	10	0
+11	h2	2	h2.n02	normal	polynomialh2	expression	式と 証明・れんしゅうの道	not_started	0	0	10	0
+11	h2	3	h2.n03	normal	polynomialh2	expression	式と 証明・ひらめきの門	not_started	0	0	10	0
+11	h2	4	h2.n04	normal	polynomialh2	expression	式と 証明・チャレンジの丘	not_started	0	0	10	0
+11	h2	5	h2.n05	normal	polynomialh2	expression	式と 証明・マスターの宝箱	not_started	0	0	10	0
+11	h2	6	h2.n06	normal	complexEq2	complex	複素数と 方程式・はじめの一歩	not_started	0	0	10	0
+11	h2	7	h2.n07	normal	complexEq2	complex	複素数と 方程式・れんしゅうの道	not_started	0	0	10	0
+11	h2	8	h2.n08	normal	complexEq2	complex	複素数と 方程式・ひらめきの門	not_started	0	0	10	0
+11	h2	9	h2.n09	normal	complexEq2	complex	複素数と 方程式・チャレンジの丘	not_started	0	0	10	0
+11	h2	10	h2.n10	normal	complexEq2	complex	複素数と 方程式・マスターの宝箱	not_started	0	0	10	0
+11	h2	11	h2.n11	normal	circleline2	coordinateGeometry	図形と 方程式・はじめの一歩	not_started	0	0	10	0
+11	h2	12	h2.n12	normal	circleline2	coordinateGeometry	図形と 方程式・れんしゅうの道	not_started	0	0	10	0
+11	h2	13	h2.n13	normal	circleline2	coordinateGeometry	図形と 方程式・ひらめきの門	not_started	0	0	10	0
+11	h2	14	h2.n14	normal	circleline2	coordinateGeometry	図形と 方程式・チャレンジの丘	not_started	0	0	10	0
+11	h2	15	h2.n15	normal	circleline2	coordinateGeometry	図形と 方程式・マスターの宝箱	not_started	0	0	10	0
+11	h2	16	h2.n16	normal	trigfunction2	trig	三角関数・はじめの一歩	not_started	0	0	10	0
+11	h2	17	h2.n17	normal	trigfunction2	trig	三角関数・れんしゅうの道	not_started	0	0	10	0
+11	h2	18	h2.n18	normal	trigfunction2	trig	三角関数・ひらめきの門	not_started	0	0	10	0
+11	h2	19	h2.n19	normal	trigfunction2	trig	三角関数・チャレンジの丘	not_started	0	0	10	0
+11	h2	20	h2.n20	normal	trigfunction2	trig	三角関数・マスターの宝箱	not_started	0	0	10	0
+11	h2	21	h2.n21	normal	expLog2	exponential	指数関数・対数関数・はじめの一歩	not_started	0	0	10	0
+11	h2	22	h2.n22	normal	expLog2	exponential	指数関数・対数関数・れんしゅうの道	not_started	0	0	10	0
+11	h2	23	h2.n23	normal	expLog2	exponential	指数関数・対数関数・ひらめきの門	not_started	0	0	10	0
+11	h2	24	h2.n24	normal	expLog2	exponential	指数関数・対数関数・チャレンジの丘	not_started	0	0	10	0
+11	h2	25	h2.n25	normal	expLog2	exponential	指数関数・対数関数・マスターの宝箱	not_started	0	0	10	0
+11	h2	26	h2.n26	normal	derivative2	calculus	微分法・はじめの一歩	not_started	0	0	10	0
+11	h2	27	h2.n27	normal	derivative2	calculus	微分法・れんしゅうの道	not_started	0	0	10	0
+11	h2	28	h2.n28	normal	derivative2	calculus	微分法・ひらめきの門	not_started	0	0	10	0
+11	h2	29	h2.n29	normal	derivative2	calculus	微分法・チャレンジの丘	not_started	0	0	10	0
+11	h2	30	h2.n30	normal	derivative2	calculus	微分法・マスターの宝箱	not_started	0	0	10	0
+11	h2	31	h2.n31	normal	integral2	integral	積分法・はじめの一歩	not_started	0	0	10	0
+11	h2	32	h2.n32	normal	integral2	integral	積分法・れんしゅうの道	not_started	0	0	10	0
+11	h2	33	h2.n33	normal	integral2	integral	積分法・ひらめきの門	not_started	0	0	10	0
+11	h2	34	h2.n34	normal	integral2	integral	積分法・チャレンジの丘	not_started	0	0	10	0
+11	h2	35	h2.n35	normal	integral2	integral	積分法・マスターの宝箱	not_started	0	0	10	0
+11	h2	36	h2.n36	normal	sequence2	sequence	数列と 漸化式・はじめの一歩	not_started	0	0	10	0
+11	h2	37	h2.n37	normal	sequence2	sequence	数列と 漸化式・れんしゅうの道	not_started	0	0	10	0
+11	h2	38	h2.n38	normal	sequence2	sequence	数列と 漸化式・ひらめきの門	not_started	0	0	10	0
+11	h2	39	h2.n39	normal	sequence2	sequence	数列と 漸化式・チャレンジの丘	not_started	0	0	10	0
+11	h2	40	h2.n40	normal	sequence2	sequence	数列と 漸化式・マスターの宝箱	not_started	0	0	10	0
+11	h2	41	h2.n41	normal	stats2	probability	統計的な 推測・はじめの一歩	not_started	0	0	10	0
+11	h2	42	h2.n42	normal	stats2	probability	統計的な 推測・れんしゅうの道	not_started	0	0	10	0
+11	h2	43	h2.n43	normal	stats2	probability	統計的な 推測・ひらめきの門	not_started	0	0	10	0
+11	h2	44	h2.n44	normal	stats2	probability	統計的な 推測・チャレンジの丘	not_started	0	0	10	0
+11	h2	45	h2.n45	normal	stats2	probability	統計的な 推測・マスターの宝箱	not_started	0	0	10	0
+11	h2	46	h2.n46	normal	vector2	vector	平面ベクトル・はじめの一歩	not_started	0	0	10	0
+11	h2	47	h2.n47	normal	vector2	vector	平面ベクトル・れんしゅうの道	not_started	0	0	10	0
+11	h2	48	h2.n48	normal	vector2	vector	平面ベクトル・ひらめきの門	not_started	0	0	10	0
+11	h2	49	h2.n49	normal	vector2	vector	平面ベクトル・チャレンジの丘	not_started	0	0	10	0
+11	h2	50	h2.n50	normal	vector2	vector	平面ベクトル・マスターの宝箱	not_started	0	0	10	0
+11	h2	51	h2.x01	extra	polynomialh2	expression	EX・式と 証明	not_started	0	0	10	0
+11	h2	52	h2.x02	extra	complexEq2	complex	EX・複素数と 方程式	not_started	0	0	10	0
+11	h2	53	h2.x03	extra	circleline2	coordinateGeometry	EX・図形と 方程式	not_started	0	0	10	0
+11	h2	54	h2.x04	extra	trigfunction2	trig	EX・三角関数	not_started	0	0	10	0
+11	h2	55	h2.x05	extra	expLog2	exponential	EX・指数関数・対数関数	not_started	0	0	10	0
+11	h2	56	h2.x06	extra	derivative2	calculus	EX・微分法	not_started	0	0	10	0
+11	h2	57	h2.x07	extra	integral2	integral	EX・積分法	not_started	0	0	10	0
+11	h2	58	h2.x08	extra	sequence2	sequence	EX・数列と 漸化式	not_started	0	0	10	0
+11	h2	59	h2.x09	extra	stats2	probability	EX・統計的な 推測	not_started	0	0	10	0
+11	h2	60	h2.x10	extra	vector2	vector	EX・平面ベクトル	not_started	0	0	10	0
+11	h2	61	h2.s01	secret	polynomialh2	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+11	h2	62	h2.s02	secret	complexEq2	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+11	h2	63	h2.s03	secret	circleline2	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+11	h2	64	h2.s04	secret	trigfunction2	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+11	h2	65	h2.s05	secret	expLog2	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
+12	h3	1	h3.n01	normal	limitseq3	limit	数列の 極限・はじめの一歩	not_started	0	0	10	0
+12	h3	2	h3.n02	normal	limitseq3	limit	数列の 極限・れんしゅうの道	not_started	0	0	10	0
+12	h3	3	h3.n03	normal	limitseq3	limit	数列の 極限・ひらめきの門	not_started	0	0	10	0
+12	h3	4	h3.n04	normal	limitseq3	limit	数列の 極限・チャレンジの丘	not_started	0	0	10	0
+12	h3	5	h3.n05	normal	limitseq3	limit	数列の 極限・マスターの宝箱	not_started	0	0	10	0
+12	h3	6	h3.n06	normal	limitfunction3	limit	関数の 極限と 連続・はじめの一歩	not_started	0	0	10	0
+12	h3	7	h3.n07	normal	limitfunction3	limit	関数の 極限と 連続・れんしゅうの道	not_started	0	0	10	0
+12	h3	8	h3.n08	normal	limitfunction3	limit	関数の 極限と 連続・ひらめきの門	not_started	0	0	10	0
+12	h3	9	h3.n09	normal	limitfunction3	limit	関数の 極限と 連続・チャレンジの丘	not_started	0	0	10	0
+12	h3	10	h3.n10	normal	limitfunction3	limit	関数の 極限と 連続・マスターの宝箱	not_started	0	0	10	0
+12	h3	11	h3.n11	normal	derivative3	calculus	いろいろな 微分・はじめの一歩	not_started	0	0	10	0
+12	h3	12	h3.n12	normal	derivative3	calculus	いろいろな 微分・れんしゅうの道	not_started	0	0	10	0
+12	h3	13	h3.n13	normal	derivative3	calculus	いろいろな 微分・ひらめきの門	not_started	0	0	10	0
+12	h3	14	h3.n14	normal	derivative3	calculus	いろいろな 微分・チャレンジの丘	not_started	0	0	10	0
+12	h3	15	h3.n15	normal	derivative3	calculus	いろいろな 微分・マスターの宝箱	not_started	0	0	10	0
+12	h3	16	h3.n16	normal	derivativeUse3	calculus	導関数と グラフ・はじめの一歩	not_started	0	0	10	0
+12	h3	17	h3.n17	normal	derivativeUse3	calculus	導関数と グラフ・れんしゅうの道	not_started	0	0	10	0
+12	h3	18	h3.n18	normal	derivativeUse3	calculus	導関数と グラフ・ひらめきの門	not_started	0	0	10	0
+12	h3	19	h3.n19	normal	derivativeUse3	calculus	導関数と グラフ・チャレンジの丘	not_started	0	0	10	0
+12	h3	20	h3.n20	normal	derivativeUse3	calculus	導関数と グラフ・マスターの宝箱	not_started	0	0	10	0
+12	h3	21	h3.n21	normal	integral3	integral	いろいろな 積分・はじめの一歩	not_started	0	0	10	0
+12	h3	22	h3.n22	normal	integral3	integral	いろいろな 積分・れんしゅうの道	not_started	0	0	10	0
+12	h3	23	h3.n23	normal	integral3	integral	いろいろな 積分・ひらめきの門	not_started	0	0	10	0
+12	h3	24	h3.n24	normal	integral3	integral	いろいろな 積分・チャレンジの丘	not_started	0	0	10	0
+12	h3	25	h3.n25	normal	integral3	integral	いろいろな 積分・マスターの宝箱	not_started	0	0	10	0
+12	h3	26	h3.n26	normal	integralUse3	integral	面積・体積と 積分・はじめの一歩	not_started	0	0	10	0
+12	h3	27	h3.n27	normal	integralUse3	integral	面積・体積と 積分・れんしゅうの道	not_started	0	0	10	0
+12	h3	28	h3.n28	normal	integralUse3	integral	面積・体積と 積分・ひらめきの門	not_started	0	0	10	0
+12	h3	29	h3.n29	normal	integralUse3	integral	面積・体積と 積分・チャレンジの丘	not_started	0	0	10	0
+12	h3	30	h3.n30	normal	integralUse3	integral	面積・体積と 積分・マスターの宝箱	not_started	0	0	10	0
+12	h3	31	h3.n31	normal	complexplane3	complex	複素数平面・はじめの一歩	not_started	0	0	10	0
+12	h3	32	h3.n32	normal	complexplane3	complex	複素数平面・れんしゅうの道	not_started	0	0	10	0
+12	h3	33	h3.n33	normal	complexplane3	complex	複素数平面・ひらめきの門	not_started	0	0	10	0
+12	h3	34	h3.n34	normal	complexplane3	complex	複素数平面・チャレンジの丘	not_started	0	0	10	0
+12	h3	35	h3.n35	normal	complexplane3	complex	複素数平面・マスターの宝箱	not_started	0	0	10	0
+12	h3	36	h3.n36	normal	curves3	coordinateGeometry	平面上の 曲線・はじめの一歩	not_started	0	0	10	0
+12	h3	37	h3.n37	normal	curves3	coordinateGeometry	平面上の 曲線・れんしゅうの道	not_started	0	0	10	0
+12	h3	38	h3.n38	normal	curves3	coordinateGeometry	平面上の 曲線・ひらめきの門	not_started	0	0	10	0
+12	h3	39	h3.n39	normal	curves3	coordinateGeometry	平面上の 曲線・チャレンジの丘	not_started	0	0	10	0
+12	h3	40	h3.n40	normal	curves3	coordinateGeometry	平面上の 曲線・マスターの宝箱	not_started	0	0	10	0
+12	h3	41	h3.n41	normal	spacevector3	vector	空間ベクトル・はじめの一歩	not_started	0	0	10	0
+12	h3	42	h3.n42	normal	spacevector3	vector	空間ベクトル・れんしゅうの道	not_started	0	0	10	0
+12	h3	43	h3.n43	normal	spacevector3	vector	空間ベクトル・ひらめきの門	not_started	0	0	10	0
+12	h3	44	h3.n44	normal	spacevector3	vector	空間ベクトル・チャレンジの丘	not_started	0	0	10	0
+12	h3	45	h3.n45	normal	spacevector3	vector	空間ベクトル・マスターの宝箱	not_started	0	0	10	0
+12	h3	46	h3.n46	normal	discovery3	mixed	発展問題と 数学の 探究・はじめの一歩	not_started	0	0	10	0
+12	h3	47	h3.n47	normal	discovery3	mixed	発展問題と 数学の 探究・れんしゅうの道	not_started	0	0	10	0
+12	h3	48	h3.n48	normal	discovery3	mixed	発展問題と 数学の 探究・ひらめきの門	not_started	0	0	10	0
+12	h3	49	h3.n49	normal	discovery3	mixed	発展問題と 数学の 探究・チャレンジの丘	not_started	0	0	10	0
+12	h3	50	h3.n50	normal	discovery3	mixed	発展問題と 数学の 探究・マスターの宝箱	not_started	0	0	10	0
+12	h3	51	h3.x01	extra	limitseq3	limit	EX・数列の 極限	not_started	0	0	10	0
+12	h3	52	h3.x02	extra	limitfunction3	limit	EX・関数の 極限と 連続	not_started	0	0	10	0
+12	h3	53	h3.x03	extra	derivative3	calculus	EX・いろいろな 微分	not_started	0	0	10	0
+12	h3	54	h3.x04	extra	derivativeUse3	calculus	EX・導関数と グラフ	not_started	0	0	10	0
+12	h3	55	h3.x05	extra	integral3	integral	EX・いろいろな 積分	not_started	0	0	10	0
+12	h3	56	h3.x06	extra	integralUse3	integral	EX・面積・体積と 積分	not_started	0	0	10	0
+12	h3	57	h3.x07	extra	complexplane3	complex	EX・複素数平面	not_started	0	0	10	0
+12	h3	58	h3.x08	extra	curves3	coordinateGeometry	EX・平面上の 曲線	not_started	0	0	10	0
+12	h3	59	h3.x09	extra	spacevector3	vector	EX・空間ベクトル	not_started	0	0	10	0
+12	h3	60	h3.x10	extra	discovery3	mixed	EX・発展問題と 数学の 探究	not_started	0	0	10	0
+12	h3	61	h3.s01	secret	limitseq3	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+12	h3	62	h3.s02	secret	limitfunction3	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+12	h3	63	h3.s03	secret	derivative3	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+12	h3	64	h3.s04	secret	derivativeUse3	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+12	h3	65	h3.s05	secret	integral3	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
+13	sage	1	sage.n01	normal	sage-mixed-1	sageMixed	総合演習 1	hundred_created	100	100	0	0
+13	sage	2	sage.n02	normal	sage-mixed-1	sageMixed	総合演習 2	hundred_created	100	100	0	0
+13	sage	3	sage.n03	normal	sage-mixed-1	sageMixed	総合演習 3	hundred_created	100	100	0	0
+13	sage	4	sage.n04	normal	sage-mixed-1	sageMixed	総合演習 4	not_started	3	3	7	0
+13	sage	5	sage.n05	normal	sage-mixed-1	sageMixed	確認テスト 1	not_started	0	0	10	0
+13	sage	6	sage.n06	normal	sage-mixed-2	sageMixed	総合演習 6	not_started	0	0	10	0
+13	sage	7	sage.n07	normal	sage-mixed-2	sageMixed	総合演習 7	not_started	0	0	10	0
+13	sage	8	sage.n08	normal	sage-mixed-2	sageMixed	総合演習 8	not_started	0	0	10	0
+13	sage	9	sage.n09	normal	sage-mixed-2	sageMixed	総合演習 9	not_started	0	0	10	0
+13	sage	10	sage.n10	normal	sage-mixed-2	sageMixed	確認テスト 2	not_started	0	0	10	0
+13	sage	11	sage.n11	normal	sage-mixed-3	sageMixed	総合演習 11	not_started	0	0	10	0
+13	sage	12	sage.n12	normal	sage-mixed-3	sageMixed	総合演習 12	not_started	0	0	10	0
+13	sage	13	sage.n13	normal	sage-mixed-3	sageMixed	総合演習 13	not_started	0	0	10	0
+13	sage	14	sage.n14	normal	sage-mixed-3	sageMixed	総合演習 14	not_started	0	0	10	0
+13	sage	15	sage.n15	normal	sage-mixed-3	sageMixed	確認テスト 3	not_started	0	0	10	0
+13	sage	16	sage.n16	normal	sage-mixed-4	sageMixed	総合演習 16	not_started	0	0	10	0
+13	sage	17	sage.n17	normal	sage-mixed-4	sageMixed	総合演習 17	not_started	0	0	10	0
+13	sage	18	sage.n18	normal	sage-mixed-4	sageMixed	総合演習 18	not_started	0	0	10	0
+13	sage	19	sage.n19	normal	sage-mixed-4	sageMixed	総合演習 19	not_started	0	0	10	0
+13	sage	20	sage.n20	normal	sage-mixed-4	sageMixed	確認テスト 4	not_started	0	0	10	0
+13	sage	21	sage.n21	normal	sage-mixed-5	sageMixed	総合演習 21	not_started	0	0	10	0
+13	sage	22	sage.n22	normal	sage-mixed-5	sageMixed	総合演習 22	not_started	0	0	10	0
+13	sage	23	sage.n23	normal	sage-mixed-5	sageMixed	総合演習 23	not_started	0	0	10	0
+13	sage	24	sage.n24	normal	sage-mixed-5	sageMixed	総合演習 24	not_started	0	0	10	0
+13	sage	25	sage.n25	normal	sage-mixed-5	sageMixed	確認テスト 5	not_started	0	0	10	0
+13	sage	26	sage.n26	normal	sage-mixed-6	sageMixed	総合演習 26	not_started	0	0	10	0
+13	sage	27	sage.n27	normal	sage-mixed-6	sageMixed	総合演習 27	not_started	0	0	10	0
+13	sage	28	sage.n28	normal	sage-mixed-6	sageMixed	総合演習 28	not_started	0	0	10	0
+13	sage	29	sage.n29	normal	sage-mixed-6	sageMixed	総合演習 29	not_started	0	0	10	0
+13	sage	30	sage.n30	normal	sage-mixed-6	sageMixed	確認テスト 6	not_started	0	0	10	0
+13	sage	31	sage.n31	normal	sage-mixed-7	sageMixed	総合演習 31	not_started	0	0	10	0
+13	sage	32	sage.n32	normal	sage-mixed-7	sageMixed	総合演習 32	not_started	0	0	10	0
+13	sage	33	sage.n33	normal	sage-mixed-7	sageMixed	総合演習 33	not_started	0	0	10	0
+13	sage	34	sage.n34	normal	sage-mixed-7	sageMixed	総合演習 34	not_started	0	0	10	0
+13	sage	35	sage.n35	normal	sage-mixed-7	sageMixed	確認テスト 7	not_started	0	0	10	0
+13	sage	36	sage.n36	normal	sage-mixed-8	sageMixed	総合演習 36	not_started	0	0	10	0
+13	sage	37	sage.n37	normal	sage-mixed-8	sageMixed	総合演習 37	not_started	0	0	10	0
+13	sage	38	sage.n38	normal	sage-mixed-8	sageMixed	総合演習 38	not_started	0	0	10	0
+13	sage	39	sage.n39	normal	sage-mixed-8	sageMixed	総合演習 39	not_started	0	0	10	0
+13	sage	40	sage.n40	normal	sage-mixed-8	sageMixed	確認テスト 8	not_started	0	0	10	0
+13	sage	41	sage.n41	normal	sage-mixed-9	sageMixed	総合演習 41	not_started	0	0	10	0
+13	sage	42	sage.n42	normal	sage-mixed-9	sageMixed	総合演習 42	not_started	0	0	10	0
+13	sage	43	sage.n43	normal	sage-mixed-9	sageMixed	総合演習 43	not_started	0	0	10	0
+13	sage	44	sage.n44	normal	sage-mixed-9	sageMixed	総合演習 44	not_started	0	0	10	0
+13	sage	45	sage.n45	normal	sage-mixed-9	sageMixed	確認テスト 9	not_started	0	0	10	0
+13	sage	46	sage.n46	normal	sage-mixed-10	sageMixed	総合演習 46	not_started	0	0	10	0
+13	sage	47	sage.n47	normal	sage-mixed-10	sageMixed	総合演習 47	not_started	0	0	10	0
+13	sage	48	sage.n48	normal	sage-mixed-10	sageMixed	総合演習 48	not_started	0	0	10	0
+13	sage	49	sage.n49	normal	sage-mixed-10	sageMixed	総合演習 49	not_started	0	0	10	0
+13	sage	50	sage.n50	normal	sage-mixed-10	sageMixed	総合最終試験	not_started	0	0	10	0
+13	sage	51	sage.x01	extra	sage-mixed-1	sageMixed	EX・分野融合 1	not_started	0	0	10	0
+13	sage	52	sage.x02	extra	sage-mixed-2	sageMixed	EX・分野融合 2	not_started	0	0	10	0
+13	sage	53	sage.x03	extra	sage-mixed-3	sageMixed	EX・分野融合 3	not_started	0	0	10	0
+13	sage	54	sage.x04	extra	sage-mixed-4	sageMixed	EX・分野融合 4	not_started	0	0	10	0
+13	sage	55	sage.x05	extra	sage-mixed-5	sageMixed	EX・分野融合 5	not_started	0	0	10	0
+13	sage	56	sage.x06	extra	sage-mixed-6	sageMixed	EX・分野融合 6	not_started	0	0	10	0
+13	sage	57	sage.x07	extra	sage-mixed-7	sageMixed	EX・分野融合 7	not_started	0	0	10	0
+13	sage	58	sage.x08	extra	sage-mixed-8	sageMixed	EX・分野融合 8	not_started	0	0	10	0
+13	sage	59	sage.x09	extra	sage-mixed-9	sageMixed	EX・分野融合 9	not_started	0	0	10	0
+13	sage	60	sage.x10	extra	sage-mixed-10	sageMixed	EX・分野融合 10	not_started	0	0	10	0
+13	sage	61	sage.s01	secret	sage-mixed-1	sageMixed	ひみつ・数のひみつを発見	not_started	0	0	10	0
+13	sage	62	sage.s02	secret	sage-mixed-2	sageMixed	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+13	sage	63	sage.s03	secret	sage-mixed-3	sageMixed	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+13	sage	64	sage.s04	secret	sage-mixed-4	sageMixed	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+13	sage	65	sage.s05	secret	sage-mixed-5	sageMixed	ひみつ・無限のトビラ	not_started	0	0	10	0
+14	champion	1	champion.n01	normal	integer	numberTheory	整数と合同式・はじめの一歩	not_started	3	3	7	0
+14	champion	2	champion.n02	normal	integer	numberTheory	整数と合同式・れんしゅうの道	not_started	0	0	10	0
+14	champion	3	champion.n03	normal	integer	numberTheory	整数と合同式・ひらめきの門	not_started	0	0	10	0
+14	champion	4	champion.n04	normal	integer	numberTheory	整数と合同式・チャレンジの丘	not_started	0	0	10	0
+14	champion	5	champion.n05	normal	integer	numberTheory	整数と合同式・マスターの宝箱	not_started	0	0	10	0
+14	champion	6	champion.n06	normal	diophantine	numberTheory	整数方程式・はじめの一歩	not_started	0	0	10	0
+14	champion	7	champion.n07	normal	diophantine	numberTheory	整数方程式・れんしゅうの道	not_started	0	0	10	0
+14	champion	8	champion.n08	normal	diophantine	numberTheory	整数方程式・ひらめきの門	not_started	0	0	10	0
+14	champion	9	champion.n09	normal	diophantine	numberTheory	整数方程式・チャレンジの丘	not_started	0	0	10	0
+14	champion	10	champion.n10	normal	diophantine	numberTheory	整数方程式・マスターの宝箱	not_started	0	0	10	0
+14	champion	11	champion.n11	normal	inequality	inequality	不等式と等号条件・はじめの一歩	not_started	0	0	10	0
+14	champion	12	champion.n12	normal	inequality	inequality	不等式と等号条件・れんしゅうの道	not_started	0	0	10	0
+14	champion	13	champion.n13	normal	inequality	inequality	不等式と等号条件・ひらめきの門	not_started	0	0	10	0
+14	champion	14	champion.n14	normal	inequality	inequality	不等式と等号条件・チャレンジの丘	not_started	0	0	10	0
+14	champion	15	champion.n15	normal	inequality	inequality	不等式と等号条件・マスターの宝箱	not_started	0	0	10	0
+14	champion	16	champion.n16	normal	extremal	proof	極値原理・はじめの一歩	not_started	0	0	10	0
+14	champion	17	champion.n17	normal	extremal	proof	極値原理・れんしゅうの道	not_started	0	0	10	0
+14	champion	18	champion.n18	normal	extremal	proof	極値原理・ひらめきの門	not_started	0	0	10	0
+14	champion	19	champion.n19	normal	extremal	proof	極値原理・チャレンジの丘	not_started	0	0	10	0
+14	champion	20	champion.n20	normal	extremal	proof	極値原理・マスターの宝箱	not_started	0	0	10	0
+14	champion	21	champion.n21	normal	invariant	proof	不変量と単調量・はじめの一歩	not_started	0	0	10	0
+14	champion	22	champion.n22	normal	invariant	proof	不変量と単調量・れんしゅうの道	not_started	0	0	10	0
+14	champion	23	champion.n23	normal	invariant	proof	不変量と単調量・ひらめきの門	not_started	0	0	10	0
+14	champion	24	champion.n24	normal	invariant	proof	不変量と単調量・チャレンジの丘	not_started	0	0	10	0
+14	champion	25	champion.n25	normal	invariant	proof	不変量と単調量・マスターの宝箱	not_started	0	0	10	0
+14	champion	26	champion.n26	normal	counting	combinatorics	数え上げと二重計数・はじめの一歩	not_started	0	0	10	0
+14	champion	27	champion.n27	normal	counting	combinatorics	数え上げと二重計数・れんしゅうの道	not_started	0	0	10	0
+14	champion	28	champion.n28	normal	counting	combinatorics	数え上げと二重計数・ひらめきの門	not_started	0	0	10	0
+14	champion	29	champion.n29	normal	counting	combinatorics	数え上げと二重計数・チャレンジの丘	not_started	0	0	10	0
+14	champion	30	champion.n30	normal	counting	combinatorics	数え上げと二重計数・マスターの宝箱	not_started	0	0	10	0
+14	champion	31	champion.n31	normal	pigeonhole	combinatorics	鳩の巣原理・はじめの一歩	not_started	0	0	10	0
+14	champion	32	champion.n32	normal	pigeonhole	combinatorics	鳩の巣原理・れんしゅうの道	not_started	0	0	10	0
+14	champion	33	champion.n33	normal	pigeonhole	combinatorics	鳩の巣原理・ひらめきの門	not_started	0	0	10	0
+14	champion	34	champion.n34	normal	pigeonhole	combinatorics	鳩の巣原理・チャレンジの丘	not_started	0	0	10	0
+14	champion	35	champion.n35	normal	pigeonhole	combinatorics	鳩の巣原理・マスターの宝箱	not_started	0	0	10	0
+14	champion	36	champion.n36	normal	geometry	geometry	平面幾何と補助線・はじめの一歩	not_started	0	0	10	0
+14	champion	37	champion.n37	normal	geometry	geometry	平面幾何と補助線・れんしゅうの道	not_started	0	0	10	0
+14	champion	38	champion.n38	normal	geometry	geometry	平面幾何と補助線・ひらめきの門	not_started	0	0	10	0
+14	champion	39	champion.n39	normal	geometry	geometry	平面幾何と補助線・チャレンジの丘	not_started	0	0	10	0
+14	champion	40	champion.n40	normal	geometry	geometry	平面幾何と補助線・マスターの宝箱	not_started	0	0	10	0
+14	champion	41	champion.n41	normal	sequences	sequences	数列と帰納法・はじめの一歩	not_started	0	0	10	0
+14	champion	42	champion.n42	normal	sequences	sequences	数列と帰納法・れんしゅうの道	not_started	0	0	10	0
+14	champion	43	champion.n43	normal	sequences	sequences	数列と帰納法・ひらめきの門	not_started	0	0	10	0
+14	champion	44	champion.n44	normal	sequences	sequences	数列と帰納法・チャレンジの丘	not_started	0	0	10	0
+14	champion	45	champion.n45	normal	sequences	sequences	数列と帰納法・マスターの宝箱	not_started	0	0	10	0
+14	champion	46	champion.n46	normal	counterexample	proof	反例と構成・はじめの一歩	not_started	0	0	10	0
+14	champion	47	champion.n47	normal	counterexample	proof	反例と構成・れんしゅうの道	not_started	0	0	10	0
+14	champion	48	champion.n48	normal	counterexample	proof	反例と構成・ひらめきの門	not_started	0	0	10	0
+14	champion	49	champion.n49	normal	counterexample	proof	反例と構成・チャレンジの丘	not_started	0	0	10	0
+14	champion	50	champion.n50	normal	counterexample	proof	反例と構成・マスターの宝箱	not_started	0	0	10	0
+14	champion	51	champion.x01	extra	integer	numberTheory	EX・整数と合同式	not_started	0	0	10	0
+14	champion	52	champion.x02	extra	diophantine	numberTheory	EX・整数方程式	not_started	0	0	10	0
+14	champion	53	champion.x03	extra	inequality	inequality	EX・不等式と等号条件	not_started	0	0	10	0
+14	champion	54	champion.x04	extra	extremal	proof	EX・極値原理	not_started	0	0	10	0
+14	champion	55	champion.x05	extra	invariant	proof	EX・不変量と単調量	not_started	0	0	10	0
+14	champion	56	champion.x06	extra	counting	combinatorics	EX・数え上げと二重計数	not_started	0	0	10	0
+14	champion	57	champion.x07	extra	pigeonhole	combinatorics	EX・鳩の巣原理	not_started	0	0	10	0
+14	champion	58	champion.x08	extra	geometry	geometry	EX・平面幾何と補助線	not_started	0	0	10	0
+14	champion	59	champion.x09	extra	sequences	sequences	EX・数列と帰納法	not_started	0	0	10	0
+14	champion	60	champion.x10	extra	counterexample	proof	EX・反例と構成	not_started	0	0	10	0
+14	champion	61	champion.s01	secret	integer	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+14	champion	62	champion.s02	secret	diophantine	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+14	champion	63	champion.s03	secret	inequality	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+14	champion	64	champion.s04	secret	extremal	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+14	champion	65	champion.s05	secret	invariant	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
+15	cosmos	1	cosmos.n01	normal	logic	proof	集合・写像・論理・はじめの一歩	not_started	3	3	7	0
+15	cosmos	2	cosmos.n02	normal	logic	proof	集合・写像・論理・れんしゅうの道	not_started	0	0	10	0
+15	cosmos	3	cosmos.n03	normal	logic	proof	集合・写像・論理・ひらめきの門	not_started	0	0	10	0
+15	cosmos	4	cosmos.n04	normal	logic	proof	集合・写像・論理・チャレンジの丘	not_started	0	0	10	0
+15	cosmos	5	cosmos.n05	normal	logic	proof	集合・写像・論理・マスターの宝箱	not_started	0	0	10	0
+15	cosmos	6	cosmos.n06	normal	number-theory	numberTheory	整数論・はじめの一歩	not_started	0	0	10	0
+15	cosmos	7	cosmos.n07	normal	number-theory	numberTheory	整数論・れんしゅうの道	not_started	0	0	10	0
+15	cosmos	8	cosmos.n08	normal	number-theory	numberTheory	整数論・ひらめきの門	not_started	0	0	10	0
+15	cosmos	9	cosmos.n09	normal	number-theory	numberTheory	整数論・チャレンジの丘	not_started	0	0	10	0
+15	cosmos	10	cosmos.n10	normal	number-theory	numberTheory	整数論・マスターの宝箱	not_started	0	0	10	0
+15	cosmos	11	cosmos.n11	normal	linear-algebra	linearAlgebra	線形空間と行列・はじめの一歩	not_started	0	0	10	0
+15	cosmos	12	cosmos.n12	normal	linear-algebra	linearAlgebra	線形空間と行列・れんしゅうの道	not_started	0	0	10	0
+15	cosmos	13	cosmos.n13	normal	linear-algebra	linearAlgebra	線形空間と行列・ひらめきの門	not_started	0	0	10	0
+15	cosmos	14	cosmos.n14	normal	linear-algebra	linearAlgebra	線形空間と行列・チャレンジの丘	not_started	0	0	10	0
+15	cosmos	15	cosmos.n15	normal	linear-algebra	linearAlgebra	線形空間と行列・マスターの宝箱	not_started	0	0	10	0
+15	cosmos	16	cosmos.n16	normal	eigenvalues	linearAlgebra	固有値と対角化・はじめの一歩	not_started	0	0	10	0
+15	cosmos	17	cosmos.n17	normal	eigenvalues	linearAlgebra	固有値と対角化・れんしゅうの道	not_started	0	0	10	0
+15	cosmos	18	cosmos.n18	normal	eigenvalues	linearAlgebra	固有値と対角化・ひらめきの門	not_started	0	0	10	0
+15	cosmos	19	cosmos.n19	normal	eigenvalues	linearAlgebra	固有値と対角化・チャレンジの丘	not_started	0	0	10	0
+15	cosmos	20	cosmos.n20	normal	eigenvalues	linearAlgebra	固有値と対角化・マスターの宝箱	not_started	0	0	10	0
+15	cosmos	21	cosmos.n21	normal	analysis	analysis	極限と連続性・はじめの一歩	not_started	0	0	10	0
+15	cosmos	22	cosmos.n22	normal	analysis	analysis	極限と連続性・れんしゅうの道	not_started	0	0	10	0
+15	cosmos	23	cosmos.n23	normal	analysis	analysis	極限と連続性・ひらめきの門	not_started	0	0	10	0
+15	cosmos	24	cosmos.n24	normal	analysis	analysis	極限と連続性・チャレンジの丘	not_started	0	0	10	0
+15	cosmos	25	cosmos.n25	normal	analysis	analysis	極限と連続性・マスターの宝箱	not_started	0	0	10	0
+15	cosmos	26	cosmos.n26	normal	series	sequences	級数と収束・はじめの一歩	not_started	0	0	10	0
+15	cosmos	27	cosmos.n27	normal	series	sequences	級数と収束・れんしゅうの道	not_started	0	0	10	0
+15	cosmos	28	cosmos.n28	normal	series	sequences	級数と収束・ひらめきの門	not_started	0	0	10	0
+15	cosmos	29	cosmos.n29	normal	series	sequences	級数と収束・チャレンジの丘	not_started	0	0	10	0
+15	cosmos	30	cosmos.n30	normal	series	sequences	級数と収束・マスターの宝箱	not_started	0	0	10	0
+15	cosmos	31	cosmos.n31	normal	probability	probability	確率とランダムウォーク・はじめの一歩	not_started	0	0	10	0
+15	cosmos	32	cosmos.n32	normal	probability	probability	確率とランダムウォーク・れんしゅうの道	not_started	0	0	10	0
+15	cosmos	33	cosmos.n33	normal	probability	probability	確率とランダムウォーク・ひらめきの門	not_started	0	0	10	0
+15	cosmos	34	cosmos.n34	normal	probability	probability	確率とランダムウォーク・チャレンジの丘	not_started	0	0	10	0
+15	cosmos	35	cosmos.n35	normal	probability	probability	確率とランダムウォーク・マスターの宝箱	not_started	0	0	10	0
+15	cosmos	36	cosmos.n36	normal	differential-equations	calculus	微分方程式・はじめの一歩	not_started	0	0	10	0
+15	cosmos	37	cosmos.n37	normal	differential-equations	calculus	微分方程式・れんしゅうの道	not_started	0	0	10	0
+15	cosmos	38	cosmos.n38	normal	differential-equations	calculus	微分方程式・ひらめきの門	not_started	0	0	10	0
+15	cosmos	39	cosmos.n39	normal	differential-equations	calculus	微分方程式・チャレンジの丘	not_started	0	0	10	0
+15	cosmos	40	cosmos.n40	normal	differential-equations	calculus	微分方程式・マスターの宝箱	not_started	0	0	10	0
+15	cosmos	41	cosmos.n41	normal	geometry	geometry	距離と幾何・はじめの一歩	not_started	0	0	10	0
+15	cosmos	42	cosmos.n42	normal	geometry	geometry	距離と幾何・れんしゅうの道	not_started	0	0	10	0
+15	cosmos	43	cosmos.n43	normal	geometry	geometry	距離と幾何・ひらめきの門	not_started	0	0	10	0
+15	cosmos	44	cosmos.n44	normal	geometry	geometry	距離と幾何・チャレンジの丘	not_started	0	0	10	0
+15	cosmos	45	cosmos.n45	normal	geometry	geometry	距離と幾何・マスターの宝箱	not_started	0	0	10	0
+15	cosmos	46	cosmos.n46	normal	exploration	proof	数学的探究・はじめの一歩	not_started	0	0	10	0
+15	cosmos	47	cosmos.n47	normal	exploration	proof	数学的探究・れんしゅうの道	not_started	0	0	10	0
+15	cosmos	48	cosmos.n48	normal	exploration	proof	数学的探究・ひらめきの門	not_started	0	0	10	0
+15	cosmos	49	cosmos.n49	normal	exploration	proof	数学的探究・チャレンジの丘	not_started	0	0	10	0
+15	cosmos	50	cosmos.n50	normal	exploration	proof	数学的探究・マスターの宝箱	not_started	0	0	10	0
+15	cosmos	51	cosmos.x01	extra	logic	proof	EX・集合・写像・論理	not_started	0	0	10	0
+15	cosmos	52	cosmos.x02	extra	number-theory	numberTheory	EX・整数論	not_started	0	0	10	0
+15	cosmos	53	cosmos.x03	extra	linear-algebra	linearAlgebra	EX・線形空間と行列	not_started	0	0	10	0
+15	cosmos	54	cosmos.x04	extra	eigenvalues	linearAlgebra	EX・固有値と対角化	not_started	0	0	10	0
+15	cosmos	55	cosmos.x05	extra	analysis	analysis	EX・極限と連続性	not_started	0	0	10	0
+15	cosmos	56	cosmos.x06	extra	series	sequences	EX・級数と収束	not_started	0	0	10	0
+15	cosmos	57	cosmos.x07	extra	probability	probability	EX・確率とランダムウォーク	not_started	0	0	10	0
+15	cosmos	58	cosmos.x08	extra	differential-equations	calculus	EX・微分方程式	not_started	0	0	10	0
+15	cosmos	59	cosmos.x09	extra	geometry	geometry	EX・距離と幾何	not_started	0	0	10	0
+15	cosmos	60	cosmos.x10	extra	exploration	proof	EX・数学的探究	not_started	0	0	10	0
+15	cosmos	61	cosmos.s01	secret	logic	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
+15	cosmos	62	cosmos.s02	secret	number-theory	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
+15	cosmos	63	cosmos.s03	secret	linear-algebra	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
+15	cosmos	64	cosmos.s04	secret	eigenvalues	discovery	ひみつ・ひらめきの天文台	not_started	0	0	10	0
+15	cosmos	65	cosmos.s05	secret	analysis	discovery	ひみつ・無限のトビラ	not_started	0	0	10	0
