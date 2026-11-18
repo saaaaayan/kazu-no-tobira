@@ -41,11 +41,11 @@ export function releaseClient(address) {
     if(version.approvedWorldMapSha256!==undefined){
       if(!/^[a-f0-9]{64}$/.test(version.approvedWorldMapSha256))
         throw new Error('The approved world map digest is invalid.');
-      const art=Buffer.from(await (await get('world-map-approved.avif')).arrayBuffer());
-      if(art.subarray(4,12).toString('ascii')!=='ftypavif' ||
+      const art=Buffer.from(await (await get('world-map-approved.png')).arrayBuffer());
+      if(art.subarray(0,8).toString('hex')!=='89504e470d0a1a0a' ||
          digest(art)!==version.approvedWorldMapSha256)
         throw new Error('The published 16-island world map differs from the approved asset.');
-      if(!js.includes('world-map-approved.avif'))
+      if(!js.includes('world-map-approved.png'))
         throw new Error('The game bundle does not use the approved world map.');
     }
     // For the 4,300-question public trial, verify that each of the 43 data
