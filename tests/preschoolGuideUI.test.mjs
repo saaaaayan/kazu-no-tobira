@@ -20,8 +20,8 @@ test('preschool 01–05 all share the stage 01 guided counting UI',()=>{
     assert.equal(questions.length,10);
     assert.ok(questions.every(q=>q.type==='choice'&&q.diagram?.kind==='countingBoard'&&q.diagram.guide===true));
   }
-  assert.match(source,/const preschoolStage=Boolean\(round\?\.stage\.gradeId==='preschool' && preschoolGuideTitles\[round\.stage\.id\]\)/u);
-  assert.match(source,/const countingGuide=Boolean\(preschoolStage && diagram\?\.kind==='countingBoard' && diagram\.guide\)/u);
+  assert.match(source,/const preschoolStage=Boolean\(round\?\.stage\.gradeId==='preschool'\)/u);
+  assert.match(source,/const countingGuide=Boolean\(preschoolStage && question\?\.type==='choice'\)/u);
   assert.match(source,/\{countingGuide && !round\.feedback && \(\s*<View style=\{styles\.preschoolAnswerSection\}>/u);
   assert.match(source,/onPress=\{\(\)=>void submit\(option\)\}/u);
   assert.match(source,/\{\(!countingGuide \|\| round\.feedback\) && <View/u);
