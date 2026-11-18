@@ -30,7 +30,8 @@ try {
   }
   execFileSync(process.execPath,[cli,'export','--platform','web','--output-dir',target],{
     stdio:'inherit',
-    env:{...env,EXPO_NO_DOTENV:'1',KAZU_DB_ONLY_PREVIEW:'1',EXPO_PUBLIC_FOLDER:'.expo/ui-preview-empty-public',
+    env:{...env,EXPO_NO_DOTENV:'1',KAZU_DB_ONLY_PREVIEW:'1',KAZU_PUBLIC_BANK_FILES:'1',
+      EXPO_PUBLIC_FOLDER:'.expo/ui-preview-empty-public',
       EXPO_PUBLIC_KAZU_UI_PREVIEW:'1',EXPO_PUBLIC_KAZU_UI_PREVIEW_SHA:version,
       EXPO_PUBLIC_KAZU_ONLINE_REVIEW:pages?'1':'0'},
   });
@@ -69,7 +70,7 @@ const entries=files.filter(file=>file.endsWith('.js'));
 if (entries.length!==1) throw new Error('The sample-only preview must have one entry bundle.');
 const [entry]=entries;
 const bundle=readFileSync(resolve(target,entry));
-assertSampleBundle(bundle.toString('utf8'),version,pages);
+assertSampleBundle(bundle.toString('utf8'),version,pages,true);
 const index=resolve(target,'index.html');
 if (pages) writePagesAdminEntry(target);
 else writeFileSync(index,readFileSync(index,'utf8').replace('<head>',
