@@ -40,9 +40,7 @@ export function createStageProductionService(pool) {
        !Number.isSafeInteger(reviewed_count)||reviewed_count<0||reviewed_count>authored_count||
        !Number.isSafeInteger(child_test_count)||child_test_count<0||child_test_count>10000||
        typeof note!=='string'||note.length>2000||
-       authored_count<productionStatusMinimum(status)||
        (status==='creator_reviewed'&&reviewed_count<10)||
-       (['final_creator_reviewed','child_tested'].includes(status)&&reviewed_count<100)||
        (status==='child_tested'&&child_test_count<1)) {
       throw invalid('制作件数・確認件数・評価状態を確認してください。');
     }
@@ -52,6 +50,12 @@ export function createStageProductionService(pool) {
       const {rows:[before]}=await session.query(
         'select * from question_catalog.stage_production where id=$1 for update',[id]);
       if(!before) throw invalid('指定されたステージがありません。');
+      const minimum=productionStatusMinimum(status,before.is_checkpoint);
+      if(authored_count<minimum||
+        (['final_creator_reviewed','child_tested'].includes(status) &&
+          reviewed_count<(before.is_checkpoint?10:100))) {
+        throw invalid('最終確認の必要問題数を満たしていません。');
+      }
       if(before.version!==version) throw conflict('別の更新があります。再読み込みしてください。');
       if(before.status===status&&before.authored_count===authored_count&&
          before.reviewed_count===reviewed_count&&before.child_test_count===child_test_count&&before.note===note) {
