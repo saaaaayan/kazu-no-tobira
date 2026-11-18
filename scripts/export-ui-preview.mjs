@@ -59,7 +59,15 @@ for(const id of publicBankIds){
   bankFiles[file]=contentDigest(readFileSync(source));
 }
 
-const allowed=new Set(['index.html','metadata.json']);
+// Keep the exact user-approved world image as a separate, cacheable public asset.
+const mapSource=resolve('public/world-map-approved.avif');
+const mapBytes=readFileSync(mapSource);
+if(mapBytes.length<50_000||mapBytes.length>2_000_000||
+   mapBytes.toString('ascii',4,12)!=='ftypavif')
+  throw new Error('The approved 16-island map is not a valid AVIF asset.');
+copyFileSync(mapSource,resolve(target,'world-map-approved.avif'));
+
+const allowed=new Set(['index.html','metadata.json','world-map-approved.avif']);
 const files=readdirSync(target,{recursive:true,withFileTypes:true}).filter(entry=>!entry.isDirectory())
   .map(entry=>relative(target,resolve(entry.parentPath,entry.name)).replaceAll('\\','/'));
 if (files.some(file=>!allowed.has(file) && !/^_expo\/static\/js\/web\/[A-Za-z0-9._-]+\.js$/.test(file) &&
@@ -78,6 +86,7 @@ else writeFileSync(index,readFileSync(index,'utf8').replace('<head>',
 writeFileSync(resolve(target,'version.json'),JSON.stringify({
   version,profile:'ui-preview',indexSha256:contentDigest(readFileSync(index)),entrySha256:contentDigest(bundle),
   publishedBankQuestions:publicBankIds.length*100,bankSha256:bankFiles,
+  approvedWorldMapSha256:contentDigest(mapBytes),
   ...(pages ? {adminSha256:contentDigest(readFileSync(resolve(target,'admin/index.html')))} : {}),
 })+'\n');
 console.log('Verified public prototype with '+(publicBankIds.length*100)+' bank questions at '+version);
