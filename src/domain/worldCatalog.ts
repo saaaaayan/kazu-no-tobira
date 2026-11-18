@@ -48,7 +48,7 @@ const makeUnits = (raw: string): StudyUnit[] => raw.trim().split('\n')
 
 export const gradeDefinitions: readonly { id: GradeId; title: string; island: string; theme: string; units: readonly StudyUnit[] }[] = [
   {
-    id: 'e1', title: '小学1年生', island: 'はじまりの島', theme: 'かずと なかよし',
+    id: 'e1', title: '小学1年生', island: 'おもちゃの島', theme: 'おもちゃと いっしょに かずを たんけん',
     units: makeUnits(`
 number-order|10までの かず|count
 add-small|9までの たしざん|addition
@@ -62,7 +62,7 @@ shapes1|かたちと おおきさ|shape
 clock1|とけいと おはなし|time`),
   },
   {
-    id: 'e2', title: '小学2年生', island: 'くくの森の島', theme: 'かけざんの まほう',
+    id: 'e2', title: '小学2年生', island: 'どうぶつの島', theme: 'どうぶつたちと もりを たんけん',
     units: makeUnits(`
 numbers1000|1000までの かず|place
 addition2|2けたの たしざん|addition
@@ -76,7 +76,7 @@ shapes2|三角形と 四角形|shape
 fraction2|分数と ひょう・グラフ|fraction`),
   },
   {
-    id: 'e3', title: '小学3年生', island: 'わり算の谷の島', theme: '数の ひみつを さがそう',
+    id: 'e3', title: '小学3年生', island: 'おかしの島', theme: 'おかしの まちで 数の ひみつを さがそう',
     units: makeUnits(`
 numbers10000|一万までの 数|place
 addition3|3けたの たし算|addition
@@ -90,7 +90,7 @@ circle3|円と 球|geometry
 data3|表と 棒グラフ|data`),
   },
   {
-    id: 'e4', title: '小学4年生', island: '四角の城の島', theme: 'ひろがる 算数の せかい',
+    id: 'e4', title: '小学4年生', island: '恐竜の島', theme: 'きょうりゅうの あしあとを たどろう',
     units: makeUnits(`
 large4|大きな数と しくみ|place
 expressions4|計算の きまり|operation
@@ -104,7 +104,7 @@ chart4|折れ線グラフ|data
 patterns4|変わり方を しらべよう|pattern`),
   },
   {
-    id: 'e5', title: '小学5年生', island: '割合の海の島', theme: 'わりあいと 図形の 冒険',
+    id: 'e5', title: '小学5年生', island: '機械の島', theme: 'はぐるまと きかいの しくみを みつけよう',
     units: makeUnits(`
 decimalmult5|小数の かけ算・わり算|decimal
 fractionadd5|異なる分母の 分数|fraction
@@ -118,7 +118,7 @@ circle5|円周と 円周率|circle
 congruence5|合同な図形と 多角形|geometry`),
   },
   {
-    id: 'e6', title: '小学6年生', island: '比の天空の島', theme: '算数から 数学へ',
+    id: 'e6', title: '小学6年生', island: '古代の島', theme: 'いせきと しんでんの なぞを とこう',
     units: makeUnits(`
 fractionmult6|分数の かけ算・わり算|fraction
 letters6|文字を 使った 式|equation
@@ -132,7 +132,7 @@ data6|データと 度数分布|data
 speed6|速さと まとめ|speed`),
   },
   {
-    id: 'j1', title: '中学1年生', island: '方程式の大陸', theme: '負の数と 文字の 力',
+    id: 'j1', title: '中学1年生', island: '迷宮の島', theme: '迷宮を進んで 数学の謎を解く',
     units: makeUnits(`
 signed1|正の数・負の数|signed
 expressions1|文字式の 計算|expression
@@ -146,7 +146,7 @@ primej1|素数・約数・倍数|divisor
 wordj1|方程式の 利用|equation`),
   },
   {
-    id: 'j2', title: '中学2年生', island: '関数の草原', theme: '変化と 証明の 旅',
+    id: 'j2', title: '中学2年生', island: '鏡の島', theme: '鏡と対称の世界で 関係を見つける',
     units: makeUnits(`
 polynomial2|式の 計算|expression
 systems2|連立方程式|system
@@ -160,7 +160,7 @@ proof2|図形の 証明|proof
 wordj2|連立方程式の 利用|system`),
   },
   {
-    id: 'j3', title: '中学3年生', island: '平方根の迷宮', theme: '二次の 世界へ',
+    id: 'j3', title: '中学3年生', island: '光と影の島', theme: '光と影がつくる 不思議な図形を探る',
     units: makeUnits(`
 factor3|展開と 因数分解|factor
 radical3|平方根|radical
@@ -174,7 +174,7 @@ proof3|数と 図形の 論証|proof
 reviewj3|中学数学の 総合|mixed`),
   },
   {
-    id: 'h1', title: '高校1年生', island: '論理と確率の王国', theme: '数学I・数学A',
+    id: 'h1', title: '高校1年生', island: '星座の島', theme: '星を結んで 数学の法則を見つける',
     units: makeUnits(`
 algebra1|数と式・展開と因数分解|factor
 logic1|集合と 命題|logic
@@ -188,7 +188,7 @@ integers1|整数の 性質|divisor
 geometryh1|図形の 性質|geometry`),
   },
   {
-    id: 'h2', title: '高校2年生', island: '関数と変化の宮殿', theme: '数学II・数学B・数学C',
+    id: 'h2', title: '高校2年生', island: '大自然の島', theme: '山や川の変化を 数学で読み解く',
     units: makeUnits(`
 polynomialh2|式と 証明|expression
 complexEq2|複素数と 方程式|complex
@@ -202,7 +202,7 @@ stats2|統計的な 推測|probability
 vector2|平面ベクトル|vector`),
   },
   {
-    id: 'h3', title: '高校3年生', island: '無限と発見の宇宙', theme: '数学III・数学C',
+    id: 'h3', title: '高校3年生', island: 'アカデミーの島', theme: '学問の殿堂で 数学を深める',
     units: makeUnits(`
 limitseq3|数列の 極限|limit
 limitfunction3|関数の 極限と 連続|limit
@@ -286,8 +286,8 @@ export const worldGrades: readonly WorldGrade[] = gradeDefinitions.map(def => ({
 const sageDefinition: Omit<WorldGrade, 'stages'> = {
   id: 'sage',
   title: '理系大学入試',
-  island: '賢者の島',
-  theme: '大図書館と天文台をめぐる 分野横断の総合演習',
+  island: '魔法使いの島',
+  theme: '魔導書と魔法の塔で 分野横断の難問に挑む',
   units: Array.from({length:10}, (_, i) => ({ code: 'sage-mixed-' + (i+1), title: '総合演習', family: 'sageMixed' })),
 };
 
@@ -309,8 +309,8 @@ play|かずと かたちの あそび|mixed`),
 };
 
 const champion: Omit<WorldGrade, 'stages'> = {
-  id: 'champion', title: '最難関入試・数学競技', island: '覇王の島',
-  theme: '発想と論証で 難関を切り開く',
+  id: 'champion', title: '最難関入試・数学競技', island: '王国',
+  theme: '城と王冠が示す 最難関への挑戦',
   units: makeUnits(`
 integer|整数と合同式|numberTheory
 diophantine|整数方程式|numberTheory
@@ -325,8 +325,8 @@ counterexample|反例と構成|proof`),
 };
 
 const cosmos: Omit<WorldGrade, 'stages'> = {
-  id: 'cosmos', title: '大学数学・探究', island: '宇宙ステージ',
-  theme: '定義から出発して 数学のつながりを探る',
+  id: 'cosmos', title: '大学数学・探究', island: '宇宙の島',
+  theme: '惑星と軌道をたどり 未知の数学を探究する',
   units: makeUnits(`
 logic|集合・写像・論理|proof
 number-theory|整数論|numberTheory
