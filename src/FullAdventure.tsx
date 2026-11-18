@@ -447,7 +447,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const specialRound=Boolean(round?.checkpoint || (round?.live && !['stage','test'].includes(round.live.mode)));
   const cleared = Boolean(round && !specialRound && round.correct >= Math.ceil(round.stage.questions * 0.8));
   const nextStage = round && !round.checkpoint && (!round.live || ['stage','test'].includes(round.live.mode)) && worldIslands.find(g=>g.id===round.stage.gradeId)?.stages[round.stage.order + 1];
-  const canContinue = !review && nextStage && progress && (uiPreview || ['play', 'learn'].includes(worldStageAction(playMode, progress, nextStage, access)));
+  const canContinue = !review && nextStage && progress && (uiPreview
+    ? (hasStageBank(nextStage.id)||Boolean(uiPreviewRound(nextStage).length))
+    : ['play', 'learn'].includes(worldStageAction(playMode, progress, nextStage, access)));
   const lessonStage = learning && (learning.target ?? grade.stages.find(stage => learning.lesson.linkedStageIds.includes(stage.id)));
   const canChallenge = lessonStage && progress && canPlayWorldStage(playMode, progress, lessonStage, access);
   const newlyEarnedTitles = round && progress && !testing ? adventureTitles(progress).filter(t=>t.unlocked).length : 0;
@@ -460,7 +462,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           style={[styles.shell,round && !round.complete && styles.playShell]}>
           {uiPreview && <View style={styles.playPanel} testID="kazu-sample-only-preview">
             <Text accessibilityRole="header" style={styles.answerHeading}>数のトビラ 試作版</Text>
-            <Text style={styles.explanation}>全16島の画面とサンプル問題を確認できます。回答は保存されません。</Text>
+            <Text style={styles.explanation}>小学1年生・賢者の島の43ステージで4,300問を公開中。各ステージ100問から10問ずつ挑戦できます。幼児01〜05も遊べます。試作版の回答記録は保存されません。</Text>
             <Text selectable style={styles.hintNote}>バージョン {process.env.EXPO_PUBLIC_KAZU_UI_PREVIEW_SHA}</Text>
           </View>}
           {__DEV__ && !review && <View style={styles.navigation}>
