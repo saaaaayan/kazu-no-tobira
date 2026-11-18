@@ -112,7 +112,7 @@ function preschoolQuestion(stage:WorldStage,index:number):BankQuestion {
   }
   const wrongs=options.filter(v=>v!==answer);
   if(new Set(options).size!==3||!options.includes(answer))throw new Error('Preschool choices invalid '+stage.id+' '+index);
-  return {id:stage.id+':draft10:'+String(index+1),skillId:stage.gradeId+'.'+stage.family,
+  return {id:stage.id+':draft10:'+String(index+1),skillId:(stage.gradeId+'.'+stage.family) as BankQuestion['skillId'],
     type:'choice',format:'counting',difficulty:difficulty as 1|2|3,
     question:stem,prompt,choices:options,answer,
     hint:hints[0],hints,explanation,steps:[
