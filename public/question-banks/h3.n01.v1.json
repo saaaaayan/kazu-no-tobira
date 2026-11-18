@@ -1,0 +1,407 @@
+{
+  "version": 1,
+  "selection": "balanced",
+  "stageId": "h3.n01",
+  "gradeId": "h3",
+  "islandId": "h3",
+  "unit": "数列の 極限",
+  "objective": "極限値を評価し、収束条件を説明する",
+  "questions": [
+    {
+      "id": "draft-h3.n01-01",
+      "skillId": "h3.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "lim(n→∞) (2n+1)/(3n+4) は？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "2/3",
+        "1/4",
+        "5",
+        "3/2"
+      ],
+      "answer": "2/3",
+      "hint": "分子と分母の最高次の項に注目。",
+      "hints": [
+        "分子と分母の最高次の項に注目。",
+        "分子・分母をnで割ろう。",
+        "定数項/n は0に収束する。"
+      ],
+      "explanation": "極限値は 2/3 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "分子・分母をnで割ろう。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "(2+1/n)/(3+4/n)→2/3=2/3。"
+        },
+        {
+          "title": "確認",
+          "body": "極限値は 2/3 です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "1/4",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "5",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "3/2",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h3.n01-02",
+      "skillId": "h3.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "lim(n→∞) 3/n² は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "0",
+      "hint": "n²の大きさを考えよう。",
+      "hints": [
+        "n²の大きさを考えよう。",
+        "分母は正で無限に大きくなる。",
+        "定数をn²で割った値は0に近づく。"
+      ],
+      "explanation": "極限値は0です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "分母は正で無限に大きくなる。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "|3/n²|→0。"
+        },
+        {
+          "title": "確認",
+          "body": "極限値は0です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-h3.n01-03",
+      "skillId": "h3.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 1,
+      "question": "lim(n→∞) [√(n²+8n)-n] は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "4",
+      "hint": "平方根の差を工夫しよう。",
+      "hints": [
+        "平方根の差を工夫しよう。",
+        "共役な式をかけて有理化する。",
+        "分子を整理し分母をnで割って極限を取る。"
+      ],
+      "explanation": "極限値は 4 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "共役な式をかけて有理化する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "2×4n/[√(n²+8n)+n]＝8/[√(1+8/n)+1]→4。"
+        },
+        {
+          "title": "確認",
+          "body": "極限値は 4 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-h3.n01-04",
+      "skillId": "h3.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "lim(n→∞) (5n+4)/(6n+7) は？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "5/6",
+        "4/7",
+        "11",
+        "6/5"
+      ],
+      "answer": "5/6",
+      "hint": "分子と分母の最高次の項に注目。",
+      "hints": [
+        "分子と分母の最高次の項に注目。",
+        "分子・分母をnで割ろう。",
+        "定数項/n は0に収束する。"
+      ],
+      "explanation": "極限値は 5/6 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "分子・分母をnで割ろう。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "(5+4/n)/(6+7/n)→5/6=5/6。"
+        },
+        {
+          "title": "確認",
+          "body": "極限値は 5/6 です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "4/7",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "11",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "6/5",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h3.n01-05",
+      "skillId": "h3.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "lim(n→∞) 6/n² は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "0",
+      "hint": "n²の大きさを考えよう。",
+      "hints": [
+        "n²の大きさを考えよう。",
+        "分母は正で無限に大きくなる。",
+        "定数をn²で割った値は0に近づく。"
+      ],
+      "explanation": "極限値は0です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "分母は正で無限に大きくなる。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "|6/n²|→0。"
+        },
+        {
+          "title": "確認",
+          "body": "極限値は0です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-h3.n01-06",
+      "skillId": "h3.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "lim(n→∞) [√(n²+14n)-n] は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "7",
+      "hint": "平方根の差を工夫しよう。",
+      "hints": [
+        "平方根の差を工夫しよう。",
+        "共役な式をかけて有理化する。",
+        "分子を整理し分母をnで割って極限を取る。"
+      ],
+      "explanation": "極限値は 7 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "共役な式をかけて有理化する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "2×7n/[√(n²+14n)+n]＝14/[√(1+14/n)+1]→7。"
+        },
+        {
+          "title": "確認",
+          "body": "極限値は 7 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-h3.n01-07",
+      "skillId": "h3.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 2,
+      "question": "lim(n→∞) (8n+7)/(4n+10) は？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "2",
+        "7/10",
+        "12",
+        "1/2"
+      ],
+      "answer": "2",
+      "hint": "分子と分母の最高次の項に注目。",
+      "hints": [
+        "分子と分母の最高次の項に注目。",
+        "分子・分母をnで割ろう。",
+        "定数項/n は0に収束する。"
+      ],
+      "explanation": "極限値は 2 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "分子・分母をnで割ろう。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "(8+7/n)/(4+10/n)→8/4=2。"
+        },
+        {
+          "title": "確認",
+          "body": "極限値は 2 です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "7/10",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "12",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "1/2",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    },
+    {
+      "id": "draft-h3.n01-08",
+      "skillId": "h3.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "lim(n→∞) 9/n² は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "0",
+      "hint": "n²の大きさを考えよう。",
+      "hints": [
+        "n²の大きさを考えよう。",
+        "分母は正で無限に大きくなる。",
+        "定数をn²で割った値は0に近づく。"
+      ],
+      "explanation": "極限値は0です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "分母は正で無限に大きくなる。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "|9/n²|→0。"
+        },
+        {
+          "title": "確認",
+          "body": "極限値は0です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-h3.n01-09",
+      "skillId": "h3.unit1",
+      "type": "number",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "lim(n→∞) [√(n²+20n)-n] は？",
+      "prompt": "答えを数字で入力しましょう。",
+      "answer": "10",
+      "hint": "平方根の差を工夫しよう。",
+      "hints": [
+        "平方根の差を工夫しよう。",
+        "共役な式をかけて有理化する。",
+        "分子を整理し分母をnで割って極限を取る。"
+      ],
+      "explanation": "極限値は 10 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "共役な式をかけて有理化する。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "2×10n/[√(n²+20n)+n]＝20/[√(1+20/n)+1]→10。"
+        },
+        {
+          "title": "確認",
+          "body": "極限値は 10 です。"
+        }
+      ],
+      "mistakes": []
+    },
+    {
+      "id": "draft-h3.n01-10",
+      "skillId": "h3.unit1",
+      "type": "choice",
+      "format": "calculation",
+      "difficulty": 3,
+      "question": "lim(n→∞) (11n+10)/(7n+13) は？",
+      "prompt": "正しい答えを選びましょう。",
+      "choices": [
+        "11/7",
+        "10/13",
+        "18",
+        "7/11"
+      ],
+      "answer": "11/7",
+      "hint": "分子と分母の最高次の項に注目。",
+      "hints": [
+        "分子と分母の最高次の項に注目。",
+        "分子・分母をnで割ろう。",
+        "定数項/n は0に収束する。"
+      ],
+      "explanation": "極限値は 11/7 です。",
+      "steps": [
+        {
+          "title": "考え方",
+          "body": "分子・分母をnで割ろう。"
+        },
+        {
+          "title": "途中の計算・理由",
+          "body": "(11+10/n)/(7+13/n)→11/7=11/7。"
+        },
+        {
+          "title": "確認",
+          "body": "極限値は 11/7 です。"
+        }
+      ],
+      "mistakes": [
+        {
+          "answer": "10/13",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "18",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        },
+        {
+          "answer": "7/11",
+          "explanation": "条件と計算手順を確かめてみましょう。"
+        }
+      ]
+    }
+  ]
+}
