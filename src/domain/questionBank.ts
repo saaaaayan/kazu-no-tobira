@@ -1,5 +1,6 @@
 import { bankStageIds } from './bankStageIds.ts';
-export { bankStageIds };
+import { starterTenStageIds } from './starterTenStageIds.ts';
+export { bankStageIds,starterTenStageIds };
 import type { SolutionStep } from './writtenSolution.ts';
 import type { MathQuestion } from './worldQuestions.ts';
 
@@ -39,10 +40,10 @@ export type StageBank = {
   questions: readonly BankQuestion[];
 };
 
-export type BankStageId = typeof bankStageIds[number];
+export type BankStageId = typeof bankStageIds[number] | typeof starterTenStageIds[number];
 
 export function hasStageBank(id: string): id is BankStageId {
-  return bankStageIds.some(stageId => stageId === id);
+  return bankStageIds.some(stageId => stageId === id) || starterTenStageIds.some(stageId => stageId === id);
 }
 
 export function isBankQuestion(question: MathQuestion): question is BankQuestion {
