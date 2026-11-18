@@ -1,6 +1,6 @@
 import type { BankQuestion } from './questionBank';
 // 2026-11-18: elementary first-unit stages 02–05. Generated from unit-specific pedagogical templates.
-export const elementaryFollowupBanks:Readonly<Record<string,readonly BankQuestion[]>> = {
+const followupData = {
  "e2.n02": [
   {
    "id": "ui-preview-e2.n02-lesson-01",
@@ -7201,4 +7201,5 @@ export const elementaryFollowupBanks:Readonly<Record<string,readonly BankQuestio
    "pedagogicalApproval": false
   }
  ]
-};
+} as const;
+export const elementaryFollowupBanks: Readonly<Record<string,readonly BankQuestion[]>> = followupData;
