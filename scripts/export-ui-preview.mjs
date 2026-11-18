@@ -70,7 +70,7 @@ const entries=files.filter(file=>file.endsWith('.js'));
 if (entries.length!==1) throw new Error('The sample-only preview must have one entry bundle.');
 const [entry]=entries;
 const bundle=readFileSync(resolve(target,entry));
-assertSampleBundle(bundle.toString('utf8'),version,pages);
+assertSampleBundle(bundle.toString('utf8'),version,pages,true);
 const index=resolve(target,'index.html');
 if (pages) writePagesAdminEntry(target);
 else writeFileSync(index,readFileSync(index,'utf8').replace('<head>',
