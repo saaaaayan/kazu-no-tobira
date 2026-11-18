@@ -241,14 +241,17 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
       </View>
       {preview && <View style={styles.previewCard}>
         {previewStage ? <>
-          <Text accessibilityRole="header" style={styles.previewHeading}>まずは ここから！</Text>
+          <Text accessibilityRole="header" style={styles.previewHeading}>{hasStageBank(previewStage.id)
+            ? '作成済みの問題を 管理者テストで確認' : 'まずは ここから！'}</Text>
           <Pressable accessibilityRole="button" testID="kazu-preview-first-stage"
             accessibilityLabel={'ステージ '+stageText(previewStage)+' を はじめる'}
             onPress={()=>onStart(previewStage)}
             style={({pressed})=>[styles.previewStart,pressed&&styles.pressed]}>
-            <Text style={styles.previewStartText}>▶ ステージ {stageText(previewStage)} を はじめる</Text>
+            <Text style={styles.previewStartText}>▶ ステージ {stageText(previewStage)} {hasStageBank(previewStage.id)?'を 管理者として確認':'を はじめる'}</Text>
           </Pressable>
-          <Text style={styles.hintText}>えを みて、さわって、かぞえてみよう。</Text>
+          <Text style={styles.hintText}>{hasStageBank(previewStage.id)
+            ? '未確認の問題です。管理者ログイン後に実際のゲーム画面で10問を試せます。'
+            : 'えを みて、さわって、かぞえてみよう。'}</Text>
         </> : <>
           <Text style={styles.previewHeading}>このしまの もんだいは じゅんびちゅう</Text>
           <Text style={styles.hintText}>いまは ちずを みられるよ。ほかの しまも みてみよう。</Text>
