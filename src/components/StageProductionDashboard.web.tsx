@@ -189,7 +189,7 @@ export default function StageProductionDashboard({api,onPreview,onInspectQuestio
         <button type="button" style={control} onClick={()=>setReload(n=>n+1)}>再読み込み</button>
       </div>
       <p>{fetching?'読み込み中…':filtered.length+'件'}　{page+1}/{maxPage+1}ページ</p>
-      <div style={{maxHeight:410,overflow:'auto'}}>
+      <div className="kazu-admin-stage-table" style={{maxHeight:410,overflow:'auto'}}>
         <table style={{width:'100%',borderCollapse:'collapse',fontSize:13}}>
           <thead><tr><th align="left">ステージ</th><th align="left">進捗ステータス</th><th align="right">制作済み</th><th align="right">DB登録</th><th align="right">確認済み</th><th>開く</th></tr></thead>
           <tbody>{shown.map(row=><tr key={row.id} style={{borderTop:'1px solid #e5e7eb',background:selectedId===row.id?'#eef4ff':'transparent'}}>

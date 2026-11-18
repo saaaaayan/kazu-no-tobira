@@ -37,8 +37,14 @@ const filters = [
 ] as const;
 const duplicateLabels = { exact:'問題文一致', equivalent:'数学的同値', structural:'構造類似' };
 const panel = { border:'1px solid #cbd5e1', borderRadius:12, margin:'16px 0', padding:16, background:'#fff' };
-const pageStyle = { maxWidth:1120, margin:'0 auto', padding:24, minHeight:'100vh', color:'#172846',
-  background:'#f2f5fa', fontFamily:'system-ui, sans-serif', overflowWrap:'anywhere' as const };
+// Explicit scroll container: Expo's root may keep body overflow hidden, and
+// a mobile device must still be able to reach the stage list and edit controls.
+const pageStyle = { maxWidth:1120, width:'100%', boxSizing:'border-box' as const,
+  margin:'0 auto', padding:24, minHeight:0, height:'100dvh',
+  overflowY:'auto' as const, overflowX:'hidden' as const, touchAction:'pan-y' as const,
+  WebkitOverflowScrolling:'touch' as const,
+  color:'#172846', background:'#f2f5fa',
+  fontFamily:'system-ui, sans-serif', overflowWrap:'anywhere' as const };
 const line = { display:'flex', flexWrap:'wrap' as const, alignItems:'end', gap:12 };
 const labelStyle = { display:'grid', gap:4 };
 const button = { padding:'8px 14px', minHeight:42, borderRadius:6, border:'1px solid #8495b3', background:'#f4f7fc', color:'#172846' };
