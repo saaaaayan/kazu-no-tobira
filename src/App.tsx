@@ -11,6 +11,7 @@ import CalculationMemo from './components/CalculationMemo';
 import NumberPad from './components/NumberPad';
 import HandwritingAnswer from './components/HandwritingAnswer';
 import AdventureMap from './components/AdventureMap';
+import WorldMap from './components/WorldMap';
 import { ClearScene, CorrectSpark, QuestionTrail, type AnswerFeedback } from './components/AdventureEffects';
 import { CompanionMoment, TreasureChest } from './components/AdventureCompanion';
 import VersionNotice from './components/VersionNotice';
@@ -40,6 +41,7 @@ type Round = {
 
 function Adventure() {
   const [progress, setProgress] = useState<Progress>();
+  const [showFirstGradeIsland, setShowFirstGradeIsland] = useState(false);
   const [round, setRound] = useState<Round>();
   const [input, setInput] = useState('');
   const [mode, setMode] = useState<AnswerMode>('keyboard');
@@ -147,7 +149,17 @@ function Adventure() {
             </Text>
           )}
           {progress && !round && (
-            <AdventureMap progress={progress} onStart={start} />
+            showFirstGradeIsland ? (
+              <>
+                <Pressable accessibilityRole="button"
+                  onPress={() => setShowFirstGradeIsland(false)} style={styles.back}>
+                  <Text style={styles.backText}>‹ 世界地図にもどる</Text>
+                </Pressable>
+                <AdventureMap progress={progress} onStart={start} />
+              </>
+            ) : (
+              <WorldMap onEnterFirstGrade={() => setShowFirstGradeIsland(true)} />
+            )
           )}
           {round && problem && (
             <View style={[styles.panel, !round.complete && styles.practicePanel]}>
