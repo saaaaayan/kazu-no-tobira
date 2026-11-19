@@ -80,7 +80,7 @@ test('Preschool terrain scatters 3 toys per row on phones and 4 on desktop',()=>
   assert.match(art,/ANIMALS\[\(row\*5\+slot\*7\)%ANIMALS.length\]/);
   assert.match(art,/scale=\{scale\*spot.size\}/);
   assert.match(art,/baseY\+spot.offset/);
-  assert.match(art,/row===0 \? 56\+PRESCHOOL_MAP_TITLE_INSET/);
+  assert.match(art,/row===0 \? 32\+PRESCHOOL_MAP_TITLE_INSET/);
   assert.match(map,/grade.id==='preschool'\?PRESCHOOL_MAP_TITLE_INSET:0,grade.id==='preschool'/);
   assert.match(map,/const nextPoint=geometry.positions\[checkpoint.after.order\+1\]/);
 });
@@ -92,5 +92,5 @@ test('The in-map preschool title is visible above plush mascots and the first ar
   assert.match(ui,/<Text style=\{styles\.preschoolMapTopGrade\}>就学前<\/Text>/);
   assert.match(ui,/<Text style=\{styles\.preschoolMapTopName\}>ぬいぐるみの島<\/Text>/);
   assert.match(ui,/preschoolMapTopTitle:\{position:'absolute',top:18,left:40,right:40,height:58/);
-  assert.match(terrain,/row===0 \? 56\+PRESCHOOL_MAP_TITLE_INSET/);
+  assert.match(terrain,/row===0 \? 32\+PRESCHOOL_MAP_TITLE_INSET/);
 });
