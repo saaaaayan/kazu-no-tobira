@@ -54,12 +54,32 @@ test('preschool checkpoint 1 draws two distinct questions from each of the 5 pre
 test('checkpoint 1 preview map is playable without unlocking all 5 normal stages',()=>{
   const source=readFileSync(new URL('../src/components/WorldScenes780.tsx',import.meta.url),'utf8');
   const app=readFileSync(new URL('../src/FullAdventure.tsx',import.meta.url),'utf8');
-  assert.match(source,/const enabled=preview \? grade\.id==='preschool' && checkpoint\.number===1/);
+  assert.match(source,/const enabled=preview \? grade\.id==='preschool' && checkpoint\.number<=10/);
   assert.match(source,/onPress=\{\(\)=>onCheckpoint\(checkpoint\)\}/);
-  assert.match(app,/item\.id!=='preschool\.checkpoint1'/);
+  assert.match(app,/item\.after\.gradeId!=='preschool'\|\|item\.number<1\|\|item\.number>10/);
   assert.match(app,/const problems=uiPreviewPreschoolCheckpointOne\(\)/);
   assert.match(app,/checkpoint:\{id:item\.id,number:item\.number\}/);
   assert.match(app,/const specialRound=Boolean\(round\?\.checkpoint/);
   assert.match(app,/const nextStage = round && !round\.checkpoint/);
   assert.match(app,/round\.checkpoint \? 'かくにんテスト '/);
+});
+
+
+test('checkpoints 2–10 each assemble ten playable tasks from the previous five stages',async()=>{
+  const {uiPreviewPreschoolCheckpoint}=await import('../src/domain/uiPreviewRound.ts');
+  for(let number=1;number<=10;number++){
+    const round=uiPreviewPreschoolCheckpoint(number,makeRng(number+91));
+    assert.equal(round.length,10,'checkpoint '+number);
+    assert.equal(new Set(round.map(q=>q.id)).size,10);
+    for(let part=0;part<5;part++){
+      const stageNo=(number-1)*5+part+1;
+      const id='preschool.n'+String(stageNo).padStart(2,'0');
+      const pair=round.slice(part*2,part*2+2);
+      assert.ok(pair.every(q=>q.id.startsWith('ui-preview-'+id+'-')));
+      assert.ok(pair.every(q=>checkMathAnswer(q,q.answer)));
+      assert.ok(pair.every(q=>q.hints.length===3&&q.explanation.length>5));
+    }
+  }
+  assert.deepEqual(uiPreviewPreschoolCheckpoint(0),[]);
+  assert.deepEqual(uiPreviewPreschoolCheckpoint(11),[]);
 });
