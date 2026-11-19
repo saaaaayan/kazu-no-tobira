@@ -295,11 +295,12 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
       label:action==='premium'?'プレミアム':action==='play'?'▶ あそぶ'
         :action==='learn'?'まず学ぶ':'未解放'};
   };
-  return (
-    <View style={styles.screen}>
-      <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
-        <Text style={styles.backText}>‹ 世界地図に もどる</Text>
-      </Pressable>
+  // The preschool map must be the first main content below Back. Long
+  // curriculum, lesson cards and controls belong AFTER the map instead of
+  // forcing children to scroll through them before seeing the first stage.
+  const islandMapExtras=(
+    <>
+      {grade.id!=='preschool' && (
       <View style={styles.islandBanner}>
         <View style={styles.islandBannerText}>
           <Text style={styles.eyebrow}>{grade.title} の ぼうけんマップ</Text>
@@ -312,6 +313,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         </View>
         <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
       </View>
+      )}
       <IslandCurriculumPanel grade={grade} onStart={onStart} availability={curriculumAvailability}/>
       {preview && <View style={styles.previewCard}>
         {previewStage ? <>
@@ -376,6 +378,14 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         <Text style={styles.hintText}>地図の丸い地点をタッチして ステージへ進もう！</Text>
         {grade.id==='preschool' && <Text style={styles.pixelMapNote}>ドットえの ぬいぐるみたちが いっぱい！</Text>}
       </View>
+    </>
+  );
+  return (
+    <View style={styles.screen}>
+      <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
+        <Text style={styles.backText}>‹ 世界地図に もどる</Text>
+      </Pressable>
+      {grade.id!=='preschool' && islandMapExtras}
       <View style={[styles.ocean,grade.id==='preschool'&&styles.pixelOcean,{height:geometry.height}]} onLayout={event=>{
         const nextWidth=Math.round(event.nativeEvent.layout.width);
         if(nextWidth>0&&nextWidth!==width)setWidth(nextWidth);
@@ -556,6 +566,11 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           </View>;
         })()}
       </View>
+      {grade.id==='preschool' && (
+        <View testID="preschool-learning-below-map" style={styles.preschoolBelowMap}>
+          {islandMapExtras}
+        </View>
+      )}
       {!testing && <View style={styles.footer}>
         <Text style={styles.footerTitle}>✦ この島には 65のステージ</Text>
         <Text style={styles.footerInfo}>冒険の道 50こ → 試練の道 10こ → 伝説のトビラ 5こ。伝説のトビラは最初の60ステージをぜんぶパーフェクトにすると開くよ。</Text>
@@ -572,6 +587,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
 }
 
 const styles=StyleSheet.create({
+  preschoolBelowMap:{gap:12,paddingTop:16},
   screen:{gap:13},
   worldBanner:{borderRadius:20,padding:18,gap:8,backgroundColor:'#263b51'},
   islandBanner:{borderRadius:20,padding:16,flexDirection:'row',alignItems:'center',backgroundColor:'#283d69',gap:8},
