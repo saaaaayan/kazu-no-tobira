@@ -20,7 +20,7 @@ test('preschool 01–05 all share the stage 01 guided counting UI',()=>{
     assert.equal(questions.length,10);
     assert.ok(questions.every(q=>q.type==='choice'&&q.diagram?.kind==='countingBoard'&&q.diagram.guide===true));
   }
-  assert.match(source,/const preschoolStage=Boolean\(round\?\.stage\.gradeId==='preschool' && preschoolGuideTitles\[round\.stage\.id\]\)/u);
+  assert.match(source,/const preschoolStage=Boolean\(round\?\.stage\.gradeId==='preschool' && \(preschoolGuideTitles\[round\.stage\.id\] \|\| uiPreview\)\)/u);
   assert.match(source,/const countingGuide=Boolean\(preschoolStage && diagram\?\.kind==='countingBoard' && diagram\.guide\)/u);
   assert.match(source,/\{countingGuide && !round\.feedback && \(\s*<View style=\{styles\.preschoolAnswerSection\}>/u);
   assert.match(source,/onPress=\{\(\)=>void submit\(option\)\}/u);
@@ -31,11 +31,14 @@ test('preschool 01–05 all share the stage 01 guided counting UI',()=>{
   assert.match(source,/\{countingGuide && diagram && <QuestionDiagram diagram=\{diagram\} phase="solution"\/>\}/u);
 });
 
-test('only preschool stages 01–05 get this UI, not a future stage',()=>{
+test('all preschool stages play; only 01–05 use the legacy large counting buttons',()=>{
   const ids=(source.match(/'preschool\.n\d{2}':/gu)??[]);
   assert.deepEqual(ids,[
     "'preschool.n01':","'preschool.n02':","'preschool.n03':","'preschool.n04':","'preschool.n05':"
   ]);
-  const later=allWorldStages.find(stage=>stage.id==='preschool.n06');
-  assert.equal(uiPreviewRound(later).length,0);
+  const preschool=allWorldStages.filter(stage=>stage.gradeId==='preschool');
+  assert.equal(preschool.length,65);
+  for(const stage of preschool)assert.equal(uiPreviewRound(stage).length,10,stage.id);
+  assert.match(source,/const traceActivity=Boolean/);
+  assert.match(source,/<PreschoolTracePad key=\{question\.id\}/);
 });
