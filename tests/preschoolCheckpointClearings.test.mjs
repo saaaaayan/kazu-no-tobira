@@ -118,5 +118,6 @@ test('checkpoint clearings use collision-safe organic plush, flowers and blocks'
  assert.doesNotMatch(src,/const spots=compact/);
  assert.match(planner,/islandCheckpointLayout\(width,end,marker,next,true\)/);
  assert.match(planner,/preschoolStageLabelLayout\(width,point,marker\)/);
- assert.match(planner,/for\(const \[kind,count\] of \[\['blocks',targetBlocks\],\['flower',targetFlowers\]\]/);
+ assert.match(planner,/const initialBlocks=Math.ceil\(targetBlocks\*\.65\)/);
+ assert.match(planner,/for\(let n=0;n<targetFlowers;n\+\+\)/);
 });
