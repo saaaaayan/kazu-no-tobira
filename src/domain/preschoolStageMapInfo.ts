@@ -1,0 +1,80 @@
+// Display-only learning objectives drafted for the preschool island.
+// These are not approved assessment content or a source of question validity.
+// Keep exercise data, stage IDs and review statuses unchanged.
+import type { WorldStage } from './worldCatalog.ts';
+const provisionalPreschoolStageInfo = [
+  { id: 'preschool.n01', title: "1〜3こを かぞえよう", goal: "1〜3個の同じぬいぐるみ/丸を横一列に並べ、指さしで1個ずつ数える" },
+  { id: 'preschool.n02', title: "4こと 5こ", goal: "4〜5個を重複・数え飛ばしなく数える" },
+  { id: 'preschool.n03', title: "10こまで かぞえよう", goal: "6〜10個を左から順に数える。途中の数と最後の個数を区別する" },
+  { id: 'preschool.n04', title: "いろいろな もの", goal: "色・形の混ざった横一列から、指定された種類だけ1〜10個の範囲で数える" },
+  { id: 'preschool.n05', title: "どんな ならびでも", goal: "間隔や見かけの大きさが違っても、対象を1個ずつ数えた結果は変わらないと経験する" },
+  { id: 'preschool.n06', title: "1・2・3を みつけよう", goal: "1〜3個の絵と数字1〜3を対応させる" },
+  { id: 'preschool.n07', title: "4・5を みつけよう", goal: "4〜5個の絵と数字4・5を対応させる" },
+  { id: 'preschool.n08', title: "6から 10の すうじ", goal: "6〜10個の絵と数字6〜10を対応させる" },
+  { id: 'preschool.n09', title: "0は どれかな", goal: "何もない状態を0と表し、0と1〜3を見分ける" },
+  { id: 'preschool.n10', title: "えと すうじを むすぼう", goal: "0〜10の数量・数字・ことばを混合して対応させる" },
+  { id: 'preschool.n11', title: "1・2・3を なぞろう", goal: "数字1・2・3の書き始めと線の方向をなぞって体験する" },
+  { id: 'preschool.n12', title: "4・5を なぞろう", goal: "数字4・5の形を手指でなぞる" },
+  { id: 'preschool.n13', title: "6・7を なぞろう", goal: "数字6・7の形と書く流れを体験する" },
+  { id: 'preschool.n14', title: "8・9を なぞろう", goal: "数字8・9の線のつながりを体験する" },
+  { id: 'preschool.n15', title: "0と 10を なぞろう", goal: "数字0の形と、10が1と0の2文字で表せることを確かめる" },
+  { id: 'preschool.n16', title: "1・2・3の じゅんばん", goal: "1→2→3という順序を絵と数字でつかむ" },
+  { id: 'preschool.n17', title: "5までの じゅんばん", goal: "1〜5の順序を知り、数字の前後のつながりを捉える" },
+  { id: 'preschool.n18', title: "10までの じゅんばん", goal: "1〜10の順序を知り、途中から続けて言える" },
+  { id: 'preschool.n19', title: "つぎと まえの かず", goal: "数字1〜10の『つぎ』『まえ』を隣の数字から探す" },
+  { id: 'preschool.n20', title: "かくれた すうじ", goal: "1〜10の連続した並びの空欄を埋める" },
+  { id: 'preschool.n21', title: "どっちが おおい？", goal: "明らかに個数の違う2組（1〜5個）を比較する" },
+  { id: 'preschool.n22', title: "1こ ちがうよ", goal: "1個だけ違う2組（1〜10個）を数えて比較する" },
+  { id: 'preschool.n23', title: "おなじ かず", goal: "並び方が違っても同じ個数の2組を見つける" },
+  { id: 'preschool.n24', title: "3つの なかから", goal: "3組の中でいちばん多い・少ない組を探す" },
+  { id: 'preschool.n25', title: "おおい・すくない めいじん", goal: "多い・少ない・同じを状況に応じて判断する" },
+  { id: 'preschool.n26', title: "おなじ いろを あつめよう", goal: "同じ色という1つの基準で分ける" },
+  { id: 'preschool.n27', title: "おなじ かたちを あつめよう", goal: "丸・三角・四角を形という1基準で分ける" },
+  { id: 'preschool.n28', title: "どれが なかま？", goal: "提示した仲間の共通点（色または形）に合う1つを選ぶ" },
+  { id: 'preschool.n29', title: "2つの おやくそく", goal: "色と形の2条件の両方に合うものを探す" },
+  { id: 'preschool.n30', title: "なかまわけの おみせ", goal: "色・形・大きさの指定基準で品物を仕分ける" },
+  { id: 'preschool.n31', title: "まるを みつけよう", goal: "さまざまな大きさや色の丸を見つける" },
+  { id: 'preschool.n32', title: "さんかくを みつけよう", goal: "向きと大きさが異なる三角を見つける" },
+  { id: 'preschool.n33', title: "しかくを みつけよう", goal: "正方形と長方形の四角を見つける" },
+  { id: 'preschool.n34', title: "くるっと まわしても", goal: "回転して向きが変わっても同じ形だと気づく" },
+  { id: 'preschool.n35', title: "かたちで つくろう", goal: "丸・三角・四角を組み合わせ、簡単な形の見本に合わせる" },
+  { id: 'preschool.n36', title: "2つの ならび", goal: "赤・青などABの繰り返しの次を見つける" },
+  { id: 'preschool.n37', title: "2こ・1この ならび", goal: "赤・赤・青などAABの繰り返しの次を予想する" },
+  { id: 'preschool.n38', title: "3つの ならび", goal: "赤・青・黄などABCの繰り返しをつかむ" },
+  { id: 'preschool.n39', title: "かたちの ならび", goal: "丸・三角・四角や大小の繰り返しを発見する" },
+  { id: 'preschool.n40', title: "ならびの たんけん", goal: "既習の複数パターンから次を見つける" },
+  { id: 'preschool.n41', title: "うえと した", goal: "ぬいぐるみの上・下を指し示す" },
+  { id: 'preschool.n42', title: "みぎと ひだり", goal: "自分から見た右・左を知る" },
+  { id: 'preschool.n43', title: "となりは だあれ？", goal: "横一列で隣にいるものを見つける" },
+  { id: 'preschool.n44', title: "まんなかは どこ？", goal: "3〜5個の横並びで真ん中・間のものを見つける" },
+  { id: 'preschool.n45', title: "ばしょの たんけん", goal: "上下・左右・隣・真ん中の指示に従って場所を探す" },
+  { id: 'preschool.n46', title: "かぞえて おくろう", goal: "数字で指定された個数のぬいぐるみを選び届ける" },
+  { id: 'preschool.n47', title: "かたちと かず", goal: "『丸を3こ』のように種類と個数を満たすものを選ぶ" },
+  { id: 'preschool.n48', title: "ひとつずつ わけよう", goal: "各ぬいぐるみに1つずつおやつ等を配り、足りているか確かめる" },
+  { id: 'preschool.n49', title: "ふしぎな おもちゃばこ", goal: "形・色・並びの決まりを見つけておもちゃ箱を完成する" },
+  { id: 'preschool.n50', title: "ぬいぐるみの おまつり", goal: "数・数字・形・並び・比較・場所を組み合わせた島全体の総合体験" },
+  { id: 'preschool.x01', title: "ぬいぐるみを かぞえよう！", goal: "いろいろな並びのぬいぐるみを、ひとつずつ数える" },
+  { id: 'preschool.x02', title: "かずの おひっこし", goal: "絵と数字を見比べ、同じ数になる組を探す" },
+  { id: 'preschool.x03', title: "すうじの ひみつの みち", goal: "数の順番や0の意味を使って、数字を見つける" },
+  { id: 'preschool.x04', title: "まいごの すうじ", goal: "抜けている数字を見つけて、順番を完成する" },
+  { id: 'preschool.x05', title: "どっちが おおいかな？", goal: "2組や3組の数を比べ、多い・少ない・同じを選ぶ" },
+  { id: 'preschool.x06', title: "おかたづけ めいじん", goal: "色や形で分類し、決めた場所に片づける" },
+  { id: 'preschool.x07', title: "かたちの へんしん", goal: "形の向きや組み合わせを見て、同じ形を探す" },
+  { id: 'preschool.x08', title: "つぎに くるのは？", goal: "繰り返す色や形の並びから、次を予想する" },
+  { id: 'preschool.x09', title: "ぬいぐるみの かくれんぼ", goal: "上下・左右・隣を手がかりに場所を探す" },
+  { id: 'preschool.x10', title: "おまつりの だいぼうけん", goal: "数・形・並びの遊びを組み合わせて挑戦する" },
+  { id: 'preschool.s01', title: "かずの ふしぎな まほう", goal: "数え方を工夫し、数字と個数の関係を考える" },
+  { id: 'preschool.s02', title: "ひみつの おもちゃばこ", goal: "色・形・数を手がかりに、おもちゃの決まりを見つける" },
+  { id: 'preschool.s03', title: "ぬいぐるみの だいさくせん", goal: "仲間分けや順番を工夫して、ぬいぐるみを助ける" },
+  { id: 'preschool.s04', title: "かたちの まほうじん", goal: "図形を並べたり向きを変えたりして形を作る" },
+  { id: 'preschool.s05', title: "ぬいぐるみの ひみつの おしろ", goal: "これまでの数と形の力を使い、最後の謎に挑戦する" },
+] as const;
+
+const byId: ReadonlyMap<string,{title:string;goal:string}> =
+  new Map(provisionalPreschoolStageInfo.map(info=>[info.id,info]));
+
+export function preschoolStageMapInfo(stage:Pick<WorldStage,'id'|'title'>) {
+  return byId.get(stage.id) ?? {title:stage.title,goal:''};
+}
+
+export const preschoolStageMapNames=provisionalPreschoolStageInfo;
