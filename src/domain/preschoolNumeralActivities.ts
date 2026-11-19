@@ -121,9 +121,11 @@ export function preschoolNumeralTask(stageNumber:6|7|8|9|10,index:number):Presch
     return findDigit(n,3,5,index===8?0:1);
   }
   if(stageNumber===8){
-    const n=6+index%5;
-    if(index<5)return readDigit(n,5,10,index);
-    return numeralToPictures(n,5,10,toys[index]);
+    // Include all three abilities: read numerals, find a named numeral,
+    // and match its value to a picture. No mere counting-only questions.
+    if(index<4)return readDigit(6+index,5,10,index);
+    if(index<7)return findDigit([10,6,7][index-4],5,10,index);
+    return numeralToPictures(index+1,5,10,toys[index]);
   }
   if(stageNumber===9){
     if(index<2)return readDigit(0,0,2,index);
