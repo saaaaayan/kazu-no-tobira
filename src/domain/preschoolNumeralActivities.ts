@@ -1,5 +1,6 @@
 import type { BankDiagram } from './questionBank.ts';
 import { countingTokenArt, type CountingToken } from './countingTokens.ts';
+import { pictureNumberMatchAnswer, type PictureNumberMatch } from './preschoolNumberConnections.ts';
 
 /** Numeral-learning tasks, separate from the counting-only preschool 01–05.
  * Child sees a numeral, hears/reads its name, or matches numeral and quantity.
@@ -11,6 +12,7 @@ export type PreschoolNumeralTask = {
   numeralPractice:true;
   focalNumeral?:string;
   diagram?:BankDiagram;
+  pictureNumberMatch?:PictureNumberMatch;
 };
 
 const sounds=['ぜろ','いち','に','さん','よん','ご','ろく','なな','はち','きゅう','じゅう'];
@@ -130,6 +132,37 @@ function zeroMeaning():PreschoolNumeralTask{
   };
 }
 
+/** A real three-pair matching activity, not a multiple-choice shortcut.
+ * The picture order and digit order vary; all ten have different cards. */
+function connectPicturesAndNumbers(index:number):PreschoolNumeralTask {
+  const counts=[1+index%5,1+(index+2)%5,1+(index+4)%5];
+  const pictures=counts.map((count,j)=>({count,token:toys[(index*3+j*2)%toys.length]}));
+  const digitOrders=[[2,0,1],[1,2,0],[2,1,0],[1,0,2]];
+  const order=digitOrders[index%digitOrders.length];
+  const match:PictureNumberMatch={
+    pictures,
+    numbers:order.map(j=>counts[j]),
+  };
+  const answer=pictureNumberMatchAnswer(match);
+  const alternatives=[
+    [counts[1],counts[0],counts[2]].join('-'),
+    [counts[2],counts[1],counts[0]].join('-'),
+  ];
+  const names=pictures.map(p=>label(p.token)+'は '+p.count+'こ').join('。');
+  return {
+    question:'えと おなじ かずの すうじを せんで むすぼう。',
+    prompt:'えを さわって、すうじを さわろう。',
+    answer,choices:pick3(answer,alternatives),
+    numeralPractice:true,pictureNumberMatch:match,
+    hints:[
+      'ひだりの えを、ひとつずつ かぞえよう。',
+      'おなじ かずの すうじを みぎから さがそう。',
+      'えを さわって、みつけた すうじを さわろう。',
+    ],
+    explanation:names+'。それぞれの えと すうじを つなげたね。',
+  };
+}
+
 /** Exactly 10 tasks per stage, covering recognition and matching—not ten counts. */
 export function preschoolNumeralTask(stageNumber:6|7|8|9|10,index:number):PreschoolNumeralTask{
   if(!Number.isInteger(index)||index<0||index>=10)throw new RangeError('Invalid numeral activity index');
@@ -170,8 +203,5 @@ export function preschoolNumeralTask(stageNumber:6|7|8|9|10,index:number):Presch
       default: return zeroMeaning();
     }
   }
-  const n=index<5?index+1:index-4;
-  return index<5
-    ? numeralToPictures(n,1,10,toys[index])
-    : picturesToNumeral(n,1,10,toys[index]);
+  return connectPicturesAndNumbers(index);
 }
