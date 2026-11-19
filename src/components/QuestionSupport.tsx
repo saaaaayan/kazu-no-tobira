@@ -66,6 +66,17 @@ function CountingBoard({ diagram, phase }: {
         gap:comparison?.after==='wide-gaps'?Math.max(10,sizes.gap+7):comparison?.after==='small'?2:diagram.guide ? sizes.gap : diagram.spacing==='wide'?20:8 }}>
         {tokens.map((token,column) => {
           const id = row+':'+column;
+          // 'empty' means an empty plate, not a mathematical circle or a
+          // countable object. Show an actual plate with its empty surface.
+          if(token==='empty')return <View key={id}
+            testID="counting-empty-plate"
+            accessible accessibilityLabel="なにも のっていない おさら。りんごは ないよ"
+            style={styles.emptyPlateScene}>
+            <View pointerEvents="none" style={styles.emptyPlateOuter}>
+              <View style={styles.emptyPlateInner}/>
+            </View>
+            <Text style={styles.emptyPlateCaption}>なにも のっていない おさら</Text>
+          </View>;
           const tapNumber = countingTapNumber(selected,id);
           const lit = tapNumber!==undefined;
           const shape = tokenArt[token];
@@ -226,6 +237,12 @@ export function WorkedSolution({ question, wrongAnswer }: { question: BankQuesti
 }
 
 const styles = StyleSheet.create({
+  emptyPlateScene:{width:'100%',minHeight:152,alignItems:'center',justifyContent:'center',gap:8,paddingVertical:10},
+  emptyPlateOuter:{width:158,height:95,borderWidth:5,borderRadius:65,borderColor:'#8297b0',
+    backgroundColor:'#e3edf7',justifyContent:'center',alignItems:'center'},
+  emptyPlateInner:{width:114,height:60,borderWidth:3,borderRadius:50,
+    borderColor:'#b2c5d9',backgroundColor:'#fff8e8'},
+  emptyPlateCaption:{fontSize:17,lineHeight:23,color:'#293f61',fontWeight:'900',textAlign:'center'},
   transfer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   group: { minWidth: 108, padding: 6, gap: 5, backgroundColor: '#eef3ff', borderRadius: 8 },
   bundles: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, maxWidth: 160 },
