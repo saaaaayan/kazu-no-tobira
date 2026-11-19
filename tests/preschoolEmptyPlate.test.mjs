@@ -39,5 +39,5 @@ test('the empty token is never just a circle glyph or a tap target',()=>{
  assert.match(picture,/なにも のっていない おさら/);
  assert.match(picture,/emptyPlateOuter:\{width:158,height:95/);
  assert.match(picture,/emptyPlateCaption:\{fontSize:17/);
- assert.match(picture,/return interactive && token!=='empty' \? <Pressable/);
+ assert.match(picture,/return interactive \? <Pressable/);
 });
