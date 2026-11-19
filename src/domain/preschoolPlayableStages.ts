@@ -79,14 +79,14 @@ function order(i:number,max:number,mode:number):Task{
  const val=mode===1 ? Math.max(2,Math.min(max-1,2+(i%Math.max(1,max-2))))
    :1+(i*3)%Math.max(1,max-2),answer=mode===0?val+1:mode===1?val-1:val+2;
  const strip=mode===0?val+'　□　'+(val+2):mode===1?'□　'+val+'　'+(val+1):val+'　'+(val+1)+'　□';
- // One blank slot and a separate, literal instruction: "hidden number"
- // is an unexplained metaphor for children who are learning number order.
- return numberTask(strip+'\nあいている ところに はいる すうじは？',answer,
+ // The visible symbol □ is clearer than the abstraction "an empty place".
+ // Keep the number pattern and the instruction on separate lines.
+ return numberTask(strip+'\n□に はいる すうじは？',answer,
    {prompt:'すうじを ひとつ えらぼう。',
-    hints:['すうじを ひとつずつ みてね。',
-      'じゅんばんに かぞえてみよう。',
-      'あいている ところの まえや あとを みてね。'],
-    explanation:'すうじは 1こずつ すすむよ。あいている ところに はいるのは '+answer+' だよ。'},max);
+    hints:['すうじを じゅんばんに よんでみよう。',
+      '□の まえと あとの すうじを みてね。',
+      'すうじは 1ずつ ふえているよ。'],
+    explanation:'□に はいるのは '+answer+' だよ。すうじは 1ずつ ふえるよ。'},max);
 }
 function position(i:number,level:number):Task{
  const items=[toys[(i+2)%toys.length],toys[(i+5)%toys.length],toys[(i+8)%toys.length]];
