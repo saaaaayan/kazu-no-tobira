@@ -85,10 +85,11 @@ test('the number-recognition UI shows a large digit and directly tappable choice
  assert.match(screen,/testID="preschool-numeral-choice-panel"/);
  assert.match(screen,/testID=\{'preschool-numeral-choice-'\+option\}/);
  assert.match(screen,/onPress=\{\(\)=>void submit\(option\)\}/);
- assert.match(screen,/\{\(\(!countingGuide && !numeralGuide\) \|\| round\.feedback\) && <View/);
- assert.match(screen,/!countingGuide && !numeralGuide && !bankQuestion\?\.preschoolTrace/);
+ assert.match(screen,/\{\(\(!countingGuide && !numeralGuide && !inlineChoice\) \|\| round\.feedback\) && <View/);
+ assert.match(screen,/!countingGuide && !numeralGuide && !bankQuestion\?\.preschoolTrace && question\.type!=='choice'/);
  assert.match(screen,/preschoolNumeralTargetText:\{fontSize:100/);
- assert.match(screen,/preschoolNumeralOption:\{minHeight:76/);
+ assert.match(screen,/preschoolNumeralChoices:\{width:'100%',maxWidth:520,gap:9,flexDirection:'row'/);
+ assert.match(screen,/preschoolNumeralOption:\{minHeight:78,flex:1,minWidth:0/);
 });
 
 test('checkpoint 2 draws the corrected 06–10 numeral activities',()=>{
