@@ -14,15 +14,17 @@ test('number-order tasks in every preschool stage display one missing square on 
   for(const stage of preschool.stages){
     const bank=uiPreviewBank(stage);
     for(const question of bank){
-      if(!question.question.includes('あいている ところに はいる すうじは？'))continue;
+      if(!question.question.includes('□に はいる すうじは？'))continue;
       checkedStages.add(stage.id);
       checkedQuestions++;
       const lines=question.question.split('\n');
       assert.equal(lines.length,2,question.id);
       assert.match(lines[0],/^((?:\d+|□)　){2}(?:\d+|□)$/u,question.id);
       assert.equal((lines[0].match(/□/g)??[]).length,1,question.id);
-      assert.equal(lines[1],'あいている ところに はいる すうじは？');
-      assert.equal((question.question.match(/□/g)??[]).length,1,question.id);
+      assert.equal(lines[1],'□に はいる すうじは？');
+      assert.equal((question.question.match(/□/g)??[]).length,2,question.id);
+      assert.ok(!/あいている ところ|かくれた すうじ/.test(question.question));
+      assert.ok(!/あいている ところ|かくれている/.test(question.explanation));
       const items=lines[0].split('　').map(item=>item==='□'?Number(question.answer):Number(item));
       assert.deepEqual(items,[items[0],items[0]+1,items[0]+2],
         'The answer must complete a true consecutive sequence: '+question.id);
@@ -31,8 +33,9 @@ test('number-order tasks in every preschool stage display one missing square on 
   }
   assert.ok(checkedQuestions>=50,'expect all ordering stage banks');
   const titleSource=readFileSync(new URL('../src/domain/preschoolStageMapInfo.ts',import.meta.url),'utf8');
-  assert.match(titleSource,/id: 'preschool.n20', title: "あいている ところ"/);
-  assert.doesNotMatch(titleSource,/id: 'preschool.n20', title: "かくれた すうじ"/);
+  assert.match(titleSource,/id: 'preschool.n20', title: "□に はいる すうじ"/);
+  assert.match(titleSource,/id: 'preschool.x04', title: "すうじの ならびに ちょうせん"/);
+  assert.doesNotMatch(titleSource,/id: 'preschool.n20', title: "あいている ところ"/);
   for(const number of [16,17,18,19,20]){
     assert.ok(checkedStages.has('preschool.n'+String(number).padStart(2,'0')));
   }
