@@ -22,7 +22,7 @@ const provisionalPreschoolStageInfo = [
   { id: 'preschool.n17', title: "5までの じゅんばん", goal: "1から 5までの すうじを ならべよう。" },
   { id: 'preschool.n18', title: "10までの じゅんばん", goal: "1から 10までの じゅんばんを たしかめよう。" },
   { id: 'preschool.n19', title: "つぎと まえの かず", goal: "すうじの つぎと まえを みつけよう。" },
-  { id: 'preschool.n20', title: "かくれた すうじ", goal: "あいている ところに はいる すうじを さがそう。" },
+  { id: 'preschool.n20', title: "あいている ところ", goal: "すうじの ならびを みて、あいている ところを うめよう。" },
   { id: 'preschool.n21', title: "どっちが おおい？", goal: "ぬいぐるみは どっちが おおいかな？" },
   { id: 'preschool.n22', title: "1こ ちがうよ", goal: "1こだけ ちがう かずを みくらべよう。" },
   { id: 'preschool.n23', title: "おなじ かず", goal: "おなじ かずの おもちゃを みつけよう。" },

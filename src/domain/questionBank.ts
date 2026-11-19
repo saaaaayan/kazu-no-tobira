@@ -24,6 +24,7 @@ export type BankQuestion = MathQuestion & {
   preschoolTrace?: string; // Public prototype: finger-drawn number practice only.
   preschoolNumberActivity?: true; // Preschool numeral-recognition/matching, not plain counting.
   preschoolNumeral?: string; // Large printed numeral shown above choices.
+  preschoolTwoRules?: {color:'あか'|'あお';shape:'まる'|'さんかく'|'しかく'}; // Two visual criteria.
   topic?: string;
   difficulty: 1 | 2 | 3;
   hints: readonly [string, string, string];

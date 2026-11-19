@@ -12,7 +12,8 @@ const toys: CountingToken[]=['bear','cat','dog','rabbit','chick','car','flower',
 const shapes=['●','▲','■'] as const;
 type Task={question:string;answer:string;choices:string[];prompt?:string;diagram?:BankDiagram;
   trace?:string; explanation?:string;hints?:[string,string,string];
-  numeralPractice?:true;focalNumeral?:string};
+  numeralPractice?:true;focalNumeral?:string;
+  twoRules?:{color:'あか'|'あお';shape:'まる'|'さんかく'|'しかく'};};
 const image=(token:CountingToken)=>countingTokenArt[token][0];
 const name=(token:CountingToken)=>countingTokenArt[token][1];
 const repeat=(token:CountingToken,n:number)=>Array.from({length:n},()=>token);
@@ -78,10 +79,14 @@ function order(i:number,max:number,mode:number):Task{
  const val=mode===1 ? Math.max(2,Math.min(max-1,2+(i%Math.max(1,max-2))))
    :1+(i*3)%Math.max(1,max-2),answer=mode===0?val+1:mode===1?val-1:val+2;
  const strip=mode===0?val+'　□　'+(val+2):mode===1?'□　'+val+'　'+(val+1):val+'　'+(val+1)+'　□';
- // The sequence and the instruction MUST be displayed on separate lines.
- // Repeating □ on the instruction line looked like a second missing number.
- return numberTask(strip+'\nかくれた すうじは どれ？',answer,
-   {explanation:'1こずつ すうじが すすむよ。 かくれている すうじは '+answer+' だよ。'},max);
+ // One blank slot and a separate, literal instruction: "hidden number"
+ // is an unexplained metaphor for children who are learning number order.
+ return numberTask(strip+'\nあいている ところに はいる すうじは？',answer,
+   {prompt:'すうじを ひとつ えらぼう。',
+    hints:['すうじを ひとつずつ みてね。',
+      'じゅんばんに かぞえてみよう。',
+      'あいている ところの まえや あとを みてね。'],
+    explanation:'すうじは 1こずつ すすむよ。あいている ところに はいるのは '+answer+' だよ。'},max);
 }
 function position(i:number,level:number):Task{
  const items=[toys[(i+2)%toys.length],toys[(i+5)%toys.length],toys[(i+8)%toys.length]];
@@ -151,12 +156,26 @@ function makeTask(n:number,i:number):Task{
  }
  if(n===28)return classify(i,0);
  if(n===29){
-   const items=[['🔴','🔺','🔵'],['🔺','🔴','🔵'],['🔵','🔴','🔺']];
-   const arr=items[i%3];
-   const answer=i%2===0?'🔴':'🔺';
-   return choose('この なかの '+(i%2===0?'あかい まる':'あかい さんかく')+' は どれ？　'+seq(arr),
-       answer,arr.filter(x=>x!==answer),
-       {explanation:'あかい ことと かたちの 2つを みて えらぶよ。'});
+   // Two genuine constraints: one incorrect candidate shares the COLOR,
+   // another shares the SHAPE. Never print the correct figure in the stem.
+   const conditions=[
+     {color:'あか',shape:'まる',answer:'🔴',sameColor:'🔺',sameShape:'🔵'},
+     {color:'あお',shape:'まる',answer:'🔵',sameColor:'🟦',sameShape:'🔴'},
+     {color:'あか',shape:'さんかく',answer:'🔺',sameColor:'🔴',sameShape:'🔼'},
+     {color:'あお',shape:'さんかく',answer:'🔼',sameColor:'🔵',sameShape:'🔺'},
+     {color:'あか',shape:'しかく',answer:'🟥',sameColor:'🔴',sameShape:'🟦'},
+     {color:'あお',shape:'しかく',answer:'🟦',sameColor:'🔵',sameShape:'🟥'},
+   ] as const;
+   const c=conditions[i%conditions.length];
+   return choose('2つの おやくそくに あうのは どれ？',c.answer,
+     [c.sameColor,c.sameShape],{
+       twoRules:{color:c.color,shape:c.shape},
+       prompt:'いろと かたち、りょうほう みて えらぼう。',
+       hints:['いろは '+c.color+' だよ。',
+         'かたちは '+c.shape+' だよ。',
+         'いろも かたちも あう ものを えらぼう。'],
+       explanation:'いろは '+c.color+'、かたちは '+c.shape+'。どちらも あうのが せいかいだよ。',
+     });
  }
  if(n===30)return classify(i,4);
  if(n>=31&&n<=35)return shapeTask(i,n-31);
@@ -244,6 +263,7 @@ export function preschoolPrototypeBank(stage:Pick<WorldStage,'id'|'gradeId'|'kin
      ...(q.trace?{preschoolTrace:q.trace}:{}),
      ...(q.numeralPractice?{preschoolNumberActivity:true as const}:{}),
      ...(q.focalNumeral!==undefined?{preschoolNumeral:q.focalNumeral}:{}),
+     ...(q.twoRules?{preschoolTwoRules:q.twoRules}:{}),
    } as BankQuestion;
  });
 }

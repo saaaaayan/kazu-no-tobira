@@ -576,6 +576,12 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                       variation={round.dialogueOffset + round.index}/>
                     {!countingGuide && <Text style={styles.difficulty}>{round.stage.kind==='secret'?stageLabels.secret:round.stage.kind==='extra'?stageLabels.extra:bankQuestion ? ['● きほん', '● ひょうじゅん', '★ おうよう'][bankQuestion.difficulty - 1]
                       : round.index<3?'● きほん':round.index<8?'● ひょうじゅん':'★ おうよう'}</Text>}
+                    {preschoolStage && bankQuestion?.preschoolTwoRules && !round.feedback && (
+                      <View testID="preschool-two-rule-conditions" style={styles.preschoolRulesPanel}>
+                        <Text style={styles.preschoolRuleText}>① いろは　{bankQuestion.preschoolTwoRules.color}</Text>
+                        <Text style={styles.preschoolRuleText}>② かたちは　{bankQuestion.preschoolTwoRules.shape}</Text>
+                      </View>
+                    )}
                     {round.stage.gradeId==='preschool' && question.question.includes('\n') ? (
                       <View testID="preschool-sequence-two-line-question"
                         accessibilityLabel={question.question} style={styles.preschoolSequenceQuestion}>
@@ -592,8 +598,13 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                       </View>
                     )}
                     {preschoolStage && !round.feedback &&
-                      <QuestionReadAloud text={[question.question,question.prompt,
-                        round.hintLevel ? hints[round.hintLevel-1] : ''].filter(Boolean).join('。')}/>}
+                      <QuestionReadAloud text={[
+                        ...(bankQuestion?.preschoolTwoRules
+                          ? ['いろは '+bankQuestion.preschoolTwoRules.color,
+                             'かたちは '+bankQuestion.preschoolTwoRules.shape] : []),
+                        question.question,question.prompt,
+                        round.hintLevel ? hints[round.hintLevel-1] : ''
+                      ].filter(Boolean).join('。')}/>}
                     {question.figure && <StudyFigureView figure={question.figure}/>}
                     {question.clock && !round.feedback && <ClockFace time={question.clock.start} read={question.clock.read}/>}
                     {diagram && !round.feedback && (
@@ -830,6 +841,9 @@ const styles = StyleSheet.create({
   questionIndex: { color: '#e1e7ff', fontWeight: '800', fontSize: 13 },
   difficulty: { color: '#ffe09f', fontSize: 12, fontWeight: '800', paddingTop: 4 },
   questionText: { color: 'white', fontWeight: '900', fontSize: 29, lineHeight: 40 },
+  preschoolRulesPanel:{alignSelf:'flex-start',width:'100%',maxWidth:520,marginBottom:14,
+    backgroundColor:'#fff5d6',borderRadius:9,paddingVertical:13,paddingHorizontal:18,gap:9},
+  preschoolRuleText:{color:'#293757',fontWeight:'900',fontSize:24,lineHeight:34},
   preschoolSequenceQuestion:{alignItems:'flex-start',justifyContent:'center',gap:14,
     marginBottom:8,minWidth:0,maxWidth:'100%'},
   preschoolSequenceNumbers:{color:'#fff0b5',fontWeight:'900',fontSize:38,
