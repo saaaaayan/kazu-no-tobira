@@ -350,6 +350,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
       <View style={styles.mapHeading}>
         <Text style={styles.mapTitle}>島のぼうけんルート</Text>
         <Text style={styles.hintText}>地図の丸い地点をタッチして ステージへ進もう！</Text>
+        {grade.id==='preschool' && <Text style={styles.pixelMapNote}>ドットえの ぬいぐるみたちが いっぱい！</Text>}
       </View>
       <View style={[styles.ocean,grade.id==='preschool'&&styles.pixelOcean,{height:geometry.height}]} onLayout={event=>{
         const nextWidth=Math.round(event.nativeEvent.layout.width);
@@ -455,6 +456,7 @@ const styles=StyleSheet.create({
   mapTitle:{color:'#2b395e',fontWeight:'900',fontSize:19},
   hintText:{color:'#5c657d',fontSize:13,lineHeight:20},
   ocean:{borderRadius:22,backgroundColor:'#548cab',overflow:'hidden',position:'relative',borderWidth:3,borderColor:'#d1dbdd'},
+  pixelMapNote:{color:'#536c57',fontSize:14,fontWeight:'800'},
   pixelOcean:{borderRadius:9,backgroundColor:'#80adc4',borderWidth:4,borderColor:'#344454'},
   atlas:{borderRadius:22,backgroundColor:'#244e68',overflow:'hidden',position:'relative',borderWidth:1,borderColor:'#4e7180'},
   worldMapControls:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:10,paddingHorizontal:4},
