@@ -57,7 +57,7 @@ test('checkpoint 1 preview map is playable without unlocking all 5 normal stages
   assert.match(source,/const enabled=preview \? grade\.id==='preschool' && checkpoint\.number<=10/);
   assert.match(source,/onPress=\{\(\)=>onCheckpoint\(checkpoint\)\}/);
   assert.match(app,/item\.after\.gradeId!=='preschool'\|\|item\.number<1\|\|item\.number>10/);
-  assert.match(app,/const problems=uiPreviewPreschoolCheckpointOne\(\)/);
+  assert.match(app,/const problems=item\.number===1\?uiPreviewPreschoolCheckpointOne\(\)/);
   assert.match(app,/checkpoint:\{id:item\.id,number:item\.number\}/);
   assert.match(app,/const specialRound=Boolean\(round\?\.checkpoint/);
   assert.match(app,/const nextStage = round && !round\.checkpoint/);
