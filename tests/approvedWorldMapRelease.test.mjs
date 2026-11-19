@@ -64,8 +64,8 @@ test('release pipeline publishes and independently checks the actual map, not on
   assert.match(exporter,/copyFileSync\(mapSource,resolve\(target,'world-map-approved\.png'\)\)/);
   assert.match(exporter,/approvedWorldMapSha256:contentDigest\(mapBytes\)/);
   assert.match(verifier,/await get\(imageFile\)/);
-  assert.match(verifier,/world-map-approved\\.avif/);
-  assert.match(verifier,/world-map-approved\\.png/);
+  assert.match(verifier,/world-map-approved[.]avif/);
+  assert.match(verifier,/world-map-approved[.]png/);
   const snapshot=read('scripts/snapshot-pages-prototype.mjs').toString();
   assert.match(snapshot,/approvedMap\.file/);
   assert.match(snapshot,/publishedBanks/);
