@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {compactIslandStageMap,islandCheckpointLayout,islandStageLayout,PRESCHOOL_MAP_TITLE_INSET}
   from '../src/domain/worldMapLayout.ts';
 import {worldIslands} from '../src/domain/worldCatalog.ts';
-import {checkpointsFor} from '../src/domain/checkpoints.ts';
+import {checkpointsFor} from '../src/domain/stageStructure.ts';
 const code=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 
 test('every five-stage preschool group has a dedicated wide vertical clearing',()=>{
