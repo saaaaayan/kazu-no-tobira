@@ -6,13 +6,15 @@ import type { MathQuestion } from './domain/worldQuestions';
 import { checkMathAnswer, isValidMathAnswer } from './domain/mathAnswer';
 import { stageDisplayTitle,stageLabels, type Checkpoint } from './domain/stageStructure';
 import { stageCategoryName } from './domain/islandCurriculumView';
+import { preschoolStageMapInfo } from './domain/preschoolStageMapInfo';
+import PreschoolTracePad from './components/PreschoolTracePad';
 import { liveOrigin, requestLiveRound, requestLiveGrade, requestLiveHint, type LiveMode, type LiveRound } from './domain/liveQuestions';
 import type { SkillId } from './domain/curriculum';
 import { hasStageBank,isBankQuestion } from './domain/questionBank';
 import { prepareStageRound } from './stageRounds';
 import { QuestionDiagram, WorkedSolution, WrittenSolution } from './components/QuestionSupport';
 import { emptyProgress, recordAttempt, type Progress } from './domain/progress';
-import { uiPreviewRound, uiPreviewPreschoolCheckpointOne } from './domain/uiPreviewRound';
+import { uiPreviewRound, uiPreviewPreschoolCheckpointOne, uiPreviewPreschoolCheckpoint } from './domain/uiPreviewRound';
 import { publicBankStageRound } from './domain/publicBankStageRound';
 import QuestionReadAloud from './components/QuestionReadAloud';
 import { canAccessFeature, canAccessStage, freeAccess, hasPremium, type Entitlement } from './domain/accessPlan';
@@ -235,17 +237,18 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
 
   function startCheckpoint(item:Checkpoint) {
     if (uiPreview) {
-      if (item.id!=='preschool.checkpoint1') {
+      if(item.after.gradeId!=='preschool'||item.number<1||item.number>10){
         setStartError('この かくにんテストは じゅんびちゅうだよ。'); return;
       }
-      const problems=uiPreviewPreschoolCheckpointOne();
+      const problems=item.number===1?uiPreviewPreschoolCheckpointOne()
+        :uiPreviewPreschoolCheckpoint(item.number);
       if (problems.length!==10) {
         setStartError('かくにんテストの もんだいを ひらけなかったよ。'); return;
       }
       resetAnswer();
       setStartError('');
       setScreen('island');
-      setRound({stage:{...item.after,title:'かくにんテスト 1'},checkpoint:{id:item.id,number:item.number},
+      setRound({stage:{...item.after,title:'かくにんテスト '+item.number},checkpoint:{id:item.id,number:item.number},
         problems,index:0,correct:0,results:[],dialogueOffset:0,usedHint:false,hintLevel:0});
       return;
     }
@@ -332,8 +335,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const canReadWorkedSolution = review ? review.detailed : uiPreview || canAccessFeature(access, 'workedSolutions');
   const liveCard=round?.live?.round.questions[round.index];
   const diagram=bankQuestion?.diagram ?? liveCard?.diagram;
-  const preschoolStage=Boolean(round?.stage.gradeId==='preschool' && preschoolGuideTitles[round.stage.id]);
+  const preschoolStage=Boolean(round?.stage.gradeId==='preschool' && (preschoolGuideTitles[round.stage.id] || uiPreview));
   const countingGuide=Boolean(preschoolStage && diagram?.kind==='countingBoard' && diagram.guide);
+  const traceActivity=Boolean(uiPreview && bankQuestion?.preschoolTrace && !round?.feedback);
   const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && (Boolean(liveCard) || Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0);
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
@@ -558,7 +562,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                 <>
                   <View style={styles.questionPanel}>
                     <View style={styles.questionHeader}>
-                      <Text style={styles.stageTitle}>{round.checkpoint ? 'かくにんテスト '+round.checkpoint.number : countingGuide ? preschoolGuideTitles[round.stage.id] : stageDisplayTitle(round.stage)}</Text>
+                      <Text style={styles.stageTitle}>{round.checkpoint ? 'かくにんテスト '+round.checkpoint.number : countingGuide ? preschoolGuideTitles[round.stage.id] : round.stage.gradeId==='preschool' ? preschoolStageMapInfo(round.stage).title : stageDisplayTitle(round.stage)}</Text>
                       <Text style={styles.questionIndex}>{countingGuide ? round.index+1 : '第'+(round.index+1)+'問'} / {round.problems.length}</Text>
                     </View>
                     <Text style={styles.stageCategory}>{round.checkpoint
@@ -581,6 +585,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                       <QuestionDiagram diagram={diagram} phase={round.hintLevel ? 'hint' : 'question'} />
                     )}
                     <MathText style={styles.prompt} value={question.prompt}/>
+                    {traceActivity && bankQuestion?.preschoolTrace && <PreschoolTracePad key={question.id}
+                      digit={bankQuestion.preschoolTrace} disabled={saving}
+                      onChange={value=>{setAnswer(value);setMessage('');}}/>}
                     {countingGuide && !round.feedback && (
                       <View style={styles.preschoolAnswerSection}>
                         <Text style={styles.preschoolInstruction}>すうじを さわってね</Text>
@@ -656,7 +663,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                       ) : (
                         <>
                           <Text style={styles.answerHeading}>こたえ</Text>
-                          {question.type==='choice' ? (
+                          {traceActivity ? (
+                            <Text style={styles.preschoolTraceNotice}>おてほんを なぞったら、「こたえあわせ」を おしてね。</Text>
+                          ) : question.type==='choice' ? (
                             <View style={styles.options}>
                               {question.choices?.map(option => (
                                 <Pressable key={option} accessibilityRole="button" accessibilityLabel={option}
@@ -722,7 +731,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                           )}
                           {!!message&&<Text accessibilityLiveRegion="polite" style={styles.error}>{message}</Text>}
                           <GameButton label={saving?'きろくしているよ…':'こたえあわせ'} onPress={()=>void submit()}
-                            disabled={saving||(shownMode==='handwriting'&&(blocked||drawing))}/>
+                            disabled={saving||(traceActivity&&answer!=='できた')||(shownMode==='handwriting'&&(blocked||drawing))}/>
                         </>
                       )}
                     </View>
@@ -799,6 +808,7 @@ const styles = StyleSheet.create({
   // 幼児は問題のすぐ下で「すうじを1回さわる→採点」。右下の小さな回答欄は使わない。
   preschoolAnswerSection: { gap: 10, alignItems:'center', paddingTop: 4 },
   preschoolInstruction: { color:'#fff4ce', fontSize:20, fontWeight:'900', textAlign:'center' },
+  preschoolTraceNotice:{fontSize:15,fontWeight:'800',color:'#344454',lineHeight:22},
   preschoolNumberRow: { flexDirection:'row', width:'100%', maxWidth:440, gap:10 },
   preschoolNumberButton: { flex:1, minWidth:0, minHeight:78, borderWidth:3,
     borderColor:'#e8bf66', borderRadius:18, backgroundColor:'#fff2c8',
