@@ -66,6 +66,19 @@ test('cannot get a correct grade by drawing a different digit or colouring in th
  const short={size,drawing:[[{x:.5,y:.3},{x:.5,y:.36}]]};
  assert.equal(preschoolTraceGuideMatch('1',short).matched,false);
 });
+test('every target digit rejects strokes that follow a different numeral guide',()=>{
+ const size={width:1024,height:188};
+ for(const written of '0123456789'){
+   const ink=drawnFromGuide(written,size,0);
+   for(const asked of '0123456789'){
+     if(asked===written)continue;
+     const result=preschoolTraceGuideMatch(asked,ink);
+     assert.equal(result.matched,false,
+       'wrote '+written+' but was asked for '+asked+'; '+JSON.stringify(result));
+   }
+ }
+});
+
 test('the visible guide and hit test share identical paths, and feedback is readable',()=>{
  const view=readFileSync(new URL('../src/components/PreschoolTracePad.tsx',import.meta.url),'utf8');
  assert.match(view,/preschoolDigitGuidePaths\(target,size\)\.map/);
