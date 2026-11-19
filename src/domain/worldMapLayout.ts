@@ -46,20 +46,33 @@ export function compactIslandStageMap(width:number): boolean {
 }
 
 /**
- * Checkpoints have their own lane on narrow devices, beneath the centered
- * row's learning topic. Preserve the original desktop placement.
+ * Preschool checkpoints are distinct, large signposts in a dedicated
+ * clearing between EVERY set of five stages. Put them beside their route's
+ * vertical join, inset from the map edge so they are never clipped.
+ * Other islands retain their original small checkpoint layout.
  */
 export function islandCheckpointLayout(width:number,point:MapPoint,marker:number,nextPoint?:MapPoint,detailedLabels=false) {
   const compact=compactIslandStageMap(width);
+  if(detailedLabels&&nextPoint){
+    const boxWidth=compact?Math.min(136,Math.max(116,Math.round(width*.42))):154;
+    const boxHeight=86;
+    const side=point.x>width/2?-1:1;
+    const shiftedX=(point.x+nextPoint.x)/2+side*(compact?27:38);
+    return {
+      compact,
+      left:Math.max(8,Math.min(width-boxWidth-8,Math.round(shiftedX-boxWidth/2))),
+      top:Math.round((point.y+nextPoint.y-boxHeight)/2),
+      width:boxWidth,
+      height:boxHeight,
+    };
+  }
   const boxWidth=compact?56:66;
-  const boxHeight=44; // Preserve a 44px touch target on narrow screens.
+  const boxHeight=44;
   return {
     compact,
     left:compact
       ? Math.max(8,Math.min(width-boxWidth-8,point.x-boxWidth/2))
       : Math.min(width-boxWidth-2,Math.max(2,point.x-boxWidth/2)),
-    // In portrait, center the checkpoint vertically in the connecting path
-    // between the two stage rows rather than attaching it to the lower row.
     top:compact&&nextPoint
       ? Math.round((point.y+nextPoint.y-boxHeight)/2)
       : compact?point.y+marker/2+60:point.y+(detailedLabels?82:37),
@@ -86,6 +99,9 @@ export function islandStageLayout(width: number, stageCount = 65, topInset = 0, 
   // separate lane for the row title and the checkpoint after stage 05/10/etc.
   const compact = compactIslandStageMap(safeWidth);
   const rowHeight = compact ? (detailedLabels ? 190 : 166) : (detailedLabels ? 160 : 119);
+  // Preschool alone: a wide clearing after each five-stage row accommodates
+  // a large checkpoint sign and additional plush toys without overlaps.
+  const groupGap = detailedLabels ? (compact ? 102 : 90) : 0;
   const areaGap = compact ? 58 : (detailedLabels ? 50 : 0);
   const positions: IslandStagePoint[] = Array.from({ length: stageCount }, (_, order) => {
     const row = Math.floor(order / 5);
@@ -95,7 +111,8 @@ export function islandStageLayout(width: number, stageCount = 65, topInset = 0, 
       row,
       column,
       x: Math.round(safeWidth * (column + 0.5) / 5),
-      y: 134 + topInset + row * rowHeight + (row >= 10 ? areaGap : 0) + (row >= 12 ? areaGap : 0),
+      y: 134 + topInset + row * (rowHeight + groupGap)
+        + (row >= 10 ? areaGap : 0) + (row >= 12 ? areaGap : 0),
     };
   });
   return {
