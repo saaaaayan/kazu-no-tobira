@@ -1,71 +1,177 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Polyline } from 'react-native-svg';
+import { normalizePoint, toPixels, type Drawing, type Point, type Size } from '../domain/ink';
+import digitRecognizer from '../recognition/digitRecognizer';
+import { createRecognitionQueue } from '../recognition/recognitionQueue';
+import { preschoolTraceInkQuality, preschoolTraceMatches } from '../domain/preschoolTraceRecognition';
 import InkSurface from './InkSurface';
-import type { Point } from '../domain/ink';
+
+type TraceStatus = 'idle' | 'drawing' | 'checking' | 'matched' | 'small' | 'scribble' | 'different' | 'unavailable';
 
 /**
- * Actual finger-drawing practice for preschool 11–15. There is no reliable
- * digit recognizer in the public prototype: completion proves a continuous
- * finger movement, NOT handwriting accuracy. Never report recognition.
+ * Genuine numeral recognition for the preschool Web prototype.
+ * Each digit must be recognised as the expected digit, not merely drawn over,
+ * coloured in, or held down for long enough. A two-digit "10" has two
+ * separately recognised writing cells so it cannot be guessed as one shape.
+ * The classifier sees the strokes only; the exercise answer is compared
+ * AFTER recognition.
  */
-export default function PreschoolTracePad({digit,disabled,onChange}:{
+export default function PreschoolTracePad({ digit, disabled, onChange }: {
   digit:string;disabled:boolean;onChange:(value:string)=>void;
 }) {
-  const [strokes,setStrokes]=useState<Point[][]>([]);
-  const active=useRef<Point[]>([]);
-  const [preview,setPreview]=useState<Point[]>([]);
-  const [size,setSize]=useState({width:280,height:168});
-  const [completed,setCompleted]=useState(false);
-  const drawn=[...strokes,...(preview.length?[preview]:[])];
-  function reset() {active.current=[];setPreview([]);setStrokes([]);setCompleted(false);onChange('');}
-  function finish(){
-    const current=active.current;
-    active.current=[];
-    if(current.length<2){setPreview([]);return;}
-    const total= current.reduce((s,p,i)=>i? s+Math.hypot(p.x-current[i-1].x,p.y-current[i-1].y):0,0);
-    const next=[...strokes,current];setStrokes(next);setPreview([]);
-    if(total>size.width*.4 && current.length>=7){
-      setCompleted(true);onChange('できた');
-    }
+  const digits=digit==='10'?['1','0']:[digit];
+  const [matches,setMatches]=useState<boolean[]>(()=>digits.map(()=>false));
+  const onChangeRef=useRef(onChange);
+  onChangeRef.current=onChange;
+  useEffect(()=>{
+    onChangeRef.current(matches.length===digits.length&&matches.every(Boolean)?'できた':'');
+  },[matches,digit]);
+
+  function setPart(index:number,matched:boolean){
+    setMatches(current=>current[index]===matched?current:current.map((value,i)=>i===index?matched:value));
   }
-  return <View style={styles.container}>
-    <Text style={styles.instruction}>おてほんを みながら、ゆびで なぞってね</Text>
-    <View style={styles.paper} onLayout={e=>setSize({
-      width:e.nativeEvent.layout.width,height:e.nativeEvent.layout.height,
-    })}>
-      <View pointerEvents="none" style={styles.guide}>
-        <Text style={styles.guideText}>{digit}</Text>
-      </View>
-      <InkSurface label={digit+'を ゆびで なぞる ところ'}
-        start={point=>{if(disabled)return;active.current=[point];setPreview([point]);}}
-        move={point=>{if(disabled||!active.current.length)return;const next=[...active.current,point];active.current=next;setPreview(next);}}
-        finish={()=>{if(!disabled)finish();}} cancel={()=>{active.current=[];setPreview([]);}}>
-        <Svg width="100%" height="100%" viewBox={`0 0 ${size.width} ${size.height}`}>
-          {drawn.map((stroke,i)=><Polyline key={i}
-            points={stroke.map(p=>`${p.x},${p.y}`).join(' ')} stroke="#405b8c"
-            fill="none" strokeWidth={7} strokeLinecap="round" strokeLinejoin="round"/>)}
-        </Svg>
-      </InkSurface>
+
+  return <View testID="preschool-trace-recognition" style={styles.container}>
+    <Text style={styles.instruction}>おてほんを みて、すうじを かいてね</Text>
+    <View style={styles.cells}>
+      {digits.map((number,index)=>(
+        <View key={index} style={[styles.cell,digits.length>1&&styles.halfCell]}>
+          {digits.length>1&&<Text style={styles.cellLabel}>{index+1}つめ：{number}</Text>}
+          <RecognizedDigitCell key={number+'-'+index}
+            target={number} disabled={disabled} onMatched={matched=>setPart(index,matched)}/>
+        </View>
+      ))}
     </View>
-    <View style={styles.toolbar}>
-      <Pressable accessibilityRole="button" disabled={disabled}
-        onPress={reset} style={styles.button}><Text style={styles.buttonText}>かきなおす</Text></Pressable>
-      <Text style={styles.status}>{completed?'かけたね！ こたえあわせを おそう':'おてほんの せんを なぞろう'}</Text>
-    </View>
-    <Text style={styles.note}>この れんしゅうでは、かたちの じどう はんていは まだ できないよ。</Text>
+    <Text style={styles.note}>かたちを たしかめるよ。ぬりつぶすだけでは せいかいに ならないよ。</Text>
+    {matches.every(Boolean)&&<Text accessibilityLiveRegion="polite" style={styles.allDone}>
+      じょうずに かけたね！「こたえあわせ」を おしてね。
+    </Text>}
   </View>;
 }
+
+function RecognizedDigitCell({target,disabled,onMatched}:{
+  target:string;disabled:boolean;onMatched:(matched:boolean)=>void;
+}) {
+  const [strokes,setStrokes]=useState<Drawing>([]);
+  const [preview,setPreview]=useState<Point[]>([]);
+  const [size,setSize]=useState<Size>({width:0,height:0});
+  const active=useRef<Point[]|null>(null);
+  const [status,setStatus]=useState<TraceStatus>('idle');
+  const cb=useRef({target,onMatched});
+  cb.current={target,onMatched};
+  const [queue]=useState(()=>createRecognitionQueue(digitRecognizer.recognize,result=>{
+    const isMatch=preschoolTraceMatches(cb.current.target,result,'plausible');
+    cb.current.onMatched(isMatch);
+    setStatus(isMatch?'matched':'different');
+  },550));
+
+  useEffect(()=>()=>queue.cancel(),[queue]);
+
+  function begin(p:Point){
+    if(disabled||!size.width||!size.height)return;
+    queue.cancel();
+    cb.current.onMatched(false);
+    active.current=[normalizePoint(p,size)];
+    setPreview(active.current);
+    setStatus('drawing');
+  }
+  function move(p:Point){
+    if(disabled||!active.current)return;
+    const point=normalizePoint(p,size);
+    const last=active.current.at(-1);
+    if(last&&Math.hypot((last.x-point.x)*size.width,(last.y-point.y)*size.height)<0.7)return;
+    active.current=[...active.current,point];
+    setPreview(active.current);
+  }
+  function finish(){
+    if(disabled||!active.current)return;
+    const completed=active.current;
+    active.current=null;
+    setPreview([]);
+    if(completed.length<2){setStatus('small');return;}
+    const next=[...strokes,completed];
+    setStrokes(next);
+    const quality=preschoolTraceInkQuality({drawing:next,size});
+    if(quality!=='plausible'){
+      setStatus(quality==='scribble'?'scribble':'small');
+      return;
+    }
+    if(!digitRecognizer.available){setStatus('unavailable');return;}
+    setStatus('checking');
+    // The same model recognises thin and thick drawn lines, because the ink
+    // rasterizer operates on the trajectory centreline, not displayed width.
+    queue.schedule({drawing:next,size});
+  }
+  function reset(){
+    queue.cancel();
+    active.current=null;
+    setPreview([]);
+    setStrokes([]);
+    setStatus('idle');
+    cb.current.onMatched(false);
+  }
+  const all=preview.length?[...strokes,preview]:strokes;
+  const message:Record<TraceStatus,string>={
+    idle:'せんで かいてみよう。',
+    drawing:'ゆっくり かいてね。',
+    checking:'すうじの かたちを たしかめているよ…',
+    matched:'「'+target+'」と よみとれたよ！',
+    small:'もうすこし おおきく かいてね。',
+    scribble:'ぬりつぶさず、すうじの せんを かいてね。',
+    different:'おてほんを みて、もういちど かいてみよう。',
+    unavailable:'この たんまつでは てがきの はんていが つかえないよ。',
+  };
+  return <View style={styles.single}>
+    <View style={styles.paper}
+      onLayout={event=>setSize(previous=>{
+        const {width,height}=event.nativeEvent.layout;
+        return previous.width===width&&previous.height===height?previous:{width,height};
+      })}>
+      <View pointerEvents="none" style={styles.guide}>
+        <Text style={styles.guideText}>{target}</Text>
+      </View>
+      <InkSurface label={'すうじの '+target+' を てがきする ところ'}
+        start={begin} move={move} finish={finish}
+        cancel={()=>{active.current=null;setPreview([]);setStatus('idle');}}>
+        {size.width>0&&size.height>0&&(
+          <Svg width="100%" height="100%" viewBox={`0 0 ${size.width} ${size.height}`}>
+            {all.map((stroke,i)=><Polyline key={i}
+              points={stroke.map(p=>{const xy=toPixels(p,size);return `${xy.x},${xy.y}`;}).join(' ')}
+              stroke="#405b8c" fill="none" strokeWidth={3.5}
+              strokeLinecap="round" strokeLinejoin="round"/>)}
+          </Svg>
+        )}
+      </InkSurface>
+    </View>
+    <Text accessibilityLiveRegion="polite"
+      style={[styles.status,status==='matched'&&styles.success]}>{message[status]}</Text>
+    <Pressable accessibilityRole="button" disabled={disabled}
+      onPress={reset} style={[styles.reset,disabled&&styles.dim]}>
+      <Text style={styles.resetText}>かきなおす</Text>
+    </Pressable>
+  </View>;
+}
+
 const styles=StyleSheet.create({
-  container:{gap:10,width:'100%',minWidth:0},
-  instruction:{color:'#31445d',fontSize:17,fontWeight:'900'},
-  paper:{position:'relative',width:'100%',height:188,backgroundColor:'#fffaf0',borderWidth:2,borderColor:'#8d9d95',borderRadius:8,overflow:'hidden'},
+  container:{gap:12,width:'100%',minWidth:0},
+  instruction:{color:'#31445d',fontSize:18,fontWeight:'900'},
+  cells:{width:'100%',flexDirection:'row',flexWrap:'wrap',gap:10},
+  cell:{width:'100%',minWidth:0,gap:4},
+  halfCell:{width:'48%',flexGrow:1},
+  cellLabel:{color:'#31445d',fontSize:15,fontWeight:'800'},
+  single:{gap:8,minWidth:0},
+  paper:{width:'100%',height:188,backgroundColor:'#fffaf0',
+    borderWidth:2,borderColor:'#8d9d95',borderRadius:8,overflow:'hidden'},
   guide:{...StyleSheet.absoluteFill,alignItems:'center',justifyContent:'center'},
-  guideText:{fontSize:134,lineHeight:169,fontWeight:'900',color:'#d5dacf',textAlign:'center'},
-  toolbar:{flexDirection:'row',flexWrap:'wrap',alignItems:'center',gap:10},
-  button:{minHeight:44,borderWidth:1,borderColor:'#596984',backgroundColor:'#e6e8e4',
-    paddingHorizontal:16,justifyContent:'center',borderRadius:6},
-  buttonText:{color:'#344454',fontWeight:'800'},
-  status:{flex:1,color:'#355969',fontSize:14,fontWeight:'700'},
-  note:{color:'#576e6f',fontSize:11},
+  guideText:{fontSize:128,lineHeight:160,fontWeight:'900',color:'#d5dacf',textAlign:'center'},
+  status:{color:'#355969',fontSize:14,lineHeight:21,fontWeight:'800',minHeight:23},
+  success:{color:'#197052'},
+  reset:{minHeight:44,alignSelf:'flex-start',justifyContent:'center',
+    paddingHorizontal:15,backgroundColor:'#e6e8e4',borderWidth:1,
+    borderColor:'#596984',borderRadius:6},
+  resetText:{color:'#344454',fontSize:14,fontWeight:'800'},
+  dim:{opacity:.6},
+  note:{fontSize:12,color:'#576e6f',lineHeight:18},
+  allDone:{fontSize:16,lineHeight:24,fontWeight:'900',color:'#197052'},
 });

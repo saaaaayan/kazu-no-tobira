@@ -56,12 +56,14 @@ test('all ten checkpoint lanes are playable without requiring an approved bank',
  assert.match(game,/onPress=\{\(\)=>void submit\(\)\}/);
 });
 
-test('numeral tracing uses actual finger input and explicitly avoids a fake handwriting score',()=>{
+test('numeral tracing requires shape recognition and never credits merely moving the pen',()=>{
  const view=code('src/components/PreschoolTracePad.tsx');
  const game=code('src/FullAdventure.tsx');
  assert.match(view,/<InkSurface label=/);
- assert.match(view,/onChange\('できた'\)/);
- assert.match(view,/かたちの じどう はんていは まだ できないよ/);
+ assert.match(view,/digitRecognizer\.recognize/);
+ assert.match(view,/preschoolTraceInkQuality/);
+ assert.match(view,/preschoolTraceMatches/);
+ assert.match(view,/ぬりつぶさず、すうじの せんを かいてね/);
  assert.match(game,/<PreschoolTracePad key=\{question\.id\}/);
  assert.match(game,/traceActivity&&answer!=='できた'/);
 });
