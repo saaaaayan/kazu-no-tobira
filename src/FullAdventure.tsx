@@ -626,7 +626,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                     )}
                     <MathText style={styles.prompt} value={question.prompt}/>
                     {traceActivity && bankQuestion?.preschoolTrace && <PreschoolTracePad key={question.id}
-                      digit={bankQuestion.preschoolTrace} disabled={saving}
+                      digit={bankQuestion.preschoolTrace} disabled={saving} autoAdvance={autoTraceEnabled}
                       onChange={value=>{
                         setAnswer(value);
                         setMessage('');
