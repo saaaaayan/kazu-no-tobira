@@ -30,7 +30,7 @@ test('preschool island map appears before curriculum, start shortcut, legend and
 });
 
 test('preschool map navigation stays playable without scrolling through curriculum first',()=>{
-  assert.match(ui,/testID=\{'island-stage-'\+stage\.id\}/);
+  assert.match(ui,/styles\.stagePin,grade.id==='preschool'&&styles\.pixelStagePin/);
   assert.match(ui,/onPress=\{\(\)=>onStart\(stage\)\}/);
   assert.match(ui,/testID=\{'island-checkpoint-'\+checkpoint\.number\}/);
   assert.match(ui,/testID="preschool-map-top-title"/);
