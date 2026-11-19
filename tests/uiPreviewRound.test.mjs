@@ -7,8 +7,9 @@ import { allWorldStages } from '../src/domain/worldCatalog.ts';
 const expected = ['e1.forest','e1.n06','preschool.n01','preschool.n02','preschool.n03','preschool.n04','preschool.n05',
   'e2.n01','e3.n01','e4.n01','e5.n01','e6.n01','j1.n01','j2.n01','j3.n01',
   'h1.n01','h2.n01','h3.n01','champion.n01','cosmos.n01',
-  ...['e2','e3','e4','e5','e6'].flatMap(g=>[2,3,4,5].map(n=>g+'.n0'+n))].sort();
-test('public prototype exposes exactly preschool 01–05 and the original elementary demos',()=>{
+  ...['e2','e3','e4','e5','e6'].flatMap(g=>[2,3,4,5].map(n=>g+'.n0'+n)),
+  ...allWorldStages.filter(stage=>stage.gradeId==='preschool'&&stage.order>=5).map(stage=>stage.id)].sort();
+test('public prototype exposes all 65 preschool stages and the original school demos',()=>{
   const playable=allWorldStages.map(stage=>[stage,uiPreviewRound(stage)]).filter(([,round])=>round.length);
   assert.deepEqual(playable.map(([stage])=>stage.id).sort(),expected);
   for (const [stage,round] of playable) {
@@ -16,11 +17,12 @@ test('public prototype exposes exactly preschool 01–05 and the original elemen
     assert.equal(new Set(round.map(q=>q.id)).size,10);
     assert.ok(round.every(question=>question.id.startsWith('ui-preview-'+stage.id+'-')));
     assert.ok(round.every(question=>checkMathAnswer(question,question.answer)));
-    assert.deepEqual(uiPreviewRound({...stage,kind:'extra'}),[]);
+    if(stage.kind==='normal') assert.deepEqual(uiPreviewRound({...stage,kind:'extra'}),[]);
     assert.deepEqual(uiPreviewRound({...stage,family:'unknown'}),[]);
     if (stage.gradeId==='preschool') {
-      assert.ok(round.every(q=>q.diagram.kind==='countingBoard'));
+      if(stage.order<5) assert.ok(round.every(q=>q.diagram?.kind==='countingBoard'));
       assert.ok(round.every(q=>!/[＋+＝=]/.test(q.question)));
+      assert.ok(round.every(q=>q.hints?.length===3 && q.steps?.length));
     } else if(stage.gradeId==='e1') assert.ok(round.every(q=>Number(q.answer)<=9));
   }
 });
