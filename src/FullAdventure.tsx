@@ -7,6 +7,7 @@ import { checkMathAnswer, isValidMathAnswer } from './domain/mathAnswer';
 import { stageDisplayTitle,stageLabels, type Checkpoint } from './domain/stageStructure';
 import { stageCategoryName } from './domain/islandCurriculumView';
 import { preschoolStageMapInfo } from './domain/preschoolStageMapInfo';
+import { shouldAutoGradePreschoolChoice } from './domain/preschoolAnswerFlow';
 import PreschoolTracePad from './components/PreschoolTracePad';
 import PreschoolPictureNumberMatch from './components/PreschoolPictureNumberMatch';
 import { liveOrigin, requestLiveRound, requestLiveGrade, requestLiveHint, type LiveMode, type LiveRound } from './domain/liveQuestions';
@@ -344,6 +345,10 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const pictureMatching=Boolean(preschoolStage && bankQuestion?.preschoolNumberMatch);
   const traceActivity=Boolean(uiPreview && bankQuestion?.preschoolTrace && !round?.feedback);
   const autoTraceEnabled=Boolean(uiPreview && !review && bankQuestion?.preschoolTrace);
+  const autoGradePreschoolChoice=shouldAutoGradePreschoolChoice(
+    round?.stage,question?.type,Boolean(review),
+    Boolean(bankQuestion?.preschoolTrace || bankQuestion?.preschoolNumberMatch),
+  );
   const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && (Boolean(liveCard) || Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0);
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
@@ -778,7 +783,15 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                               {question.choices?.map(option => (
                                 <Pressable key={option} accessibilityRole="button" accessibilityLabel={option}
                                   accessibilityState={{selected:answer===option,disabled:saving}}
-                                  disabled={saving} onPress={()=>{setAnswer(option);setMessage('');}}
+                                  disabled={saving} onPress={()=>{
+                                    if(autoGradePreschoolChoice){
+                                      // Read the tapped option, not potentially stale React state.
+                                      void submit(option);
+                                    } else {
+                                      setAnswer(option);
+                                      setMessage('');
+                                    }
+                                  }}
                                   style={[styles.option,answer===option&&styles.optionSelected]}>
                                   <MathText style={[styles.optionText,answer===option&&styles.optionTextSelected]} value={option}/>
                                 </Pressable>
@@ -838,7 +851,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                             </Pressable>
                           )}
                           {!!message&&<Text accessibilityLiveRegion="polite" style={styles.error}>{message}</Text>}
-                          {!autoTraceEnabled && <GameButton label={saving?'きろくしているよ…':'こたえあわせ'} onPress={()=>void submit()}
+                          {!autoTraceEnabled && !autoGradePreschoolChoice && <GameButton label={saving?'きろくしているよ…':'こたえあわせ'} onPress={()=>void submit()}
                             disabled={saving||(traceActivity&&answer!=='できた')||(shownMode==='handwriting'&&(blocked||drawing))}/>}
                         </>
                       )}

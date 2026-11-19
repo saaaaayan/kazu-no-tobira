@@ -16,7 +16,7 @@ test('tracing success submits the recognised result directly, without a second p
  assert.match(game,/autoTraceSubmitted\.current=question\.id;/);
  assert.match(game,/void submit\('できた'\);/);
  assert.match(game,/autoGrade=\{autoTraceEnabled\}/);
- assert.match(game,/\{!autoTraceEnabled && <GameButton label=\{saving\?'きろくしているよ…':'こたえあわせ'\}/);
+ assert.match(game,/\{!autoTraceEnabled && !autoGradePreschoolChoice && <GameButton/);
  assert.match(game,/!bankQuestion\?\.preschoolTrace &&/);
 });
 test('correct recognition shows feedback and waits for an explicit next-question tap',()=>{
