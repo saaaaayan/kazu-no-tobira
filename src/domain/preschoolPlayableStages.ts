@@ -78,8 +78,10 @@ function order(i:number,max:number,mode:number):Task{
  const val=mode===1 ? Math.max(2,Math.min(max-1,2+(i%Math.max(1,max-2))))
    :1+(i*3)%Math.max(1,max-2),answer=mode===0?val+1:mode===1?val-1:val+2;
  const strip=mode===0?val+'　□　'+(val+2):mode===1?'□　'+val+'　'+(val+1):val+'　'+(val+1)+'　□';
- return numberTask(strip+'　□ に はいる すうじは？',answer,
-   {explanation:'1こずつ すうじが すすむよ。 □は '+answer+' だよ。'},max);
+ // The sequence and the instruction MUST be displayed on separate lines.
+ // Repeating □ on the instruction line looked like a second missing number.
+ return numberTask(strip+'\nかくれた すうじは どれ？',answer,
+   {explanation:'1こずつ すうじが すすむよ。 かくれている すうじは '+answer+' だよ。'},max);
 }
 function position(i:number,level:number):Task{
  const items=[toys[(i+2)%toys.length],toys[(i+5)%toys.length],toys[(i+8)%toys.length]];
