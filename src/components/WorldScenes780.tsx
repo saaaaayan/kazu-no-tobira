@@ -7,7 +7,7 @@ import { hasPremium, type Entitlement } from '../domain/accessPlan';
 import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldProgress';
 import { worldStageAction, type PlayMode } from '../domain/playMode';
 import { checkpointsFor, stageDisplayTitle, stageLabels, type Checkpoint } from '../domain/stageStructure';
-import { PRESCHOOL_MAP_TITLE_INSET, compactIslandStageMap, islandCheckpointLayout, islandRouteByKind, islandStageLayout, routeThrough } from '../domain/worldMapLayout';
+import { PRESCHOOL_MAP_TITLE_INSET, compactIslandStageMap, islandCheckpointLayout, preschoolStageLabelLayout, islandRouteByKind, islandStageLayout, routeThrough } from '../domain/worldMapLayout';
 import { approvedWorldMapDimensions, approvedWorldMapHotspots, approvedWorldMapImageUrl } from '../domain/approvedWorldMap';
 import { hasStageBank } from '../domain/questionBank';
 import type { Progress } from '../domain/progress';
@@ -389,7 +389,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
                 grade.id==='preschool'&&styles.pixelZoneLabel,
                 grade.id!=='preschool'&&area.kind==='extra'&&styles.extraAreaLabel,
                 grade.id!=='preschool'&&area.kind==='secret'&&styles.secretAreaLabel,
-                {top:y-60,left:inset,right:inset,alignItems:'center'},
+                {top:y-(grade.id==='preschool'?68:60),left:inset,right:inset,alignItems:'center'},
               ]}>
               <Text style={[
                 styles.zoneName,grade.id==='preschool'&&styles.pixelZoneName,
@@ -403,15 +403,12 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         {grade.id==='preschool' && grade.stages.map((stage,index)=>{
           const position=geometry.positions[index];
           const info=preschoolStageMapInfo(stage);
-          const labelWidth=Math.max(42,actual/5-(compactStageMap?3:12));
+          const labelLayout=preschoolStageLabelLayout(actual,position,marker);
           return <Pressable key={'stage-topic-'+stage.id}
             accessibilityRole="button" accessibilityLabel={'ステージ '+String(index+1)+' の ないようを みる '+info.title}
             testID={'preschool-stage-topic-'+String(index+1)}
             onPress={()=>setDetailStageId(stage.id)}
-            style={[styles.preschoolStageTopic,{
-              width:labelWidth,left:Math.max(1,position.x-labelWidth/2),
-              top:position.y+marker/2+5,
-            }]}>
+            style={[styles.preschoolStageTopic,labelLayout]}>
             <Text numberOfLines={compactStageMap?3:2}
               style={[styles.preschoolStageTopicText,compactStageMap&&styles.preschoolStageTopicSmall]}>
               {info.title}
@@ -615,15 +612,17 @@ const styles=StyleSheet.create({
   nextText:{color:'#544268',fontWeight:'900',fontSize:15,textAlign:'center'},
   zoneLabel:{position:'absolute',paddingVertical:5,paddingHorizontal:9,backgroundColor:'#fff8dd',borderRadius:9,borderWidth:1,borderColor:'#ecdfb3',maxWidth:'90%'},
   zoneName:{color:'#545078',fontWeight:'900',fontSize:13},
-  // Keep the preschool map's illustrated grass visible. Section headings
-  // are plain lettering rather than cream bordered banners.
+  // The outer heading spans the map but is transparent. Only the text itself
+  // gets a small muted frame, never a full-width banner.
   pixelZoneLabel:{borderRadius:0,backgroundColor:'transparent',borderWidth:0,
-    paddingVertical:3,paddingHorizontal:2},
+    paddingVertical:0,paddingHorizontal:0},
   extraAreaLabel:{backgroundColor:'#e0eae5',borderColor:'#90b4a8'},
   secretAreaLabel:{backgroundColor:'#eee2e9',borderColor:'#b39aaa'},
-  pixelZoneName:{color:'#283e55',fontSize:17,lineHeight:23,
-    fontWeight:'900',textAlign:'center',
-    textShadowColor:'rgba(240,248,218,0.95)',textShadowOffset:{width:0,height:1},textShadowRadius:2},
+  pixelZoneName:{color:'#283e55',fontSize:15,lineHeight:21,
+    fontWeight:'900',textAlign:'center',alignSelf:'center',
+    backgroundColor:'rgba(247,239,214,0.96)',
+    borderWidth:1,borderColor:'#849d81',borderRadius:4,
+    paddingVertical:3,paddingHorizontal:9,overflow:'hidden'},
   pinCategoryBox:{position:'absolute',borderRadius:5,paddingHorizontal:2,paddingVertical:1,
     backgroundColor:'rgba(255,250,228,0.92)',alignItems:'center',justifyContent:'center'},
   pinCategoryText:{fontSize:10,fontWeight:'800',color:'#314661',textAlign:'center',lineHeight:12},
@@ -632,8 +631,8 @@ const styles=StyleSheet.create({
   compactRowTopicText:{color:'#344454',fontWeight:'900',fontSize:13,lineHeight:17,textAlign:'center'},
   pixelCategoryBox:{borderRadius:1,backgroundColor:'rgba(247,238,207,0.94)'},
   pixelCategoryText:{color:'#344454'},
-  // Stage titles are still tappable for details, but never obscured by
-  // individual rectangles. A faint light text shadow gives contrast on grass.
+  // The full tappable target stays transparent. Only each title's actual
+  // text has a tightly fitted, softly colored frame below its stage pin.
   preschoolCheckpointSign:{paddingHorizontal:4,paddingVertical:5,gap:1,shadowOpacity:0},
   preschoolCheckpointHeading:{fontSize:12,lineHeight:16,color:'#465d5b',
     fontWeight:'900',textAlign:'center'},
@@ -641,11 +640,13 @@ const styles=StyleSheet.create({
     fontWeight:'900',textAlign:'center'},
   preschoolCheckpointRange:{fontSize:12,lineHeight:16,color:'#344454',
     fontWeight:'800',textAlign:'center'},
-  preschoolStageTopic:{position:'absolute',minHeight:36,paddingHorizontal:1,paddingVertical:1,
-    backgroundColor:'transparent',borderRadius:0,borderWidth:0,
+  preschoolStageTopic:{position:'absolute',paddingHorizontal:0,paddingVertical:0,
+    backgroundColor:'transparent',borderWidth:0,
     alignItems:'center',justifyContent:'flex-start'},
-  preschoolStageTopicText:{fontSize:12,lineHeight:16,color:'#283e55',fontWeight:'900',textAlign:'center',
-    textShadowColor:'rgba(244,249,226,0.96)',textShadowOffset:{width:0,height:1},textShadowRadius:2},
+  preschoolStageTopicText:{fontSize:12,lineHeight:16,color:'#283e55',
+    fontWeight:'900',textAlign:'center',alignSelf:'center',maxWidth:'100%',
+    backgroundColor:'rgba(247,241,219,0.95)',borderWidth:1,borderColor:'#8d9f86',
+    borderRadius:3,paddingHorizontal:2,paddingVertical:2,overflow:'hidden'},
   preschoolStageTopicSmall:{fontSize:10,lineHeight:14},
   preschoolStageInfoCard:{position:'absolute',zIndex:30,backgroundColor:'#f8f0d8',
     borderWidth:3,borderColor:'#344454',borderRadius:4,padding:10,gap:8,
