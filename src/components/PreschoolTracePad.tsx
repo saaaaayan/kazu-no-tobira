@@ -18,8 +18,8 @@ type TraceStatus = 'idle' | 'drawing' | 'checking' | 'matched' | 'small' | 'scri
  * The classifier sees the strokes only; the exercise answer is compared
  * AFTER recognition.
  */
-export default function PreschoolTracePad({ digit, disabled, onChange, autoAdvance=false }: {
-  digit:string;disabled:boolean;onChange:(value:string)=>void;autoAdvance?:boolean;
+export default function PreschoolTracePad({ digit, disabled, onChange, autoGrade=false }: {
+  digit:string;disabled:boolean;onChange:(value:string)=>void;autoGrade?:boolean;
 }) {
   const digits=digit==='10'?['1','0']:[digit];
   const [matches,setMatches]=useState<boolean[]>(()=>digits.map(()=>false));
@@ -46,7 +46,7 @@ export default function PreschoolTracePad({ digit, disabled, onChange, autoAdvan
     </View>
     <Text style={styles.note}>かたちを たしかめるよ。ぬりつぶすだけでは せいかいに ならないよ。</Text>
     {matches.every(Boolean)&&<Text accessibilityLiveRegion="polite" style={styles.allDone}>
-      {autoAdvance?'じょうずに かけたね！つぎの もんだいに すすむよ。':'じょうずに かけたね！「こたえあわせ」を おしてね。'}
+      {autoGrade?'じょうずに かけたね！「つぎの もんだいへ」を おしてね。':'じょうずに かけたね！「こたえあわせ」を おしてね。'}
     </Text>}
   </View>;
 }

@@ -15,28 +15,25 @@ test('tracing success submits the recognised result directly, without a second p
  assert.match(game,/autoTraceSubmitted\.current!==question\.id/);
  assert.match(game,/autoTraceSubmitted\.current=question\.id;/);
  assert.match(game,/void submit\('できた'\);/);
- assert.match(game,/autoAdvance=\{autoTraceEnabled\}/);
+ assert.match(game,/autoGrade=\{autoTraceEnabled\}/);
  assert.match(game,/\{!autoTraceEnabled && <GameButton label=\{saving\?'きろくしているよ…':'こたえあわせ'\}/);
  assert.match(game,/!bankQuestion\?\.preschoolTrace &&/);
 });
-test('only correct recognised trace answers auto-advance after a visible success interval',()=>{
- const effect=game.slice(game.indexOf('  // A preschool learner should not need a second tap'),
-   game.indexOf('  function goToIsland()'));
- assert.match(effect,/round\.feedback!=='correct'/);
- assert.match(effect,/!current\.preschoolTrace/);
- assert.match(effect,/setTimeout\(\(\)=>advance\(\),1150\)/);
- assert.match(effect,/return \(\)=>clearTimeout\(timer\)/);
+test('correct recognition shows feedback and waits for an explicit next-question tap',()=>{
  const submit=game.slice(game.indexOf('  async function submit('),game.indexOf('  function advance()'));
  assert.match(submit,/setRound\(\{ \.\.\.round, problems, correct: newCorrect, results: \[\.\.\.round\.results, result\], feedback: result \}\)/);
+ assert.match(game,/<GameButton gold label=\{round\.index\+1===round\.problems\.length\?'けっかを みる':'つぎの もんだいへ'\} onPress=\{advance\}\/>/);
  assert.match(game,/if \(round\.index === round\.problems\.length - 1\) \{/);
  assert.match(game,/setRound\(\{ \.\.\.round, complete: true, hintLevel: 0 \}\)/);
+ assert.doesNotMatch(game,/setTimeout\(\(\)=>advance\(\)/);
+ assert.doesNotMatch(game,/useEffect\(\(\) => \{\s*const current=round\?\.problems\[round\.index\]/);
 });
 test('a blank or wrong trace does not trigger automatic success and manual review stays manual',()=>{
  assert.match(game,/if\(value==='できた' && autoTraceEnabled &&/);
  assert.match(game,/!round\?\.feedback && autoTraceSubmitted\.current!==question\.id/);
  assert.match(pad,/onChangeRef\.current\(matches\.length===digits\.length&&matches\.every\(Boolean\)\?'できた':''\)/);
- assert.match(pad,/autoAdvance=false/);
- assert.match(pad,/autoAdvance\?'じょうずに かけたね！つぎの もんだいに すすむよ。'/);
+ assert.match(pad,/autoGrade=false/);
+ assert.match(pad,/autoGrade\?'じょうずに かけたね！「つぎの もんだいへ」を おしてね。'/);
  assert.match(pad,/:'じょうずに かけたね！「こたえあわせ」を おしてね。'/);
 });
 test('all preschool tracing steps use existing 10-question answer flow',()=>{

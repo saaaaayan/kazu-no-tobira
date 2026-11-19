@@ -435,16 +435,8 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     }
   }
 
-  // A preschool learner should not need a second tap after accurately
-  // tracing a number. Show the standard positive feedback long enough to
-  // recognise success, then advance (or show the final result).
-  useEffect(() => {
-    const current=round?.problems[round.index];
-    if(!autoTraceEnabled || !round || round.complete || round.feedback!=='correct' ||
-      !current || !isBankQuestion(current) || !current.preschoolTrace)return;
-    const timer=setTimeout(()=>advance(),1150);
-    return ()=>clearTimeout(timer);
-  },[autoTraceEnabled,round?.index,round?.stage.id,round?.feedback,round?.complete]);
+  // Digit recognition grades the tracing automatically. Moving to the next
+  // question is always an explicit tap on the feedback screen's button.
 
   function goToIsland() {
     if (starting.current || submitting.current || lessonWrite.current) return;
@@ -626,7 +618,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                     )}
                     <MathText style={styles.prompt} value={question.prompt}/>
                     {traceActivity && bankQuestion?.preschoolTrace && <PreschoolTracePad key={question.id}
-                      digit={bankQuestion.preschoolTrace} disabled={saving} autoAdvance={autoTraceEnabled}
+                      digit={bankQuestion.preschoolTrace} disabled={saving} autoGrade={autoTraceEnabled}
                       onChange={value=>{
                         setAnswer(value);
                         setMessage('');
