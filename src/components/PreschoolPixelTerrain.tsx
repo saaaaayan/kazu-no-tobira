@@ -24,15 +24,19 @@ const CREAM = '#f8edcd';
 function Plush({animal,x,y,scale=1}:{animal:Animal;x:number;y:number;scale?:number}) {
   const fur=FUR[animal];
   const dark=animal==='panda'?'#47505a':fur;
-  const bearEars=['bear','panda','lion','koala','monkey','owl'].includes(animal);
+  // Monkeys have side ears and owls have two tufts of their own.
+  // Do not draw the generic bear ears on top of those silhouettes.
+  const bearEars=['bear','panda','lion','koala'].includes(animal);
   const longEars=animal==='bunny';
   const catEars=['cat','fox','raccoon'].includes(animal);
   return <G transform={`translate(${x} ${y}) scale(${scale})`}>
     {/* Distinct muted pixel silhouettes; all toys have simple stitched faces. */}
     {animal==='squirrel'&&<G>
-      <Rect x={17} y={-24} width={16} height={21} fill={fur} stroke={INK} strokeWidth={2.6}/>
-      <Rect x={23} y={-33} width={12} height={12} fill={fur} stroke={INK} strokeWidth={2.6}/>
-      <Rect x={19} y={-13} width={10} height={19} fill={fur}/>
+      {/* A short curled tail beside the body, NOT a tall detached tower. */}
+      <Path d="M14 12 V-5 H20 V-15 H30 V-10 H34 V2 H28 V12 H23 V17 H15 Z"
+        fill="#af825e" stroke={INK} strokeWidth={2.5} strokeLinejoin="miter"/>
+      <Rect x={21} y={-7} width={7} height={12} fill={fur}/>
+      <Rect x={14} y={3} width={8} height={10} fill={fur}/>
     </G>}
     {animal==='hedgehog'&&<G>
       {[-22,-12,0,12].map((x,i)=><Rect key={i} x={x} y={-37-(i%2)*6}
@@ -66,8 +70,9 @@ function Plush({animal,x,y,scale=1}:{animal:Animal;x:number;y:number;scale?:numb
       <Rect x={9} y={-33} width={4} height={5} fill={INK}/>
     </G>}
     {animal==='owl'&&<G>
-      <Rect x={-21} y={-38} width={11} height={18} fill={fur} stroke={INK} strokeWidth={2.5}/>
-      <Rect x={10} y={-38} width={11} height={18} fill={fur} stroke={INK} strokeWidth={2.5}/>
+      {/* Just TWO small feather tufts; the old generic bear ears made four. */}
+      <Rect x={-16} y={-34} width={9} height={12} fill={fur} stroke={INK} strokeWidth={2.3}/>
+      <Rect x={7} y={-34} width={9} height={12} fill={fur} stroke={INK} strokeWidth={2.3}/>
     </G>}
     {animal==='duck'&&<G>
       <Rect x={-22} y={-15} width={9} height={17} fill="#e9cfa1" stroke={INK} strokeWidth={2}/>
