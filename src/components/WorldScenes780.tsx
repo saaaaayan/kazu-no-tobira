@@ -7,14 +7,14 @@ import { hasPremium, type Entitlement } from '../domain/accessPlan';
 import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldProgress';
 import { worldStageAction, type PlayMode } from '../domain/playMode';
 import { checkpointsFor, stageDisplayTitle, stageLabels, type Checkpoint } from '../domain/stageStructure';
-import { islandRouteByKind, islandStageLayout, routeThrough } from '../domain/worldMapLayout';
+import { compactIslandStageMap, islandCheckpointLayout, islandRouteByKind, islandStageLayout, routeThrough } from '../domain/worldMapLayout';
 import { approvedWorldMapDimensions, approvedWorldMapHotspots, approvedWorldMapImageUrl } from '../domain/approvedWorldMap';
 import { hasStageBank } from '../domain/questionBank';
 import type { Progress } from '../domain/progress';
 import { lessonStatus, unitLessons, type UnitLesson } from '../domain/unitLessons';
 import { featureAccess } from '../domain/accessPlan';
 import { uiPreviewSampleKind } from '../domain/uiPreviewRound';
-import { stageCategoryName } from '../domain/islandCurriculumView';
+import { stageCategoryName, stageRowCategoryName } from '../domain/islandCurriculumView';
 import { IslandCurriculumPanel } from './IslandCurriculumPanel';
 import { PreschoolPixelTerrain } from './PreschoolPixelTerrain';
 
@@ -253,6 +253,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
 }) {
   const [width,setWidth]=useState(0);
   const actual=measuredWidth(width);
+  const compactStageMap=compactIslandStageMap(actual);
   const geometry=islandStageLayout(actual,grade.stages.length);
   const stats=gradeProgress(progress,grade.id);
   const gradeIndex=worldIslands.findIndex(g=>g.id===grade.id);
@@ -385,7 +386,21 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
             </View>
           );
         })}
-        {grade.stages.map((stage,index)=>{
+        {/* Compact screens show one centered lesson title per five-stage row.
+            Individual stage names remain available to screen readers/tap targets. */}
+        {compactStageMap && Array.from({length:Math.ceil(grade.stages.length/5)},(_,row)=>{
+          const position=geometry.positions[row*5];
+          return <View key={'row-topic-'+row} testID={'island-row-topic-'+row}
+            pointerEvents="none" style={[styles.compactRowTopic,{
+              top:position.y+marker/2+13,
+              left:68,right:68,
+            }]}>
+            <Text numberOfLines={2} style={styles.compactRowTopicText}>
+              {stageRowCategoryName(grade,row)}
+            </Text>
+          </View>;
+        })}
+        {!compactStageMap && grade.stages.map((stage,index)=>{
           const position=geometry.positions[index];
           return <View key={'category-'+stage.id} pointerEvents="none"
             style={[styles.pinCategoryBox,grade.id==='preschool'&&styles.pixelCategoryBox,{
@@ -400,13 +415,22 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           // 試作版は幼児の確認テスト1のみ選択可。ほかは従来どおり。
           const enabled=preview ? grade.id==='preschool' && checkpoint.number===1
             : testing || checkpoint.sourceStageIds.every(id=>Boolean(progress.stages[id]?.clearedAt));
-          const left=Math.min(actual-68,Math.max(2,end.x-33));
+          const checkpointLayout=islandCheckpointLayout(actual,end,marker);
           return <Pressable key={checkpoint.id} accessibilityRole="button"
+            testID={'island-checkpoint-'+checkpoint.number}
             accessibilityLabel={'確認テスト '+checkpoint.number+(enabled?' を はじめる':' は準備中')} disabled={!enabled} onPress={()=>onCheckpoint(checkpoint)}
-            style={{position:'absolute',left,top:end.y+37,width:66,height:44,borderRadius:10,justifyContent:'center',
-              alignItems:'center',backgroundColor:enabled?'#fff0b5':'#d2d9e9',borderWidth:1,borderColor:'#66769a',
-               ...(grade.id==='preschool'?{borderRadius:3,borderWidth:2,borderColor:'#344454',backgroundColor:enabled?'#f3e5b9':'#d9dfdf'}:{})}}>
-            <Text style={{fontSize:11,fontWeight:'800',color:'#263453'}}>確認テスト</Text>
+            style={{position:'absolute',left:checkpointLayout.left,top:checkpointLayout.top,
+              width:checkpointLayout.width,height:checkpointLayout.height,
+              borderRadius:grade.id==='preschool'?3:10,
+              justifyContent:'center',alignItems:'center',
+              backgroundColor:grade.id==='preschool'
+                ? (enabled?'#f3e5b9':'#d9dfdf')
+                : (enabled?'#fff0b5':'#d2d9e9'),
+              borderWidth:grade.id==='preschool'?2:1,
+              borderColor:grade.id==='preschool'?'#344454':'#66769a'}}>
+            <Text style={{fontSize:checkpointLayout.compact?12:11,fontWeight:'800',color:'#263453'}}>
+              {checkpointLayout.compact?'テスト':'確認テスト'}
+            </Text>
             <Text style={{fontSize:11,color:'#263453'}}>{checkpoint.number}</Text>
           </Pressable>;
         })}
@@ -521,6 +545,9 @@ const styles=StyleSheet.create({
   pinCategoryBox:{position:'absolute',borderRadius:5,paddingHorizontal:2,paddingVertical:1,
     backgroundColor:'rgba(255,250,228,0.92)',alignItems:'center',justifyContent:'center'},
   pinCategoryText:{fontSize:10,fontWeight:'800',color:'#314661',textAlign:'center',lineHeight:12},
+  compactRowTopic:{position:'absolute',alignItems:'center',justifyContent:'center',
+    paddingHorizontal:4,paddingVertical:4,borderRadius:4,backgroundColor:'rgba(248,239,211,0.96)'},
+  compactRowTopicText:{color:'#344454',fontWeight:'900',fontSize:13,lineHeight:17,textAlign:'center'},
   pixelCategoryBox:{borderRadius:1,backgroundColor:'rgba(247,238,207,0.94)'},
   pixelCategoryText:{color:'#344454'},
   stagePin:{position:'absolute',borderRadius:50,backgroundColor:'#fffaf0',borderWidth:3,borderColor:'#d2ae66',
