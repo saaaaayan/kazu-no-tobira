@@ -138,6 +138,11 @@ export function preschoolDecorationLayout(width:number,height:number,
     if(item.kind==='plush')plush.push(item);
     return true;
   }
+  // Reserve several independent toy-block spots BEFORE the plushes fill the
+  // map. Otherwise narrow screens can end up with almost no building blocks.
+  const initialBlocks=Math.ceil(targetBlocks*.65);
+  for(let n=0;n<initialBlocks;n++)
+    for(let tries=0;tries<180;tries++)if(attempt('blocks'))break;
   for(let n=0;n<targetPlush;n++){
     if(n>0&&n%PRESCHOOL_PLUSH_ANIMALS.length===0)
       batch=shuffled(PRESCHOOL_PLUSH_ANIMALS,rand);
@@ -146,10 +151,10 @@ export function preschoolDecorationLayout(width:number,height:number,
     // gives way to placing the same type next to itself.
     for(let tries=0;tries<250;tries++)if(attempt('plush',animal))break;
   }
-  for(const [kind,count] of [['blocks',targetBlocks],['flower',targetFlowers]] as const){
-    for(let n=0;n<count;n++)
-      for(let tries=0;tries<90;tries++)if(attempt(kind))break;
-  }
+  for(let n=initialBlocks;n<targetBlocks;n++)
+    for(let tries=0;tries<130;tries++)if(attempt('blocks'))break;
+  for(let n=0;n<targetFlowers;n++)
+    for(let tries=0;tries<90;tries++)if(attempt('flower'))break;
   return placed;
 }
 
