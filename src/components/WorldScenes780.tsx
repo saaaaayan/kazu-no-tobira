@@ -15,6 +15,7 @@ import { lessonStatus, unitLessons, type UnitLesson } from '../domain/unitLesson
 import { featureAccess } from '../domain/accessPlan';
 import { uiPreviewSampleKind } from '../domain/uiPreviewRound';
 import { stageCategoryName, stageRowCategoryName } from '../domain/islandCurriculumView';
+import { preschoolStageMapInfo } from '../domain/preschoolStageMapInfo';
 import { IslandCurriculumPanel } from './IslandCurriculumPanel';
 import { PreschoolPixelTerrain } from './PreschoolPixelTerrain';
 
@@ -252,10 +253,12 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
   preview?:boolean;
 }) {
   const [width,setWidth]=useState(0);
+  const [detailStageId,setDetailStageId]=useState<string|null>(null);
   const actual=measuredWidth(width);
   const compactStageMap=compactIslandStageMap(actual);
   const geometry=islandStageLayout(actual,grade.stages.length,
-    grade.id==='preschool'?PRESCHOOL_MAP_TITLE_INSET:0);
+    grade.id==='preschool'?PRESCHOOL_MAP_TITLE_INSET:0,grade.id==='preschool');
+  const detailStage=grade.id==='preschool' ? grade.stages.find(stage=>stage.id===detailStageId) : undefined;
   const stats=gradeProgress(progress,grade.id);
   const gradeIndex=worldIslands.findIndex(g=>g.id===grade.id);
   const testing = mode === 'test';
@@ -394,15 +397,32 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
             </View>
           );
         })}
-        {/* Compact screens show one centered lesson title per five-stage row.
-            Individual stage names remain available to screen readers/tap targets. */}
-        {compactStageMap && Array.from({length:Math.ceil(grade.stages.length/5)},(_,row)=>{
+        {/* On the preschool island, every stage displays its own learning
+            title. Tap a title for the full objective; tap the round pin to play.
+            Other islands keep the existing compact/wide curriculum labels. */}
+        {grade.id==='preschool' && grade.stages.map((stage,index)=>{
+          const position=geometry.positions[index];
+          const info=preschoolStageMapInfo(stage);
+          const labelWidth=Math.max(42,actual/5-(compactStageMap?3:12));
+          return <Pressable key={'stage-topic-'+stage.id}
+            accessibilityRole="button" accessibilityLabel={'ステージ '+String(index+1)+' の ないようを みる '+info.title}
+            testID={'preschool-stage-topic-'+String(index+1)}
+            onPress={()=>setDetailStageId(stage.id)}
+            style={[styles.preschoolStageTopic,{
+              width:labelWidth,left:Math.max(1,position.x-labelWidth/2),
+              top:position.y+marker/2+5,
+            }]}>
+            <Text numberOfLines={compactStageMap?3:2}
+              style={[styles.preschoolStageTopicText,compactStageMap&&styles.preschoolStageTopicSmall]}>
+              {info.title}
+            </Text>
+          </Pressable>;
+        })}
+        {grade.id!=='preschool' && compactStageMap && Array.from({length:Math.ceil(grade.stages.length/5)},(_,row)=>{
           const position=geometry.positions[row*5];
           return <View key={'row-topic-'+row} testID={'island-row-topic-'+row}
             pointerEvents="none" style={[styles.compactRowTopic,{
               top:position.y+marker/2+13,
-              // Keep the title lane clear of the edge-aligned checkpoints
-              // even on larger phones and narrow tablets.
               left:Math.max(68,Math.ceil(actual*.16)),
               right:Math.max(68,Math.ceil(actual*.16)),
             }]}>
@@ -411,14 +431,14 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
             </Text>
           </View>;
         })}
-        {!compactStageMap && grade.stages.map((stage,index)=>{
+        {grade.id!=='preschool' && !compactStageMap && grade.stages.map((stage,index)=>{
           const position=geometry.positions[index];
           return <View key={'category-'+stage.id} pointerEvents="none"
-            style={[styles.pinCategoryBox,grade.id==='preschool'&&styles.pixelCategoryBox,{
+            style={[styles.pinCategoryBox,{
               width:84,left:Math.max(1,Math.min(actual-85,position.x-42)),
               top:position.y+marker/2+4,
             }]}>
-            <Text numberOfLines={2} style={[styles.pinCategoryText,grade.id==='preschool'&&styles.pixelCategoryText]}>{stageCategoryName(grade,stage)}</Text>
+            <Text numberOfLines={2} style={styles.pinCategoryText}>{stageCategoryName(grade,stage)}</Text>
           </View>;
         })}
         {checkpointsFor(grade).map(checkpoint=>{
@@ -427,7 +447,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           const enabled=preview ? grade.id==='preschool' && checkpoint.number===1
             : testing || checkpoint.sourceStageIds.every(id=>Boolean(progress.stages[id]?.clearedAt));
           const nextPoint=geometry.positions[checkpoint.after.order+1];
-          const checkpointLayout=islandCheckpointLayout(actual,end,marker,nextPoint);
+          const checkpointLayout=islandCheckpointLayout(actual,end,marker,nextPoint,grade.id==='preschool');
           return <Pressable key={checkpoint.id} accessibilityRole="button"
             testID={'island-checkpoint-'+checkpoint.number}
             accessibilityLabel={'確認テスト '+checkpoint.number+(enabled?' を はじめる':' は準備中')} disabled={!enabled} onPress={()=>onCheckpoint(checkpoint)}
@@ -458,7 +478,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           return (
             <Pressable key={stage.id} accessibilityRole="button" disabled={!selectable}
               accessibilityState={{disabled:!selectable}}
-              accessibilityLabel={stageDisplayTitle(stage)+'、単元 '+stageCategoryName(grade,stage)+'、'+(preview ? (hasStageBank(stage.id) ? '100問のなかから10問ずつ あそべる' : uiPreviewSampleKind(stage) ? 'サンプル問題' : '体験用問題は準備中') : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
+              accessibilityLabel={stageDisplayTitle(stage)+'、単元 '+stageCategoryName(grade,stage)+'、'+(grade.id==='preschool'?'学習内容 '+preschoolStageMapInfo(stage).title+'、':'')+(preview ? (hasStageBank(stage.id) ? '100問のなかから10問ずつ あそべる' : uiPreviewSampleKind(stage) ? 'サンプル問題' : '体験用問題は準備中') : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
                 styles.stagePin,grade.id==='preschool'&&styles.pixelStagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
@@ -475,6 +495,37 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
             </Pressable>
           );
         })}
+        {detailStage && (()=>{
+          const info=preschoolStageMapInfo(detailStage);
+          const position=geometry.positions[detailStage.order];
+          const playable=preview
+            ? Boolean(uiPreviewSampleKind(detailStage)) || hasStageBank(detailStage.id)
+            : ['play','learn'].includes(worldStageAction(mode,progress,detailStage,access));
+          return <View testID="preschool-stage-info-card"
+            style={[styles.preschoolStageInfoCard,{
+              top:Math.min(geometry.height-188,position.y+marker/2+48),
+              left:compactStageMap?12:Math.max(30,Math.round(actual*.2)),
+              right:compactStageMap?12:Math.max(30,Math.round(actual*.2)),
+            }]}>
+            <Text style={styles.preschoolStageInfoTitle}>
+              {String(detailStage.order+1).padStart(2,'0')}　{info.title}
+            </Text>
+            <Text style={styles.preschoolStageInfoGoal}>{info.goal}</Text>
+            <Text style={styles.preschoolStageInfoNotice}>がくしゅうないよう（あん）</Text>
+            <View style={styles.preschoolStageInfoActions}>
+              <Pressable accessibilityRole="button" accessibilityLabel="とじる"
+                onPress={()=>setDetailStageId(null)} style={styles.preschoolStageInfoClose}>
+                <Text style={styles.preschoolStageInfoActionText}>とじる</Text>
+              </Pressable>
+              <Pressable accessibilityRole="button" disabled={!playable}
+                accessibilityLabel={playable?'このステージで あそぶ':'このステージは じゅんびちゅう'}
+                onPress={()=>onStart(detailStage)}
+                style={[styles.preschoolStageInfoPlay,!playable&&styles.preschoolStageInfoDisabled]}>
+                <Text style={styles.preschoolStageInfoActionText}>{playable?'あそぶ':'じゅんびちゅう'}</Text>
+              </Pressable>
+            </View>
+          </View>;
+        })()}
       </View>
       {!testing && <View style={styles.footer}>
         <Text style={styles.footerTitle}>✦ この島には 65のステージ</Text>
@@ -567,6 +618,24 @@ const styles=StyleSheet.create({
   compactRowTopicText:{color:'#344454',fontWeight:'900',fontSize:13,lineHeight:17,textAlign:'center'},
   pixelCategoryBox:{borderRadius:1,backgroundColor:'rgba(247,238,207,0.94)'},
   pixelCategoryText:{color:'#344454'},
+  preschoolStageTopic:{position:'absolute',minHeight:25,paddingHorizontal:2,paddingVertical:2,
+    backgroundColor:'rgba(246,238,206,0.97)',borderRadius:2,
+    alignItems:'center',justifyContent:'center'},
+  preschoolStageTopicText:{fontSize:11,lineHeight:14,color:'#344454',fontWeight:'900',textAlign:'center'},
+  preschoolStageTopicSmall:{fontSize:9,lineHeight:12},
+  preschoolStageInfoCard:{position:'absolute',zIndex:30,backgroundColor:'#f8f0d8',
+    borderWidth:3,borderColor:'#344454',borderRadius:4,padding:10,gap:8,
+    shadowColor:'#344454',shadowOpacity:.22,shadowOffset:{width:2,height:3},shadowRadius:2},
+  preschoolStageInfoTitle:{fontSize:16,lineHeight:22,fontWeight:'900',color:'#344454'},
+  preschoolStageInfoGoal:{fontSize:13,lineHeight:21,color:'#344454',fontWeight:'700'},
+  preschoolStageInfoNotice:{fontSize:10,color:'#65715f'},
+  preschoolStageInfoActions:{flexDirection:'row',gap:10,justifyContent:'flex-end'},
+  preschoolStageInfoClose:{minHeight:44,justifyContent:'center',paddingHorizontal:15,
+    backgroundColor:'#d9dfd8',borderRadius:3,borderWidth:1,borderColor:'#344454'},
+  preschoolStageInfoPlay:{minHeight:44,justifyContent:'center',paddingHorizontal:15,
+    backgroundColor:'#eac68c',borderRadius:3,borderWidth:1,borderColor:'#344454'},
+  preschoolStageInfoDisabled:{backgroundColor:'#d8dbd3'},
+  preschoolStageInfoActionText:{color:'#344454',fontWeight:'900',fontSize:13},
   stagePin:{position:'absolute',borderRadius:50,backgroundColor:'#fffaf0',borderWidth:3,borderColor:'#d2ae66',
     alignItems:'center',justifyContent:'center',shadowColor:'#24445b',shadowOpacity:0.25,shadowRadius:3,shadowOffset:{width:0,height:2}},
   pixelStagePin:{borderColor:'#344454',borderRadius:50,shadowOpacity:0,backgroundColor:'#fff8e2'},

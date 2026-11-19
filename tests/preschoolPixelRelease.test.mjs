@@ -50,34 +50,40 @@ test('Each island map has exactly three section banners, one per 50/10/5 stage a
   assert.match(ui,/checkpointsFor\(grade\)\.map/);
 });
 
-test('Phone maps condense five stage labels to a single row title without hiding stage controls',()=>{
+test('All 65 preschool stages have their own title and tap-to-read learning goal',()=>{
   const ui=read('src/components/WorldScenes780.tsx');
+  const names=read('src/domain/preschoolStageMapInfo.ts');
   const domain=read('src/domain/islandCurriculumView.ts');
-  assert.match(ui,/compactStageMap && Array.from\(\{length:Math.ceil\(grade.stages.length\/5\)\}/);
-  assert.match(ui,/!compactStageMap && grade.stages.map/);
-  assert.match(ui,/stageRowCategoryName\(grade,row\)/);
-  assert.match(domain,/export function stageRowCategoryName/);
-  assert.match(ui,/testID=\{'island-row-topic-'\+row\}/);
-  assert.match(ui,/numberOfLines=\{2\} style=\{styles.compactRowTopicText\}/);
-  assert.match(ui,/islandCheckpointLayout\(actual,end,marker,nextPoint\)/);
-  assert.match(ui,/checkpointLayout.compact\?'テスト':'確認テスト'/);
-  assert.match(ui,/onPress=\{\(\)=>onCheckpoint\(checkpoint\)\}/);
+  const catalog=read('src/domain/worldCatalog.ts');
+  assert.match(ui,/grade.id==='preschool' && grade.stages.map/);
+  assert.match(ui,/preschoolStageMapInfo\(stage\)/);
+  assert.match(ui,/testID=\{'preschool-stage-topic-'\+String\(index\+1\)\}/);
+  assert.match(ui,/numberOfLines=\{compactStageMap\?3:2\}/);
+  assert.match(ui,/testID="preschool-stage-info-card"/);
   assert.match(ui,/onPress=\{\(\)=>onStart\(stage\)\}/);
-  assert.match(ui,/testID=\{'island-area-'\+area.kind\}/);
+  assert.match(ui,/onPress=\{\(\)=>onStart\(detailStage\)\}/);
+  assert.match(domain,/export function stageCategoryName/);
+  assert.match(catalog,/id: 'preschool', title: '就学前'/);
+  const ids=[...names.matchAll(/id: '(preschool\.(?:n|x|s)\d{2})'/g)].map(m=>m[1]);
+  assert.equal(ids.length,65);
+  assert.equal(new Set(ids).size,65);
+  const titles=[...names.matchAll(/title: "([^"]+)"/g)].map(m=>m[1]);
+  assert.equal(titles.length,65);
+  assert.equal(new Set(titles).size,65);
 });
-
-test('Mobile preschool plush toys are visibly enlarged and avoid the three area banners',()=>{
+test('Preschool terrain scatters 3 toys per row on phones and 4 on desktop',()=>{
   const art=read('src/components/PreschoolPixelTerrain.tsx');
-  const ui=read('src/components/WorldScenes780.tsx');
+  const map=read('src/components/WorldScenes780.tsx');
   assert.match(art,/const compact=width<620/);
-  assert.match(art,/Math\.max\(\.72,Math\.min\(\.94,width\/410\)\)/);
-  assert.match(art,/row===0\?56\+PRESCHOOL_MAP_TITLE_INSET:compact&&\(row===10\|\|row===12\)\?y-105/);
-  assert.match(art,/x=\{width\*\(compact\?\.28:\.2\)\}/);
-  assert.match(art,/x=\{width\*\(compact\?\.72:\.8\)\}/);
-  assert.match(ui,/left:Math\.max\(68,Math\.ceil\(actual\*\.16\)\)/);
-  assert.match(ui,/const nextPoint=geometry\.positions\[checkpoint\.after\.order\+1\]/);
+  assert.match(art,/const compactScatter/);
+  assert.match(art,/const desktopScatter/);
+  assert.match(art,/ANIMALS\[\(row\*5\+slot\*7\)%ANIMALS.length\]/);
+  assert.match(art,/scale=\{scale\*spot.size\}/);
+  assert.match(art,/baseY\+spot.offset/);
+  assert.match(art,/row===0 \? 56\+PRESCHOOL_MAP_TITLE_INSET/);
+  assert.match(map,/grade.id==='preschool'\?PRESCHOOL_MAP_TITLE_INSET:0,grade.id==='preschool'/);
+  assert.match(map,/const nextPoint=geometry.positions\[checkpoint.after.order\+1\]/);
 });
-
 test('The in-map preschool title is visible above plush mascots and the first area',()=>{
   const ui=read('src/components/WorldScenes780.tsx');
   const terrain=read('src/components/PreschoolPixelTerrain.tsx');
@@ -86,5 +92,5 @@ test('The in-map preschool title is visible above plush mascots and the first ar
   assert.match(ui,/<Text style=\{styles\.preschoolMapTopGrade\}>就学前<\/Text>/);
   assert.match(ui,/<Text style=\{styles\.preschoolMapTopName\}>ぬいぐるみの島<\/Text>/);
   assert.match(ui,/preschoolMapTopTitle:\{position:'absolute',top:18,left:40,right:40,height:58/);
-  assert.match(terrain,/row===0\?56\+PRESCHOOL_MAP_TITLE_INSET/);
+  assert.match(terrain,/row===0 \? 56\+PRESCHOOL_MAP_TITLE_INSET/);
 });

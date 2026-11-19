@@ -1,0 +1,80 @@
+// Display-only learning objectives drafted for the preschool island.
+// These are not approved assessment content or a source of question validity.
+// Keep exercise data, stage IDs and review statuses unchanged.
+import type { WorldStage } from './worldCatalog.ts';
+const provisionalPreschoolStageInfo = [
+  { id: 'preschool.n01', title: "1〜3こを かぞえよう", goal: "ぬいぐるみを 1こずつ タッチして、1〜3こ かぞえよう。" },
+  { id: 'preschool.n02', title: "4こと 5こ", goal: "4こ と 5こを かぞえて、すうじを えらぼう。" },
+  { id: 'preschool.n03', title: "10こまで かぞえよう", goal: "6こから 10こまで、ひとつずつ かぞえよう。" },
+  { id: 'preschool.n04', title: "いろいろな もの", goal: "いろや かたちを みて、きまった ものだけ かぞえよう。" },
+  { id: 'preschool.n05', title: "どんな ならびでも", goal: "おもちゃの ならびが かわっても、かずを たしかめよう。" },
+  { id: 'preschool.n06', title: "1・2・3を みつけよう", goal: "1・2・3の すうじと、おなじ かずの えを さがそう。" },
+  { id: 'preschool.n07', title: "4・5を みつけよう", goal: "4・5の すうじと、おなじ かずの えを さがそう。" },
+  { id: 'preschool.n08', title: "6から 10の すうじ", goal: "6〜10の すうじを みつけて、えと あわせよう。" },
+  { id: 'preschool.n09', title: "0は どれかな", goal: "なにも ないときの 0を みつけよう。" },
+  { id: 'preschool.n10', title: "えと すうじを むすぼう", goal: "えの かずと すうじを、ぴったり あわせよう。" },
+  { id: 'preschool.n11', title: "1・2・3を なぞろう", goal: "1・2・3の かたちを、ゆびで ゆっくり なぞろう。" },
+  { id: 'preschool.n12', title: "4・5を なぞろう", goal: "4・5の かたちを、ゆびで なぞって みよう。" },
+  { id: 'preschool.n13', title: "6・7を なぞろう", goal: "6・7の かたちを、ゆびで かいて みよう。" },
+  { id: 'preschool.n14', title: "8・9を なぞろう", goal: "8・9の せんを たどって、なぞって みよう。" },
+  { id: 'preschool.n15', title: "0と 10を なぞろう", goal: "0と 10を みて、ゆびで なぞって みよう。" },
+  { id: 'preschool.n16', title: "1・2・3の じゅんばん", goal: "1・2・3を、ただしい じゅんに ならべよう。" },
+  { id: 'preschool.n17', title: "5までの じゅんばん", goal: "1から 5までの すうじを ならべよう。" },
+  { id: 'preschool.n18', title: "10までの じゅんばん", goal: "1から 10までの じゅんばんを たしかめよう。" },
+  { id: 'preschool.n19', title: "つぎと まえの かず", goal: "すうじの つぎと まえを みつけよう。" },
+  { id: 'preschool.n20', title: "かくれた すうじ", goal: "あいている ところに はいる すうじを さがそう。" },
+  { id: 'preschool.n21', title: "どっちが おおい？", goal: "ぬいぐるみは どっちが おおいかな？" },
+  { id: 'preschool.n22', title: "1こ ちがうよ", goal: "1こだけ ちがう かずを みくらべよう。" },
+  { id: 'preschool.n23', title: "おなじ かず", goal: "おなじ かずの おもちゃを みつけよう。" },
+  { id: 'preschool.n24', title: "3つの なかから", goal: "3つの なかで いちばん おおい ものを さがそう。" },
+  { id: 'preschool.n25', title: "おおい・すくない めいじん", goal: "おおい・すくない・おなじを えらぼう。" },
+  { id: 'preschool.n26', title: "おなじ いろを あつめよう", goal: "おなじ いろの おもちゃを あつめよう。" },
+  { id: 'preschool.n27', title: "おなじ かたちを あつめよう", goal: "おなじ かたちの おもちゃを あつめよう。" },
+  { id: 'preschool.n28', title: "どれが なかま？", goal: "おなじ なかまに はいる ものを みつけよう。" },
+  { id: 'preschool.n29', title: "2つの おやくそく", goal: "いろと かたち、2つを よく みて えらぼう。" },
+  { id: 'preschool.n30', title: "なかまわけの おみせ", goal: "おもちゃを きまった はこに おかたづけしよう。" },
+  { id: 'preschool.n31', title: "まるを みつけよう", goal: "まるい かたちを みつけて タッチしよう。" },
+  { id: 'preschool.n32', title: "さんかくを みつけよう", goal: "さんかくの かたちを みつけよう。" },
+  { id: 'preschool.n33', title: "しかくを みつけよう", goal: "しかくの かたちを みつけよう。" },
+  { id: 'preschool.n34', title: "くるっと まわしても", goal: "くるっと まわった かたちを みくらべよう。" },
+  { id: 'preschool.n35', title: "かたちで つくろう", goal: "まる・さんかく・しかくを つかって つくろう。" },
+  { id: 'preschool.n36', title: "2つの ならび", goal: "2つの いろが くりかえす ならびを みつけよう。" },
+  { id: 'preschool.n37', title: "2こ・1この ならび", goal: "2こ・1この くりかえしを みつけよう。" },
+  { id: 'preschool.n38', title: "3つの ならび", goal: "3つの いろが つづく ならびを みつけよう。" },
+  { id: 'preschool.n39', title: "かたちの ならび", goal: "かたちが つづく じゅんばんを みつけよう。" },
+  { id: 'preschool.n40', title: "ならびの たんけん", goal: "いろいろな ならびの つぎを あてよう。" },
+  { id: 'preschool.n41', title: "うえと した", goal: "ぬいぐるみの うえと したを さがそう。" },
+  { id: 'preschool.n42', title: "みぎと ひだり", goal: "みぎと ひだりを みわけよう。" },
+  { id: 'preschool.n43', title: "となりは だあれ？", goal: "ぬいぐるみの となりに いるのは だあれ？" },
+  { id: 'preschool.n44', title: "まんなかは どこ？", goal: "まんなかに いるのは だあれ？" },
+  { id: 'preschool.n45', title: "ばしょの たんけん", goal: "うえ・した・となりを よく みて さがそう。" },
+  { id: 'preschool.n46', title: "かぞえて おくろう", goal: "ぬいぐるみを かぞえて、とどけよう。" },
+  { id: 'preschool.n47', title: "かたちと かず", goal: "かたちと かずを あわせて えらぼう。" },
+  { id: 'preschool.n48', title: "ひとつずつ わけよう", goal: "みんなに ひとつずつ おやつを くばろう。" },
+  { id: 'preschool.n49', title: "ふしぎな おもちゃばこ", goal: "おもちゃばこの きまりを みつけよう。" },
+  { id: 'preschool.n50', title: "ぬいぐるみの おまつり", goal: "ぬいぐるみと いっしょに ぜんぶの あそびに ちょうせん！" },
+  { id: 'preschool.x01', title: "ぬいぐるみを かぞえよう！", goal: "たくさんの ぬいぐるみを かぞえてみよう。" },
+  { id: 'preschool.x02', title: "かずの おひっこし", goal: "おなじ かずの おもちゃを べつの ばしょへ うごかそう。" },
+  { id: 'preschool.x03', title: "すうじの ひみつの みち", goal: "すうじが ならんだ ひみつの みちを すすもう。" },
+  { id: 'preschool.x04', title: "まいごの すうじ", goal: "あいている ばしょの すうじを みつけよう。" },
+  { id: 'preschool.x05', title: "どっちが おおいかな？", goal: "いちばん おおい ぬいぐるみを えらぼう。" },
+  { id: 'preschool.x06', title: "おかたづけ めいじん", goal: "おもちゃを いろと かたちで おかたづけしよう。" },
+  { id: 'preschool.x07', title: "かたちの へんしん", goal: "むきが かわった かたちを みつけよう。" },
+  { id: 'preschool.x08', title: "つぎに くるのは？", goal: "つぎに くる おもちゃを えらぼう。" },
+  { id: 'preschool.x09', title: "ぬいぐるみの かくれんぼ", goal: "どこに かくれたか ばしょを さがそう。" },
+  { id: 'preschool.x10', title: "おまつりの だいぼうけん", goal: "いままでの あそびを つかって ちょうせん！" },
+  { id: 'preschool.s01', title: "かずの ふしぎな まほう", goal: "ふしぎな かずの きまりを みつけよう。" },
+  { id: 'preschool.s02', title: "ひみつの おもちゃばこ", goal: "おもちゃばこの なかの きまりを みつけよう。" },
+  { id: 'preschool.s03', title: "ぬいぐるみの だいさくせん", goal: "みんなで ちからを あわせて かずと かたちを さがそう。" },
+  { id: 'preschool.s04', title: "かたちの まほうじん", goal: "まると さんかくを ならべて かたちを つくろう。" },
+  { id: 'preschool.s05', title: "ぬいぐるみの ひみつの おしろ", goal: "ぬいぐるみの おしろで さいごの なぞに ちょうせん！" },
+] as const;
+
+const byId: ReadonlyMap<string,{title:string;goal:string}> =
+  new Map(provisionalPreschoolStageInfo.map(info=>[info.id,info]));
+
+export function preschoolStageMapInfo(stage:Pick<WorldStage,'id'|'title'>) {
+  return byId.get(stage.id) ?? {title:stage.title,goal:''};
+}
+
+export const preschoolStageMapNames=provisionalPreschoolStageInfo;

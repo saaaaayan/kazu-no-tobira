@@ -125,6 +125,24 @@ const ANIMALS:Animal[] = [
   'fox','koala','chick','lamb','giraffe',
 ];
 
+// Stable layouts produce an organic scatter without shuffling on every render.
+// Smaller companions are interleaved with larger mascots in each clearing.
+type PlushSpot = {x:number;offset:number;size:number};
+const compactScatter: readonly (readonly PlushSpot[])[] = [
+  [{x:.28,offset:-4,size:1.13},{x:.51,offset:-10,size:.59},{x:.70,offset:5,size:.91}],
+  [{x:.31,offset:8,size:.84},{x:.50,offset:-15,size:.68},{x:.69,offset:-2,size:1.21}],
+  [{x:.27,offset:2,size:1.05},{x:.48,offset:-8,size:.62},{x:.72,offset:-6,size:.80}],
+  [{x:.29,offset:-8,size:1.17},{x:.52,offset:0,size:.56},{x:.68,offset:10,size:.98}],
+  [{x:.33,offset:5,size:.81},{x:.47,offset:-14,size:.67},{x:.71,offset:-6,size:1.16}],
+  [{x:.27,offset:-5,size:1.02},{x:.53,offset:3,size:.64},{x:.69,offset:8,size:.89}],
+];
+const desktopScatter: readonly (readonly PlushSpot[])[] = [
+  [{x:.19,offset:-2,size:1.02},{x:.37,offset:4,size:.73},{x:.63,offset:-5,size:1.12},{x:.82,offset:8,size:.63}],
+  [{x:.17,offset:6,size:.70},{x:.39,offset:-5,size:1.18},{x:.60,offset:6,size:.69},{x:.83,offset:-4,size:.96}],
+  [{x:.20,offset:-7,size:1.14},{x:.40,offset:9,size:.65},{x:.61,offset:-6,size:.97},{x:.81,offset:4,size:.78}],
+  [{x:.18,offset:2,size:.88},{x:.38,offset:-8,size:1.09},{x:.64,offset:7,size:.68},{x:.84,offset:-3,size:1.00}],
+];
+
 export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
   width:number;height:number;positions:readonly {x:number;y:number}[];
   grade:WorldGrade;next:number;
@@ -147,7 +165,6 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
       rx={3} fill="none" stroke="#7a9d6d" strokeWidth={2}/>
     {Array.from({length:13},(_,row)=>{
       const y=positions[row*5].y;
-      const animals=[ANIMALS[(row*2)%ANIMALS.length],ANIMALS[(row*2+1)%ANIMALS.length]];
       return <G key={row}>
         <Rect x={26} y={y-50} width={width-52} height={75}
           fill={row<10
@@ -163,17 +180,17 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
         <Rect x={width*.43} y={y+12} width={3} height={7} fill="#62885d"/>
         <Rect x={width*.74} y={y+12} width={3} height={7} fill="#62885d"/>
         {row%3===0&&<ToyBlocks x={width*.965} y={y-34} scale={scale*.8}/>}
-        {/* On phones, sprites sit between stage columns, above the stage row.
-            The first row is placed ABOVE its area banner, and rows 10/12
-            above theirs, so every section's plush toys remain visible. */}
-        <Plush animal={animals[0]}
-          x={width*(compact?.28:.2)}
-          y={row===0?56+PRESCHOOL_MAP_TITLE_INSET:compact&&(row===10||row===12)?y-105:compact?y-53:y-38}
-          scale={scale}/>
-        <Plush animal={animals[1]}
-          x={width*(compact?.72:.8)}
-          y={row===0?56+PRESCHOOL_MAP_TITLE_INSET:compact&&(row===10||row===12)?y-105:compact?y-53:y-38}
-          scale={scale}/>
+        {(compact?compactScatter:desktopScatter)[row%(compact?compactScatter.length:desktopScatter.length)]
+          .map((spot,slot)=>{
+            const animal:Animal=row===0
+              ? (['bear','chick','bunny','panda'][slot] as Animal)
+              : ANIMALS[(row*5+slot*7)%ANIMALS.length];
+            const baseY=row===0 ? 56+PRESCHOOL_MAP_TITLE_INSET
+              : (row===10||row===12) ? y-105 : compact ? y-53 : y-52;
+            return <Plush key={'plush-'+row+'-'+slot} animal={animal}
+              x={width*spot.x} y={baseY+spot.offset}
+              scale={scale*spot.size}/>;
+          })}
       </G>;
     })}
     {/* Quiet separators mark the trial and legendary zones without
