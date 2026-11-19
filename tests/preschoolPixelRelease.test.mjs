@@ -71,9 +71,20 @@ test('Mobile preschool plush toys are visibly enlarged and avoid the three area 
   const ui=read('src/components/WorldScenes780.tsx');
   assert.match(art,/const compact=width<620/);
   assert.match(art,/Math\.max\(\.72,Math\.min\(\.94,width\/410\)\)/);
-  assert.match(art,/row===0\?56:row===10\|\|row===12\?y-105:y-53/);
+  assert.match(art,/row===0\?56\+PRESCHOOL_MAP_TITLE_INSET:compact&&\(row===10\|\|row===12\)\?y-105/);
   assert.match(art,/x=\{width\*\(compact\?\.28:\.2\)\}/);
   assert.match(art,/x=\{width\*\(compact\?\.72:\.8\)\}/);
   assert.match(ui,/left:Math\.max\(68,Math\.ceil\(actual\*\.16\)\)/);
   assert.match(ui,/const nextPoint=geometry\.positions\[checkpoint\.after\.order\+1\]/);
+});
+
+test('The in-map preschool title is visible above plush mascots and the first area',()=>{
+  const ui=read('src/components/WorldScenes780.tsx');
+  const terrain=read('src/components/PreschoolPixelTerrain.tsx');
+  assert.match(ui,/grade\.id==='preschool'\?PRESCHOOL_MAP_TITLE_INSET:0/);
+  assert.match(ui,/testID="preschool-map-top-title"/);
+  assert.match(ui,/<Text style=\{styles\.preschoolMapTopGrade\}>就学前<\/Text>/);
+  assert.match(ui,/<Text style=\{styles\.preschoolMapTopName\}>ぬいぐるみの島<\/Text>/);
+  assert.match(ui,/preschoolMapTopTitle:\{position:'absolute',top:18,left:40,right:40,height:58/);
+  assert.match(terrain,/row===0\?56\+PRESCHOOL_MAP_TITLE_INSET/);
 });
