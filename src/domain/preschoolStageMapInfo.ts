@@ -56,7 +56,7 @@ const provisionalPreschoolStageInfo = [
   { id: 'preschool.x01', title: "ぬいぐるみを かぞえよう！", goal: "たくさんの ぬいぐるみを かぞえてみよう。" },
   { id: 'preschool.x02', title: "かずの おひっこし", goal: "おなじ かずの おもちゃを べつの ばしょへ うごかそう。" },
   { id: 'preschool.x03', title: "すうじの ひみつの みち", goal: "すうじが ならんだ ひみつの みちを すすもう。" },
-  { id: 'preschool.x04', title: "□に はいる すうじ その2", goal: "すうじの じゅんばんを みて、□に はいる すうじを えらぼう。" },
+  { id: 'preschool.x04', title: "すうじの ならびに ちょうせん", goal: "すうじの じゅんばんを みて、□に はいる すうじを えらぼう。" },
   { id: 'preschool.x05', title: "どっちが おおいかな？", goal: "いちばん おおい ぬいぐるみを えらぼう。" },
   { id: 'preschool.x06', title: "おかたづけ めいじん", goal: "おもちゃを いろと かたちで おかたづけしよう。" },
   { id: 'preschool.x07', title: "かたちの へんしん", goal: "むきが かわった かたちを みつけよう。" },
