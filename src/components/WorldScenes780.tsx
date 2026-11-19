@@ -43,6 +43,25 @@ function measuredWidth(width: number) {
   return Math.max(244, width || 360);
 }
 
+/** Muted 8-bit paw stamps: no emoji font differences, gradients or glitter. */
+function PreschoolPawStamp({flipped=false,compact=false}:{
+  flipped?:boolean;compact?:boolean;
+}) {
+  const shade='#9b8b77';
+  return <Svg testID={flipped?'preschool-title-paw-right':'preschool-title-paw-left'}
+    accessible={false} width={compact?17:23} height={compact?17:23} viewBox="0 0 24 24">
+    <G transform={flipped?'translate(24 0) scale(-1 1)':undefined} fill={shade}>
+      {/* Four small toe pads, kept separate from the larger stitched paw pad. */}
+      <Rect x={2} y={8} width={4} height={5}/>
+      <Rect x={7} y={3} width={4} height={6}/>
+      <Rect x={14} y={3} width={4} height={6}/>
+      <Rect x={19} y={8} width={4} height={5}/>
+      <Rect x={8} y={12} width={9} height={8}/>
+      <Rect x={6} y={15} width={13} height={4}/>
+    </G>
+  </Svg>;
+}
+
 function OceanTexture({ width, height, seed = 0 }: { width: number; height: number; seed?: number }) {
   return (
     <G>
@@ -368,9 +387,13 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         </View>
         {grade.id==='preschool' && (
           <View testID="preschool-map-top-title" pointerEvents="none"
-            style={styles.preschoolMapTopTitle}>
+            style={[styles.preschoolMapTopTitle,compactStageMap&&styles.preschoolMapTopTitleCompact]}>
             <Text style={styles.preschoolMapTopGrade}>就学前</Text>
-            <Text style={styles.preschoolMapTopName}>ぬいぐるみの島</Text>
+            <View style={styles.preschoolMapTopNameWithPaws}>
+              <PreschoolPawStamp compact={compactStageMap}/>
+              <Text style={[styles.preschoolMapTopName,compactStageMap&&styles.preschoolMapTopNameCompact]}>ぬいぐるみの島</Text>
+              <PreschoolPawStamp flipped compact={compactStageMap}/>
+            </View>
           </View>
         )}
         {/* Only one banner per adventure area. Normal = stages 01–50,
@@ -568,8 +591,11 @@ const styles=StyleSheet.create({
   preschoolMapTopTitle:{position:'absolute',top:18,left:40,right:40,height:58,
     backgroundColor:'#f5edce',borderWidth:2,borderColor:'#7e9a73',
     borderRadius:2,alignItems:'center',justifyContent:'center',gap:2},
+  preschoolMapTopTitleCompact:{left:17,right:17},
   preschoolMapTopGrade:{color:'#526651',fontWeight:'900',fontSize:12,lineHeight:16,textAlign:'center'},
+  preschoolMapTopNameWithPaws:{flexDirection:'row',alignItems:'center',justifyContent:'center',gap:7},
   preschoolMapTopName:{color:'#344454',fontWeight:'900',fontSize:20,lineHeight:24,textAlign:'center'},
+  preschoolMapTopNameCompact:{fontSize:17,lineHeight:21},
   atlas:{borderRadius:22,backgroundColor:'#244e68',overflow:'hidden',position:'relative',borderWidth:1,borderColor:'#4e7180'},
   worldMapControls:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:10,paddingHorizontal:4},
   mapZoomToggle:{paddingVertical:9,paddingHorizontal:11,minHeight:39,borderRadius:10,backgroundColor:'#e7e6db',
