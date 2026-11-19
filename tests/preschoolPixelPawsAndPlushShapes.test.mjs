@@ -23,6 +23,9 @@ test('squirrel has a short curled side tail rather than tall rectangular chimney
   const match=terrain.match(/\{animal==='squirrel'&&<G>([\s\S]*?)<\/G>\}/);
   assert.ok(match,'squirrel-specific vector art must exist');
   const squirrel=match[1];
+  assert.match(squirrel,/<Path d="M-17 -23 L-14 -38 L-2 -23 Z"/);
+  assert.match(squirrel,/<Path d="M2 -23 L14 -38 L17 -23 Z"/);
+  assert.equal((squirrel.match(/<Path d="M(?:-17|2) -23/g)||[]).length,2,'two triangular ears');
   assert.match(squirrel,/<Path d="M14 12 V-5 H20 V-15/);
   assert.match(squirrel,/fill="#af825e"/);
   assert.doesNotMatch(squirrel,/x=\{23\} y=\{-33\}/);
