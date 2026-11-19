@@ -2,6 +2,7 @@ import type { WorldStage } from './worldCatalog';
 import type { BankQuestion } from './questionBank';
 import { countingTokenArt, preschoolCountingTokens } from './countingTokens.ts';
 import { preschoolSample02to05 } from './preschoolSampleStages.ts';
+import { preschoolPrototypeBank } from './preschoolPlayableStages.ts';
 import { elementaryPilotBanks } from './elementaryPilotBanks.ts';
 import { elementaryFollowupBanks } from './elementaryFollowupBanks.ts';
 import { secondaryPilotBanks } from './secondaryPilotBanks.ts';
@@ -15,6 +16,10 @@ export const firstStageLessonBanks:Readonly<Record<string,readonly BankQuestion[
 export const additionalStageLessonBanks:Readonly<Record<string,readonly BankQuestion[]>> = elementaryFollowupBanks;
 
 export function uiPreviewSampleKind(stage: SampleStage) {
+  if (stage.gradeId==='preschool' && /^preschool\\.(?:n(?:0[6-9]|[1-4][0-9]|50)|x(?:0[1-9]|10)|s0[1-5])$/.test(stage.id)) {
+    const expected=stage.id.includes('.n')?'normal':stage.id.includes('.x')?'extra':'secret';
+    return stage.kind===expected?'preschool-activity':undefined;
+  }
   if (stage.kind !== 'normal') return undefined;
   if (additionalStageLessonBanks[stage.id] && stage.id.startsWith(stage.gradeId+'.') &&
       stage.family === (stage.gradeId==='e5'?'decimal':stage.gradeId==='e6'?'fraction':'place')) return 'foundation-stage';
@@ -54,6 +59,7 @@ export function uiPreviewBank(stage: SampleStage): BankQuestion[] {
   if (kind==='foundation-stage') return [...additionalStageLessonBanks[stage.id]];
   if (kind==='counting') return [...countingPreviewBank];
   if (kind==='preschool-sample') return [...(preschoolSample02to05[stage.id] ?? [])];
+  if (kind==='preschool-activity') return preschoolPrototypeBank(stage as WorldStage);
   return Array.from({ length: 10 }, (_, index) => {
     const first = index % 5 + 1;
     const second = (index * 3 + 1) % 4 + 1;
@@ -114,7 +120,7 @@ export function uiPreviewRound(stage: SampleStage, random: () => number = Math.r
   const kind=uiPreviewSampleKind(stage);
   if (!kind) return [];
   const bank=uiPreviewBank(stage);
-  return kind==='counting' ? randomCountingRound(bank,random) : kind==='preschool-sample'||kind==='island-first-stage'||kind==='foundation-stage' ? [...bank] : shuffled(bank,random).slice(0,10);
+  return kind==='counting' ? randomCountingRound(bank,random) : kind==='preschool-sample'||kind==='preschool-activity'||kind==='island-first-stage'||kind==='foundation-stage' ? [...bank] : shuffled(bank,random).slice(0,10);
 }
 
 
@@ -132,4 +138,23 @@ export function uiPreviewPreschoolCheckpointOne(random: () => number = Math.rand
     if(bank.length<2) throw new Error('確認テストのもんだいが たりません。');
     return shuffled(bank,random).slice(0,2).sort((a,b)=>Number(a.answer)-Number(b.answer));
   });
+}
+
+/** Prototype checkpoint 01–10: two tasks from each preceding stage.
+ * Retains the original checkpoint 1's established round contract.
+ */
+export function uiPreviewPreschoolCheckpoint(number:number,random:()=>number=Math.random):BankQuestion[]{
+ if(!Number.isInteger(number)||number<1||number>10)return [];
+ if(number===1)return uiPreviewPreschoolCheckpointOne(random);
+ const starts=(number-1)*5+1;
+ const out:BankQuestion[]=[];
+ for(let i=0;i<5;i++){
+   const position=starts+i,stageId='preschool.n'+String(position).padStart(2,'0');
+   const category=['count','count','tracing','count','comparison','sorting','shape','pattern','position','mixed'][Math.floor((position-1)/5)];
+   const stage={id:stageId,gradeId:'preschool',kind:'normal',family:category,order:position-1,unitIndex:Math.floor((position-1)/5)} as WorldStage;
+   const bank=uiPreviewBank(stage);
+   if(bank.length<2)throw Error('No checkpoint prototype bank: '+stageId);
+   out.push(...shuffled(bank,random).slice(0,2));
+ }
+ return out;
 }
