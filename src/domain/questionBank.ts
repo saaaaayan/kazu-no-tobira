@@ -4,6 +4,7 @@ import type { SolutionStep } from './writtenSolution.ts';
 import type { MathQuestion } from './worldQuestions.ts';
 
 import type { CountingToken } from './countingTokens.ts';
+import type { PictureNumberMatch } from './preschoolNumberConnections.ts';
 export type { CountingToken } from './countingTokens.ts';
 export type BankDiagram = { kind: 'plateCount'; token: CountingToken; count: 0 | 1 | 2 }
   | { kind: 'countingBoard'; guide?: true; spacing?: 'wide'; rows: readonly { label?: string; tokens: readonly CountingToken[] }[]; targetToken?: CountingToken; layoutComparison?: { before:'wide-gaps'|'even-gaps'|'small'|'large'|'left-packed'; after:'wide-gaps'|'even-gaps'|'small'|'large'|'left-packed'; beforeRows?: readonly number[] } }
@@ -24,6 +25,7 @@ export type BankQuestion = MathQuestion & {
   preschoolTrace?: string; // Public prototype: finger-drawn number practice only.
   preschoolNumberActivity?: true; // Preschool numeral-recognition/matching, not plain counting.
   preschoolNumeral?: string; // Large printed numeral shown above choices.
+  preschoolNumberMatch?: PictureNumberMatch; // Tap pairs to draw real connecting lines.
   preschoolTwoRules?: {color:'あか'|'あお';shape:'まる'|'さんかく'|'しかく'}; // Two visual criteria.
   topic?: string;
   difficulty: 1 | 2 | 3;
