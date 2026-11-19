@@ -133,7 +133,7 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
     ...spot,order,row:Math.floor(order/5),column:order%5,
   })));
   const scale=Math.max(.49,Math.min(1.16,width/920));
-  return <Svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}
+  return <Svg testID="preschool-plush-pixel-v2" width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}
     preserveAspectRatio="none" accessible={false}>
     <Rect width={width} height={height} fill="#80adc4"/>
     <Rect x={10} y={10} width={width-20} height={height-20}
