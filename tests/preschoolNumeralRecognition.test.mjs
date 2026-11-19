@@ -83,7 +83,7 @@ test('the number-recognition UI shows a large digit and directly tappable choice
  assert.match(screen,/testID=\{'preschool-numeral-choice-'\+option\}/);
  assert.match(screen,/onPress=\{\(\)=>void submit\(option\)\}/);
  assert.match(screen,/\{\(\(!countingGuide && !numeralGuide\) \|\| round\.feedback\) && <View/);
- assert.match(screen,/!countingGuide && !numeralGuide && <CalculationMemo/);
+ assert.match(screen,/!countingGuide && !numeralGuide && !bankQuestion\?\.preschoolTrace/);
  assert.match(screen,/preschoolNumeralTargetText:\{fontSize:100/);
  assert.match(screen,/preschoolNumeralOption:\{minHeight:76/);
 });
