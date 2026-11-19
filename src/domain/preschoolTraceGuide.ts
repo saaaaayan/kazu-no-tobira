@@ -88,6 +88,19 @@ export function preschoolTraceGuideMatch(digit:string,ink:DigitInk):PreschoolGui
     return pts.length>0 &&
       pts.filter(p=>pointPathDistance(p,drawn)<=tolerance).length/pts.length>=.65;
   });
-  return {matched:near>=.76&&covered>=.78&&ratio>=.5&&ratio<=1.85&&everyStroke,
+  // Several numerals share long sections. For example 2 and 7 share a
+  // descending diagonal; the learner must match THIS guide better than any
+  // OTHER numeral guide. Without this, drawing 2 could be accepted as 7.
+  let closestOther=-Infinity;
+  for(const other of Object.keys(templates)){
+    if(other===digit)continue;
+    const otherGuide=preschoolDigitGuidePaths(other,ink.size);
+    const otherPoints=samples(otherGuide);
+    const otherInkNear=penPoints.filter(p=>pointPathDistance(p,otherGuide)<=tolerance).length/penPoints.length;
+    const otherCovered=otherPoints.filter(p=>pointPathDistance(p,drawn)<=tolerance).length/otherPoints.length;
+    closestOther=Math.max(closestOther,(otherInkNear+otherCovered)/2);
+  }
+  const shapeDiscriminates=(near+covered)/2-closestOther>=.025;
+  return {matched:near>=.76&&covered>=.78&&ratio>=.5&&ratio<=1.85&&everyStroke&&shapeDiscriminates,
     inkNear:near,guideCovered:covered,lengthRatio:ratio};
 }
