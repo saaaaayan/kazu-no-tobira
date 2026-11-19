@@ -81,6 +81,21 @@ export function islandCheckpointLayout(width:number,point:MapPoint,marker:number
   };
 }
 
+/** Geometry of the (transparent) tappable stage title target. The visible
+ * border belongs to the inner text and shrinks to its content, not a
+ * full-width card. The whole target stays below its circular stage pin.
+ */
+export function preschoolStageLabelLayout(width:number,point:MapPoint,marker:number) {
+  const compact=compactIslandStageMap(width);
+  const boxWidth=Math.max(42,width/5-(compact?6:14));
+  const height=compact?54:44;
+  return {
+    width:boxWidth,height,
+    left:Math.max(1,point.x-boxWidth/2),
+    top:point.y+marker/2+8,
+  };
+}
+
 export type IslandStagePoint = MapPoint & {
   order: number;
   row: number;
@@ -101,7 +116,7 @@ export function islandStageLayout(width: number, stageCount = 65, topInset = 0, 
   const rowHeight = compact ? (detailedLabels ? 190 : 166) : (detailedLabels ? 160 : 119);
   // Preschool alone: a wide clearing after each five-stage row accommodates
   // a large checkpoint sign and additional plush toys without overlaps.
-  const groupGap = detailedLabels ? (compact ? 102 : 90) : 0;
+  const groupGap = detailedLabels ? (compact ? 102 : 110) : 0;
   const areaGap = compact ? 58 : (detailedLabels ? 50 : 0);
   const positions: IslandStagePoint[] = Array.from({ length: stageCount }, (_, order) => {
     const row = Math.floor(order / 5);
