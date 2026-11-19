@@ -363,11 +363,11 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
     </>
   );
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen,grade.id==='preschool'&&styles.preschoolScreen]}>
       <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
-        <Text style={styles.backText}>‹ 世界地図に もどる</Text>
+        <Text style={styles.backText}>{grade.id==='preschool'?'‹ せかいちずへ':'‹ 世界地図に もどる'}</Text>
       </Pressable>
-      <View style={styles.islandBanner}>
+      {grade.id!=='preschool' && <View style={styles.islandBanner}>
         <View style={styles.islandBannerText}>
           <Text style={styles.eyebrow}>{grade.title} の ぼうけんマップ</Text>
           <Text style={styles.bannerHeading}>{grade.island}</Text>
@@ -378,13 +378,13 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
             ? `${grade.stages.filter(stage => hasStageBank(stage.id)).length} / 65 地点で出題中` : '高校3年生の冒険の道50・試練の道10をクリアすると解放') : testing ? (hasPremium(access) ? "65ステージ すべてプレイできるよ" : "冒険の道50ステージを 自由に あそべるよ") : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
         </View>
         <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
-      </View>
+      </View>}
       {grade.id!=='preschool' && supplementalPanels}
-      <View style={styles.mapHeading}>
+      {grade.id==='preschool' && <Text testID="preschool-map-quick-hint" style={styles.preschoolMapHint}>すうじを さわってね</Text>}
+      {grade.id!=='preschool' && <View style={styles.mapHeading}>
         <Text style={styles.mapTitle}>島のぼうけんルート</Text>
         <Text style={styles.hintText}>地図の丸い地点をタッチして ステージへ進もう！</Text>
-        {grade.id==='preschool' && <Text style={styles.pixelMapNote}>ドットえの ぬいぐるみたちが いっぱい！</Text>}
-      </View>
+      </View>}
       <View style={[styles.ocean,grade.id==='preschool'&&styles.pixelOcean,{height:geometry.height}]} onLayout={event=>{
         const nextWidth=Math.round(event.nativeEvent.layout.width);
         if(nextWidth>0&&nextWidth!==width)setWidth(nextWidth);
@@ -583,6 +583,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
 
 const styles=StyleSheet.create({
   screen:{gap:13},
+  preschoolScreen:{gap:5},
+  preschoolMapHint:{color:'#344454',fontSize:15,fontWeight:'800',paddingHorizontal:6,paddingBottom:1},
   worldBanner:{borderRadius:20,padding:18,gap:8,backgroundColor:'#263b51'},
   islandBanner:{borderRadius:20,padding:16,flexDirection:'row',alignItems:'center',backgroundColor:'#283d69',gap:8},
   islandBannerText:{flex:1,gap:5},
