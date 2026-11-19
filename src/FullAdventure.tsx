@@ -473,20 +473,24 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const lessonStage = learning && (learning.target ?? grade.stages.find(stage => learning.lesson.linkedStageIds.includes(stage.id)));
   const canChallenge = lessonStage && progress && canPlayWorldStage(playMode, progress, lessonStage, access);
   const newlyEarnedTitles = round && progress && !testing ? adventureTitles(progress).filter(t=>t.unlocked).length : 0;
+  // Child-facing preschool screens show only the controls needed to play.
+  // Prototype details remain accessible from the home and world map.
+  const preschoolMapFirst = !round && screen === 'island' && grade.id === 'preschool';
+  const preschoolChildView = preschoolMapFirst || Boolean(!review && round?.stage.gradeId === 'preschool');
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" scrollEnabled={!drawing}
-        contentContainerStyle={styles.scroll}>
+        contentContainerStyle={[styles.scroll,preschoolMapFirst&&styles.preschoolScroll]}>
         <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}
-          style={[styles.shell,round && !round.complete && styles.playShell]}>
-          {!round && screen !== 'lesson' && screen !== 'study-plan' && <VersionNotice/>}
-          {uiPreview && <View style={styles.playPanel} testID="kazu-sample-only-preview">
+          style={[styles.shell,preschoolMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell]}>
+          {!round && screen !== 'lesson' && screen !== 'study-plan' && !preschoolMapFirst && <VersionNotice/>}
+          {uiPreview && !preschoolChildView && <View style={styles.playPanel} testID="kazu-sample-only-preview">
             <Text accessibilityRole="header" style={styles.answerHeading}>数のトビラ 試作版</Text>
             <Text style={styles.explanation}>小学1年生・賢者の島の43ステージで4,300問を公開中。各ステージ100問から10問ずつ挑戦できます。幼児01〜05も遊べます。試作版の回答記録は保存されません。</Text>
             <Text selectable style={styles.hintNote}>バージョン {process.env.EXPO_PUBLIC_KAZU_UI_PREVIEW_SHA}</Text>
           </View>}
-          {__DEV__ && !review && <View style={styles.navigation}>
+          {__DEV__ && !review && !preschoolChildView && <View style={styles.navigation}>
             <Text style={styles.logo}>開発用プラン　{hasPremium(access) ? '有料ユーザー' : '無料ユーザー'}</Text>
             <View style={styles.navigationHeader}>
               <GameButton label="無料ユーザー" secondary disabled={loadingRound || saving} onPress={() => { setAccess(freeAccess); setShowPlanInfo(false); }} />
@@ -507,7 +511,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
               {process.env.EXPO_PUBLIC_KAZU_ONLINE_REVIEW === '1' && typeof window !== 'undefined' &&
                 <GameButton label="管理者ログイン" secondary onPress={() => window.location.assign('/kazu-no-tobira/admin/')} />}
             </>
-          ) : (
+          ) : !preschoolChildView ? (
             <View style={styles.navigation}>
               <View style={styles.navigationHeader}>
                 {round ? <Text style={styles.logo}>数のトビラ</Text> : (
@@ -520,7 +524,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
               </View>
               {!uiPreview && !round && screen !== 'titles' && screen !== 'lesson' && screen !== 'study' && screen !== 'study-plan' && screen !== 'admin' && <ModeControls mode={playMode} onChange={setPlayMode} />}
             </View>
-          )}
+          ) : null}
           {!progress && (
             <Text style={styles.loading}>{loadError ? 'きろくを よみこめなかったよ。アプリを ひらきなおしてね。' : 'ぼうけんの じゅんびを しているよ…'}</Text>
           )}
@@ -888,7 +892,9 @@ export function ReviewQuestionPreview(props: ReviewPreview) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#f0edf6' },
   scroll: { flexGrow: 1, padding: 14, paddingBottom: 55 },
+  preschoolScroll: { paddingTop: 4, paddingHorizontal: 8, paddingBottom: 36 },
   shell: { width: '100%', maxWidth: 1030, alignSelf: 'center', gap: 15 },
+  preschoolShell: { gap: 5 },
   playShell: { maxWidth: 1090 },
   navigation: { borderRadius: 16, backgroundColor: '#162d48', padding: 12, gap: 7 },
   navigationHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 },
