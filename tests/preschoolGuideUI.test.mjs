@@ -25,7 +25,7 @@ test('preschool 01–05 all share the stage 01 guided counting UI',()=>{
   assert.match(source,/\{countingGuide && !round\.feedback && \(\s*<View style=\{styles\.preschoolAnswerSection\}>/u);
   assert.match(source,/onPress=\{\(\)=>void submit\(option\)\}/u);
   assert.match(source,/\{\(\(!countingGuide && !numeralGuide\) \|\| round\.feedback\) && <View/u);
-  assert.match(source,/\{!countingGuide && !numeralGuide && <CalculationMemo/u);
+  assert.match(source,/!countingGuide && !numeralGuide && !bankQuestion\?\.preschoolTrace/u);
   assert.match(source,/\{preschoolStage && !round\.feedback &&\s*<QuestionReadAloud/u);
   assert.match(source,/\{preschoolStage && <QuestionReadAloud text=\{question\.explanation\}\/>\}/u);
   assert.match(source,/\{countingGuide && diagram && <QuestionDiagram diagram=\{diagram\} phase="solution"\/>\}/u);
