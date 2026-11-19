@@ -394,31 +394,21 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
             </View>
           );
         })}
-        {/* Compact screens show one centered lesson title per five-stage row.
-            Individual stage names remain available to screen readers/tap targets. */}
-        {compactStageMap && Array.from({length:Math.ceil(grade.stages.length/5)},(_,row)=>{
+        {/* One lesson topic per five-stage row on BOTH phones and desktops.
+            Repeating the same subtitle at every pin crowds the map. The
+            individual stage names remain in each pin's accessibility label. */}
+        {Array.from({length:Math.ceil(grade.stages.length/5)},(_,row)=>{
           const position=geometry.positions[row*5];
           return <View key={'row-topic-'+row} testID={'island-row-topic-'+row}
             pointerEvents="none" style={[styles.compactRowTopic,{
-              top:position.y+marker/2+13,
-              // Keep the title lane clear of the edge-aligned checkpoints
-              // even on larger phones and narrow tablets.
+              top:position.y+marker/2+(compactStageMap?13:7),
+              // Reserve edge lanes for the checkpoint controls.
               left:Math.max(68,Math.ceil(actual*.16)),
               right:Math.max(68,Math.ceil(actual*.16)),
             }]}>
             <Text numberOfLines={2} style={styles.compactRowTopicText}>
               {stageRowCategoryName(grade,row)}
             </Text>
-          </View>;
-        })}
-        {!compactStageMap && grade.stages.map((stage,index)=>{
-          const position=geometry.positions[index];
-          return <View key={'category-'+stage.id} pointerEvents="none"
-            style={[styles.pinCategoryBox,grade.id==='preschool'&&styles.pixelCategoryBox,{
-              width:84,left:Math.max(1,Math.min(actual-85,position.x-42)),
-              top:position.y+marker/2+4,
-            }]}>
-            <Text numberOfLines={2} style={[styles.pinCategoryText,grade.id==='preschool'&&styles.pixelCategoryText]}>{stageCategoryName(grade,stage)}</Text>
           </View>;
         })}
         {checkpointsFor(grade).map(checkpoint=>{
