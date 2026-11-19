@@ -295,6 +295,15 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
       label:action==='premium'?'プレミアム':action==='play'?'▶ あそぶ'
         :action==='learn'?'まず学ぶ':'未解放'};
   };
+  // The preschool map is the primary navigation. Keep reference material,
+  // the curriculum table and the optional shortcut BELOW the map so
+  // children can see the first stage immediately on opening the island.
+  // Other islands retain their original ordering.
+  const supplementalPanels=(
+    <>
+      {grade.id!=='preschool' && supplementalPanels}
+    </>
+  );
   return (
     <View style={styles.screen}>
       <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
@@ -556,6 +565,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           </View>;
         })()}
       </View>
+      {grade.id==='preschool' && supplementalPanels}
       {!testing && <View style={styles.footer}>
         <Text style={styles.footerTitle}>✦ この島には 65のステージ</Text>
         <Text style={styles.footerInfo}>冒険の道 50こ → 試練の道 10こ → 伝説のトビラ 5こ。伝説のトビラは最初の60ステージをぜんぶパーフェクトにすると開くよ。</Text>
