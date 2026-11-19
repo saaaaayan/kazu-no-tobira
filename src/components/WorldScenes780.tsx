@@ -444,7 +444,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         {checkpointsFor(grade).map(checkpoint=>{
           const end=geometry.positions[checkpoint.after.order];
           // 試作版は幼児の確認テスト1のみ選択可。ほかは従来どおり。
-          const enabled=preview ? grade.id==='preschool' && checkpoint.number===1
+          const enabled=preview ? grade.id==='preschool' && checkpoint.number<=10
             : testing || checkpoint.sourceStageIds.every(id=>Boolean(progress.stages[id]?.clearedAt));
           const nextPoint=geometry.positions[checkpoint.after.order+1];
           const checkpointLayout=islandCheckpointLayout(actual,end,marker,nextPoint,grade.id==='preschool');
