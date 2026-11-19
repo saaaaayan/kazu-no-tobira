@@ -32,3 +32,4 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build:web
+      - run: node scripts/export-ui-preview.mjs .expo/pages-prototype --pages
