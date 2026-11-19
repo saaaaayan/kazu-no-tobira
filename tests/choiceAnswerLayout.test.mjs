@@ -29,7 +29,7 @@ test('choice submission goes immediately to feedback, has no memo, and next ques
   assert.match(game,/setRound\(\{ \.\.\.round, problems, correct: newCorrect, results: \[\.\.\.round.results, result\], feedback: result \}\)/u);
   assert.match(game,/\{\(\(!countingGuide && !numeralGuide && !inlineChoice\) \|\| round.feedback\) && <View/u);
   assert.match(game,/!bankQuestion\?\.preschoolTrace && question.type!=='choice' &&\s*<CalculationMemo/u);
-  assert.match(game,/<GameButton gold label=\{round.index\+1===round.problems.length\?'けっかを みる':'つぎの もんだいへ'\} onPress=\{advance\}\/\>/u);
+  assert.match(game,/<GameButton gold label=\{round.index\+1===round.problems.length\?'けっかを みる':'つぎの もんだいへ'\} onPress=\{advance\}\/>/u);
   assert.doesNotMatch(game,/setTimeout\(\(\)=>advance\(\)/u);
 });
 
