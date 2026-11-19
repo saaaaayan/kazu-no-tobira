@@ -38,6 +38,9 @@ export function worldMapLayout(width: number) {
   };
 }
 
+// Reserved space above the preschool stages for a readable in-map island title.
+export const PRESCHOOL_MAP_TITLE_INSET = 86;
+
 export function compactIslandStageMap(width:number): boolean {
   return Math.max(244,width||360) < 620;
 }
@@ -71,12 +74,13 @@ export type IslandStagePoint = MapPoint & {
   column: number;
 };
 
-export function islandStageLayout(width: number, stageCount = 65): {
+export function islandStageLayout(width: number, stageCount = 65, topInset = 0): {
   height: number;
   rowHeight: number;
   positions: readonly IslandStagePoint[];
 } {
   if (!Number.isInteger(stageCount) || stageCount < 1) throw new RangeError('Invalid stage count');
+  if (!Number.isFinite(topInset) || topInset < 0) throw new RangeError('Invalid top inset');
   const safeWidth = Math.max(244, width || 360);
   // Five stage pins remain across each row, but compact screens need a
   // separate lane for the row title and the checkpoint after stage 05/10/etc.
@@ -91,7 +95,7 @@ export function islandStageLayout(width: number, stageCount = 65): {
       row,
       column,
       x: Math.round(safeWidth * (column + 0.5) / 5),
-      y: 134 + row * rowHeight + (row >= 10 ? areaGap : 0) + (row >= 12 ? areaGap : 0),
+      y: 134 + topInset + row * rowHeight + (row >= 10 ? areaGap : 0) + (row >= 12 ? areaGap : 0),
     };
   });
   return {
