@@ -73,7 +73,7 @@ function compare(i:number,level:number):Task{
     explanation:'ひだりは '+a+'こ、みぎは '+b+'こ。'+correct+' だよ。'});
 }
 function order(i:number,max:number,mode:number):Task{
- const val=1+(i*3)%Math.max(1,max-2),answer=mode===0?val+1:mode===1?val-1:val+2;
+ const val=2+(i*3)%Math.max(1,max-3),answer=mode===0?val+1:mode===1?val-1:val+2;
  const strip=mode===0?val+'　□　'+(val+2):mode===1?'□　'+val+'　'+(val+1):val+'　'+(val+1)+'　□';
  return numberTask(strip+'　□ に はいる すうじは？',answer,
    {explanation:'1こずつ すうじが すすむよ。 □は '+answer+' だよ。'},max);
@@ -127,8 +127,8 @@ function mixed(i:number,kind:number):Task{
 function makeTask(n:number,i:number):Task{
  const toy=t(i),k=i%3, num=1+i%10;
  if(n>=6&&n<=8)return match((i+(n-6)*3)%10,n===6?3:n===7?5:10);
- if(n===9){const x=i%4;return numberTask('この おさらは からっぽだよ。 いくつ ある？',0,
-   {diagram:groups(['empty']),explanation:'なにも ないときは 0 だよ。'},3);}
+ if(n===9){const token=toys[i],count=i%3===0?0:i%3;return numberTask(name(token)+' が いくつ ある？',count,
+   {diagram:groups(count===0?['empty']:repeat(token,count)),explanation:count===0?'なにも ないときは 0 だよ。':'ひとつずつ かぞえると '+count+'こ だよ。'},3);}
  if(n===10)return match(i,10);
  if(n>=11&&n<=15)return trace(i,n-11);
  if(n>=16&&n<=20)return order((i+n)%10,n===16?4:n===17?5:10,(n===19?i%2:n===20?2:i%3));
