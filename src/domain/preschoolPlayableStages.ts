@@ -58,7 +58,7 @@ function shapeTask(i:number,part:number):Task{
     return choose('この かたちを くるっと まわすと？　'+rotated,'さんかく',
       ['まる','しかく'],{explanation:'むきを かえても 3つの かどが あるよ。'});
   }
-  const pair=[['▲','■'],['●','▲'],['●','■']][i%3];
+  const pair=[['▲','■'],['●','●'],['●','■']][i%3];
   const answer=['おうち','ゆきだるま','くるま'][i%3];
   return choose(seq(pair)+' を つかって つくるよ。どの かたちが できそう？',answer,
     ['おうち','ゆきだるま','くるま','ほし'],
@@ -73,7 +73,8 @@ function compare(i:number,level:number):Task{
     explanation:'ひだりは '+a+'こ、みぎは '+b+'こ。'+correct+' だよ。'});
 }
 function order(i:number,max:number,mode:number):Task{
- const val=2+(i*3)%Math.max(1,max-3),answer=mode===0?val+1:mode===1?val-1:val+2;
+ const val=mode===1 ? Math.max(2,Math.min(max-1,2+(i%Math.max(1,max-2))))
+   :1+(i*3)%Math.max(1,max-2),answer=mode===0?val+1:mode===1?val-1:val+2;
  const strip=mode===0?val+'　□　'+(val+2):mode===1?'□　'+val+'　'+(val+1):val+'　'+(val+1)+'　□';
  return numberTask(strip+'　□ に はいる すうじは？',answer,
    {explanation:'1こずつ すうじが すすむよ。 □は '+answer+' だよ。'},max);
@@ -131,13 +132,62 @@ function makeTask(n:number,i:number):Task{
    {diagram:groups(count===0?['empty']:repeat(token,count)),explanation:count===0?'なにも ないときは 0 だよ。':'ひとつずつ かぞえると '+count+'こ だよ。'},3);}
  if(n===10)return match(i,10);
  if(n>=11&&n<=15)return trace(i,n-11);
- if(n>=16&&n<=20)return order((i+n)%10,n===16?4:n===17?5:10,(n===19?i%2:n===20?2:i%3));
+ if(n>=16&&n<=20)return order((i+n)%10,n===16?3:n===17?5:10,(n===19?i%2:n===20?2:i%3));
  if(n>=21&&n<=25)return compare(i+(n-21)*3,n===21?0:1);
- if(n>=26&&n<=30)return classify(i,n-26);
+ if(n===26){
+   const colors=[
+    ['🔴','🔵','🟢'],['🔵','🟡','🔴'],['🟢','🟣','🟡'],
+    ['🟡','🔴','🔵'],['🟣','🟢','🔵'],
+   ];
+   const [target,wrong1,wrong2]=colors[i%5];
+   return choose('この まる '+target+' と おなじ いろは どれ？',target,[wrong1,wrong2],
+     {explanation:'おなじ いろの まるを えらんだよ。'});
+ }
+ if(n===27){
+   const correct=shapes[i%3];
+   return choose('この かたち '+correct+' と おなじ かたちは どれ？',correct,
+     [shapes[(i+1)%3],shapes[(i+2)%3]],{explanation:'かたちの せんと かどを みくらべよう。'});
+ }
+ if(n===28)return classify(i,0);
+ if(n===29){
+   const items=[['🔴','🔺','🔵'],['🔺','🔴','🔵'],['🔵','🔴','🔺']];
+   const arr=items[i%3];
+   const answer=i%2===0?'🔴':'🔺';
+   return choose('この なかの '+(i%2===0?'あかい まる':'あかい さんかく')+' は どれ？　'+seq(arr),
+       answer,arr.filter(x=>x!==answer),
+       {explanation:'あかい ことと かたちの 2つを みて えらぶよ。'});
+ }
+ if(n===30)return classify(i,4);
  if(n>=31&&n<=35)return shapeTask(i,n-31);
  if(n>=36&&n<=40)return sequence(i,['two','double','three','shape','mixed'][n-36] as 'two'|'double'|'three'|'shape'|'mixed');
- if(n>=41&&n<=45)return position(i,n-41);
- if(n>=46&&n<=50)return mixed(i,n-46);
+ if(n===41){
+   const top=toys[(i+2)%toys.length],bottom=toys[(i+5)%toys.length];
+   return choose('うえ：'+image(top)+'　した：'+image(bottom)+'　うえに いるのは？',
+     name(top),[name(bottom),name(toys[(i+8)%toys.length])],
+     {explanation:'うえに いるのは '+name(top)+' だよ。'});
+ }
+ if(n===42)return position(i,i%2===0?1:2);
+ if(n===43)return position(i,i%2===0?3:4);
+ if(n===44)return position(i,0);
+ if(n===45)return position(i,i%5);
+ if(n===46)return match(i,10);
+ if(n===47){
+   const token=toys[i],count=1+i%5;
+   return numberTask(name(token)+' は いくつ？　'+name(token)+' だけ かぞえよう。',
+     count,{diagram:groups([...repeat(token,count),...repeat(toys[(i+3)%toys.length],2)],undefined,token),
+       explanation:name(token)+' は '+count+'こ だよ。'},10);
+ }
+ if(n===48){
+   const left=2+i%6,right=i%3===0?left:i%3===1?left-1:left+1;
+   const answer=left===right?'ぴったり':left>right?'たりない':'あまる';
+   return choose('ぬいぐるみに おやつを ひとつずつ くばるよ。 おやつは？',
+     answer,['ぴったり','たりない','あまる'],{
+       diagram:groups(repeat('bear',left),repeat('cookie',right)),
+       explanation:'ぬいぐるみは '+left+'ひき。おやつは '+right+'こ。'+answer+' だよ。'
+     });
+ }
+ if(n===49)return i%2===0?classify(i,3):sequence(i,'shape');
+ if(n===50)return mixed(i,i%6);
  if(n>=51&&n<=60){
    const theme=n-51;
    if(theme===0)return match(i,10);
@@ -150,7 +200,11 @@ function makeTask(n:number,i:number):Task{
    if(theme===8)return position(i,i);
    return mixed(i,i%6);
  }
- if(n>=61&&n<=65)return mixed((i+n)%10,(i+n)%6);
+ if(n===61)return sequence(i,i%2===0?'mixed':'double');
+ if(n===62)return classify(i,4);
+ if(n===63)return i%2===0?position(i,i):compare(i,1);
+ if(n===64)return shapeTask(i,(i+2)%5);
+ if(n===65)return mixed((i+n)%10,(i+n)%6);
  return numberTask('いくつ ある？',num,{diagram:groups(repeat(toy,num))});
 }
 const specificHints=(q:Task,n:number):[string,string,string]=>{
