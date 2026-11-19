@@ -68,7 +68,7 @@ function RecognizedDigitCell({target,disabled,onMatched}:{
     // is stronger evidence than a low-confidence generic digit classifier.
     const guide=lastGuideMatch.current;
     const modelMatch=preschoolTraceMatches(cb.current.target,result,'plausible') &&
-      !!guide && guide.inkNear>=.55 && guide.guideCovered>=.56 &&
+      !!guide && guide.distinct && guide.inkNear>=.55 && guide.guideCovered>=.56 &&
       guide.lengthRatio>=.5 && guide.lengthRatio<=1.85;
     cb.current.onMatched(modelMatch);
     setStatus(modelMatch?'matched':'different');
