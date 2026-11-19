@@ -168,11 +168,11 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
             above theirs, so every section's plush toys remain visible. */}
         <Plush animal={animals[0]}
           x={width*(compact?.28:.2)}
-          y={compact?(row===0?56+PRESCHOOL_MAP_TITLE_INSET:row===10||row===12?y-105:y-53):y-38}
+          y={row===0?56+PRESCHOOL_MAP_TITLE_INSET:compact&&(row===10||row===12)?y-105:compact?y-53:y-38}
           scale={scale}/>
         <Plush animal={animals[1]}
           x={width*(compact?.72:.8)}
-          y={compact?(row===0?56+PRESCHOOL_MAP_TITLE_INSET:row===10||row===12?y-105:y-53):y-38}
+          y={row===0?56+PRESCHOOL_MAP_TITLE_INSET:compact&&(row===10||row===12)?y-105:compact?y-53:y-38}
           scale={scale}/>
       </G>;
     })}
