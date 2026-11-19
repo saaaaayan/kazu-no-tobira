@@ -185,7 +185,7 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
             const animal:Animal=row===0
               ? (['bear','chick','bunny','panda'][slot] as Animal)
               : ANIMALS[(row*5+slot*7)%ANIMALS.length];
-            const baseY=row===0 ? 56+PRESCHOOL_MAP_TITLE_INSET
+            const baseY=row===0 ? 32+PRESCHOOL_MAP_TITLE_INSET
               : (row===10||row===12) ? y-105 : compact ? y-53 : y-52;
             return <Plush key={'plush-'+row+'-'+slot} animal={animal}
               x={width*spot.x} y={baseY+spot.offset}
