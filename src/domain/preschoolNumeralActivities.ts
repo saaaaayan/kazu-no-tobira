@@ -118,7 +118,7 @@ export function preschoolNumeralTask(stageNumber:6|7|8|9|10,index:number):Presch
     if(index<4)return findDigit(n,3,5,index);
     if(index<6)return numeralToPictures(n,3,5,toys[index]);
     if(index<8)return picturesToNumeral(n,3,5,toys[index]);
-    return findDigit(n,3,5,2);
+    return findDigit(n,3,5,index===8?0:1);
   }
   if(stageNumber===8){
     const n=6+index%5;
