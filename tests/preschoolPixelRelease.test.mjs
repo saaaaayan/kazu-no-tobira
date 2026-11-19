@@ -50,11 +50,13 @@ test('Each island map has exactly three section banners, one per 50/10/5 stage a
   assert.match(ui,/checkpointsFor\(grade\)\.map/);
 });
 
-test('Phone maps condense five stage labels to a single row title without hiding stage controls',()=>{
+test('Desktop and phone maps show exactly one row topic for each five stages',()=>{
   const ui=read('src/components/WorldScenes780.tsx');
   const domain=read('src/domain/islandCurriculumView.ts');
-  assert.match(ui,/compactStageMap && Array.from\(\{length:Math.ceil\(grade.stages.length\/5\)\}/);
-  assert.match(ui,/!compactStageMap && grade.stages.map/);
+  assert.match(ui,/\{Array.from\(\{length:Math.ceil\(grade.stages.length\/5\)\}/);
+  assert.doesNotMatch(ui,/!compactStageMap && grade.stages.map/);
+  assert.doesNotMatch(ui,/key=\{'category-'\+stage.id\}/);
+  assert.match(ui,/top:position.y\+marker\/2\+\(compactStageMap\?13:7\)/);
   assert.match(ui,/stageRowCategoryName\(grade,row\)/);
   assert.match(domain,/export function stageRowCategoryName/);
   assert.match(ui,/testID=\{'island-row-topic-'\+row\}/);
