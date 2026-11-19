@@ -165,7 +165,6 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
       rx={3} fill="none" stroke="#7a9d6d" strokeWidth={2}/>
     {Array.from({length:13},(_,row)=>{
       const y=positions[row*5].y;
-      const animals=[ANIMALS[(row*2)%ANIMALS.length],ANIMALS[(row*2+1)%ANIMALS.length]];
       return <G key={row}>
         <Rect x={26} y={y-50} width={width-52} height={75}
           fill={row<10
