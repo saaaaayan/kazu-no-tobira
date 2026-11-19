@@ -34,6 +34,11 @@ export function releaseClient(address) {
     const bundle=Buffer.from(await (await get(script)).arrayBuffer());
     const js=bundle.toString('utf8');
     if (!js.includes(sha) || (profile && !js.includes('kazu-sample-only-preview'))) throw new Error('The served app bundle differs from the requested release.');
+    if (version.preschoolPlushPixelV2 === true &&
+        (!js.includes('preschool-plush-pixel-v2') ||
+         !js.includes('ドットえの ぬいぐるみたちが いっぱい！'))) {
+      throw new Error('The public bundle is missing the interactive preschool plush pixel map.');
+    }
     if (profile && (version.indexSha256!==digest(index) || version.entrySha256!==digest(bundle))) {
       throw new Error('The sample HTML or JavaScript differs from the verified build.');
     }

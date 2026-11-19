@@ -4,20 +4,38 @@ import { BUILD_VERSION } from '../buildVersion';
 
 type PublishedVersion = { version?: unknown };
 
+// Prototype builds stamp the commit via the Expo environment; production uses BUILD_VERSION.
+const currentVersion = process.env.EXPO_PUBLIC_KAZU_UI_PREVIEW_SHA || BUILD_VERSION;
+const isCommit = (value: string) => /^[a-f0-9]{40}$/.test(value);
+
 export default function VersionNotice() {
   const [publishedVersion, setPublishedVersion] = useState<string>();
 
   useEffect(() => {
     let active = true;
     async function checkForUpdate() {
-      if (BUILD_VERSION === 'local-dev') return;
+      if (!isCommit(currentVersion)) return;
       try {
         const endpoint = new URL('version.json', new URL('.', window.location.href));
         endpoint.searchParams.set('check', String(Date.now()));
         const response = await fetch(endpoint.toString(), { cache: 'no-store' });
         if (!response.ok) return;
         const published = await response.json() as PublishedVersion;
-        if (active && typeof published.version === 'string' && published.version !== BUILD_VERSION) {
+        if (active && typeof published.version === 'string' && isCommit(published.version) && published.version !== currentVersion) {
+          // Never interrupt an active exercise: this component is only mounted on
+          // idle application screens. Guard against infinite reloads if CDN caches lag.
+          const fresh = new URL(window.location.href);
+          fresh.searchParams.set('release', published.version.slice(0, 12));
+          const guard = 'kazu-refreshed-' + published.version;
+          try {
+            if (window.sessionStorage.getItem(guard) !== '1') {
+              window.sessionStorage.setItem(guard, '1');
+              window.location.replace(fresh.toString());
+              return;
+            }
+          } catch {
+            // In private / restricted browsing, keep the manual refresh button.
+          }
           setPublishedVersion(published.version);
         }
       } catch {
@@ -41,7 +59,7 @@ export default function VersionNotice() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.version} accessibilityLabel={`アプリのバージョン ${BUILD_VERSION.slice(0, 7)}`}>
+      <Text style={styles.version} accessibilityLabel={`アプリのバージョン ${currentVersion.slice(0, 7)}`}>
         バージョン {BUILD_VERSION.slice(0, 7)}
       </Text>
       {publishedVersion && (

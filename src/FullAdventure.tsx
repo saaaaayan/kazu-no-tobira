@@ -23,6 +23,7 @@ import { loadProgress, saveProgress } from './storage';
 import { applyNumberPadKey } from './domain/answerInput';
 import { TitleAlbum, WorldChest } from './components/WorldMap780';
 import { WorldMap780, IslandStageMap } from './components/WorldScenes780';
+import VersionNotice from './components/VersionNotice';
 import { CompanionMoment } from './components/AdventureCompanion';
 import { MagicMeter, ComboBadge, SparkleBurst } from './components/AdventureJuice';
 import { CorrectSpark } from './components/AdventureEffects';
@@ -461,6 +462,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
         contentContainerStyle={styles.scroll}>
         <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}
           style={[styles.shell,round && !round.complete && styles.playShell]}>
+          {!round && screen !== 'lesson' && screen !== 'study-plan' && <VersionNotice/>}
           {uiPreview && <View style={styles.playPanel} testID="kazu-sample-only-preview">
             <Text accessibilityRole="header" style={styles.answerHeading}>数のトビラ 試作版</Text>
             <Text style={styles.explanation}>小学1年生・賢者の島の43ステージで4,300問を公開中。各ステージ100問から10問ずつ挑戦できます。幼児01〜05も遊べます。試作版の回答記録は保存されません。</Text>

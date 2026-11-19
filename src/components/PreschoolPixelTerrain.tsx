@@ -133,7 +133,7 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
     ...spot,order,row:Math.floor(order/5),column:order%5,
   })));
   const scale=Math.max(.49,Math.min(1.16,width/920));
-  return <Svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}
+  return <Svg testID="preschool-plush-pixel-v2" width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}
     preserveAspectRatio="none" accessible={false}>
     <Rect width={width} height={height} fill="#80adc4"/>
     <Rect x={10} y={10} width={width-20} height={height-20}
@@ -145,9 +145,13 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
       const animals=[ANIMALS[(row*2)%ANIMALS.length],ANIMALS[(row*2+1)%ANIMALS.length]];
       return <G key={row}>
         <Rect x={26} y={y-50} width={width-52} height={75}
-          fill={row%2===0?'#b2d28e':'#aacb83'}/>
+          fill={row<10
+            ? (row%2===0?'#b2d28e':'#aacb83')
+            : row<12
+              ? (row%2===0?'#aac4b8':'#a2bdb0')
+              : '#c5b5c4'}/>
         <Rect x={24} y={y+53} width={width-48} height={6}
-          fill="#94bc77"/>
+          fill={row<10?'#94bc77':row<12?'#88a99e':'#aa98a8'}/>
         <Flower x={width*.39} y={y-17}/>
         <Flower x={width*.61} y={y-18}/>
         <Rect x={width*.17} y={y+14} width={3} height={7} fill="#62885d"/>
@@ -158,6 +162,13 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
         <Plush animal={animals[1]} x={width*.8} y={y-38} scale={scale}/>
       </G>;
     })}
+    {/* Quiet separators mark the trial and legendary zones without
+        interrupting the stage path or covering the clickable nodes. */}
+    {[50,60].map((order,index)=>
+      <Rect key={'area-divider-'+order}
+        x={24} y={positions[order].y-65} width={width-48} height={4}
+        fill={index===0?'#759c8c':'#9a8495'} />
+    )}
     <Path d={routeThrough(paths.normal)} fill="none"
       stroke="#506d5e" strokeWidth={12} strokeLinejoin="miter"/>
     <Path d={routeThrough(paths.normal)} fill="none"
