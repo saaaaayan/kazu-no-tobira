@@ -108,6 +108,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const [blocked, setBlocked] = useState(false);
   const blockRef = useRef(false);
   const submitting = useRef(false);
+  const autoTraceSubmitted = useRef<string | undefined>(undefined);
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   const keyboard = useRef<ComponentRef<typeof TextInput>>(null);
   const viewport = useWindowDimensions().width;
@@ -148,6 +149,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     setBlocked(value);
   }
   function resetAnswer() {
+    autoTraceSubmitted.current=undefined;
     setAnswer('');
     setShowWorkedSolution(false);
     setMessage('');
@@ -339,6 +341,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const countingGuide=Boolean(preschoolStage && diagram?.kind==='countingBoard' && diagram.guide);
   const numeralGuide=Boolean(preschoolStage && bankQuestion?.preschoolNumberActivity);
   const traceActivity=Boolean(uiPreview && bankQuestion?.preschoolTrace && !round?.feedback);
+  const autoTraceEnabled=Boolean(uiPreview && !review && bankQuestion?.preschoolTrace);
   const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && (Boolean(liveCard) || Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0);
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
@@ -431,6 +434,17 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
       setRound({ ...round, index: round.index + 1, feedback: undefined, hintLevel: 0, liveHints:undefined, noMoreHints:false });
     }
   }
+
+  // A preschool learner should not need a second tap after accurately
+  // tracing a number. Show the standard positive feedback long enough to
+  // recognise success, then advance (or show the final result).
+  useEffect(() => {
+    const current=round?.problems[round.index];
+    if(!autoTraceEnabled || !round || round.complete || round.feedback!=='correct' ||
+      !current || !isBankQuestion(current) || !current.preschoolTrace)return;
+    const timer=setTimeout(()=>advance(),1150);
+    return ()=>clearTimeout(timer);
+  },[autoTraceEnabled,round?.index,round?.stage.id,round?.feedback,round?.complete]);
 
   function goToIsland() {
     if (starting.current || submitting.current || lessonWrite.current) return;
@@ -612,8 +626,19 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                     )}
                     <MathText style={styles.prompt} value={question.prompt}/>
                     {traceActivity && bankQuestion?.preschoolTrace && <PreschoolTracePad key={question.id}
-                      digit={bankQuestion.preschoolTrace} disabled={saving}
-                      onChange={value=>{setAnswer(value);setMessage('');}}/>}
+                      digit={bankQuestion.preschoolTrace} disabled={saving} autoAdvance={autoTraceEnabled}
+                      onChange={value=>{
+                        setAnswer(value);
+                        setMessage('');
+                        // Pass the recognized result directly: React may not
+                        // have committed setAnswer yet. The ref also prevents
+                        // StrictMode replays / repeated recognition from grading twice.
+                        if(value==='できた' && autoTraceEnabled &&
+                          !round?.feedback && autoTraceSubmitted.current!==question.id){
+                          autoTraceSubmitted.current=question.id;
+                          void submit('できた');
+                        }
+                      }}/>}
                     {countingGuide && !round.feedback && (
                       <View style={styles.preschoolAnswerSection}>
                         <Text style={styles.preschoolInstruction}>すうじを さわってね</Text>
@@ -722,7 +747,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                         <>
                           <Text style={styles.answerHeading}>こたえ</Text>
                           {traceActivity ? (
-                            <Text style={styles.preschoolTraceNotice}>おてほんを なぞったら、「こたえあわせ」を おしてね。</Text>
+                            <Text style={styles.preschoolTraceNotice}>{autoTraceEnabled
+                              ? 'すうじを かけたら、じどうで せいかいに なるよ。'
+                              : 'おてほんを なぞったら、「こたえあわせ」を おしてね。'}</Text>
                           ) : question.type==='choice' ? (
                             <View style={styles.options}>
                               {question.choices?.map(option => (
@@ -788,12 +815,13 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                             </Pressable>
                           )}
                           {!!message&&<Text accessibilityLiveRegion="polite" style={styles.error}>{message}</Text>}
-                          <GameButton label={saving?'きろくしているよ…':'こたえあわせ'} onPress={()=>void submit()}
-                            disabled={saving||(traceActivity&&answer!=='できた')||(shownMode==='handwriting'&&(blocked||drawing))}/>
+                          {!autoTraceEnabled && <GameButton label={saving?'きろくしているよ…':'こたえあわせ'} onPress={()=>void submit()}
+                            disabled={saving||(traceActivity&&answer!=='できた')||(shownMode==='handwriting'&&(blocked||drawing))}/>}
                         </>
                       )}
                     </View>
-                    {!countingGuide && !numeralGuide && <CalculationMemo key={question.id} onDrawingChange={setDrawing}/>}
+                    {!countingGuide && !numeralGuide && !bankQuestion?.preschoolTrace &&
+                      <CalculationMemo key={question.id} onDrawingChange={setDrawing}/>}
                   </View>}
                 </>
               )}
