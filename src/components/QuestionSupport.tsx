@@ -91,7 +91,7 @@ function CountingBoard({ diagram, phase }: {
                 backgroundColor:lit?'#28735b':'#253e70' }} />
             : <Text style={{ fontSize:sizes.symbol, color:token==='marked' ? '#3f765b' : '#253e70' }}>{shape[0]}</Text>;
           const ignored=Boolean(diagram.targetToken && token!==diagram.targetToken);
-          return interactive && token!=='empty' ? <Pressable key={id} style={card} disabled={ignored}
+          return interactive ? <Pressable key={id} style={card} disabled={ignored}
             onPress={() => toggle(id)}
             accessibilityRole="button"
             accessibilityLabel={lit ? shape[1]+'、'+tapNumber+'ばんめ' : ignored ? shape[1]+'、かぞえない え' : shape[1]+'、まだ かぞえていない'}
