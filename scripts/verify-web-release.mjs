@@ -37,19 +37,26 @@ export function releaseClient(address) {
     if (profile && (version.indexSha256!==digest(index) || version.entrySha256!==digest(bundle))) {
       throw new Error('The sample HTML or JavaScript differs from the verified build.');
     }
-    // The approved background and the 16 interactive islands are deployed together.
+    // Validate the original AVIF on previous releases, and the new exact PNG
+    // on updated releases. This also allows recovery snapshots during migration.
+    let approvedMap;
     if(version.approvedWorldMapSha256!==undefined){
       if(!/^[a-f0-9]{64}$/.test(version.approvedWorldMapSha256))
         throw new Error('The approved world map digest is invalid.');
-      const art=Buffer.from(await (await get('world-map-approved.png')).arrayBuffer());
-      if(art.subarray(0,8).toString('hex')!=='89504e470d0a1a0a' ||
-         digest(art)!==version.approvedWorldMapSha256)
+      const imageFile=js.includes('world-map-approved.png')?'world-map-approved.png':
+        js.includes('world-map-approved.avif')?'world-map-approved.avif':null;
+      if(!imageFile)throw new Error('The game bundle does not use the approved world map.');
+      const art=Buffer.from(await (await get(imageFile)).arrayBuffer());
+      const valid=imageFile.endsWith('.png')
+        ?art.subarray(0,8).toString('hex')==='89504e470d0a1a0a'
+        :art.subarray(4,12).toString('ascii')==='ftypavif';
+      if(!valid||digest(art)!==version.approvedWorldMapSha256)
         throw new Error('The published 16-island world map differs from the approved asset.');
-      if(!js.includes('world-map-approved.png'))
-        throw new Error('The game bundle does not use the approved world map.');
+      approvedMap={file:imageFile,data:art};
     }
     // For the 4,300-question public trial, verify that each of the 43 data
     // files is actually accessible at the hosted site, not merely in GitHub.
+    const publishedBanks=[];
     if (version.bankSha256 !== undefined) {
       const entries=Object.entries(version.bankSha256);
       if (entries.length!==43 || version.publishedBankQuestions!==4300) {
@@ -63,6 +70,7 @@ export function releaseClient(address) {
           }
           const data=Buffer.from(await (await get('question-banks/'+file)).arrayBuffer());
           if (digest(data)!==hash)throw new Error('The published question bank differs: '+file);
+          publishedBanks.push({file,data});
           const bank=JSON.parse(data.toString('utf8'));
           if(bank.stageId!==file.slice(0,-'.v1.json'.length)||
              !Array.isArray(bank.questions)||bank.questions.length!==100||
@@ -79,7 +87,7 @@ export function releaseClient(address) {
           !admin.toString('utf8').includes('src="' + script + '"') ||
           !js.includes('/kazu-no-tobira/admin')) throw new Error('The admin route differs from the verified build.');
     }
-    return {version,index,entryPath,bundle,admin};
+    return {version,index,entryPath,bundle,admin,approvedMap,publishedBanks};
   }};
 }
 
