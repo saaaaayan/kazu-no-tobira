@@ -7,7 +7,7 @@ import { hasPremium, type Entitlement } from '../domain/accessPlan';
 import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldProgress';
 import { worldStageAction, type PlayMode } from '../domain/playMode';
 import { checkpointsFor, stageDisplayTitle, stageLabels, type Checkpoint } from '../domain/stageStructure';
-import { compactIslandStageMap, islandCheckpointLayout, islandRouteByKind, islandStageLayout, routeThrough } from '../domain/worldMapLayout';
+import { PRESCHOOL_MAP_TITLE_INSET, compactIslandStageMap, islandCheckpointLayout, islandRouteByKind, islandStageLayout, routeThrough } from '../domain/worldMapLayout';
 import { approvedWorldMapDimensions, approvedWorldMapHotspots, approvedWorldMapImageUrl } from '../domain/approvedWorldMap';
 import { hasStageBank } from '../domain/questionBank';
 import type { Progress } from '../domain/progress';
@@ -254,7 +254,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
   const [width,setWidth]=useState(0);
   const actual=measuredWidth(width);
   const compactStageMap=compactIslandStageMap(actual);
-  const geometry=islandStageLayout(actual,grade.stages.length);
+  const geometry=islandStageLayout(actual,grade.stages.length,
+    grade.id==='preschool'?PRESCHOOL_MAP_TITLE_INSET:0);
   const stats=gradeProgress(progress,grade.id);
   const gradeIndex=worldIslands.findIndex(g=>g.id===grade.id);
   const testing = mode === 'test';
@@ -362,6 +363,13 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           <IslandTerrain gradeIndex={gradeIndex} width={actual} height={geometry.height}
             positions={geometry.positions} grade={grade} next={next?.order ?? -1}/>
         </View>
+        {grade.id==='preschool' && (
+          <View testID="preschool-map-top-title" pointerEvents="none"
+            style={styles.preschoolMapTopTitle}>
+            <Text style={styles.preschoolMapTopGrade}>就学前</Text>
+            <Text style={styles.preschoolMapTopName}>ぬいぐるみの島</Text>
+          </View>
+        )}
         {/* Only one banner per adventure area. Normal = stages 01–50,
             trial = 51–60, legend = 61–65; all stage nodes remain clickable. */}
         {([
@@ -500,6 +508,11 @@ const styles=StyleSheet.create({
   ocean:{borderRadius:22,backgroundColor:'#548cab',overflow:'hidden',position:'relative',borderWidth:3,borderColor:'#d1dbdd'},
   pixelMapNote:{color:'#536c57',fontSize:14,fontWeight:'800'},
   pixelOcean:{borderRadius:9,backgroundColor:'#80adc4',borderWidth:4,borderColor:'#344454'},
+  preschoolMapTopTitle:{position:'absolute',top:18,left:40,right:40,height:58,
+    backgroundColor:'#f5edce',borderWidth:2,borderColor:'#7e9a73',
+    borderRadius:2,alignItems:'center',justifyContent:'center',gap:2},
+  preschoolMapTopGrade:{color:'#526651',fontWeight:'900',fontSize:12,lineHeight:16,textAlign:'center'},
+  preschoolMapTopName:{color:'#344454',fontWeight:'900',fontSize:20,lineHeight:24,textAlign:'center'},
   atlas:{borderRadius:22,backgroundColor:'#244e68',overflow:'hidden',position:'relative',borderWidth:1,borderColor:'#4e7180'},
   worldMapControls:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:10,paddingHorizontal:4},
   mapZoomToggle:{paddingVertical:9,paddingHorizontal:11,minHeight:39,borderRadius:10,backgroundColor:'#e7e6db',

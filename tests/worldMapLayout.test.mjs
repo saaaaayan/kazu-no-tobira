@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { worldMapLayout, islandStageLayout, routeThrough, islandRouteByKind, compactIslandStageMap, islandCheckpointLayout } from '../src/domain/worldMapLayout.ts';
+import { worldMapLayout, islandStageLayout, routeThrough, islandRouteByKind, compactIslandStageMap, islandCheckpointLayout, PRESCHOOL_MAP_TITLE_INSET } from '../src/domain/worldMapLayout.ts';
 import { worldGrades } from '../src/domain/worldCatalog.ts';
 
 test('世界地図の16島は格子に揃わず、狭い画面でも島ラベルが地図内に収まる', () => {
@@ -96,4 +96,26 @@ test('スマホの5地点行には単元名と確認テストのための重な�
       }
     }
   }
+});
+
+test('ぬいぐるみの島だけ、タイトル分の余白を追加して65ステージを同じ順番で維持',()=>{
+  assert.equal(PRESCHOOL_MAP_TITLE_INSET,86);
+  for(const width of [290,340,390,480,620,850,1024]){
+    const old=islandStageLayout(width);
+    const themed=islandStageLayout(width,65,PRESCHOOL_MAP_TITLE_INSET);
+    assert.equal(themed.positions.length,65);
+    assert.equal(themed.height,old.height+PRESCHOOL_MAP_TITLE_INSET);
+    assert.ok(themed.positions[0].y-60>=18+58+12,'Header and first area banner need a gap');
+    for(let i=0;i<65;i++){
+      assert.equal(themed.positions[i].x,old.positions[i].x);
+      assert.equal(themed.positions[i].y,old.positions[i].y+PRESCHOOL_MAP_TITLE_INSET);
+    }
+    for(let i=0;i<10;i++){
+      const first=themed.positions[5*i+4];
+      const next=themed.positions[5*i+5];
+      const b=islandCheckpointLayout(width,first,48,next);
+      assert.ok(b.top>=0&&b.top+b.height<themed.height);
+    }
+  }
+  assert.throws(()=>islandStageLayout(340,65,-1),RangeError);
 });
