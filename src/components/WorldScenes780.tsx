@@ -16,6 +16,7 @@ import { featureAccess } from '../domain/accessPlan';
 import { uiPreviewSampleKind } from '../domain/uiPreviewRound';
 import { stageCategoryName } from '../domain/islandCurriculumView';
 import { IslandCurriculumPanel } from './IslandCurriculumPanel';
+import { PreschoolPixelTerrain } from './PreschoolPixelTerrain';
 
 const palette = [
   { land: '#b6d793', dark: '#609d77', detail: '#306d6e', roof: '#efb6a0' },
@@ -164,6 +165,9 @@ function IslandTerrain({gradeIndex,width,height,positions,grade,next}: {
   gradeIndex:number;width:number;height:number;
   positions:readonly {x:number;y:number}[];grade:WorldGrade;next:number;
 }) {
+  if (grade.id === 'preschool') {
+    return <PreschoolPixelTerrain width={width} height={height} positions={positions} grade={grade} next={next}/>;
+  }
   const p=palette[gradeIndex];
   const paths=islandRouteByKind(grade.stages,positions.map((spot,order)=>({...spot,order,row:Math.floor(order/5),column:0})));
   return (
@@ -347,7 +351,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         <Text style={styles.mapTitle}>島のぼうけんルート</Text>
         <Text style={styles.hintText}>地図の丸い地点をタッチして ステージへ進もう！</Text>
       </View>
-      <View style={[styles.ocean,{height:geometry.height}]} onLayout={event=>{
+      <View style={[styles.ocean,grade.id==='preschool'&&styles.pixelOcean,{height:geometry.height}]} onLayout={event=>{
         const nextWidth=Math.round(event.nativeEvent.layout.width);
         if(nextWidth>0&&nextWidth!==width)setWidth(nextWidth);
       }}>
@@ -361,19 +365,19 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           const label=row<10 ? grade.units[rowUnits[0]].title + (rowUnits.length > 1 ? ' など' : '') : row<12 ? stageLabels.extra : stageLabels.secret;
           return (
             <View key={row} pointerEvents="none"
-              style={[styles.zoneLabel,{top:y-76,left:78,right:78,alignItems:'center'}]}>
-              <Text style={styles.zoneName}>{row<10?stageLabels.normal+' '+String(row+1).padStart(2,'0')+' ':''}{label}</Text>
+              style={[styles.zoneLabel,grade.id==='preschool'&&styles.pixelZoneLabel,{top:y-76,left:78,right:78,alignItems:'center'}]}>
+              <Text style={[styles.zoneName,grade.id==='preschool'&&styles.pixelZoneName]}>{row<10?stageLabels.normal+' '+String(row+1).padStart(2,'0')+' ':''}{label}</Text>
             </View>
           );
         })}
         {grade.stages.map((stage,index)=>{
           const position=geometry.positions[index];
           return <View key={'category-'+stage.id} pointerEvents="none"
-            style={[styles.pinCategoryBox,{
+            style={[styles.pinCategoryBox,grade.id==='preschool'&&styles.pixelCategoryBox,{
               width:84,left:Math.max(1,Math.min(actual-85,position.x-42)),
               top:position.y+marker/2+4,
             }]}>
-            <Text numberOfLines={2} style={styles.pinCategoryText}>{stageCategoryName(grade,stage)}</Text>
+            <Text numberOfLines={2} style={[styles.pinCategoryText,grade.id==='preschool'&&styles.pixelCategoryText]}>{stageCategoryName(grade,stage)}</Text>
           </View>;
         })}
         {checkpointsFor(grade).map(checkpoint=>{
@@ -385,7 +389,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           return <Pressable key={checkpoint.id} accessibilityRole="button"
             accessibilityLabel={'確認テスト '+checkpoint.number+(enabled?' を はじめる':' は準備中')} disabled={!enabled} onPress={()=>onCheckpoint(checkpoint)}
             style={{position:'absolute',left,top:end.y+37,width:66,height:44,borderRadius:10,justifyContent:'center',
-              alignItems:'center',backgroundColor:enabled?'#fff0b5':'#d2d9e9',borderWidth:1,borderColor:'#66769a'}}>
+              alignItems:'center',backgroundColor:enabled?'#fff0b5':'#d2d9e9',borderWidth:1,borderColor:'#66769a',
+               ...(grade.id==='preschool'?{borderRadius:3,borderWidth:2,borderColor:'#344454',backgroundColor:enabled?'#f3e5b9':'#d9dfdf'}:{})}}>
             <Text style={{fontSize:11,fontWeight:'800',color:'#263453'}}>確認テスト</Text>
             <Text style={{fontSize:11,color:'#263453'}}>{checkpoint.number}</Text>
           </Pressable>;
@@ -405,7 +410,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
               accessibilityLabel={stageDisplayTitle(stage)+'、単元 '+stageCategoryName(grade,stage)+'、'+(preview ? (hasStageBank(stage.id) ? '100問のなかから10問ずつ あそべる' : uiPreviewSampleKind(stage) ? 'サンプル問題' : '体験用問題は準備中') : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
-                styles.stagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
+                styles.stagePin,grade.id==='preschool'&&styles.pixelStagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
                 !unlocked&&styles.lockedPin,cleared&&styles.clearedPin,perfect&&styles.perfectPin,
                 current&&styles.currentPin,pressed&&styles.pressed,
                 {width:marker,height:marker,left:position.x-marker/2,top:position.y-marker/2},
@@ -450,6 +455,7 @@ const styles=StyleSheet.create({
   mapTitle:{color:'#2b395e',fontWeight:'900',fontSize:19},
   hintText:{color:'#5c657d',fontSize:13,lineHeight:20},
   ocean:{borderRadius:22,backgroundColor:'#548cab',overflow:'hidden',position:'relative',borderWidth:3,borderColor:'#d1dbdd'},
+  pixelOcean:{borderRadius:9,backgroundColor:'#80adc4',borderWidth:4,borderColor:'#344454'},
   atlas:{borderRadius:22,backgroundColor:'#244e68',overflow:'hidden',position:'relative',borderWidth:1,borderColor:'#4e7180'},
   worldMapControls:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:10,paddingHorizontal:4},
   mapZoomToggle:{paddingVertical:9,paddingHorizontal:11,minHeight:39,borderRadius:10,backgroundColor:'#e7e6db',
@@ -492,11 +498,16 @@ const styles=StyleSheet.create({
   nextText:{color:'#544268',fontWeight:'900',fontSize:15,textAlign:'center'},
   zoneLabel:{position:'absolute',paddingVertical:5,paddingHorizontal:9,backgroundColor:'#fff8dd',borderRadius:9,borderWidth:1,borderColor:'#ecdfb3',maxWidth:'90%'},
   zoneName:{color:'#545078',fontWeight:'900',fontSize:13},
+  pixelZoneLabel:{borderRadius:2,backgroundColor:'#f5edce',borderWidth:2,borderColor:'#d9caa6'},
+  pixelZoneName:{color:'#344454'},
   pinCategoryBox:{position:'absolute',borderRadius:5,paddingHorizontal:2,paddingVertical:1,
     backgroundColor:'rgba(255,250,228,0.92)',alignItems:'center',justifyContent:'center'},
   pinCategoryText:{fontSize:10,fontWeight:'800',color:'#314661',textAlign:'center',lineHeight:12},
+  pixelCategoryBox:{borderRadius:1,backgroundColor:'rgba(247,238,207,0.94)'},
+  pixelCategoryText:{color:'#344454'},
   stagePin:{position:'absolute',borderRadius:50,backgroundColor:'#fffaf0',borderWidth:3,borderColor:'#d2ae66',
     alignItems:'center',justifyContent:'center',shadowColor:'#24445b',shadowOpacity:0.25,shadowRadius:3,shadowOffset:{width:0,height:2}},
+  pixelStagePin:{borderColor:'#344454',borderRadius:50,shadowOpacity:0,backgroundColor:'#fff8e2'},
   extraPin:{backgroundColor:'#f5e6ff',borderColor:'#8b75c0'},
   secretPin:{backgroundColor:'#fce4ed',borderColor:'#d89bba'},
   lockedPin:{backgroundColor:'#d1d5dc',borderColor:'#899ba8',opacity:0.9},
