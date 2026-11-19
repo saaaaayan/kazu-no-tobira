@@ -1,25 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line } from 'react-native-svg';
-import type { CountingToken } from '../domain/countingTokens';
 import { countingTokenArt } from '../domain/countingTokens';
-
-export type PictureNumberMatch = {
-  pictures: readonly { token:CountingToken; count:number }[];
-  numbers: readonly number[];
-};
-
-/** The first (left-hand) group is position 0 in the answer. All three
- * connections must be made, and each digit may be used only once. */
-export function pictureNumberMatchAnswer(match:PictureNumberMatch):string {
-  return match.pictures.map(p=>p.count).join('-');
-}
-export function pictureNumberConnectedAnswer(match:PictureNumberMatch,links:Readonly<Record<number,number>>):string {
-  const indexes=match.pictures.map((_,i)=>links[i]);
-  if(indexes.some(i=>i===undefined||i<0||i>=match.numbers.length) ||
-    new Set(indexes).size!==match.pictures.length)return '';
-  return indexes.map(i=>match.numbers[i]).join('-');
-}
+import { pictureNumberConnectedAnswer, type PictureNumberMatch } from '../domain/preschoolNumberConnections';
 
 const rowHeight=94;
 const rowGap=12;
