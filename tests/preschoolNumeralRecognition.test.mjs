@@ -44,14 +44,17 @@ test('stage 09 teaches zero through contrast with one and two, not ten answers o
  assert.ok(plates.every(q=>q.explanation.includes(q.diagram.count+'こ')));
 });
 
-test('stage 10 matches printed numerals to quantities in both directions',()=>{
+test('stage 10 is a real three-pair matching exercise in all ten tasks',()=>{
  const qs=uiPreviewBank(stage(10));
  assert.equal(qs.length,10);
- assert.equal(qs.filter(q=>q.preschoolNumeral!==undefined).length,5,
-   'five large number to pictures');
- assert.equal(qs.filter(q=>q.diagram?.kind==='countingBoard').length,5,
-   'five pictured quantities to number choices');
- assert.ok(qs.every(q=>/おなじ/.test(q.question)));
+ assert.ok(qs.every(q=>q.preschoolNumberMatch),'the actual line-connecting activity must be present');
+ assert.ok(qs.every(q=>q.preschoolNumeral===undefined&&!q.diagram),
+   'no old single-number multiple choice UI');
+ assert.ok(qs.every(q=>/せんで むすぼう/.test(q.question)));
+ assert.ok(qs.every(q=>q.preschoolNumberMatch.pictures.length===3
+   &&q.preschoolNumberMatch.numbers.length===3));
+ assert.equal(new Set(qs.map(q=>JSON.stringify(q.preschoolNumberMatch))).size,10,
+   'the ten sets of matching cards should differ');
 });
 
 test('all fifty numeral tasks have one valid answer, targeted hints and unbiased answer positions',()=>{
