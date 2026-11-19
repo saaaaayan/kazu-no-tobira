@@ -8,21 +8,24 @@ import {checkMathAnswer} from '../src/domain/mathAnswer.ts';
 const read=(p)=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const island=worldIslands.find(x=>x.id==='preschool');
 
-test('zero means no apples: every empty-plate question has answer zero and zero countable objects',()=>{
- const questions=uiPreviewBank(island.stages[8]); // n09, zero
+test('stage 09 visibly contrasts empty, one-object and two-object plates',()=>{
+ const questions=uiPreviewBank(island.stages[8]);
  assert.equal(questions.length,10);
- const plates=questions.filter(q=>q.diagram?.kind==='countingBoard' &&
-    q.diagram.rows.some(row=>row.tokens.includes('empty')));
- assert.ok(plates.length>=4);
+ const plates=questions.filter(q=>q.diagram?.kind==='plateCount');
+ assert.equal(plates.length,6);
+ assert.deepEqual(plates.map(q=>q.diagram.count),[0,1,2,1,2,0]);
+ assert.deepEqual(plates.map(q=>q.answer),['0','1','2','1','2','0']);
  for(const q of plates){
-   assert.deepEqual(q.diagram.rows.flatMap(row=>row.tokens),['empty']);
-   assert.equal(q.answer,'0',q.id);
+   assert.equal(q.answer,String(q.diagram.count),q.id);
    assert.equal(q.choices.filter(c=>checkMathAnswer(q,c)).length,1,q.id);
-   assert.match(q.question,/おさらに/);
-   assert.match(q.prompt,/おさらの なかを みて/);
-   assert.match(q.explanation,/0こ/);
-   assert.ok(q.hints.every(h=>h.length>=9));
+   assert.ok(q.question.includes('おさら')||q.prompt.includes('おさら'),q.id);
+   assert.ok(q.explanation.includes(q.diagram.count+'こ'),q.id);
+   assert.ok(q.hints.every(h=>h.length>=9),q.id);
+   assert.ok(['apple','bear','rabbit','flower'].includes(q.diagram.token),q.id);
  }
+ // The user should need to look at the picture; zero cannot be the only correct choice.
+ assert.ok(questions.some(q=>q.answer==='1'));
+ assert.ok(questions.some(q=>q.answer==='2'));
  const mixed=uiPreviewPreschoolCheckpoint(2,()=>0.34);
  assert.equal(mixed.length,10);
 });
@@ -40,4 +43,17 @@ test('the empty token is never just a circle glyph or a tap target',()=>{
  assert.match(picture,/emptyPlateOuter:\{width:158,height:95/);
  assert.match(picture,/emptyPlateCaption:\{fontSize:17/);
  assert.match(picture,/return interactive \? <Pressable/);
+});
+
+test('plate graphics include identical plate outlines and countable objects for 0, 1, and 2',()=>{
+ const picture=read('src/components/QuestionSupport.tsx');
+ const types=read('src/domain/questionBank.ts');
+ assert.match(types,/kind: 'plateCount'; token: CountingToken; count: 0 \| 1 \| 2/);
+ assert.match(picture,/if \(diagram.kind === 'plateCount'\) \{/);
+ assert.match(picture,/testID="preschool-plate-count-scene"/);
+ assert.match(picture,/styles\.plateCountOuter/);
+ assert.match(picture,/styles\.plateCountInner/);
+ assert.match(picture,/Array\.from\(\{length:diagram.count\}/);
+ assert.match(picture,/styles\.plateCountToy/);
+ assert.doesNotMatch(picture,/0こ\s*<Text/);
 });

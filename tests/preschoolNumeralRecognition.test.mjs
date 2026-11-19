@@ -26,16 +26,22 @@ test('stage 06–08 teach numerals, not another round of only counting toys',()=
  }
 });
 
-test('stage 09 teaches zero as empty, as a written 0 and as a spoken word',()=>{
+test('stage 09 teaches zero through contrast with one and two, not ten answers of 0',()=>{
  const qs=uiPreviewBank(stage(9));
  assert.equal(qs.length,10);
+ assert.ok(qs.every(q=>q.preschoolNumberActivity));
  assert.ok(qs.some(q=>q.preschoolNumeral==='0'));
  assert.ok(qs.some(q=>q.answer==='ぜろ'));
- assert.ok(qs.some(q=>q.answer==='0'));
  assert.ok(qs.some(q=>q.answer==='からっぽ'));
- assert.ok(qs.some(q=>q.diagram?.kind==='countingBoard'&&
-    q.diagram.rows.some(row=>row.tokens.includes('empty'))));
- assert.ok(qs.every(q=>q.preschoolNumberActivity));
+ assert.ok(qs.some(q=>q.answer==='なにも ない'));
+ const counts={0:0,1:0,2:0};
+ for(const q of qs)if(q.answer in counts)counts[q.answer]++;
+ assert.deepEqual(counts,{'0':3,'1':2,'2':2});
+ const plates=qs.filter(q=>q.diagram?.kind==='plateCount');
+ assert.equal(plates.length,6);
+ assert.deepEqual(plates.map(q=>q.diagram.count),[0,1,2,1,2,0]);
+ assert.ok(plates.every(q=>q.answer===String(q.diagram.count)));
+ assert.ok(plates.every(q=>q.explanation.includes(q.diagram.count+'こ')));
 });
 
 test('stage 10 matches printed numerals to quantities in both directions',()=>{

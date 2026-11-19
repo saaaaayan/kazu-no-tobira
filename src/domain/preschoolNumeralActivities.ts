@@ -88,19 +88,45 @@ function picturesToNumeral(n:number,lo:number,hi:number,token:CountingToken):Pre
     explanation:label(token)+' は '+n+' こ。 この かずを すうじで かくと '+n+' だよ。',
   };
 }
-function emptyDish(token:CountingToken):PreschoolNumeralTask{
-  // The plate is a visual setting, not an object to count. All these tasks
-  // have zero items; never show an 'empty dish' prompt next to visible fruit.
+function plateQuestion(count:0|1|2,token:CountingToken,variant:number):PreschoolNumeralTask{
+  // Contrast 0 with 1 and 2 on the SAME illustration. An empty plate is not
+  // a clue that the answer must be zero on every question.
+  const name=label(token);
   return {
-    question:'おさらに '+label(token)+' は なんこ ある？',
-    prompt:'おさらの なかを みて、すうじを えらぼう。',
-    answer:'0',choices:pick3('0',['1','2']),
+    question:[
+      'おさらに '+name+' は なんこ ある？',
+      'おさらの '+name+' を かぞえよう。',
+      'おさらに '+name+' は なんこ のっている？',
+    ][variant%3],
+    prompt:'えを みて、0・1・2の なかから えらぼう。',
+    answer:String(count),
+    choices:pick3(String(count),['0','1','2']),
     numeralPractice:true,
-    diagram:{kind:'countingBoard',rows:[{tokens:['empty']}]},
-    hints:['おさらの なかを よく みてね。',
-      label(token)+' が ひとつでも のっているかな？',
-      'なにも のっていない ときは 0 こ。すうじは「0」だよ。'],
-    explanation:'おさらは からっぽだね。'+label(token)+' は 1こも ないから、0こ だよ。',
+    diagram:{kind:'plateCount',token,count},
+    hints:[
+      'おさらの なかを よく みてね。',
+      'ひとつずつ ゆびで さして かぞえよう。',
+      count===0?'ひとつも なければ 0こ だよ。':
+        name+' が '+count+'こ のっているよ。',
+    ],
+    explanation:count===0?'おさらは からっぽ。'+name+' は 0こ だよ。':
+      'おさらに '+name+' が '+count+'こ のっているね。こたえは '+count+' だよ。',
+  };
+}
+function zeroMeaning():PreschoolNumeralTask{
+  return {
+    question:'0こって どんな いみ？',
+    prompt:'ことばを えらぼう。',
+    answer:'なにも ない',
+    choices:['なにも ない','1こ ある','2こ ある'],
+    numeralPractice:true,
+    focalNumeral:'0',
+    hints:[
+      'おおきな すうじは 0 だね。',
+      'おさらが からっぽの ときを おもいだそう。',
+      '1こも ない ことを 0こ と いうよ。',
+    ],
+    explanation:'0こは、ひとつも ない という いみだよ。',
   };
 }
 
@@ -129,10 +155,20 @@ export function preschoolNumeralTask(stageNumber:6|7|8|9|10,index:number):Presch
     return numeralToPictures(index+1,5,10,toys[index]);
   }
   if(stageNumber===9){
-    if(index<2)return readDigit(0,0,2,index);
-    if(index<4)return findDigit(0,0,2,index);
-    if(index<6)return numeralToPictures(0,0,2,toys[index]);
-    return emptyDish(toys[index]);
+    // Ten complementary tasks. The child must distinguish 0, 1 and 2,
+    // recognise the symbol, and understand what "none" means.
+    switch(index){
+      case 0: return readDigit(0,0,2,0);
+      case 1: return findDigit(0,0,2,1);
+      case 2: return numeralToPictures(0,0,2,'cat');
+      case 3: return plateQuestion(0,'apple',0);
+      case 4: return plateQuestion(1,'apple',1);
+      case 5: return plateQuestion(2,'apple',2);
+      case 6: return plateQuestion(1,'bear',0);
+      case 7: return plateQuestion(2,'rabbit',1);
+      case 8: return plateQuestion(0,'flower',2);
+      default: return zeroMeaning();
+    }
   }
   const n=index<5?index+1:index-4;
   return index<5

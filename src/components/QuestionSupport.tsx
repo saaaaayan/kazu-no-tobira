@@ -118,6 +118,21 @@ function CountingBoard({ diagram, phase }: {
 }
 
 export function QuestionDiagram({ diagram, phase }: { diagram: BankDiagram; phase: 'question' | 'hint' | 'solution' }) {
+  if (diagram.kind === 'plateCount') {
+    const toy=tokenArt[diagram.token];
+    const label=diagram.count===0 ? 'なにも のっていない おさら'
+      : 'おさらに '+toy[1]+' が '+diagram.count+' こ';
+    return <View testID="preschool-plate-count-scene"
+      style={styles.plateCountScene} accessible accessibilityLabel={label}>
+      <View style={styles.plateCountOuter}>
+        <View style={styles.plateCountInner}>
+          {Array.from({length:diagram.count},(_,i)=>(
+            <Text key={i} style={styles.plateCountToy}>{toy[0]}</Text>
+          ))}
+        </View>
+      </View>
+    </View>;
+  }
   if (diagram.kind === 'countingBoard') return <CountingBoard diagram={diagram} phase={phase}/>;
   if (diagram.kind === 'tenFrame') return <TenFrame first={diagram.first} second={diagram.second ?? 0} third={diagram.third}/>;
 
@@ -237,6 +252,14 @@ export function WorkedSolution({ question, wrongAnswer }: { question: BankQuesti
 }
 
 const styles = StyleSheet.create({
+  // Same visual plate for 0, 1 and 2. Never print the answer on the plate.
+  plateCountScene:{width:'100%',minHeight:170,alignItems:'center',justifyContent:'center',paddingVertical:12},
+  plateCountOuter:{width:208,height:132,borderWidth:6,borderRadius:80,borderColor:'#8297b0',
+    backgroundColor:'#e3edf7',justifyContent:'center',alignItems:'center'},
+  plateCountInner:{width:165,height:94,borderWidth:3,borderRadius:65,
+    borderColor:'#b2c5d9',backgroundColor:'#fff8e8',flexDirection:'row',
+    justifyContent:'center',alignItems:'center',gap:8},
+  plateCountToy:{fontSize:40,lineHeight:55,textAlign:'center'},
   emptyPlateScene:{width:'100%',minHeight:152,alignItems:'center',justifyContent:'center',gap:8,paddingVertical:10},
   emptyPlateOuter:{width:158,height:95,borderWidth:5,borderRadius:65,borderColor:'#8297b0',
     backgroundColor:'#e3edf7',justifyContent:'center',alignItems:'center'},
