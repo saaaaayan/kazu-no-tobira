@@ -67,17 +67,25 @@ test('スマホの5地点行には単元名と確認テストのための重な�
     for(let row=0;row<10;row++){
       const end=map.positions[row*5+4];
       const marker=Math.max(46,Math.min(57,Math.floor(width/5)-9));
-      const testBox=islandCheckpointLayout(width,end,marker);
+      const next=map.positions[(row+1)*5];
+      const testBox=islandCheckpointLayout(width,end,marker,next);
       assert.equal(testBox.compact,compact);
       assert.ok(testBox.left>=0 && testBox.left+testBox.width<=width,
         JSON.stringify({width,row,testBox}));
       if(!compact)continue;
-      const topicTop=end.y+marker/2+13;
-      const topicBottom=topicTop+44; // two-line title in the worst case
-      assert.ok(testBox.top>=topicBottom+2,JSON.stringify({width,row,testBox,topicBottom}));
-      const nextCenter=map.positions[(row+1)*5].y;
-      assert.ok(testBox.top+testBox.height<nextCenter-marker/2,
-        JSON.stringify({width,row,testBox,nextCenter}));
+      const topicInset=Math.max(68,Math.ceil(width*.16));
+      const topicLeft=topicInset,topicRight=width-topicInset;
+      // Checkpoints and centered topic labels may share some vertical space,
+      // but their horizontal bounds must never overlap.
+      assert.ok(
+        testBox.left+testBox.width<=topicLeft || testBox.left>=topicRight,
+        JSON.stringify({width,row,testBox,topicLeft,topicRight}));
+      assert.equal(testBox.top,Math.round((end.y+next.y-testBox.height)/2),
+        'checkpoint must be vertically centered between neighboring rows');
+      assert.ok(testBox.top>end.y+marker/2,
+        JSON.stringify({width,row,testBox,end}));
+      assert.ok(testBox.top+testBox.height<next.y-marker/2,
+        JSON.stringify({width,row,testBox,next}));
     }
     if(compact){
       // Area banners must not collide with the preceding five-stage checkpoint.
