@@ -96,7 +96,7 @@ function plateQuestion(count:0|1|2,token:CountingToken,variant:number):Preschool
     question:[
       'おさらに '+name+' は なんこ ある？',
       'おさらの '+name+' を かぞえよう。',
-      name+' は なんこ のっている？',
+      'おさらに '+name+' は なんこ のっている？',
     ][variant%3],
     prompt:'えを みて、0・1・2の なかから えらぼう。',
     answer:String(count),
