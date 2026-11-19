@@ -356,7 +356,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         const nextWidth=Math.round(event.nativeEvent.layout.width);
         if(nextWidth>0&&nextWidth!==width)setWidth(nextWidth);
       }}>
-        <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+        <View pointerEvents="none" testID={grade.id==='preschool'?'preschool-plush-pixel-v2':undefined}
+          style={StyleSheet.absoluteFill}>
           <IslandTerrain gradeIndex={gradeIndex} width={actual} height={geometry.height}
             positions={geometry.positions} grade={grade} next={next?.order ?? -1}/>
         </View>
