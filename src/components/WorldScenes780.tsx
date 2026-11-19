@@ -387,8 +387,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
               style={[
                 styles.zoneLabel,
                 grade.id==='preschool'&&styles.pixelZoneLabel,
-                area.kind==='extra'&&styles.extraAreaLabel,
-                area.kind==='secret'&&styles.secretAreaLabel,
+                grade.id!=='preschool'&&area.kind==='extra'&&styles.extraAreaLabel,
+                grade.id!=='preschool'&&area.kind==='secret'&&styles.secretAreaLabel,
                 {top:y-60,left:inset,right:inset,alignItems:'center'},
               ]}>
               <Text style={[
@@ -606,10 +606,15 @@ const styles=StyleSheet.create({
   nextText:{color:'#544268',fontWeight:'900',fontSize:15,textAlign:'center'},
   zoneLabel:{position:'absolute',paddingVertical:5,paddingHorizontal:9,backgroundColor:'#fff8dd',borderRadius:9,borderWidth:1,borderColor:'#ecdfb3',maxWidth:'90%'},
   zoneName:{color:'#545078',fontWeight:'900',fontSize:13},
-  pixelZoneLabel:{borderRadius:2,backgroundColor:'#f5edce',borderWidth:2,borderColor:'#d9caa6'},
+  // Keep the preschool map's illustrated grass visible. Section headings
+  // are plain lettering rather than cream bordered banners.
+  pixelZoneLabel:{borderRadius:0,backgroundColor:'transparent',borderWidth:0,
+    paddingVertical:3,paddingHorizontal:2},
   extraAreaLabel:{backgroundColor:'#e0eae5',borderColor:'#90b4a8'},
   secretAreaLabel:{backgroundColor:'#eee2e9',borderColor:'#b39aaa'},
-  pixelZoneName:{color:'#344454'},
+  pixelZoneName:{color:'#283e55',fontSize:17,lineHeight:23,
+    fontWeight:'900',textAlign:'center',
+    textShadowColor:'rgba(240,248,218,0.95)',textShadowOffset:{width:0,height:1},textShadowRadius:2},
   pinCategoryBox:{position:'absolute',borderRadius:5,paddingHorizontal:2,paddingVertical:1,
     backgroundColor:'rgba(255,250,228,0.92)',alignItems:'center',justifyContent:'center'},
   pinCategoryText:{fontSize:10,fontWeight:'800',color:'#314661',textAlign:'center',lineHeight:12},
@@ -618,11 +623,14 @@ const styles=StyleSheet.create({
   compactRowTopicText:{color:'#344454',fontWeight:'900',fontSize:13,lineHeight:17,textAlign:'center'},
   pixelCategoryBox:{borderRadius:1,backgroundColor:'rgba(247,238,207,0.94)'},
   pixelCategoryText:{color:'#344454'},
-  preschoolStageTopic:{position:'absolute',minHeight:25,paddingHorizontal:2,paddingVertical:2,
-    backgroundColor:'rgba(246,238,206,0.97)',borderRadius:2,
-    alignItems:'center',justifyContent:'center'},
-  preschoolStageTopicText:{fontSize:11,lineHeight:14,color:'#344454',fontWeight:'900',textAlign:'center'},
-  preschoolStageTopicSmall:{fontSize:9,lineHeight:12},
+  // Stage titles are still tappable for details, but never obscured by
+  // individual rectangles. A faint light text shadow gives contrast on grass.
+  preschoolStageTopic:{position:'absolute',minHeight:36,paddingHorizontal:1,paddingVertical:1,
+    backgroundColor:'transparent',borderRadius:0,borderWidth:0,
+    alignItems:'center',justifyContent:'flex-start'},
+  preschoolStageTopicText:{fontSize:12,lineHeight:16,color:'#283e55',fontWeight:'900',textAlign:'center',
+    textShadowColor:'rgba(244,249,226,0.96)',textShadowOffset:{width:0,height:1},textShadowRadius:2},
+  preschoolStageTopicSmall:{fontSize:10,lineHeight:14},
   preschoolStageInfoCard:{position:'absolute',zIndex:30,backgroundColor:'#f8f0d8',
     borderWidth:3,borderColor:'#344454',borderRadius:4,padding:10,gap:8,
     shadowColor:'#344454',shadowOpacity:.22,shadowOffset:{width:2,height:3},shadowRadius:2},
