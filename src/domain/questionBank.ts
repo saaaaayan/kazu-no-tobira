@@ -12,7 +12,7 @@ export type BankDiagram = { kind: 'countingBoard'; guide?: true; spacing?: 'wide
   | { kind: 'borrowTen'; total: number; used: number }
   | { kind: 'bundlesAndOnes'; tens: number; ones: number };
 export type BankQuestion = MathQuestion & {
-  format: 'counting' | 'calculation' | 'missingPart' | 'story' | 'decomposition' | 'comparison' | 'position' | 'interval' | 'sequence' | 'line' | 'reverseTransfer'
+  format: 'tracing' | 'counting' | 'calculation' | 'missingPart' | 'story' | 'decomposition' | 'comparison' | 'position' | 'interval' | 'sequence' | 'line' | 'reverseTransfer'
     | 'joinThree' | 'target' | 'splitTotal' | 'compareGroups' | 'returnSome' | 'refill' | 'twoCollections'
     | 'takeAway' | 'takeTwice' | 'startAmount' | 'unknownLast' | 'compareAfter' | 'moveAway' | 'equalize' | 'comparedStart'
     | 'tenCompareGaps' | 'tenAfterRemoval' | 'tenSecondSource' | 'tenReserved' | 'tenEqualShare' | 'tenTrimAfterTwo' | 'tenShift'
@@ -20,6 +20,7 @@ export type BankQuestion = MathQuestion & {
     | 'carryThenUse' | 'carryFindFirstGain' | 'carryCompare' | 'carryThreeGroups' | 'carryPackTarget'
     | 'borrowDirect' | 'borrowThenUse' | 'borrowFindLater' | 'borrowNeedMore' | 'borrowCompare'
     | 'hundredBundle' | 'hundredTensForward' | 'hundredComparePlaces' | 'hundredNextBundle' | 'hundredStepsToTarget';
+  preschoolTrace?: string; // Public prototype: finger-drawn number practice only.
   topic?: string;
   difficulty: 1 | 2 | 3;
   hints: readonly [string, string, string];
