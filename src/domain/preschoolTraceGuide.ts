@@ -66,13 +66,14 @@ export type PreschoolGuideMatch = {
   inkNear:number;
   guideCovered:number;
   lengthRatio:number;
+  distinct:boolean;
 };
 
 /** Follow the displayed guide, with tolerance for thin, wobbly preschool ink.
  * Every guide stroke must be covered: e.g. a single diagonal cannot pass as 4.
  */
 export function preschoolTraceGuideMatch(digit:string,ink:DigitInk):PreschoolGuideMatch{
-  const failure={matched:false,inkNear:0,guideCovered:0,lengthRatio:0};
+  const failure={matched:false,inkNear:0,guideCovered:0,lengthRatio:0,distinct:false};
   if(preschoolTraceInkQuality(ink)!=='plausible')return failure;
   const guide=preschoolDigitGuidePaths(digit,ink.size);
   if(!guide.length)return failure;
@@ -102,5 +103,5 @@ export function preschoolTraceGuideMatch(digit:string,ink:DigitInk):PreschoolGui
   }
   const shapeDiscriminates=(near+covered)/2-closestOther>=.025;
   return {matched:near>=.76&&covered>=.78&&ratio>=.5&&ratio<=1.85&&everyStroke&&shapeDiscriminates,
-    inkNear:near,guideCovered:covered,lengthRatio:ratio};
+    inkNear:near,guideCovered:covered,lengthRatio:ratio,distinct:shapeDiscriminates};
 }
