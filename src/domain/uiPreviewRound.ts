@@ -16,7 +16,7 @@ export const firstStageLessonBanks:Readonly<Record<string,readonly BankQuestion[
 export const additionalStageLessonBanks:Readonly<Record<string,readonly BankQuestion[]>> = elementaryFollowupBanks;
 
 export function uiPreviewSampleKind(stage: SampleStage) {
-  if (stage.gradeId==='preschool' && /^preschool\\.(?:n(?:0[6-9]|[1-4][0-9]|50)|x(?:0[1-9]|10)|s0[1-5])$/.test(stage.id)) {
+  if (stage.gradeId==='preschool' && /^preschool\.(?:n(?:0[6-9]|[1-4][0-9]|50)|x(?:0[1-9]|10)|s0[1-5])$/.test(stage.id)) {
     const expected=stage.id.includes('.n')?'normal':stage.id.includes('.x')?'extra':'secret';
     return stage.kind===expected?'preschool-activity':undefined;
   }
