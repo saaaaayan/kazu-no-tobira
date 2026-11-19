@@ -15,6 +15,14 @@ export function stageCategoryName(grade:WorldGrade,stage:WorldStage):string {
   return grade.units[stage.unitIndex]?.title??stage.subtitle;
 }
 
+/** A single legible title for each five-stage row on compact maps. */
+export function stageRowCategoryName(grade:WorldGrade,row:number):string {
+  const stages=grade.stages.slice(row*5,row*5+5);
+  if(!stages.length)return '';
+  const categories=[...new Set(stages.map(stage=>stageCategoryName(grade,stage)))];
+  return categories.length===1?categories[0]:categories[0]+' など';
+}
+
 export function islandCurriculum(grade:WorldGrade) {
   return {
     units:grade.units.map((unit,index)=>({
