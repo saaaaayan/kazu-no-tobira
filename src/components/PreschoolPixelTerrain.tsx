@@ -158,8 +158,10 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
         <Rect x={width*.43} y={y+12} width={3} height={7} fill="#62885d"/>
         <Rect x={width*.74} y={y+12} width={3} height={7} fill="#62885d"/>
         {row%3===0&&<ToyBlocks x={width*.965} y={y-34} scale={scale*.8}/>}
-        <Plush animal={animals[0]} x={width*.2} y={y-38} scale={scale}/>
-        <Plush animal={animals[1]} x={width*.8} y={y-38} scale={scale}/>
+        {/* On phones keep plush toys away from the checkpoint buttons at
+            the outer edges of the route. */}
+        <Plush animal={animals[0]} x={width*(width<620?.29:.2)} y={y-38} scale={scale}/>
+        <Plush animal={animals[1]} x={width*(width<620?.71:.8)} y={y-38} scale={scale}/>
       </G>;
     })}
     {/* Quiet separators mark the trial and legendary zones without

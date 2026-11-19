@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { worldMapLayout, islandStageLayout, routeThrough, islandRouteByKind } from '../src/domain/worldMapLayout.ts';
+import { worldMapLayout, islandStageLayout, routeThrough, islandRouteByKind, compactIslandStageMap, islandCheckpointLayout } from '../src/domain/worldMapLayout.ts';
 import { worldGrades } from '../src/domain/worldCatalog.ts';
 
 test('世界地図の16島は格子に揃わず、狭い画面でも島ラベルが地図内に収まる', () => {
@@ -36,7 +36,10 @@ test('各島の65地点は5列×13行のジグザグの航路となる', () => {
     }
     for(let i=1;i<65;i++) {
       const a=map.positions[i-1], b=map.positions[i];
-      assert.ok(Math.hypot(a.x-b.x,a.y-b.y)<Math.max(119,width/5)+12,
+      const compact=compactIslandStageMap(width);
+      const atAreaBoundary=compact && (b.row===10||b.row===12) && b.row!==a.row;
+      const maxStep=a.row===b.row?width/5+12:map.rowHeight+(atAreaBoundary?58:0)+12;
+      assert.ok(Math.hypot(a.x-b.x,a.y-b.y)<maxStep,
         JSON.stringify({width,a,b}));
     }
     for(const grade of worldGrades) {
@@ -53,4 +56,36 @@ test('航路の空配列と長さ1にも対応する',()=>{
   assert.equal(routeThrough([]),'');
   assert.equal(routeThrough([{x:5,y:8}]),'M5 8');
   assert.throws(()=>islandStageLayout(300,0),RangeError);
+});
+
+test('スマホの5地点行には単元名と確認テストのための重ならない領域がある',()=>{
+  for(const width of [290,340,390,480,600,619,620,850]){
+    const map=islandStageLayout(width);
+    const compact=compactIslandStageMap(width);
+    assert.equal(compact,width<620);
+    assert.equal(map.rowHeight,compact?166:119);
+    for(let row=0;row<10;row++){
+      const end=map.positions[row*5+4];
+      const marker=Math.max(46,Math.min(57,Math.floor(width/5)-9));
+      const testBox=islandCheckpointLayout(width,end,marker);
+      assert.equal(testBox.compact,compact);
+      assert.ok(testBox.left>=0 && testBox.left+testBox.width<=width,
+        JSON.stringify({width,row,testBox}));
+      if(!compact)continue;
+      const topicTop=end.y+marker/2+13;
+      const topicBottom=topicTop+44; // two-line title in the worst case
+      assert.ok(testBox.top>=topicBottom+2,JSON.stringify({width,row,testBox,topicBottom}));
+      const nextCenter=map.positions[(row+1)*5].y;
+      assert.ok(testBox.top+testBox.height<nextCenter-marker/2,
+        JSON.stringify({width,row,testBox,nextCenter}));
+    }
+    if(compact){
+      // Area banners must not collide with the preceding five-stage checkpoint.
+      for(const row of [10,12]){
+        const current=map.positions[row*5];
+        const prev=map.positions[row*5-1];
+        assert.ok(current.y-60 > prev.y+130,JSON.stringify({width,row,current,prev}));
+      }
+    }
+  }
 });

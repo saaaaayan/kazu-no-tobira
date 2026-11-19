@@ -38,6 +38,28 @@ export function worldMapLayout(width: number) {
   };
 }
 
+export function compactIslandStageMap(width:number): boolean {
+  return Math.max(244,width||360) < 620;
+}
+
+/**
+ * Checkpoints have their own lane on narrow devices, beneath the centered
+ * row's learning topic. Preserve the original desktop placement.
+ */
+export function islandCheckpointLayout(width:number,point:MapPoint,marker:number) {
+  const compact=compactIslandStageMap(width);
+  const boxWidth=compact?56:66;
+  return {
+    compact,
+    left:compact
+      ? Math.max(8,Math.min(width-boxWidth-8,point.x-boxWidth/2))
+      : Math.min(width-boxWidth-2,Math.max(2,point.x-boxWidth/2)),
+    top:compact?point.y+marker/2+60:point.y+37,
+    width:boxWidth,
+    height:compact?44:44,
+  };
+}
+
 export type IslandStagePoint = MapPoint & {
   order: number;
   row: number;
@@ -51,7 +73,11 @@ export function islandStageLayout(width: number, stageCount = 65): {
 } {
   if (!Number.isInteger(stageCount) || stageCount < 1) throw new RangeError('Invalid stage count');
   const safeWidth = Math.max(244, width || 360);
-  const rowHeight = 119;
+  // Five stage pins remain across each row, but compact screens need a
+  // separate lane for the row title and the checkpoint after stage 05/10/etc.
+  const compact = compactIslandStageMap(safeWidth);
+  const rowHeight = compact ? 166 : 119;
+  const areaGap = compact ? 58 : 0;
   const positions: IslandStagePoint[] = Array.from({ length: stageCount }, (_, order) => {
     const row = Math.floor(order / 5);
     const column = row % 2 === 0 ? order % 5 : 4 - order % 5;
@@ -60,12 +86,12 @@ export function islandStageLayout(width: number, stageCount = 65): {
       row,
       column,
       x: Math.round(safeWidth * (column + 0.5) / 5),
-      y: 134 + row * rowHeight,
+      y: 134 + row * rowHeight + (row >= 10 ? areaGap : 0) + (row >= 12 ? areaGap : 0),
     };
   });
   return {
     rowHeight,
-    height: Math.ceil(positions.at(-1)!.y + 90),
+    height: Math.ceil(positions.at(-1)!.y + (compact ? 135 : 90)),
     positions,
   };
 }

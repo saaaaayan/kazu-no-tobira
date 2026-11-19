@@ -49,3 +49,19 @@ test('Each island map has exactly three section banners, one per 50/10/5 stage a
   assert.match(art,/\[50,60\]\.map/);
   assert.match(ui,/checkpointsFor\(grade\)\.map/);
 });
+
+test('Phone maps condense five stage labels to a single row title without hiding stage controls',()=>{
+  const ui=read('src/components/WorldScenes780.tsx');
+  const domain=read('src/domain/islandCurriculumView.ts');
+  assert.match(ui,/compactStageMap && Array.from\(\{length:Math.ceil\(grade.stages.length\/5\)\}/);
+  assert.match(ui,/!compactStageMap && grade.stages.map/);
+  assert.match(ui,/stageRowCategoryName\(grade,row\)/);
+  assert.match(domain,/export function stageRowCategoryName/);
+  assert.match(ui,/testID=\{'island-row-topic-'\+row\}/);
+  assert.match(ui,/numberOfLines=\{2\} style=\{styles.compactRowTopicText\}/);
+  assert.match(ui,/islandCheckpointLayout\(actual,end,marker\)/);
+  assert.match(ui,/checkpointLayout.compact\?'テスト':'確認テスト'/);
+  assert.match(ui,/onPress=\{\(\)=>onCheckpoint\(checkpoint\)\}/);
+  assert.match(ui,/onPress=\{\(\)=>onStart\(stage\)\}/);
+  assert.match(ui,/testID=\{'island-area-'\+area.kind\}/);
+});
