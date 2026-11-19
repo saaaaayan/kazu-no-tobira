@@ -92,5 +92,5 @@ test('The in-map preschool title is visible above plush mascots and the first ar
   assert.match(ui,/<Text style=\{styles\.preschoolMapTopGrade\}>就学前<\/Text>/);
   assert.match(ui,/<Text style=\{styles\.preschoolMapTopName\}>ぬいぐるみの島<\/Text>/);
   assert.match(ui,/preschoolMapTopTitle:\{position:'absolute',top:18,left:40,right:40,height:58/);
-  assert.match(terrain,/row===0\?56\+PRESCHOOL_MAP_TITLE_INSET/);
+  assert.match(terrain,/row===0 \? 56\+PRESCHOOL_MAP_TITLE_INSET/);
 });
