@@ -5,6 +5,7 @@ import { normalizePoint, toPixels, type Drawing, type Point, type Size } from '.
 import digitRecognizer from '../recognition/digitRecognizer';
 import { createRecognitionQueue } from '../recognition/recognitionQueue';
 import { preschoolTraceInkQuality, preschoolTraceMatches } from '../domain/preschoolTraceRecognition';
+import { preschoolDigitGuidePaths, preschoolTraceGuideMatch, type PreschoolGuideMatch } from '../domain/preschoolTraceGuide';
 import InkSurface from './InkSurface';
 
 type TraceStatus = 'idle' | 'drawing' | 'checking' | 'matched' | 'small' | 'scribble' | 'different' | 'unavailable';
@@ -60,10 +61,17 @@ function RecognizedDigitCell({target,disabled,onMatched}:{
   const [status,setStatus]=useState<TraceStatus>('idle');
   const cb=useRef({target,onMatched});
   cb.current={target,onMatched};
+  const lastGuideMatch=useRef<PreschoolGuideMatch|undefined>(undefined);
   const [queue]=useState(()=>createRecognitionQueue(digitRecognizer.recognize,result=>{
-    const isMatch=preschoolTraceMatches(cb.current.target,result,'plausible');
-    cb.current.onMatched(isMatch);
-    setStatus(isMatch?'matched':'different');
+    // ML can help with slightly off-guide writing; it cannot accept unrelated
+    // marks. For a faithful trace of the VISIBLE guide, the geometry itself
+    // is stronger evidence than a low-confidence generic digit classifier.
+    const guide=lastGuideMatch.current;
+    const modelMatch=preschoolTraceMatches(cb.current.target,result,'plausible') &&
+      !!guide && guide.inkNear>=.55 && guide.guideCovered>=.56 &&
+      guide.lengthRatio>=.5 && guide.lengthRatio<=1.85;
+    cb.current.onMatched(modelMatch);
+    setStatus(modelMatch?'matched':'different');
   },550));
 
   useEffect(()=>()=>queue.cancel(),[queue]);
@@ -71,6 +79,7 @@ function RecognizedDigitCell({target,disabled,onMatched}:{
   function begin(p:Point){
     if(disabled||!size.width||!size.height)return;
     queue.cancel();
+    lastGuideMatch.current=undefined;
     cb.current.onMatched(false);
     active.current=[normalizePoint(p,size)];
     setPreview(active.current);
@@ -97,14 +106,22 @@ function RecognizedDigitCell({target,disabled,onMatched}:{
       setStatus(quality==='scribble'?'scribble':'small');
       return;
     }
+    const guideMatch=preschoolTraceGuideMatch(target,{drawing:next,size});
+    lastGuideMatch.current=guideMatch;
+    if(guideMatch.matched){
+      // Correct thin strokes need not be rejected by an uncertain ML label.
+      queue.cancel();
+      cb.current.onMatched(true);
+      setStatus('matched');
+      return;
+    }
     if(!digitRecognizer.available){setStatus('unavailable');return;}
     setStatus('checking');
-    // The same model recognises thin and thick drawn lines, because the ink
-    // rasterizer operates on the trajectory centreline, not displayed width.
     queue.schedule({drawing:next,size});
   }
   function reset(){
     queue.cancel();
+    lastGuideMatch.current=undefined;
     active.current=null;
     setPreview([]);
     setStrokes([]);
@@ -129,7 +146,16 @@ function RecognizedDigitCell({target,disabled,onMatched}:{
         return previous.width===width&&previous.height===height?previous:{width,height};
       })}>
       <View pointerEvents="none" style={styles.guide}>
-        <Text style={styles.guideText}>{target}</Text>
+        {size.width>0&&size.height>0&&(
+          <Svg width="100%" height="100%" viewBox={`0 0 ${size.width} ${size.height}`}>
+            {preschoolDigitGuidePaths(target,size).map((stroke,i)=>(
+              <Polyline key={'guide-'+i}
+                points={stroke.map(p=>`${p.x},${p.y}`).join(' ')}
+                fill="none" stroke="#cdd6cb" strokeWidth={9}
+                strokeLinecap="round" strokeLinejoin="round"/>
+            ))}
+          </Svg>
+        )}
       </View>
       <InkSurface label={'すうじの '+target+' を てがきする ところ'}
         start={begin} move={move} finish={finish}
@@ -155,7 +181,7 @@ function RecognizedDigitCell({target,disabled,onMatched}:{
 
 const styles=StyleSheet.create({
   container:{gap:12,width:'100%',minWidth:0},
-  instruction:{color:'#31445d',fontSize:18,fontWeight:'900'},
+  instruction:{color:'#fff0b5',fontSize:18,fontWeight:'900'},
   cells:{width:'100%',flexDirection:'row',flexWrap:'wrap',gap:10},
   cell:{width:'100%',minWidth:0,gap:4},
   halfCell:{width:'48%',flexGrow:1},
@@ -164,14 +190,13 @@ const styles=StyleSheet.create({
   paper:{width:'100%',height:188,backgroundColor:'#fffaf0',
     borderWidth:2,borderColor:'#8d9d95',borderRadius:8,overflow:'hidden'},
   guide:{...StyleSheet.absoluteFill,alignItems:'center',justifyContent:'center'},
-  guideText:{fontSize:128,lineHeight:160,fontWeight:'900',color:'#d5dacf',textAlign:'center'},
-  status:{color:'#355969',fontSize:14,lineHeight:21,fontWeight:'800',minHeight:23},
-  success:{color:'#197052'},
+  status:{color:'#f5f0db',fontSize:15,lineHeight:23,fontWeight:'800',minHeight:23},
+  success:{color:'#beffd7'},
   reset:{minHeight:44,alignSelf:'flex-start',justifyContent:'center',
     paddingHorizontal:15,backgroundColor:'#e6e8e4',borderWidth:1,
     borderColor:'#596984',borderRadius:6},
   resetText:{color:'#344454',fontSize:14,fontWeight:'800'},
   dim:{opacity:.6},
-  note:{fontSize:12,color:'#576e6f',lineHeight:18},
-  allDone:{fontSize:16,lineHeight:24,fontWeight:'900',color:'#197052'},
+  note:{fontSize:12,color:'#e3e9f0',lineHeight:18},
+  allDone:{fontSize:16,lineHeight:24,fontWeight:'900',color:'#beffd7'},
 });
