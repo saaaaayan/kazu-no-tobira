@@ -14,7 +14,7 @@ test('every five-stage preschool group has a dedicated wide vertical clearing',(
    const compact=compactIslandStageMap(width);
    const normal=islandStageLayout(width,65,PRESCHOOL_MAP_TITLE_INSET,false);
    const detailed=islandStageLayout(width,65,PRESCHOOL_MAP_TITLE_INSET,true);
-   const gap=compact?102:90;
+   const gap=compact?102:110;
    const rowHeight=compact?190:160;
    assert.equal(detailed.rowHeight,rowHeight);
    assert.equal(detailed.positions.length,65);
