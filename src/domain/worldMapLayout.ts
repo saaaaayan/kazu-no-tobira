@@ -46,17 +46,22 @@ export function compactIslandStageMap(width:number): boolean {
  * Checkpoints have their own lane on narrow devices, beneath the centered
  * row's learning topic. Preserve the original desktop placement.
  */
-export function islandCheckpointLayout(width:number,point:MapPoint,marker:number) {
+export function islandCheckpointLayout(width:number,point:MapPoint,marker:number,nextPoint?:MapPoint) {
   const compact=compactIslandStageMap(width);
   const boxWidth=compact?56:66;
+  const boxHeight=44; // Preserve a 44px touch target on narrow screens.
   return {
     compact,
     left:compact
       ? Math.max(8,Math.min(width-boxWidth-8,point.x-boxWidth/2))
       : Math.min(width-boxWidth-2,Math.max(2,point.x-boxWidth/2)),
-    top:compact?point.y+marker/2+60:point.y+37,
+    // In portrait, center the checkpoint vertically in the connecting path
+    // between the two stage rows rather than attaching it to the lower row.
+    top:compact&&nextPoint
+      ? Math.round((point.y+nextPoint.y-boxHeight)/2)
+      : compact?point.y+marker/2+60:point.y+37,
     width:boxWidth,
-    height:compact?44:44,
+    height:boxHeight,
   };
 }
 

@@ -132,7 +132,12 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
   const paths=islandRouteByKind(grade.stages,positions.map((spot,order)=>({
     ...spot,order,row:Math.floor(order/5),column:order%5,
   })));
-  const scale=Math.max(.49,Math.min(1.16,width/920));
+  const compact=width<620;
+  // Larger, unmistakably plush-shaped sprites on phones; the original
+  // desktop scale remains unchanged.
+  const scale=compact
+    ? Math.max(.72,Math.min(.94,width/410))
+    : Math.max(.49,Math.min(1.16,width/920));
   return <Svg testID="preschool-plush-pixel-v2" width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}
     preserveAspectRatio="none" accessible={false}>
     <Rect width={width} height={height} fill="#80adc4"/>
@@ -158,10 +163,17 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
         <Rect x={width*.43} y={y+12} width={3} height={7} fill="#62885d"/>
         <Rect x={width*.74} y={y+12} width={3} height={7} fill="#62885d"/>
         {row%3===0&&<ToyBlocks x={width*.965} y={y-34} scale={scale*.8}/>}
-        {/* On phones keep plush toys away from the checkpoint buttons at
-            the outer edges of the route. */}
-        <Plush animal={animals[0]} x={width*(width<620?.29:.2)} y={y-38} scale={scale}/>
-        <Plush animal={animals[1]} x={width*(width<620?.71:.8)} y={y-38} scale={scale}/>
+        {/* On phones, sprites sit between stage columns, above the stage row.
+            The first row is placed ABOVE its area banner, and rows 10/12
+            above theirs, so every section's plush toys remain visible. */}
+        <Plush animal={animals[0]}
+          x={width*(compact?.28:.2)}
+          y={compact?(row===0?56:row===10||row===12?y-105:y-53):y-38}
+          scale={scale}/>
+        <Plush animal={animals[1]}
+          x={width*(compact?.72:.8)}
+          y={compact?(row===0?56:row===10||row===12?y-105:y-53):y-38}
+          scale={scale}/>
       </G>;
     })}
     {/* Quiet separators mark the trial and legendary zones without

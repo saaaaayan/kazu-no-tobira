@@ -59,9 +59,21 @@ test('Phone maps condense five stage labels to a single row title without hiding
   assert.match(domain,/export function stageRowCategoryName/);
   assert.match(ui,/testID=\{'island-row-topic-'\+row\}/);
   assert.match(ui,/numberOfLines=\{2\} style=\{styles.compactRowTopicText\}/);
-  assert.match(ui,/islandCheckpointLayout\(actual,end,marker\)/);
+  assert.match(ui,/islandCheckpointLayout\(actual,end,marker,nextPoint\)/);
   assert.match(ui,/checkpointLayout.compact\?'テスト':'確認テスト'/);
   assert.match(ui,/onPress=\{\(\)=>onCheckpoint\(checkpoint\)\}/);
   assert.match(ui,/onPress=\{\(\)=>onStart\(stage\)\}/);
   assert.match(ui,/testID=\{'island-area-'\+area.kind\}/);
+});
+
+test('Mobile preschool plush toys are visibly enlarged and avoid the three area banners',()=>{
+  const art=read('src/components/PreschoolPixelTerrain.tsx');
+  const ui=read('src/components/WorldScenes780.tsx');
+  assert.match(art,/const compact=width<620/);
+  assert.match(art,/Math\.max\(\.72,Math\.min\(\.94,width\/410\)\)/);
+  assert.match(art,/row===0\?56:row===10\|\|row===12\?y-105:y-53/);
+  assert.match(art,/x=\{width\*\(compact\?\.28:\.2\)\}/);
+  assert.match(art,/x=\{width\*\(compact\?\.72:\.8\)\}/);
+  assert.match(ui,/left:Math\.max\(68,Math\.ceil\(actual\*\.16\)\)/);
+  assert.match(ui,/const nextPoint=geometry\.positions\[checkpoint\.after\.order\+1\]/);
 });

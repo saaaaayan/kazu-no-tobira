@@ -393,7 +393,10 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           return <View key={'row-topic-'+row} testID={'island-row-topic-'+row}
             pointerEvents="none" style={[styles.compactRowTopic,{
               top:position.y+marker/2+13,
-              left:68,right:68,
+              // Keep the title lane clear of the edge-aligned checkpoints
+              // even on larger phones and narrow tablets.
+              left:Math.max(68,Math.ceil(actual*.16)),
+              right:Math.max(68,Math.ceil(actual*.16)),
             }]}>
             <Text numberOfLines={2} style={styles.compactRowTopicText}>
               {stageRowCategoryName(grade,row)}
@@ -415,7 +418,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           // 試作版は幼児の確認テスト1のみ選択可。ほかは従来どおり。
           const enabled=preview ? grade.id==='preschool' && checkpoint.number===1
             : testing || checkpoint.sourceStageIds.every(id=>Boolean(progress.stages[id]?.clearedAt));
-          const checkpointLayout=islandCheckpointLayout(actual,end,marker);
+          const nextPoint=geometry.positions[checkpoint.after.order+1];
+          const checkpointLayout=islandCheckpointLayout(actual,end,marker,nextPoint);
           return <Pressable key={checkpoint.id} accessibilityRole="button"
             testID={'island-checkpoint-'+checkpoint.number}
             accessibilityLabel={'確認テスト '+checkpoint.number+(enabled?' を はじめる':' は準備中')} disabled={!enabled} onPress={()=>onCheckpoint(checkpoint)}
