@@ -8,6 +8,7 @@ import { stageDisplayTitle,stageLabels, type Checkpoint } from './domain/stageSt
 import { stageCategoryName } from './domain/islandCurriculumView';
 import { preschoolStageMapInfo } from './domain/preschoolStageMapInfo';
 import PreschoolTracePad from './components/PreschoolTracePad';
+import PreschoolPictureNumberMatch from './components/PreschoolPictureNumberMatch';
 import { liveOrigin, requestLiveRound, requestLiveGrade, requestLiveHint, type LiveMode, type LiveRound } from './domain/liveQuestions';
 import type { SkillId } from './domain/curriculum';
 import { hasStageBank,isBankQuestion } from './domain/questionBank';
@@ -340,6 +341,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const preschoolStage=Boolean(round?.stage.gradeId==='preschool' && (preschoolGuideTitles[round.stage.id] || uiPreview));
   const countingGuide=Boolean(preschoolStage && diagram?.kind==='countingBoard' && diagram.guide);
   const numeralGuide=Boolean(preschoolStage && bankQuestion?.preschoolNumberActivity);
+  const pictureMatching=Boolean(preschoolStage && bankQuestion?.preschoolNumberMatch);
   const traceActivity=Boolean(uiPreview && bankQuestion?.preschoolTrace && !round?.feedback);
   const autoTraceEnabled=Boolean(uiPreview && !review && bankQuestion?.preschoolTrace);
   const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
@@ -661,7 +663,28 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                         {!!message && <Text accessibilityLiveRegion="polite" style={styles.preschoolError}>{message}</Text>}
                       </View>
                     )}
-                    {numeralGuide && !round.feedback && (
+                    {pictureMatching && bankQuestion?.preschoolNumberMatch && !round.feedback && (
+                      <View testID="preschool-connect-picture-number-panel"
+                        style={styles.preschoolNumeralAnswerSection}>
+                        <PreschoolPictureNumberMatch key={question.id} match={bankQuestion.preschoolNumberMatch}
+                          disabled={saving} onChange={value=>{setAnswer(value);setMessage('');}}
+                          onSubmit={value=>void submit(value)}/>
+                        {hints.slice(0,round.hintLevel).map((hint,i)=>(
+                          <View key={i} style={styles.preschoolHintBox}>
+                            <MathText style={styles.preschoolHintText} value={hint}/>
+                          </View>
+                        ))}
+                        {round.hintLevel<hints.length && (
+                          <Pressable accessibilityRole="button" disabled={saving}
+                            onPress={showHint} style={styles.preschoolHintButton}>
+                            <Text style={styles.preschoolHintButtonText}>💡 ヒントを みる</Text>
+                          </Pressable>
+                        )}
+                        {!!message && <Text accessibilityLiveRegion="polite"
+                          style={styles.preschoolError}>{message}</Text>}
+                      </View>
+                    )}
+                    {numeralGuide && !pictureMatching && !round.feedback && (
                       <View testID="preschool-numeral-choice-panel" style={styles.preschoolNumeralAnswerSection}>
                         <Text style={styles.preschoolInstruction}>こたえを ひとつ さわってね</Text>
                         <View style={styles.preschoolNumeralChoices}>
@@ -709,8 +732,16 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                                 {round.feedback==='correct'&&<CorrectSpark/>}
                               </View>
                             </View>
-                            <MathText style={styles.yourAnswer} prefix="きみの こたえ：" value={answer} format={question.type === 'choice'}/>
-                            <MathText style={styles.answerHint} prefix="ただしい こたえ：" value={question.answer}/>
+                            {pictureMatching ? (
+                              <Text style={styles.yourAnswer}>きみが つないだ すうじ：{answer.split('-').join('・')}</Text>
+                            ) : (
+                              <MathText style={styles.yourAnswer} prefix="きみの こたえ：" value={answer} format={question.type === 'choice'}/>
+                            )}
+                            {pictureMatching ? (
+                              <Text style={styles.answerHint}>ただしい つなぎかた：{question.answer.split('-').join('・')}</Text>
+                            ) : (
+                              <MathText style={styles.answerHint} prefix="ただしい こたえ：" value={question.answer}/>
+                            )}
                             {question.clock && <View style={{flexDirection:'row', flexWrap:'wrap', gap:8}}>
                               <ClockFace time={question.clock.start} caption={question.clock.read ? 'よみとった じこく' : 'はじめ'}/>
                               {!question.clock.read && <ClockFace time={question.clock.end} caption="はりを うごかした あと"/>}
