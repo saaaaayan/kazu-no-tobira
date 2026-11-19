@@ -46,7 +46,7 @@ export default function PreschoolTracePad({ digit, disabled, onChange }: {
     </View>
     <Text style={styles.note}>かたちを たしかめるよ。ぬりつぶすだけでは せいかいに ならないよ。</Text>
     {matches.every(Boolean)&&<Text accessibilityLiveRegion="polite" style={styles.allDone}>
-      じょうずに かけたね！「こたえあわせ」を おしてね。
+      じょうずに かけたね！つぎの もんだいに すすむよ。
     </Text>}
   </View>;
 }
