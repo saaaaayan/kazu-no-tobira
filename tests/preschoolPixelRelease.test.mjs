@@ -11,6 +11,7 @@ test('The preschool island uses live pixel plush SVG behind all interactive stag
   const app=read('src/FullAdventure.tsx');
   assert.match(catalog,/id: 'preschool', title: '就学前'/);
   assert.match(source,/import \{ PreschoolPixelTerrain \}/);
+  assert.match(source,/testID=\{grade\.id==='preschool'\?'preschool-plush-pixel-v2':undefined\}/);
   assert.match(source,/grade\.id === 'preschool'/);
   assert.match(source,/<PreschoolPixelTerrain width=\{width\} height=\{height\}/);
   assert.match(art,/preschool-plush-pixel-v2/);
