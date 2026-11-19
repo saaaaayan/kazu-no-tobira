@@ -733,7 +733,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                     {inlineChoice && !round.feedback && (
                       <View testID="kazu-inline-choice-panel" style={styles.preschoolAnswerSection}>
                         <Text style={styles.preschoolInstruction}>
-                          {question.choices?.every(option=>/^\\d+$/u.test(option)) ? 'すうじを さわってね' : 'こたえを さわってね'}
+                          {question.choices?.every(option=>/^\d+$/u.test(option)) ? 'すうじを さわってね' : 'こたえを さわってね'}
                         </Text>
                         <View style={[styles.preschoolNumberRow,styles.inlineChoiceRow]}>
                           {question.choices?.map(option=>(
