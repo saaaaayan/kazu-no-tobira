@@ -39,7 +39,7 @@ export const countingTokenArt = {
   gift: ['🎁','おくりもの'],
   moon: ['🌙','つき'],
   marked: ['✓','しるしのついた まる'],
-  empty: ['◯','からの おさら'],
+  empty: ['🍽️','なにも のっていない おさら'],
 } as const;
 
 export type CountingToken = keyof typeof countingTokenArt;

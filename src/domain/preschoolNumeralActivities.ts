@@ -88,18 +88,19 @@ function picturesToNumeral(n:number,lo:number,hi:number,token:CountingToken):Pre
     explanation:label(token)+' は '+n+' こ。 この かずを すうじで かくと '+n+' だよ。',
   };
 }
-function emptyDish(n:number,token:CountingToken):PreschoolNumeralTask{
+function emptyDish(token:CountingToken):PreschoolNumeralTask{
+  // The plate is a visual setting, not an object to count. All these tasks
+  // have zero items; never show an 'empty dish' prompt next to visible fruit.
   return {
-    question:label(token)+' は いくつ ある？ すうじで あらわそう。',
-    prompt:'からっぽの おさらも みてね',
-    answer:String(n),choices:pick3(String(n),['0','1','2']),
+    question:'おさらに '+label(token)+' は なんこ ある？',
+    prompt:'おさらの なかを みて、すうじを えらぼう。',
+    answer:'0',choices:pick3('0',['1','2']),
     numeralPractice:true,
-    diagram:{kind:'countingBoard',rows:[{tokens:n===0?['empty']:Array.from({length:n},()=>token)}]},
-    hints:['えが あるか どうか みてね。',
-      'なにも ない おさらは なんこ かな？',
-      n===0?'なにも ない ときは「0」だよ。':'ひとつずつ かぞえると '+n+' こだよ。'],
-    explanation:n===0?'なにも ない おさらだね。 だから すうじは 0 だよ。':
-      label(token)+' が '+n+' こ あるね。 すうじは '+n+' だよ。',
+    diagram:{kind:'countingBoard',rows:[{tokens:['empty']}]},
+    hints:['おさらの なかを よく みてね。',
+      label(token)+' が ひとつでも のっているかな？',
+      'なにも のっていない ときは 0 こ。すうじは「0」だよ。'],
+    explanation:'おさらは からっぽだね。'+label(token)+' は 1こも ないから、0こ だよ。',
   };
 }
 
@@ -131,7 +132,7 @@ export function preschoolNumeralTask(stageNumber:6|7|8|9|10,index:number):Presch
     if(index<2)return readDigit(0,0,2,index);
     if(index<4)return findDigit(0,0,2,index);
     if(index<6)return numeralToPictures(0,0,2,toys[index]);
-    return emptyDish(index%2, toys[index]);
+    return emptyDish(toys[index]);
   }
   const n=index<5?index+1:index-4;
   return index<5
