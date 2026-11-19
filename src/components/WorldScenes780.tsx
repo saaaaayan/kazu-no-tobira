@@ -360,14 +360,27 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           <IslandTerrain gradeIndex={gradeIndex} width={actual} height={geometry.height}
             positions={geometry.positions} grade={grade} next={next?.order ?? -1}/>
         </View>
-        {Array.from({length:13},(_,row)=>{
-          const y=geometry.positions[row*5]?.y??0;
-          const rowUnits = [...new Set(grade.stages.slice(row * 5, row * 5 + 5).map(stage => stage.unitIndex))];
-          const label=row<10 ? grade.units[rowUnits[0]].title + (rowUnits.length > 1 ? ' など' : '') : row<12 ? stageLabels.extra : stageLabels.secret;
+        {/* Only one banner per adventure area. Normal = stages 01–50,
+            trial = 51–60, legend = 61–65; all stage nodes remain clickable. */}
+        {([
+          {row:0,title:stageLabels.normal,count:50,kind:'normal'},
+          {row:10,title:stageLabels.extra,count:10,kind:'extra'},
+          {row:12,title:stageLabels.secret,count:5,kind:'secret'},
+        ] as const).map(area=>{
+          const y=geometry.positions[area.row*5]?.y??0;
+          const inset=Math.min(78,Math.max(20,Math.round(actual*.06)));
           return (
-            <View key={row} pointerEvents="none"
-              style={[styles.zoneLabel,grade.id==='preschool'&&styles.pixelZoneLabel,{top:y-76,left:78,right:78,alignItems:'center'}]}>
-              <Text style={[styles.zoneName,grade.id==='preschool'&&styles.pixelZoneName]}>{row<10?stageLabels.normal+' '+String(row+1).padStart(2,'0')+' ':''}{label}</Text>
+            <View key={area.kind} testID={'island-area-'+area.kind} pointerEvents="none"
+              style={[
+                styles.zoneLabel,
+                grade.id==='preschool'&&styles.pixelZoneLabel,
+                area.kind==='extra'&&styles.extraAreaLabel,
+                area.kind==='secret'&&styles.secretAreaLabel,
+                {top:y-60,left:inset,right:inset,alignItems:'center'},
+              ]}>
+              <Text style={[
+                styles.zoneName,grade.id==='preschool'&&styles.pixelZoneName,
+              ]}>{area.title}　{area.count}ステージ</Text>
             </View>
           );
         })}
@@ -501,6 +514,8 @@ const styles=StyleSheet.create({
   zoneLabel:{position:'absolute',paddingVertical:5,paddingHorizontal:9,backgroundColor:'#fff8dd',borderRadius:9,borderWidth:1,borderColor:'#ecdfb3',maxWidth:'90%'},
   zoneName:{color:'#545078',fontWeight:'900',fontSize:13},
   pixelZoneLabel:{borderRadius:2,backgroundColor:'#f5edce',borderWidth:2,borderColor:'#d9caa6'},
+  extraAreaLabel:{backgroundColor:'#e0eae5',borderColor:'#90b4a8'},
+  secretAreaLabel:{backgroundColor:'#eee2e9',borderColor:'#b39aaa'},
   pixelZoneName:{color:'#344454'},
   pinCategoryBox:{position:'absolute',borderRadius:5,paddingHorizontal:2,paddingVertical:1,
     backgroundColor:'rgba(255,250,228,0.92)',alignItems:'center',justifyContent:'center'},
