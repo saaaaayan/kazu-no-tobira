@@ -7,7 +7,7 @@ const code=readFileSync(new URL('../src/FullAdventure.tsx',import.meta.url),'utf
 test('preschool counting numbers are large, accessible, and directly under the picture',()=>{
   const diagram=code.indexOf('<QuestionDiagram diagram={diagram} phase={round.hintLevel');
   const inline=code.indexOf('{countingGuide && !round.feedback && (\n                      <View style={styles.preschoolAnswerSection}>');
-  const sidePanel=code.indexOf('{(!countingGuide || round.feedback) && <View');
+  const sidePanel=code.indexOf('{((!countingGuide && !numeralGuide) || round.feedback) && <View');
   assert.ok(diagram>0 && inline>diagram && sidePanel>inline,'place answer buttons under counting diagram, before side panel');
   assert.match(code,/testID=\{'preschool-answer-'\+option\}/u);
   assert.match(code,/accessibilityLabel=\{option\+'こ と こたえる'\}/u);
@@ -29,8 +29,8 @@ test('preschool answer buttons grade their own value in one tap without stale st
 });
 
 test('other grades still have ordinary two-step answering, and preschool hints are visible',()=>{
-  assert.match(code,/wide&&!countingGuide&&styles\.workWide/u);
-  assert.match(code,/!countingGuide && <CalculationMemo/u);
+  assert.match(code,/wide&&!countingGuide&&!numeralGuide&&styles\.workWide/u);
+  assert.match(code,/!countingGuide && !numeralGuide && <CalculationMemo/u);
   assert.match(code,/onPress=\{\(\)=>void submit\(\)\}/u);
   assert.match(code,/hints\.slice\(0,round\.hintLevel\)\.map/u);
   assert.match(code,/onPress=\{showHint\} style=\{styles\.preschoolHintButton\}/u);

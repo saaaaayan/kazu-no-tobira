@@ -1,0 +1,140 @@
+import type { BankDiagram } from './questionBank.ts';
+import { countingTokenArt, type CountingToken } from './countingTokens.ts';
+
+/** Numeral-learning tasks, separate from the counting-only preschool 01–05.
+ * Child sees a numeral, hears/reads its name, or matches numeral and quantity.
+ * No production approval is implied: public UI prototype only.
+ */
+export type PreschoolNumeralTask = {
+  question:string;prompt:string;answer:string;choices:string[];
+  explanation:string;hints:[string,string,string];
+  numeralPractice:true;
+  focalNumeral?:string;
+  diagram?:BankDiagram;
+};
+
+const sounds=['ぜろ','いち','に','さん','よん','ご','ろく','なな','はち','きゅう','じゅう'];
+const toys:CountingToken[]=['bear','rabbit','cat','dog','chick','flower','apple','car','fish','turtle'];
+const symbol=(t:CountingToken)=>countingTokenArt[t][0];
+const label=(t:CountingToken)=>countingTokenArt[t][1];
+function pick3(answer:string,alternatives:string[]):string[]{
+  const options=[answer,...alternatives.filter(x=>x!==answer)];
+  const three=[...new Set(options)].slice(0,3);
+  if(three.length!==3)throw Error('Too few numeral options for '+answer);
+  return three;
+}
+function values(n:number,lo:number,hi:number):number[]{
+  const values=[n,n>lo?n-1:n+1,n<hi?n+1:n-2].filter(x=>x>=lo&&x<=hi);
+  const options=[...new Set(values)];
+  for(let k=lo;options.length<3&&k<=hi;k++)if(!options.includes(k))options.push(k);
+  if(options.length!==3)throw Error('Insufficient number choices');
+  return options;
+}
+function readDigit(n:number,lo:number,hi:number,variant=0):PreschoolNumeralTask {
+  const names=values(n,lo,hi).map(k=>sounds[k]);
+  return {
+    question:['この すうじは なんて よむ？','この すうじの なまえは？','すうじを よんで みよう'][variant%3],
+    prompt:'よみかたを えらぼう',
+    answer:sounds[n],choices:pick3(sounds[n],names),
+    focalNumeral:String(n),numeralPractice:true,
+    hints:['おおきな すうじの かたちを みてね。',
+      'すうじの せんを ゆびで なぞって みよう。',
+      n===0?'なにも ない ときの すうじだよ。':
+        'この すうじは '+n+' この ものと おなじ かずを あらわすよ。'],
+    explanation:'この すうじは「'+n+'」。 「'+sounds[n]+'」と よむよ。',
+  };
+}
+function findDigit(n:number,lo:number,hi:number,variant=0):PreschoolNumeralTask {
+  return {
+    question:['「'+sounds[n]+'」と よむ すうじは どれ？',
+      '「'+sounds[n]+'」の すうじを みつけよう。',
+      '「'+sounds[n]+'」は どの すうじ？'][variant%3],
+    prompt:'すうじを えらぼう',
+    answer:String(n),choices:pick3(String(n),values(n,lo,hi).map(String)),
+    numeralPractice:true,
+    hints:['すうじの かたちを ひとつずつ みてね。',
+      '「'+sounds[n]+'」と こえに だして みよう。',
+      n===0?'なにも ない かずは 0 だよ。':'「'+sounds[n]+'」は '+n+' の すうじだよ。'],
+    explanation:'「'+sounds[n]+'」と よむ すうじは '+n+' だよ。',
+  };
+}
+function picture(n:number,token:CountingToken):string{
+  return n===0?'からっぽ':symbol(token).repeat(n);
+}
+function numeralToPictures(n:number,lo:number,hi:number,token:CountingToken):PreschoolNumeralTask{
+  const opts=values(n,lo,hi);
+  return {
+    question:'この すうじと おなじ かずの '+label(token)+' は どれ？',
+    prompt:'すうじと えの かずを あわせよう',
+    answer:picture(n,token),choices:pick3(picture(n,token),opts.map(k=>picture(k,token))),
+    focalNumeral:String(n),numeralPractice:true,
+    hints:['すうじを よく みてね。',
+      'えを ひとつずつ さわって かぞえよう。',
+      'すうじの '+n+' と おなじ '+n+' こ の えを えらぼう。'],
+    explanation:'すうじの '+n+' は、'+n+' こ の '+label(token)+' と おなじ かずだよ。',
+  };
+}
+function picturesToNumeral(n:number,lo:number,hi:number,token:CountingToken):PreschoolNumeralTask{
+  const pictured=Array.from({length:n},()=>token);
+  return {
+    question:'この '+label(token)+' の かずと おなじ すうじは どれ？',
+    prompt:'えを かぞえたら、すうじを えらぼう',
+    answer:String(n),choices:pick3(String(n),values(n,lo,hi).map(String)),
+    numeralPractice:true,
+    diagram:{kind:'countingBoard',rows:[{tokens:n===0?['empty']:pictured}]},
+    hints:['えと すうじを みくらべよう。',
+      'えを ひとつずつ かぞえて、かずを たしかめよう。',
+      'えは '+n+' こ だから、すうじの '+n+' を えらぼう。'],
+    explanation:label(token)+' は '+n+' こ。 この かずを すうじで かくと '+n+' だよ。',
+  };
+}
+function emptyDish(n:number,token:CountingToken):PreschoolNumeralTask{
+  return {
+    question:label(token)+' は いくつ ある？ すうじで あらわそう。',
+    prompt:'からっぽの おさらも みてね',
+    answer:String(n),choices:pick3(String(n),['0','1','2']),
+    numeralPractice:true,
+    diagram:{kind:'countingBoard',rows:[{tokens:n===0?['empty']:Array.from({length:n},()=>token)}]},
+    hints:['えが あるか どうか みてね。',
+      'なにも ない おさらは なんこ かな？',
+      n===0?'なにも ない ときは「0」だよ。':'ひとつずつ かぞえると '+n+' こだよ。'],
+    explanation:n===0?'なにも ない おさらだね。 だから すうじは 0 だよ。':
+      label(token)+' が '+n+' こ あるね。 すうじは '+n+' だよ。',
+  };
+}
+
+/** Exactly 10 tasks per stage, covering recognition and matching—not ten counts. */
+export function preschoolNumeralTask(stageNumber:6|7|8|9|10,index:number):PreschoolNumeralTask{
+  if(!Number.isInteger(index)||index<0||index>=10)throw new RangeError('Invalid numeral activity index');
+  if(stageNumber===6){
+    if(index<3)return readDigit(index+1,1,3,index);
+    if(index<6)return findDigit(index-2,1,3,index);
+    if(index<9)return numeralToPictures(index-5,1,3,toys[index]);
+    return findDigit(2,1,3,2);
+  }
+  if(stageNumber===7){
+    const n=4+index%2;
+    if(index<2)return readDigit(n,3,5,index);
+    if(index<4)return findDigit(n,3,5,index);
+    if(index<6)return numeralToPictures(n,3,5,toys[index]);
+    if(index<8)return picturesToNumeral(n,3,5,toys[index]);
+    return findDigit(n,3,5,index===8?0:1);
+  }
+  if(stageNumber===8){
+    // Include all three abilities: read numerals, find a named numeral,
+    // and match its value to a picture. No mere counting-only questions.
+    if(index<4)return readDigit(6+index,5,10,index);
+    if(index<7)return findDigit([10,6,7][index-4],5,10,index);
+    return numeralToPictures(index+1,5,10,toys[index]);
+  }
+  if(stageNumber===9){
+    if(index<2)return readDigit(0,0,2,index);
+    if(index<4)return findDigit(0,0,2,index);
+    if(index<6)return numeralToPictures(0,0,2,toys[index]);
+    return emptyDish(index%2, toys[index]);
+  }
+  const n=index<5?index+1:index-4;
+  return index<5
+    ? numeralToPictures(n,1,10,toys[index])
+    : picturesToNumeral(n,1,10,toys[index]);
+}

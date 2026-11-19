@@ -337,6 +337,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const diagram=bankQuestion?.diagram ?? liveCard?.diagram;
   const preschoolStage=Boolean(round?.stage.gradeId==='preschool' && (preschoolGuideTitles[round.stage.id] || uiPreview));
   const countingGuide=Boolean(preschoolStage && diagram?.kind==='countingBoard' && diagram.guide);
+  const numeralGuide=Boolean(preschoolStage && bankQuestion?.preschoolNumberActivity);
   const traceActivity=Boolean(uiPreview && bankQuestion?.preschoolTrace && !round?.feedback);
   const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && (Boolean(liveCard) || Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0);
@@ -576,6 +577,11 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                     {!countingGuide && <Text style={styles.difficulty}>{round.stage.kind==='secret'?stageLabels.secret:round.stage.kind==='extra'?stageLabels.extra:bankQuestion ? ['● きほん', '● ひょうじゅん', '★ おうよう'][bankQuestion.difficulty - 1]
                       : round.index<3?'● きほん':round.index<8?'● ひょうじゅん':'★ おうよう'}</Text>}
                     <MathText style={styles.questionText} value={question.question}/>
+                    {numeralGuide && bankQuestion?.preschoolNumeral!==undefined && !round.feedback && (
+                      <View testID="preschool-numeral-target" style={styles.preschoolNumeralTarget}>
+                        <Text style={styles.preschoolNumeralTargetText}>{bankQuestion.preschoolNumeral}</Text>
+                      </View>
+                    )}
                     {preschoolStage && !round.feedback &&
                       <QuestionReadAloud text={[question.question,question.prompt,
                         round.hintLevel ? hints[round.hintLevel-1] : ''].filter(Boolean).join('。')}/>}
@@ -618,9 +624,41 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                         {!!message && <Text accessibilityLiveRegion="polite" style={styles.preschoolError}>{message}</Text>}
                       </View>
                     )}
+                    {numeralGuide && !round.feedback && (
+                      <View testID="preschool-numeral-choice-panel" style={styles.preschoolNumeralAnswerSection}>
+                        <Text style={styles.preschoolInstruction}>こたえを ひとつ さわってね</Text>
+                        <View style={styles.preschoolNumeralChoices}>
+                          {question.choices?.map(option=>(
+                            <Pressable key={option} testID={'preschool-numeral-choice-'+option}
+                              accessibilityRole="button" accessibilityLabel={option+' を えらぶ'}
+                              accessibilityHint="さわると こたえあわせを するよ"
+                              accessibilityState={{disabled:saving}}
+                              disabled={saving} onPress={()=>void submit(option)}
+                              style={({pressed})=>[styles.preschoolNumeralOption,(saving||pressed)&&styles.dim]}>
+                              <Text numberOfLines={2} adjustsFontSizeToFit
+                                style={[styles.preschoolNumeralOptionText,option.length>8&&styles.preschoolNumeralOptionTextLong]}>
+                                {option}
+                              </Text>
+                            </Pressable>
+                          ))}
+                        </View>
+                        {hints.slice(0,round.hintLevel).map((hint,i)=>(
+                          <View key={i} style={styles.preschoolHintBox}>
+                            <MathText style={styles.preschoolHintText} value={hint}/>
+                          </View>
+                        ))}
+                        {round.hintLevel<hints.length && (
+                          <Pressable accessibilityRole="button" disabled={saving}
+                            onPress={showHint} style={styles.preschoolHintButton}>
+                            <Text style={styles.preschoolHintButtonText}>💡 ヒントを みる</Text>
+                          </Pressable>
+                        )}
+                        {!!message && <Text accessibilityLiveRegion="polite" style={styles.preschoolError}>{message}</Text>}
+                      </View>
+                    )}
                   </View>
-                  {(!countingGuide || round.feedback) && <View style={[styles.workArea,wide&&!countingGuide&&styles.workWide]}>
-                    <View style={[styles.answerArea,wide&&!countingGuide&&styles.answerWide]}>
+                  {((!countingGuide && !numeralGuide) || round.feedback) && <View style={[styles.workArea,wide&&!countingGuide&&!numeralGuide&&styles.workWide]}>
+                    <View style={[styles.answerArea,wide&&!countingGuide&&!numeralGuide&&styles.answerWide]}>
                       {round.feedback ? (
                         <>
                           <View accessibilityLiveRegion="polite" style={[styles.feedbackBox,round.feedback==='incorrect'&&styles.wrongBox]}>
@@ -735,7 +773,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                         </>
                       )}
                     </View>
-                    {!countingGuide && <CalculationMemo key={question.id} onDrawingChange={setDrawing}/>}
+                    {!countingGuide && !numeralGuide && <CalculationMemo key={question.id} onDrawingChange={setDrawing}/>}
                   </View>}
                 </>
               )}
@@ -809,6 +847,18 @@ const styles = StyleSheet.create({
   preschoolAnswerSection: { gap: 10, alignItems:'center', paddingTop: 4 },
   preschoolInstruction: { color:'#fff4ce', fontSize:20, fontWeight:'900', textAlign:'center' },
   preschoolTraceNotice:{fontSize:15,fontWeight:'800',color:'#344454',lineHeight:22},
+  preschoolNumeralTarget:{minHeight:126,maxWidth:420,width:'100%',alignSelf:'center',
+    justifyContent:'center',alignItems:'center',borderRadius:9,borderWidth:3,
+    borderColor:'#8b997e',backgroundColor:'#fff8e2',paddingHorizontal:10},
+  preschoolNumeralTargetText:{fontSize:100,lineHeight:118,fontWeight:'900',color:'#344454',textAlign:'center'},
+  preschoolNumeralAnswerSection:{width:'100%',alignItems:'center',gap:11,paddingTop:6},
+  preschoolNumeralChoices:{width:'100%',maxWidth:520,gap:9},
+  preschoolNumeralOption:{minHeight:76,backgroundColor:'#fff4d1',
+    borderWidth:3,borderColor:'#d6b56c',borderRadius:12,
+    paddingHorizontal:10,paddingVertical:10,justifyContent:'center',alignItems:'center'},
+  preschoolNumeralOptionText:{color:'#293757',fontWeight:'900',fontSize:30,textAlign:'center'},
+  preschoolNumeralOptionTextLong:{fontSize:23},
+
   preschoolNumberRow: { flexDirection:'row', width:'100%', maxWidth:440, gap:10 },
   preschoolNumberButton: { flex:1, minWidth:0, minHeight:78, borderWidth:3,
     borderColor:'#e8bf66', borderRadius:18, backgroundColor:'#fff2c8',
