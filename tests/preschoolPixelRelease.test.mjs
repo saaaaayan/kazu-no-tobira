@@ -34,3 +34,17 @@ test('The public sample release manifest and verifier enforce the themed map',()
   assert.match(notice,/sessionStorage/);
   assert.match(notice,/location\.replace/);
 });
+
+test('Each island map has exactly three section banners, one per 50/10/5 stage area',()=>{
+  const ui=read('src/components/WorldScenes780.tsx');
+  const art=read('src/components/PreschoolPixelTerrain.tsx');
+  assert.match(ui,/\{row:0,title:stageLabels\.normal,count:50,kind:'normal'\}/);
+  assert.match(ui,/\{row:10,title:stageLabels\.extra,count:10,kind:'extra'\}/);
+  assert.match(ui,/\{row:12,title:stageLabels\.secret,count:5,kind:'secret'\}/);
+  assert.match(ui,/testID=\{'island-area-'\+area\.kind\}/);
+  assert.doesNotMatch(ui,/Array\.from\(\{length:13\},\(_,row\)=>\{\s*const y=geometry\.positions/);
+  assert.match(art,/row<10\s*\? \(row%2===0/);
+  assert.match(art,/row<12\s*\? \(row%2===0/);
+  assert.match(art,/\[50,60\]\.map/);
+  assert.match(ui,/checkpointsFor\(grade\)\.map/);
+});
