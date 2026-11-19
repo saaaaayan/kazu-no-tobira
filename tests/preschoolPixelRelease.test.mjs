@@ -71,16 +71,19 @@ test('All 65 preschool stages have their own title and tap-to-read learning goal
   assert.equal(titles.length,65);
   assert.equal(new Set(titles).size,65);
 });
-test('Preschool terrain scatters 3 toys per row on phones and 4 on desktop',()=>{
+test('Preschool terrain uses stable organic scatter instead of repeated per-row plush templates',()=>{
   const art=read('src/components/PreschoolPixelTerrain.tsx');
+  const plan=read('src/domain/preschoolDecorLayout.ts');
   const map=read('src/components/WorldScenes780.tsx');
-  assert.match(art,/const compact=width<620/);
-  assert.match(art,/const compactScatter/);
-  assert.match(art,/const desktopScatter/);
-  assert.match(art,/ANIMALS\[\(row\*5\+slot\*7\)%ANIMALS.length\]/);
-  assert.match(art,/scale=\{scale\*spot.size\}/);
-  assert.match(art,/baseY\+spot.offset/);
-  assert.match(art,/row===0 \? 32\+PRESCHOOL_MAP_TITLE_INSET/);
+  assert.match(art,/preschoolDecorationLayout\(width,height,positions\)/);
+  assert.match(art,/decorations.map\(\(item,i\)=>item.kind==='plush'/);
+  assert.match(art,/<ToyBlocks key=\{'toy-blocks-'\+i\}/);
+  assert.match(art,/<Flower key=\{'flower-'\+i\}/);
+  assert.doesNotMatch(art,/compactScatter|desktopScatter|checkpoint-clearing-plush-/);
+  assert.match(plan,/PRESCHOOL_PLUSH_ANIMALS=/);
+  assert.match(plan,/preschoolMapExclusionZones/);
+  assert.match(plan,/preschoolDecorationBounds/);
+  assert.match(plan,/shuffled\(PRESCHOOL_PLUSH_ANIMALS,rand\)/);
   assert.match(map,/grade.id==='preschool'\?PRESCHOOL_MAP_TITLE_INSET:0,grade.id==='preschool'/);
   assert.match(map,/const nextPoint=geometry.positions\[checkpoint.after.order\+1\]/);
 });
@@ -92,5 +95,6 @@ test('The in-map preschool title is visible above plush mascots and the first ar
   assert.match(ui,/<Text style=\{styles\.preschoolMapTopGrade\}>就学前<\/Text>/);
   assert.match(ui,/<Text style=\{styles\.preschoolMapTopName\}>ぬいぐるみの島<\/Text>/);
   assert.match(ui,/preschoolMapTopTitle:\{position:'absolute',top:18,left:40,right:40,height:58/);
-  assert.match(terrain,/row===0 \? 32\+PRESCHOOL_MAP_TITLE_INSET/);
+  assert.match(terrain,/preschoolDecorationLayout\(width,height,positions\)/);
+  assert.match(read('src/domain/preschoolDecorLayout.ts'),/PRESCHOOL_DECOR_TOP_INSET=PRESCHOOL_MAP_TITLE_INSET/);
 });

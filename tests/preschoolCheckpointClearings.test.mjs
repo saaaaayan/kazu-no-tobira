@@ -108,15 +108,16 @@ test('checkpoint signs show the review range and the ten actual numbered tests',
  assert.match(src,/grade.id==='preschool'&&styles\.preschoolCheckpointSign/);
 });
 
-test('new pixel plush friends fill the checkpoint clearings without obscuring signs',()=>{
+test('checkpoint clearings use collision-safe organic plush, flowers and blocks',()=>{
  const src=code('src/components/PreschoolPixelTerrain.tsx');
- assert.match(src,/Array\.from\(\{length:12\},\(_,gap\)=>\{/);
- assert.match(src,/const midY=\(positions\[row\*5-1\]\.y\+positions\[row\*5\]\.y\)\/2/);
- assert.match(src,/row%2===1/);
- assert.match(src,/x:\.23,offset:-18/);
- assert.match(src,/x:\.77,offset:18/);
- assert.match(src,/checkpoint-clearing-plush-/);
- assert.match(src,/ANIMALS\[\(row\*3\+slot\*5\)%ANIMALS\.length\]/);
- assert.match(src,/scale=\{scale\*spot\.size\}/);
- assert.match(src,/routeThrough\(paths\.normal\)/);
+ const planner=code('src/domain/preschoolDecorLayout.ts');
+ assert.match(src,/preschoolDecorationLayout\(width,height,positions\)/);
+ assert.match(src,/item.kind==='blocks'/);
+ assert.match(src,/item.kind==='plush'/);
+ assert.match(src,/item.scale/);
+ assert.doesNotMatch(src,/const spots=compact/);
+ assert.match(planner,/islandCheckpointLayout\(width,end,marker,next,true\)/);
+ assert.match(planner,/preschoolStageLabelLayout\(width,point,marker\)/);
+ assert.match(planner,/const initialBlocks=Math.ceil\(targetBlocks\*\.65\)/);
+ assert.match(planner,/for\(let n=0;n<targetFlowers;n\+\+\)/);
 });

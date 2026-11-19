@@ -1,18 +1,22 @@
+import { useMemo } from 'react';
 import Svg, { G, Path, Rect } from 'react-native-svg';
-import { PRESCHOOL_MAP_TITLE_INSET, islandRouteByKind, routeThrough } from '../domain/worldMapLayout';
+import { islandRouteByKind, routeThrough } from '../domain/worldMapLayout';
+import {preschoolDecorationLayout, type PreschoolPlushAnimal} from '../domain/preschoolDecorLayout';
 import type { WorldGrade } from '../domain/worldCatalog';
 
 // The preschool island is an actual interactive map. This artwork is drawn
 // behind the existing accessible stage/checkpoint Pressables, not over them.
 // Deliberately use flat colours, hard edges, and no gradients/sparkles.
-type Animal = 'bear' | 'bunny' | 'panda' | 'elephant' | 'dog' | 'cat'
-  | 'penguin' | 'lion' | 'lamb' | 'fox' | 'koala' | 'chick' | 'giraffe';
+type Animal=PreschoolPlushAnimal;
 const INK = '#344454';
 const FUR: Record<Animal,string> = {
   bear:'#c99867', bunny:'#f4d6d7', panda:'#f3eedc',
   elephant:'#9cb8c7', dog:'#d7b890', cat:'#b6bac0',
   penguin:'#5d7e9c', lion:'#d9ac68', lamb:'#e7dec9',
   fox:'#cc926a', koala:'#a6adb8', chick:'#e9d18a', giraffe:'#e0c17c',
+  monkey:'#b58c70', frog:'#8fbc90', mouse:'#c1b5b7',
+  duck:'#f0dcb4', raccoon:'#aab0ad', squirrel:'#c69c76',
+  hedgehog:'#c7a27f', pig:'#e8bbbd', turtle:'#91b39a', owl:'#b0a08c',
 };
 const BLUSH = '#dca3a3';
 const CREAM = '#f8edcd';
@@ -20,10 +24,25 @@ const CREAM = '#f8edcd';
 function Plush({animal,x,y,scale=1}:{animal:Animal;x:number;y:number;scale?:number}) {
   const fur=FUR[animal];
   const dark=animal==='panda'?'#47505a':fur;
-  const bearEars=['bear','panda','lion','koala'].includes(animal);
+  const bearEars=['bear','panda','lion','koala','monkey','owl'].includes(animal);
   const longEars=animal==='bunny';
-  const catEars=['cat','fox'].includes(animal);
+  const catEars=['cat','fox','raccoon'].includes(animal);
   return <G transform={`translate(${x} ${y}) scale(${scale})`}>
+    {/* Distinct muted pixel silhouettes; all toys have simple stitched faces. */}
+    {animal==='squirrel'&&<G>
+      <Rect x={17} y={-24} width={16} height={21} fill={fur} stroke={INK} strokeWidth={2.6}/>
+      <Rect x={23} y={-33} width={12} height={12} fill={fur} stroke={INK} strokeWidth={2.6}/>
+      <Rect x={19} y={-13} width={10} height={19} fill={fur}/>
+    </G>}
+    {animal==='hedgehog'&&<G>
+      {[-22,-12,0,12].map((x,i)=><Rect key={i} x={x} y={-37-(i%2)*6}
+        width={12} height={21} fill="#8f755f" stroke={INK} strokeWidth={2}/>)}
+    </G>}
+    {animal==='turtle'&&<G>
+      <Rect x={-23} y={-19} width={46} height={34} fill="#7c9c80" stroke={INK} strokeWidth={3}/>
+      <Rect x={-12} y={-15} width={24} height={13} fill="#aac0a0"/>
+      <Rect x={-12} y={0} width={24} height={11} fill="#aac0a0"/>
+    </G>}
     {/* Stuffed fabric feet and body, with deliberate blocky outlines */}
     <Rect x={-16} y={-4} width={32} height={21} fill={fur} stroke={INK} strokeWidth={2.8}/>
     <Rect x={-20} y={10} width={13} height={9} fill={fur} stroke={INK} strokeWidth={2.5}/>
@@ -33,6 +52,26 @@ function Plush({animal,x,y,scale=1}:{animal:Animal;x:number;y:number;scale?:numb
       <Rect x={7} y={-30} width={12} height={13} fill={dark} stroke={INK} strokeWidth={2.5}/>
       <Rect x={-16} y={-26} width={5} height={5} fill="#e5b9a2"/>
       <Rect x={11} y={-26} width={5} height={5} fill="#e5b9a2"/>
+    </G>}
+    {animal==='mouse'&&<G>
+      <Rect x={-29} y={-38} width={20} height={20} fill={fur} stroke={INK} strokeWidth={2.6}/>
+      <Rect x={9} y={-38} width={20} height={20} fill={fur} stroke={INK} strokeWidth={2.6}/>
+      <Rect x={-25} y={-34} width={12} height={12} fill={BLUSH}/>
+      <Rect x={13} y={-34} width={12} height={12} fill={BLUSH}/>
+    </G>}
+    {animal==='frog'&&<G>
+      <Rect x={-18} y={-39} width={15} height={15} fill={fur} stroke={INK} strokeWidth={2.6}/>
+      <Rect x={3} y={-39} width={15} height={15} fill={fur} stroke={INK} strokeWidth={2.6}/>
+      <Rect x={-13} y={-33} width={4} height={5} fill={INK}/>
+      <Rect x={9} y={-33} width={4} height={5} fill={INK}/>
+    </G>}
+    {animal==='owl'&&<G>
+      <Rect x={-21} y={-38} width={11} height={18} fill={fur} stroke={INK} strokeWidth={2.5}/>
+      <Rect x={10} y={-38} width={11} height={18} fill={fur} stroke={INK} strokeWidth={2.5}/>
+    </G>}
+    {animal==='duck'&&<G>
+      <Rect x={-22} y={-15} width={9} height={17} fill="#e9cfa1" stroke={INK} strokeWidth={2}/>
+      <Rect x={13} y={-15} width={9} height={17} fill="#e9cfa1" stroke={INK} strokeWidth={2}/>
     </G>}
     {longEars && <G>
       <Rect x={-13} y={-43} width={9} height={24} fill={fur} stroke={INK} strokeWidth={2.5}/>
@@ -71,6 +110,20 @@ function Plush({animal,x,y,scale=1}:{animal:Animal;x:number;y:number;scale?:numb
       <Rect x={-9} y={-34} width={18} height={11} fill={fur} stroke={INK} strokeWidth={2}/>
     </G>}
     <Rect x={-17} y={-26} width={34} height={28} fill={animal==='lamb'?'#dbc6a5':fur} stroke={INK} strokeWidth={2.8}/>
+    {animal==='monkey'&&<G>
+      <Rect x={-27} y={-27} width={11} height={17} fill={fur} stroke={INK} strokeWidth={2.6}/>
+      <Rect x={16} y={-27} width={11} height={17} fill={fur} stroke={INK} strokeWidth={2.6}/>
+      <Rect x={-13} y={-23} width={26} height={19} fill="#f1d8b4"/>
+    </G>}
+    {animal==='raccoon'&&<G>
+      <Rect x={-16} y={-21} width={32} height={12} fill="#6c737a"/>
+      <Rect x={-12} y={-17} width={8} height={6} fill="#f8eacc"/>
+      <Rect x={4} y={-17} width={8} height={6} fill="#f8eacc"/>
+    </G>}
+    {animal==='owl'&&<G>
+      <Rect x={-15} y={-23} width={13} height={14} fill="#f8e7ce"/>
+      <Rect x={2} y={-23} width={13} height={14} fill="#f8e7ce"/>
+    </G>}
     {animal==='panda'&&<G>
       <Rect x={-15} y={-21} width={12} height={14} fill="#58606a"/>
       <Rect x={3} y={-21} width={12} height={14} fill="#58606a"/>
@@ -81,8 +134,13 @@ function Plush({animal,x,y,scale=1}:{animal:Animal;x:number;y:number;scale?:numb
     </G>}
     <Rect x={-10} y={-17} width={4} height={5} fill={INK}/>
     <Rect x={6} y={-17} width={4} height={5} fill={INK}/>
-    {animal==='chick'
-      ? <Rect x={-3} y={-9} width={8} height={5} fill="#c8915e" stroke="#917348" strokeWidth={1}/>
+    {['chick','duck','owl'].includes(animal)
+      ? <Rect x={-5} y={-9} width={10} height={6} fill="#c8915e" stroke="#917348" strokeWidth={1}/>
+      : animal==='pig' ? <G>
+        <Rect x={-10} y={-11} width={20} height={11} fill="#d99c9e" stroke={INK} strokeWidth={1}/>
+        <Rect x={-5} y={-8} width={3} height={4} fill="#8f6e72"/>
+        <Rect x={2} y={-8} width={3} height={4} fill="#8f6e72"/>
+      </G>
       : animal!=='elephant'&&<G>
         <Rect x={-6} y={-8} width={12} height={8} fill={CREAM}/>
         <Rect x={-2} y={-7} width={4} height={4} fill={INK}/>
@@ -102,8 +160,8 @@ function Plush({animal,x,y,scale=1}:{animal:Animal;x:number;y:number;scale?:numb
   </G>;
 }
 
-function Flower({x,y}:{x:number;y:number}) {
-  return <G transform={`translate(${x} ${y})`}>
+function Flower({x,y,scale=1}:{x:number;y:number;scale?:number}) {
+  return <G transform={`translate(${x} ${y}) scale(${scale})`}>
     <Rect x={-2} y={-10} width={4} height={11} fill="#66865b"/>
     <Rect x={-8} y={-13} width={6} height={6} fill="#e8d6a9"/>
     <Rect x={2} y={-13} width={6} height={6} fill="#e8d6a9"/>
@@ -120,29 +178,6 @@ function ToyBlocks({x,y,scale}:{x:number;y:number;scale:number}) {
     <Rect x={-8} y={-31} width={16} height={16} fill="#d4a3a0" stroke={INK} strokeWidth={2}/>
   </G>;
 }
-const ANIMALS:Animal[] = [
-  'bear','bunny','elephant','dog','panda','cat','lion','penguin',
-  'fox','koala','chick','lamb','giraffe',
-];
-
-// Stable layouts produce an organic scatter without shuffling on every render.
-// Smaller companions are interleaved with larger mascots in each clearing.
-type PlushSpot = {x:number;offset:number;size:number};
-const compactScatter: readonly (readonly PlushSpot[])[] = [
-  [{x:.28,offset:-4,size:1.13},{x:.51,offset:-10,size:.59},{x:.70,offset:5,size:.91}],
-  [{x:.31,offset:8,size:.84},{x:.50,offset:-15,size:.68},{x:.69,offset:-2,size:1.21}],
-  [{x:.27,offset:2,size:1.05},{x:.48,offset:-8,size:.62},{x:.72,offset:-6,size:.80}],
-  [{x:.29,offset:-8,size:1.17},{x:.52,offset:0,size:.56},{x:.68,offset:10,size:.98}],
-  [{x:.33,offset:5,size:.81},{x:.47,offset:-14,size:.67},{x:.71,offset:-6,size:1.16}],
-  [{x:.27,offset:-5,size:1.02},{x:.53,offset:3,size:.64},{x:.69,offset:8,size:.89}],
-];
-const desktopScatter: readonly (readonly PlushSpot[])[] = [
-  [{x:.19,offset:-2,size:1.02},{x:.37,offset:4,size:.73},{x:.63,offset:-5,size:1.12},{x:.82,offset:8,size:.63}],
-  [{x:.17,offset:6,size:.70},{x:.39,offset:-5,size:1.18},{x:.60,offset:6,size:.69},{x:.83,offset:-4,size:.96}],
-  [{x:.20,offset:-7,size:1.14},{x:.40,offset:9,size:.65},{x:.61,offset:-6,size:.97},{x:.81,offset:4,size:.78}],
-  [{x:.18,offset:2,size:.88},{x:.38,offset:-8,size:1.09},{x:.64,offset:7,size:.68},{x:.84,offset:-3,size:1.00}],
-];
-
 export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
   width:number;height:number;positions:readonly {x:number;y:number}[];
   grade:WorldGrade;next:number;
@@ -150,12 +185,8 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
   const paths=islandRouteByKind(grade.stages,positions.map((spot,order)=>({
     ...spot,order,row:Math.floor(order/5),column:order%5,
   })));
-  const compact=width<620;
-  // Larger, unmistakably plush-shaped sprites on phones; the original
-  // desktop scale remains unchanged.
-  const scale=compact
-    ? Math.max(.72,Math.min(.94,width/410))
-    : Math.max(.49,Math.min(1.16,width/920));
+  const decorations=useMemo(()=>preschoolDecorationLayout(width,height,positions),
+    [width,height,positions.length,positions[0]?.y,positions[positions.length-1]?.y]);
   return <Svg testID="preschool-plush-pixel-v2" width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}
     preserveAspectRatio="none" accessible={false}>
     <Rect width={width} height={height} fill="#80adc4"/>
@@ -174,48 +205,16 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
               : '#c5b5c4'}/>
         <Rect x={24} y={y+53} width={width-48} height={6}
           fill={row<10?'#94bc77':row<12?'#88a99e':'#aa98a8'}/>
-        <Flower x={width*.39} y={y-17}/>
-        <Flower x={width*.61} y={y-18}/>
-        <Rect x={width*.17} y={y+14} width={3} height={7} fill="#62885d"/>
-        <Rect x={width*.43} y={y+12} width={3} height={7} fill="#62885d"/>
-        <Rect x={width*.74} y={y+12} width={3} height={7} fill="#62885d"/>
-        {row%3===0&&<ToyBlocks x={width*.965} y={y-34} scale={scale*.8}/>}
-        {(compact?compactScatter:desktopScatter)[row%(compact?compactScatter.length:desktopScatter.length)]
-          .map((spot,slot)=>{
-            const animal:Animal=row===0
-              ? (['bear','chick','bunny','panda'][slot] as Animal)
-              : ANIMALS[(row*5+slot*7)%ANIMALS.length];
-            const baseY=row===0 ? 32+PRESCHOOL_MAP_TITLE_INSET
-              : (row===10||row===12) ? y-105 : compact ? y-53 : y-52;
-            return <Plush key={'plush-'+row+'-'+slot} animal={animal}
-              x={width*spot.x} y={baseY+spot.offset}
-              scale={scale*spot.size}/>;
-          })}
       </G>;
     })}
-    {/* The enlarged 5-stage clearings have room for more plush friends.
-        Keep these central, away from the checkpoint signs on alternating
-        left/right edges and from the round stage markers. */ }
-    {Array.from({length:12},(_,gap)=>{
-      const row=gap+1;
-      const midY=(positions[row*5-1].y+positions[row*5].y)/2;
-      // Stage 05/15/... finish at the right edge, and 10/20/... at
-      // the left. Scatter the extra plush on the opposite open side.
-      const spots=compact
-        ? row%2===1
-          ? [{x:.23,offset:-18,size:.89},{x:.44,offset:18,size:1.05}]
-          : [{x:.56,offset:-18,size:1.02},{x:.77,offset:18,size:.85}]
-        : [{x:.29,offset:-16,size:1.02},{x:.50,offset:20,size:.72},{x:.71,offset:-12,size:.94}];
-      return <G key={'checkpoint-clearing-plush-'+row}>
-        {spots.map((spot,slot)=>(
-          <Plush key={'clearing-'+row+'-'+slot}
-            animal={ANIMALS[(row*3+slot*5)%ANIMALS.length]}
-            x={width*spot.x} y={midY+spot.offset}
-            scale={scale*spot.size}/>
-        ))}
-        <Flower x={width*.46} y={midY+42}/>
-      </G>;
-    })}
+    {/* Stable, collision-checked organic scattering. Never obscure checkpoint
+        signs, stage circles, names, routes or the three area headings. */}
+    {decorations.map((item,i)=>item.kind==='plush'
+      ? <Plush key={'plush-'+i} animal={item.animal}
+          x={item.x} y={item.y} scale={item.scale}/>
+      : item.kind==='blocks'
+        ? <ToyBlocks key={'toy-blocks-'+i} x={item.x} y={item.y} scale={item.scale}/>
+        : <Flower key={'flower-'+i} x={item.x} y={item.y} scale={item.scale}/>)}
     {/* Quiet separators mark the trial and legendary zones without
         interrupting the stage path or covering the clickable nodes. */}
     {[50,60].map((order,index)=>
