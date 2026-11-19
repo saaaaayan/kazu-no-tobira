@@ -44,5 +44,5 @@ test('preschool game lays out the number pattern and its instruction as two sepa
   assert.match(game,/question.question.split\('\\n'\).map/);
   assert.match(game,/styles.preschoolSequenceNumbers/);
   assert.match(game,/styles.preschoolSequenceInstruction/);
-  assert.match(game,/styles.preschoolSequenceQuestion:\{alignItems:'flex-start'/);
+  assert.match(game,/preschoolSequenceQuestion:\{alignItems:'flex-start'/);
 });
