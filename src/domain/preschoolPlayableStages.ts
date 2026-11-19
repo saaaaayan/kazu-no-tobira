@@ -2,6 +2,7 @@ import type { WorldStage } from './worldCatalog.ts';
 import type { BankQuestion, BankDiagram } from './questionBank.ts';
 import { countingTokenArt, type CountingToken } from './countingTokens.ts';
 import { preschoolNumeralTask } from './preschoolNumeralActivities.ts';
+import type { PictureNumberMatch } from './preschoolNumberConnections.ts';
 
 /**
  * Public prototype only. These ten activities per stage are NOT approved
@@ -13,6 +14,7 @@ const shapes=['●','▲','■'] as const;
 type Task={question:string;answer:string;choices:string[];prompt?:string;diagram?:BankDiagram;
   trace?:string; explanation?:string;hints?:[string,string,string];
   numeralPractice?:true;focalNumeral?:string;
+  pictureNumberMatch?:PictureNumberMatch;
   twoRules?:{color:'あか'|'あお';shape:'まる'|'さんかく'|'しかく'};};
 const image=(token:CountingToken)=>countingTokenArt[token][0];
 const name=(token:CountingToken)=>countingTokenArt[token][1];
@@ -262,6 +264,7 @@ export function preschoolPrototypeBank(stage:Pick<WorldStage,'id'|'gradeId'|'kin
      ...(q.diagram?{diagram:q.diagram}:{}),
      ...(q.trace?{preschoolTrace:q.trace}:{}),
      ...(q.numeralPractice?{preschoolNumberActivity:true as const}:{}),
+     ...(q.pictureNumberMatch?{preschoolNumberMatch:q.pictureNumberMatch}:{}),
      ...(q.focalNumeral!==undefined?{preschoolNumeral:q.focalNumeral}:{}),
      ...(q.twoRules?{preschoolTwoRules:q.twoRules}:{}),
    } as BankQuestion;
