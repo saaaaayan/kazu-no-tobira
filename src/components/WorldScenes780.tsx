@@ -443,7 +443,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         })}
         {checkpointsFor(grade).map(checkpoint=>{
           const end=geometry.positions[checkpoint.after.order];
-          // 試作版は幼児の確認テスト1のみ選択可。ほかは従来どおり。
+          // All ten preschool five-stage checks are playable in preview.
           const enabled=preview ? grade.id==='preschool' && checkpoint.number<=10
             : testing || checkpoint.sourceStageIds.every(id=>Boolean(progress.stages[id]?.clearedAt));
           const nextPoint=geometry.positions[checkpoint.after.order+1];
@@ -451,19 +451,28 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           return <Pressable key={checkpoint.id} accessibilityRole="button"
             testID={'island-checkpoint-'+checkpoint.number}
             accessibilityLabel={'確認テスト '+checkpoint.number+(enabled?' を はじめる':' は準備中')} disabled={!enabled} onPress={()=>onCheckpoint(checkpoint)}
-            style={{position:'absolute',left:checkpointLayout.left,top:checkpointLayout.top,
+            style={[{position:'absolute',left:checkpointLayout.left,top:checkpointLayout.top,
               width:checkpointLayout.width,height:checkpointLayout.height,
-              borderRadius:grade.id==='preschool'?3:10,
+              borderRadius:grade.id==='preschool'?7:10,
               justifyContent:'center',alignItems:'center',
               backgroundColor:grade.id==='preschool'
-                ? (enabled?'#f3e5b9':'#d9dfdf')
+                ? (enabled?'#f4e9c7':'#d9dfdf')
                 : (enabled?'#fff0b5':'#d2d9e9'),
-              borderWidth:grade.id==='preschool'?2:1,
-              borderColor:grade.id==='preschool'?'#344454':'#66769a'}}>
-            <Text style={{fontSize:checkpointLayout.compact?12:11,fontWeight:'800',color:'#263453'}}>
-              {checkpointLayout.compact?'テスト':'確認テスト'}
-            </Text>
-            <Text style={{fontSize:11,color:'#263453'}}>{checkpoint.number}</Text>
+              borderWidth:grade.id==='preschool'?3:1,
+              borderColor:grade.id==='preschool'?'#344454':'#66769a'},
+              grade.id==='preschool'&&styles.preschoolCheckpointSign]}>
+            {grade.id==='preschool' ? <>
+              <Text style={styles.preschoolCheckpointHeading}>✓ かくにん</Text>
+              <Text style={styles.preschoolCheckpointTitle}>テスト {checkpoint.number}</Text>
+              <Text style={styles.preschoolCheckpointRange}>
+                {(checkpoint.number-1)*5+1}〜{checkpoint.number*5} の もんだい
+              </Text>
+            </> : <>
+              <Text style={{fontSize:checkpointLayout.compact?12:11,fontWeight:'800',color:'#263453'}}>
+                {checkpointLayout.compact?'テスト':'確認テスト'}
+              </Text>
+              <Text style={{fontSize:11,color:'#263453'}}>{checkpoint.number}</Text>
+            </>}
           </Pressable>;
         })}
         {grade.stages.map((stage,index)=>{
@@ -625,6 +634,13 @@ const styles=StyleSheet.create({
   pixelCategoryText:{color:'#344454'},
   // Stage titles are still tappable for details, but never obscured by
   // individual rectangles. A faint light text shadow gives contrast on grass.
+  preschoolCheckpointSign:{paddingHorizontal:4,paddingVertical:5,gap:1,shadowOpacity:0},
+  preschoolCheckpointHeading:{fontSize:12,lineHeight:16,color:'#465d5b',
+    fontWeight:'900',textAlign:'center'},
+  preschoolCheckpointTitle:{fontSize:20,lineHeight:25,color:'#283f54',
+    fontWeight:'900',textAlign:'center'},
+  preschoolCheckpointRange:{fontSize:12,lineHeight:16,color:'#344454',
+    fontWeight:'800',textAlign:'center'},
   preschoolStageTopic:{position:'absolute',minHeight:36,paddingHorizontal:1,paddingVertical:1,
     backgroundColor:'transparent',borderRadius:0,borderWidth:0,
     alignItems:'center',justifyContent:'flex-start'},
