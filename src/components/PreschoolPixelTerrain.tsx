@@ -185,12 +185,35 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
             const animal:Animal=row===0
               ? (['bear','chick','bunny','panda'][slot] as Animal)
               : ANIMALS[(row*5+slot*7)%ANIMALS.length];
-            const baseY=row===0 ? 56+PRESCHOOL_MAP_TITLE_INSET
+            const baseY=row===0 ? 32+PRESCHOOL_MAP_TITLE_INSET
               : (row===10||row===12) ? y-105 : compact ? y-53 : y-52;
             return <Plush key={'plush-'+row+'-'+slot} animal={animal}
               x={width*spot.x} y={baseY+spot.offset}
               scale={scale*spot.size}/>;
           })}
+      </G>;
+    })}
+    {/* The enlarged 5-stage clearings have room for more plush friends.
+        Keep these central, away from the checkpoint signs on alternating
+        left/right edges and from the round stage markers. */ }
+    {Array.from({length:12},(_,gap)=>{
+      const row=gap+1;
+      const midY=(positions[row*5-1].y+positions[row*5].y)/2;
+      // Stage 05/15/... finish at the right edge, and 10/20/... at
+      // the left. Scatter the extra plush on the opposite open side.
+      const spots=compact
+        ? row%2===1
+          ? [{x:.23,offset:-18,size:.89},{x:.44,offset:18,size:1.05}]
+          : [{x:.56,offset:-18,size:1.02},{x:.77,offset:18,size:.85}]
+        : [{x:.29,offset:-16,size:1.02},{x:.50,offset:20,size:.72},{x:.71,offset:-12,size:.94}];
+      return <G key={'checkpoint-clearing-plush-'+row}>
+        {spots.map((spot,slot)=>(
+          <Plush key={'clearing-'+row+'-'+slot}
+            animal={ANIMALS[(row*3+slot*5)%ANIMALS.length]}
+            x={width*spot.x} y={midY+spot.offset}
+            scale={scale*spot.size}/>
+        ))}
+        <Flower x={width*.46} y={midY+42}/>
       </G>;
     })}
     {/* Quiet separators mark the trial and legendary zones without
