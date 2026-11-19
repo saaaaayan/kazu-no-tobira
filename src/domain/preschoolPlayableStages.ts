@@ -1,6 +1,7 @@
 import type { WorldStage } from './worldCatalog.ts';
 import type { BankQuestion, BankDiagram } from './questionBank.ts';
 import { countingTokenArt, type CountingToken } from './countingTokens.ts';
+import { preschoolNumeralTask } from './preschoolNumeralActivities.ts';
 
 /**
  * Public prototype only. These ten activities per stage are NOT approved
@@ -10,7 +11,8 @@ import { countingTokenArt, type CountingToken } from './countingTokens.ts';
 const toys: CountingToken[]=['bear','cat','dog','rabbit','chick','car','flower','star','apple','fish'];
 const shapes=['●','▲','■'] as const;
 type Task={question:string;answer:string;choices:string[];prompt?:string;diagram?:BankDiagram;
-  trace?:string; explanation?:string;hints?:[string,string,string]};
+  trace?:string; explanation?:string;hints?:[string,string,string];
+  numeralPractice?:true;focalNumeral?:string};
 const image=(token:CountingToken)=>countingTokenArt[token][0];
 const name=(token:CountingToken)=>countingTokenArt[token][1];
 const repeat=(token:CountingToken,n:number)=>Array.from({length:n},()=>token);
@@ -127,10 +129,7 @@ function mixed(i:number,kind:number):Task{
 }
 function makeTask(n:number,i:number):Task{
  const toy=t(i),k=i%3, num=1+i%10;
- if(n>=6&&n<=8)return match((i+(n-6)*3)%10,n===6?3:n===7?5:10);
- if(n===9){const token=toys[i],count=i%3===0?0:i%3;return numberTask(name(token)+' が いくつ ある？',count,
-   {diagram:groups(count===0?['empty']:repeat(token,count)),explanation:count===0?'なにも ないときは 0 だよ。':'ひとつずつ かぞえると '+count+'こ だよ。'},3);}
- if(n===10)return match(i,10);
+ if(n>=6&&n<=10)return preschoolNumeralTask(n as 6|7|8|9|10,i);
  if(n>=11&&n<=15)return trace(i,n-11);
  if(n>=16&&n<=20)return order((i+n)%10,n===16?3:n===17?5:10,(n===19?i%2:n===20?2:i%3));
  if(n>=21&&n<=25)return compare(i+(n-21)*3,n===21?0:1);
@@ -227,17 +226,22 @@ export function preschoolPrototypeBank(stage:Pick<WorldStage,'id'|'gradeId'|'kin
    const hints=specificHints(q,n);
    const answer=q.answer, choices=q.choices;
    if(!choices.includes(answer)||new Set(choices).size!==3)throw Error('Invalid prototype options '+n+':'+i);
+   // Correct answers must not always occupy the first button.
+   const shift=(n+i)%3;
+   const displayedChoices=[...choices.slice(shift),...choices.slice(0,shift)];
    return {
      id:'ui-preview-'+stage.id+'-activity-'+String(i+1).padStart(2,'0'),
      skillId:'preschool.'+group,
-     type:'choice',format:q.trace?'tracing':'counting',difficulty:i<3?1:i<8?2:3,
+     type:'choice',format:q.numeralPractice?'numeral':q.trace?'tracing':'counting',difficulty:i<3?1:i<8?2:3,
      question:q.question,prompt:q.prompt??'えを よく みて、こたえを えらぼう。',
-     answer,choices,hint:hints[0],hints,
+     answer,choices:displayedChoices,hint:hints[0],hints,
      explanation:q.explanation??'えを ひとつずつ みて たしかめよう。',
      steps:[{title:'みる',body:hints[1]},{title:'たしかめる',body:q.explanation??'えを よく みて たしかめたよ。'}],
      mistakes:choices.filter(c=>c!==answer).map(c=>({answer:c,explanation:'よく みて、もういちど やってみよう。'})),
      ...(q.diagram?{diagram:q.diagram}:{}),
      ...(q.trace?{preschoolTrace:q.trace}:{}),
+     ...(q.numeralPractice?{preschoolNumberActivity:true as const}:{}),
+     ...(q.focalNumeral!==undefined?{preschoolNumeral:q.focalNumeral}:{}),
    } as BankQuestion;
  });
 }
