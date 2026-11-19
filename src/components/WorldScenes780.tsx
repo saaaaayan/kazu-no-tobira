@@ -295,23 +295,12 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
       label:action==='premium'?'プレミアム':action==='play'?'▶ あそぶ'
         :action==='learn'?'まず学ぶ':'未解放'};
   };
-  return (
-    <View style={styles.screen}>
-      <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
-        <Text style={styles.backText}>‹ 世界地図に もどる</Text>
-      </Pressable>
-      <View style={styles.islandBanner}>
-        <View style={styles.islandBannerText}>
-          <Text style={styles.eyebrow}>{grade.title} の ぼうけんマップ</Text>
-          <Text style={styles.bannerHeading}>{grade.island}</Text>
-          <Text style={styles.bannerDescription}>{grade.theme}</Text>
-          <Text style={styles.islandBannerCount}>{preview ? (grade.stages.some(stage=>hasStageBank(stage.id))
-            ? '問題がある '+grade.stages.filter(stage=>hasStageBank(stage.id)).length+'ステージを あそべるよ'
-            : '65ステージと10か所の確認テスト · サンプル表示') : isPlannedIsland(grade.id) ? '教材を準備中 · 65地点' : grade.id === 'sage' ? (testing || isIslandUnlocked(progress, grade.id)
-            ? `${grade.stages.filter(stage => hasStageBank(stage.id)).length} / 65 地点で出題中` : '高校3年生の冒険の道50・試練の道10をクリアすると解放') : testing ? (hasPremium(access) ? "65ステージ すべてプレイできるよ" : "冒険の道50ステージを 自由に あそべるよ") : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
-        </View>
-        <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
-      </View>
+  // The preschool map is the primary navigation. Keep reference material,
+  // the curriculum table and the optional shortcut BELOW the map so
+  // children can see the first stage immediately on opening the island.
+  // Other islands retain their original ordering.
+  const supplementalPanels=(
+    <>
       <IslandCurriculumPanel grade={grade} onStart={onStart} availability={curriculumAvailability}/>
       {preview && <View style={styles.previewCard}>
         {previewStage ? <>
@@ -371,6 +360,26 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           <Text style={styles.nextText}>✦ {worldStageAction(mode, progress, next, access) === 'learn' ? 'まず まなぼう' : 'つづきから ぼうけんする'}　ステージ {stageText(next)} ›</Text>
         </Pressable>
       )}
+    </>
+  );
+  return (
+    <View style={styles.screen}>
+      <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
+        <Text style={styles.backText}>‹ 世界地図に もどる</Text>
+      </Pressable>
+      <View style={styles.islandBanner}>
+        <View style={styles.islandBannerText}>
+          <Text style={styles.eyebrow}>{grade.title} の ぼうけんマップ</Text>
+          <Text style={styles.bannerHeading}>{grade.island}</Text>
+          <Text style={styles.bannerDescription}>{grade.theme}</Text>
+          <Text style={styles.islandBannerCount}>{preview ? (grade.stages.some(stage=>hasStageBank(stage.id))
+            ? '問題がある '+grade.stages.filter(stage=>hasStageBank(stage.id)).length+'ステージを あそべるよ'
+            : '65ステージと10か所の確認テスト · サンプル表示') : isPlannedIsland(grade.id) ? '教材を準備中 · 65地点' : grade.id === 'sage' ? (testing || isIslandUnlocked(progress, grade.id)
+            ? `${grade.stages.filter(stage => hasStageBank(stage.id)).length} / 65 地点で出題中` : '高校3年生の冒険の道50・試練の道10をクリアすると解放') : testing ? (hasPremium(access) ? "65ステージ すべてプレイできるよ" : "冒険の道50ステージを 自由に あそべるよ") : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
+        </View>
+        <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
+      </View>
+      {grade.id!=='preschool' && supplementalPanels}
       <View style={styles.mapHeading}>
         <Text style={styles.mapTitle}>島のぼうけんルート</Text>
         <Text style={styles.hintText}>地図の丸い地点をタッチして ステージへ進もう！</Text>
@@ -556,6 +565,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           </View>;
         })()}
       </View>
+      {grade.id==='preschool' && supplementalPanels}
       {!testing && <View style={styles.footer}>
         <Text style={styles.footerTitle}>✦ この島には 65のステージ</Text>
         <Text style={styles.footerInfo}>冒険の道 50こ → 試練の道 10こ → 伝説のトビラ 5こ。伝説のトビラは最初の60ステージをぜんぶパーフェクトにすると開くよ。</Text>
