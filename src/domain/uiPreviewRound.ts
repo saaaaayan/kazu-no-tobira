@@ -18,7 +18,14 @@ export const additionalStageLessonBanks:Readonly<Record<string,readonly BankQues
 export function uiPreviewSampleKind(stage: SampleStage) {
   if (stage.gradeId==='preschool' && /^preschool\.(?:n(?:0[6-9]|[1-4][0-9]|50)|x(?:0[1-9]|10)|s0[1-5])$/.test(stage.id)) {
     const expected=stage.id.includes('.n')?'normal':stage.id.includes('.x')?'extra':'secret';
-    return stage.kind===expected && stage.family!=='unknown'?'preschool-activity':undefined;
+    const full=stage as Partial<WorldStage>;
+    // Never unlock a fabricated id-only stage: real prototype map objects
+    // carry the canonical position and unit index from worldCatalog.
+    const number=Number(stage.id.slice(stage.id.lastIndexOf('.')+2));
+    const order=expected==='normal'?number-1:expected==='extra'?49+number:59+number;
+    return stage.kind===expected && stage.family!=='unknown' &&
+      full.order===order && Number.isInteger(full.unitIndex)
+      ?'preschool-activity':undefined;
   }
   if (stage.kind !== 'normal') return undefined;
   if (additionalStageLessonBanks[stage.id] && stage.id.startsWith(stage.gradeId+'.') &&
