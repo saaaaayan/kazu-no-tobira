@@ -576,7 +576,16 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                       variation={round.dialogueOffset + round.index}/>
                     {!countingGuide && <Text style={styles.difficulty}>{round.stage.kind==='secret'?stageLabels.secret:round.stage.kind==='extra'?stageLabels.extra:bankQuestion ? ['● きほん', '● ひょうじゅん', '★ おうよう'][bankQuestion.difficulty - 1]
                       : round.index<3?'● きほん':round.index<8?'● ひょうじゅん':'★ おうよう'}</Text>}
-                    <MathText style={styles.questionText} value={question.question}/>
+                    {round.stage.gradeId==='preschool' && question.question.includes('\n') ? (
+                      <View testID="preschool-sequence-two-line-question"
+                        accessibilityLabel={question.question} style={styles.preschoolSequenceQuestion}>
+                        {question.question.split('\n').map((line,index)=>(
+                          <Text key={index} style={index===0
+                            ? styles.preschoolSequenceNumbers
+                            : styles.preschoolSequenceInstruction}>{line}</Text>
+                        ))}
+                      </View>
+                    ) : <MathText style={styles.questionText} value={question.question}/>}
                     {numeralGuide && bankQuestion?.preschoolNumeral!==undefined && !round.feedback && (
                       <View testID="preschool-numeral-target" style={styles.preschoolNumeralTarget}>
                         <Text style={styles.preschoolNumeralTargetText}>{bankQuestion.preschoolNumeral}</Text>
@@ -821,6 +830,12 @@ const styles = StyleSheet.create({
   questionIndex: { color: '#e1e7ff', fontWeight: '800', fontSize: 13 },
   difficulty: { color: '#ffe09f', fontSize: 12, fontWeight: '800', paddingTop: 4 },
   questionText: { color: 'white', fontWeight: '900', fontSize: 29, lineHeight: 40 },
+  preschoolSequenceQuestion:{alignItems:'flex-start',justifyContent:'center',gap:14,
+    marginBottom:8,minWidth:0,maxWidth:'100%'},
+  preschoolSequenceNumbers:{color:'#fff0b5',fontWeight:'900',fontSize:38,
+    lineHeight:54,letterSpacing:2,flexShrink:1},
+  preschoolSequenceInstruction:{color:'white',fontWeight:'900',fontSize:27,
+    lineHeight:38,flexShrink:1},
   prompt: { color: '#e3e9fc', fontSize: 13, fontWeight: '700' },
   workArea: { gap: 13 },
   workWide: { flexDirection: 'row-reverse', alignItems: 'stretch' },
