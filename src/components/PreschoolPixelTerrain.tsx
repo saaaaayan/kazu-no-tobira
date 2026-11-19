@@ -32,6 +32,13 @@ function Plush({animal,x,y,scale=1}:{animal:Animal;x:number;y:number;scale?:numb
   return <G transform={`translate(${x} ${y}) scale(${scale})`}>
     {/* Distinct muted pixel silhouettes; all toys have simple stitched faces. */}
     {animal==='squirrel'&&<G>
+      {/* Two little pointed ears behind the squirrel's face. */}
+      <Path d="M-17 -23 L-14 -38 L-2 -23 Z"
+        fill={fur} stroke={INK} strokeWidth={2.4} strokeLinejoin="round"/>
+      <Path d="M2 -23 L14 -38 L17 -23 Z"
+        fill={fur} stroke={INK} strokeWidth={2.4} strokeLinejoin="round"/>
+      <Path d="M-13 -29 L-12 -34 L-8 -29 Z" fill={BLUSH}/>
+      <Path d="M8 -29 L12 -34 L13 -29 Z" fill={BLUSH}/>
       {/* A short curled tail beside the body, NOT a tall detached tower. */}
       <Path d="M14 12 V-5 H20 V-15 H30 V-10 H34 V2 H28 V12 H23 V17 H15 Z"
         fill="#af825e" stroke={INK} strokeWidth={2.5} strokeLinejoin="miter"/>
