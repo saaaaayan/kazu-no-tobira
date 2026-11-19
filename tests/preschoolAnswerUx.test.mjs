@@ -30,7 +30,7 @@ test('preschool answer buttons grade their own value in one tap without stale st
 
 test('other grades still have ordinary two-step answering, and preschool hints are visible',()=>{
   assert.match(code,/wide&&!countingGuide&&!numeralGuide&&styles\.workWide/u);
-  assert.match(code,/!countingGuide && !numeralGuide && <CalculationMemo/u);
+  assert.match(code,/!countingGuide && !numeralGuide && !bankQuestion\?\.preschoolTrace/u);
   assert.match(code,/onPress=\{\(\)=>void submit\(\)\}/u);
   assert.match(code,/hints\.slice\(0,round\.hintLevel\)\.map/u);
   assert.match(code,/onPress=\{showHint\} style=\{styles\.preschoolHintButton\}/u);
