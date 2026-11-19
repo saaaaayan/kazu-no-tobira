@@ -199,8 +199,12 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
     {Array.from({length:12},(_,gap)=>{
       const row=gap+1;
       const midY=(positions[row*5-1].y+positions[row*5].y)/2;
+      // Stage 05/15/... finish at the right edge, and 10/20/... at
+      // the left. Scatter the extra plush on the opposite open side.
       const spots=compact
-        ? [{x:.34,offset:-18,size:.89},{x:.66,offset:18,size:1.05}]
+        ? row%2===1
+          ? [{x:.23,offset:-18,size:.89},{x:.44,offset:18,size:1.05}]
+          : [{x:.56,offset:-18,size:1.02},{x:.77,offset:18,size:.85}]
         : [{x:.29,offset:-16,size:1.02},{x:.50,offset:20,size:.72},{x:.71,offset:-12,size:.94}];
       return <G key={'checkpoint-clearing-plush-'+row}>
         {spots.map((spot,slot)=>(
