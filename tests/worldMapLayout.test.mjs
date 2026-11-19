@@ -119,3 +119,28 @@ test('ぬいぐるみの島だけ、タイトル分の余白を追加して65ス
   }
   assert.throws(()=>islandStageLayout(340,65,-1),RangeError);
 });
+
+test('ぬいぐるみ島の個別ステージ名用の行間・テスト配置をスマホとPCで確保',()=>{
+  for (const width of [290,340,390,480,619,620,850,1080]) {
+    const compact=compactIslandStageMap(width);
+    const base=islandStageLayout(width,65,86);
+    const detailed=islandStageLayout(width,65,86,true);
+    assert.equal(detailed.rowHeight,compact?190:160);
+    assert.ok(detailed.height>base.height);
+    for (let i=0;i<65;i++) {
+      assert.equal(detailed.positions[i].order,i);
+      assert.equal(detailed.positions[i].x,base.positions[i].x);
+      assert.ok(detailed.positions[i].y>=base.positions[i].y);
+    }
+    for(let row=0;row<10;row++){
+      const first=detailed.positions[row*5+4];
+      const next=detailed.positions[(row+1)*5];
+      const marker=Math.max(46,Math.min(57,Math.floor(width/5)-9));
+      const check=islandCheckpointLayout(width,first,marker,next,true);
+      assert.ok(check.top>first.y+marker/2+35,
+        JSON.stringify({width,row,check,first}));
+      assert.ok(check.top+check.height<next.y-marker/2,
+        JSON.stringify({width,row,check,next}));
+    }
+  }
+});
