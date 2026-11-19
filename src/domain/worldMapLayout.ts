@@ -49,7 +49,7 @@ export function compactIslandStageMap(width:number): boolean {
  * Checkpoints have their own lane on narrow devices, beneath the centered
  * row's learning topic. Preserve the original desktop placement.
  */
-export function islandCheckpointLayout(width:number,point:MapPoint,marker:number,nextPoint?:MapPoint) {
+export function islandCheckpointLayout(width:number,point:MapPoint,marker:number,nextPoint?:MapPoint,expandedDesktop=false) {
   const compact=compactIslandStageMap(width);
   const boxWidth=compact?56:66;
   const boxHeight=44; // Preserve a 44px touch target on narrow screens.
@@ -62,7 +62,7 @@ export function islandCheckpointLayout(width:number,point:MapPoint,marker:number
     // between the two stage rows rather than attaching it to the lower row.
     top:compact&&nextPoint
       ? Math.round((point.y+nextPoint.y-boxHeight)/2)
-      : compact?point.y+marker/2+60:point.y+37,
+      : compact?point.y+marker/2+60:point.y+(expandedDesktop?82:37),
     width:boxWidth,
     height:boxHeight,
   };
@@ -74,7 +74,7 @@ export type IslandStagePoint = MapPoint & {
   column: number;
 };
 
-export function islandStageLayout(width: number, stageCount = 65, topInset = 0): {
+export function islandStageLayout(width: number, stageCount = 65, topInset = 0, desktopRowHeight?:number): {
   height: number;
   rowHeight: number;
   positions: readonly IslandStagePoint[];
@@ -85,8 +85,8 @@ export function islandStageLayout(width: number, stageCount = 65, topInset = 0):
   // Five stage pins remain across each row, but compact screens need a
   // separate lane for the row title and the checkpoint after stage 05/10/etc.
   const compact = compactIslandStageMap(safeWidth);
-  const rowHeight = compact ? 166 : 119;
-  const areaGap = compact ? 58 : 0;
+  const rowHeight = compact ? 166 : (desktopRowHeight ?? 119);
+  const areaGap = compact ? 58 : (desktopRowHeight ? 50 : 0);
   const positions: IslandStagePoint[] = Array.from({ length: stageCount }, (_, order) => {
     const row = Math.floor(order / 5);
     const column = row % 2 === 0 ? order % 5 : 4 - order % 5;
