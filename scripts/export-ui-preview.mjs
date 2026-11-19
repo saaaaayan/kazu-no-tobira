@@ -79,6 +79,8 @@ if (entries.length!==1) throw new Error('The sample-only preview must have one e
 const [entry]=entries;
 const bundle=readFileSync(resolve(target,entry));
 assertSampleBundle(bundle.toString('utf8'),version,pages,true);
+if(!bundle.toString('utf8').includes('preschool-plush-pixel-v2'))
+  throw new Error('The compiled preview does not contain the preschool plush map view.');
 const index=resolve(target,'index.html');
 if (pages) writePagesAdminEntry(target);
 else writeFileSync(index,readFileSync(index,'utf8').replace('<head>',
