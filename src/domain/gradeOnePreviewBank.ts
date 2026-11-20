@@ -123,7 +123,7 @@ function directSub(i:number,stage:number,borrow=false):Task{
 }
 function basicNumberLine(i:number,upTo:10|20|100=20):Task{
   const step=upTo===100?10:1;
-  const start=upTo===100?10+(i%4)*10:upTo===10?i%6:Math.max(0,1+i%9);
+  const start=upTo===100?10+(i%5)*10:upTo===10?i%6:Math.max(0,1+i%9);
   const offset=1+(i*3)%4;
   const missing=start+offset*step;
   return task('？ に はいる かずは？',missing,'sequence',
