@@ -825,7 +825,8 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                               {!question.clock.read && <ClockFace time={question.clock.end} caption="はりを うごかした あと"/>}
                             </View>}
                             <Text style={styles.answerHeading}>{countingGuide ? 'こたえの わけ' : '基本の かいせつ'}</Text>
-                            {countingGuide && diagram && <QuestionDiagram diagram={diagram} phase="solution"/>}
+                            {(countingGuide || diagram?.kind==='preschoolSplit') && diagram &&
+                              <QuestionDiagram diagram={diagram} phase="solution"/>}
                             <MathText style={styles.explanation} value={question.explanation}/>
                             {preschoolStage && <QuestionReadAloud text={question.explanation}/>}
                             {(bankQuestion || question.steps) && <>

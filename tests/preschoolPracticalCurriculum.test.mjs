@@ -56,16 +56,27 @@ test('stage 46 combines two visible groups to find a total within ten',()=>{
   }
 });
 
-test('stage 47 splits an illustrated whole into two named boxes',()=>{
-  for(const q of bank(47)){
-    assert.equal(q.diagram?.kind,'countingBoard',q.id);
-    assert.equal(q.diagram.arrangement,'side-by-side',q.id);
-    assert.deepEqual(q.diagram.rows.map(row=>row.label),['ひだりの はこ','みぎの はこ'],q.id);
-    const a=q.diagram.rows[0].tokens.length,b=q.diagram.rows[1].tokens.length;
-    assert.ok(a>0&&b>0&&a+b<=10,q.id);
-    assert.equal(q.answer,String(b),q.id);
-    assert.match(q.explanation,/ぜんぶで/u,q.id);
+test('stage 47 splits a visible whole with one known part and an unknown remainder',()=>{
+  const problems=bank(47);
+  assert.equal(problems.length,10);
+  const distinct=new Set();
+  for(const q of problems){
+    assert.equal(q.diagram?.kind,'preschoolSplit',q.id);
+    const {total,placedLeft}=q.diagram;
+    assert.ok(total>=3&&total<=8,q.id);
+    assert.ok(placedLeft>=1&&placedLeft<total,q.id);
+    const remainder=total-placedLeft;
+    assert.equal(q.answer,String(remainder),q.id);
+    assert.match(q.question,/ひだりの はこに/u,q.id);
+    assert.match(q.question,/みぎには いくつ はいる？/u,q.id);
+    assert.equal(q.choices.filter(choice=>checkMathAnswer(q,choice)).length,1,q.id);
+    assert.ok(q.hints[0].includes(String(total)),q.id);
+    assert.ok(q.hints[1].includes(String(placedLeft)),q.id);
+    assert.ok(q.explanation.includes(String(remainder)),q.id);
+    assert.match(q.explanation,/のこり/u,q.id);
+    distinct.add(total+'-'+placedLeft);
   }
+  assert.equal(distinct.size,10,'each stage 47 question uses a different total/known-part pair');
 });
 
 test('stage 49 equalizes two groups with one additional object, keeping both-side counts independent',()=>{
@@ -96,5 +107,5 @@ test('renamed learning targets match the playable banks and reach review checkpo
   const s50=bank(50);
   assert.ok(s50.some(q=>q.diagram?.kind==='magnitudeCompare'));
   assert.ok(s50.some(q=>q.explanation.includes('あわせて')));
-  assert.ok(s50.some(q=>q.explanation.includes('ぜんぶで')));
+  assert.ok(s50.some(q=>q.diagram?.kind==='preschoolSplit'));
 });

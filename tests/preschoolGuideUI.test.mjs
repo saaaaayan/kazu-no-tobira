@@ -28,7 +28,7 @@ test('preschool 01–05 all share the stage 01 guided counting UI',()=>{
   assert.match(source,/!countingGuide && !numeralGuide && !bankQuestion\?\.preschoolTrace && question\.type!=='choice'/u);
   assert.match(source,/\{preschoolStage && !round\.feedback &&\s*<QuestionReadAloud/u);
   assert.match(source,/\{preschoolStage && <QuestionReadAloud text=\{question\.explanation\}\/>\}/u);
-  assert.match(source,/\{countingGuide && diagram && <QuestionDiagram diagram=\{diagram\} phase="solution"\/>\}/u);
+  assert.match(source,/\{\(countingGuide \|\| diagram\?\.kind==='preschoolSplit'\) && diagram &&\s*<QuestionDiagram diagram=\{diagram\} phase="solution"\/>\}/u);
 });
 
 test('all preschool stages play; only 01–05 use the legacy large counting buttons',()=>{
