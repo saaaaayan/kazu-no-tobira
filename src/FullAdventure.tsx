@@ -354,6 +354,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   // on their dedicated input flows.
   const inlineChoice=Boolean(question?.type==='choice' && !countingGuide && !numeralGuide &&
     !pictureMatching && !bankQuestion?.preschoolTrace && !review);
+  // The memo is absent for choice questions, so the results must not keep
+  // the old two-column desktop layout with an empty left side.
+  const choiceFeedback=Boolean(round?.feedback && question?.type==='choice');
   const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && (Boolean(liveCard) || Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0);
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
@@ -767,8 +770,12 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                       </View>
                     )}
                   </View>
-                  {((!countingGuide && !numeralGuide && !inlineChoice) || round.feedback) && <View style={[styles.workArea,wide&&!countingGuide&&!numeralGuide&&styles.workWide]}>
-                    <View style={[styles.answerArea,wide&&!countingGuide&&!numeralGuide&&styles.answerWide]}>
+                  {((!countingGuide && !numeralGuide && !inlineChoice) || round.feedback) && <View testID={choiceFeedback?'choice-feedback-centered':undefined}
+                    style={[styles.workArea,wide&&!countingGuide&&!numeralGuide&&question.type!=='choice'&&styles.workWide,
+                      choiceFeedback&&styles.choiceFeedbackWork]}>
+                    <View style={[styles.answerArea,
+                      wide&&!countingGuide&&!numeralGuide&&question.type!=='choice'&&styles.answerWide,
+                      choiceFeedback&&styles.choiceFeedbackArea]}>
                       {round.feedback ? (
                         <>
                           <View accessibilityLiveRegion="polite" style={[styles.feedbackBox,round.feedback==='incorrect'&&styles.wrongBox]}>
@@ -787,11 +794,11 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                             ) : (
                               <MathText style={styles.yourAnswer} prefix="きみの こたえ：" value={answer} format={question.type === 'choice'}/>
                             )}
-                            {pictureMatching ? (
+                            {round.feedback==='incorrect' && (pictureMatching ? (
                               <Text style={styles.answerHint}>ただしい つなぎかた：{question.answer.split('-').join('・')}</Text>
                             ) : (
                               <MathText style={styles.answerHint} prefix="ただしい こたえ：" value={question.answer}/>
-                            )}
+                            ))}
                             {question.clock && <View style={{flexDirection:'row', flexWrap:'wrap', gap:8}}>
                               <ClockFace time={question.clock.start} caption={question.clock.read ? 'よみとった じこく' : 'はじめ'}/>
                               {!question.clock.read && <ClockFace time={question.clock.end} caption="はりを うごかした あと"/>}
@@ -966,6 +973,8 @@ const styles = StyleSheet.create({
   workWide: { flexDirection: 'row-reverse', alignItems: 'stretch' },
   answerArea: { gap: 9, backgroundColor: '#f0f4fc', borderRadius: 16, padding: 14, minWidth: 0 },
   answerWide: { width: 360 },
+  choiceFeedbackWork: { alignItems: 'center' },
+  choiceFeedbackArea: { width: '100%', maxWidth: 760, alignSelf: 'center', padding: 12 },
   answerHeading: { color: '#29345d', fontWeight: '900', fontSize: 19 },
   modes: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
   mode: { backgroundColor: '#dfe5f5', borderRadius: 9, paddingVertical: 9, paddingHorizontal: 9, flex: 1, minHeight: 43, alignItems: 'center', justifyContent: 'center' },

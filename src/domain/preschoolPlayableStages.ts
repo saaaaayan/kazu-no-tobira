@@ -12,7 +12,7 @@ import type { PictureNumberMatch } from './preschoolNumberConnections.ts';
 const toys: CountingToken[]=['bear','cat','dog','rabbit','chick','car','flower','star','apple','fish'];
 const shapes=['●','▲','■'] as const;
 type Task={question:string;answer:string;choices:string[];prompt?:string;diagram?:BankDiagram;
-  trace?:string; explanation?:string;hints?:[string,string,string];
+  trace?:string; spatial?:true; explanation?:string;hints?:[string,string,string];
   numeralPractice?:true;focalNumeral?:string;
   pictureNumberMatch?:PictureNumberMatch;
   twoRules?:{color:'あか'|'あお';shape:'まる'|'さんかく'|'しかく'};};
@@ -21,6 +21,9 @@ const name=(token:CountingToken)=>countingTokenArt[token][1];
 const repeat=(token:CountingToken,n:number)=>Array.from({length:n},()=>token);
 const groups=(left:CountingToken[],right?:CountingToken[],target?:CountingToken):BankDiagram=>({
   kind:'countingBoard',rows:[{label:right?'ひだり':'',tokens:left},...(right?[{label:'みぎ',tokens:right}]:[])],
+  // Two distinct labeled groups must occupy left and right columns, never
+  // top and bottom: spatial questions depend on their actual placement.
+  ...(right?{arrangement:'side-by-side' as const}:{}),
   ...(target?{targetToken:target}:{}),
 });
 const numbers=(n:number,max=10)=>[n,Math.max(0,n-1),Math.min(max,n+1)].map(String)
@@ -92,13 +95,17 @@ function order(i:number,max:number,mode:number):Task{
 }
 function position(i:number,level:number):Task{
  const items=[toys[(i+2)%toys.length],toys[(i+5)%toys.length],toys[(i+8)%toys.length]];
- const names=items.map(name);const icons=items.map(image);
+ const names=items.map(name);
+ // The three toys are rendered as an actual one-row diagram, not inline
+ // emoji text that may wrap across lines on narrow phone screens.
+ const visual={diagram:{kind:'countingBoard' as const,arrangement:'position-row' as const,
+   rows:[{tokens:items}]},spatial:true as const};
  const q=level%5;
- if(q===0)return choose(seq(icons)+'　まんなかは だれ？',names[1],[names[0],names[2]],{explanation:'3つの えの まんなかは '+names[1]+' だよ。'});
- if(q===1)return choose(seq(icons)+'　いちばん ひだりは だれ？',names[0],[names[1],names[2]],{explanation:'ひだりはしに いるのは '+names[0]+' だよ。'});
- if(q===2)return choose(seq(icons)+'　いちばん みぎは だれ？',names[2],[names[0],names[1]],{explanation:'みぎはしに いるのは '+names[2]+' だよ。'});
- if(q===3)return choose(seq(icons)+'　'+names[1]+' の ひだりは？',names[0],[names[1],names[2]],{explanation:'まんなかの ひだりに '+names[0]+' が いるよ。'});
- return choose(seq(icons)+'　'+names[1]+' の みぎは？',names[2],[names[0],names[1]],{explanation:'まんなかの みぎに '+names[2]+' が いるよ。'});
+ if(q===0)return choose('まんなかは だれ？',names[1],[names[0],names[2]],{...visual,explanation:'3つの えの まんなかは '+names[1]+' だよ。'});
+ if(q===1)return choose('いちばん ひだりは だれ？',names[0],[names[1],names[2]],{...visual,explanation:'ひだりはしに いるのは '+names[0]+' だよ。'});
+ if(q===2)return choose('いちばん みぎは だれ？',names[2],[names[0],names[1]],{...visual,explanation:'みぎはしに いるのは '+names[2]+' だよ。'});
+ if(q===3)return choose(names[1]+' の ひだりは？',names[0],[names[1],names[2]],{...visual,explanation:'まんなかの ひだりに '+names[0]+' が いるよ。'});
+ return choose(names[1]+' の みぎは？',names[2],[names[0],names[1]],{...visual,explanation:'まんなかの みぎに '+names[2]+' が いるよ。'});
 }
 function classify(i:number,level:number):Task{
  const variants=[
@@ -232,6 +239,7 @@ function makeTask(n:number,i:number):Task{
 const specificHints=(q:Task,n:number):[string,string,string]=>{
  if(q.hints)return q.hints;
  if(q.trace)return ['おてほんを みてね。','うえから ゆっくり ゆびを うごかそう。','かきおわったら、かたちを くらべよう。'];
+ if(q.spatial)return ['えを ひだりから みてね。','ひだり・まんなか・みぎを たしかめよう。','きかれた ばしょの えを えらぼう。'];
  if(q.diagram?.kind==='countingBoard')return [
    'えを よく みてね。',
    'ひとつずつ さわって かぞえよう。',

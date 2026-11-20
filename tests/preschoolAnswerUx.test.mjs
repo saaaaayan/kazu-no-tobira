@@ -29,7 +29,7 @@ test('preschool answer buttons grade their own value in one tap without stale st
 });
 
 test('choice answers use the shared inline buttons, while non-choice inputs retain manual submit',()=>{
-  assert.match(code,/wide&&!countingGuide&&!numeralGuide&&styles\.workWide/u);
+  assert.match(code,/wide&&!countingGuide&&!numeralGuide&&question\.type!=='choice'&&styles\.workWide/u);
   assert.match(code,/!countingGuide && !numeralGuide && !bankQuestion\?\.preschoolTrace && question\.type!=='choice'/u);
   assert.match(code,/const inlineChoice=Boolean\(question\?\.type==='choice'/u);
   assert.match(code,/testID="kazu-inline-choice-panel"/u);
