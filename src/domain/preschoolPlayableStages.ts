@@ -73,7 +73,7 @@ function magnitudeTask(i:number,metric:'length'|'size'):Task{
      hints:[metric==='length'?'ひもの はじまりを そろえて みよう。':'まるを ふたつ みてね。',
        metric==='length'?'どちらが さきまで のびているかな？':'どちらの まるが おおきいかな？',
        'おなじ くらいなら「おなじ」を えらぼう。'],
-     explanation:first===second?'あかも あおも、おなじ '+quality+'だよ。':
+     explanation:first===second?'あかも あおも、おなじ '+(metric==='length'?'ながさ':'おおきさ')+'だよ。':
        answer+'の '+object+'が '+quality+'ね。',
    });
 }
@@ -107,12 +107,12 @@ function splitTask(i:number):Task{
 function equalizeTask(i:number):Task{
  const token=t(i),left=2+i%5,right=left+(i%3===0?0:i%3===1?1:-1);
  const answer=left===right?'おなじ':left<right?'ひだり':'みぎ';
- return choose('1こ ふやして おなじに するなら、どっち？',
+ return choose('おなじ かずに するには？',
    answer,['ひだり','おなじ','みぎ'],{
      diagram:groups(repeat(token,left),repeat(token,right)),
-     prompt:'ひだりと みぎの かずを くらべよう。',
+     prompt:'ひとつ ふやす ばしょを えらぼう。もう おなじなら「おなじ」。',
      hints:['ひだりを かぞえてね。','みぎを かぞえてね。',
-       'すくない ほうに 1こ ふやすと どうなる？'],
+       'すくない ほうに 1こ ふやそう。おなじなら そのまま。'],
      explanation:left===right?'ひだりも みぎも '+left+'こ。もう おなじだよ。':
        'ひだりは '+left+'こ、みぎは '+right+'こ。'+answer+'に 1こ ふやすと おなじだよ。',
    });
