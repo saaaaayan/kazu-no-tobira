@@ -29,11 +29,11 @@
 0	preschool	28	preschool.n28	normal	sorting	sorting	なかまわけ・ひらめきの門	not_started	0	0	10	0
 0	preschool	29	preschool.n29	normal	sorting	sorting	なかまわけ・チャレンジの丘	not_started	0	0	10	0
 0	preschool	30	preschool.n30	normal	sorting	sorting	なかまわけ・マスターの宝箱	not_started	0	0	10	0
-0	preschool	31	preschool.n31	normal	shapes	shape	まる・さんかく・しかく・はじめの一歩	not_started	0	0	10	0
-0	preschool	32	preschool.n32	normal	shapes	shape	まる・さんかく・しかく・れんしゅうの道	not_started	0	0	10	0
-0	preschool	33	preschool.n33	normal	shapes	shape	まる・さんかく・しかく・ひらめきの門	not_started	0	0	10	0
-0	preschool	34	preschool.n34	normal	shapes	shape	まる・さんかく・しかく・チャレンジの丘	not_started	0	0	10	0
-0	preschool	35	preschool.n35	normal	shapes	shape	まる・さんかく・しかく・マスターの宝箱	not_started	0	0	10	0
+0	preschool	31	preschool.n31	normal	shapes	shape	かたちと おおきさ・はじめの一歩	not_started	0	0	10	0
+0	preschool	32	preschool.n32	normal	shapes	shape	かたちと おおきさ・れんしゅうの道	not_started	0	0	10	0
+0	preschool	33	preschool.n33	normal	shapes	shape	かたちと おおきさ・ひらめきの門	not_started	0	0	10	0
+0	preschool	34	preschool.n34	normal	shapes	shape	かたちと おおきさ・チャレンジの丘	not_started	0	0	10	0
+0	preschool	35	preschool.n35	normal	shapes	shape	かたちと おおきさ・マスターの宝箱	not_started	0	0	10	0
 0	preschool	36	preschool.n36	normal	patterns	pattern	つぎは なにかな・はじめの一歩	not_started	0	0	10	0
 0	preschool	37	preschool.n37	normal	patterns	pattern	つぎは なにかな・れんしゅうの道	not_started	0	0	10	0
 0	preschool	38	preschool.n38	normal	patterns	pattern	つぎは なにかな・ひらめきの門	not_started	0	0	10	0
@@ -44,21 +44,21 @@
 0	preschool	43	preschool.n43	normal	position	position	うえ・した・となり・ひらめきの門	not_started	0	0	10	0
 0	preschool	44	preschool.n44	normal	position	position	うえ・した・となり・チャレンジの丘	not_started	0	0	10	0
 0	preschool	45	preschool.n45	normal	position	position	うえ・した・となり・マスターの宝箱	not_started	0	0	10	0
-0	preschool	46	preschool.n46	normal	play	mixed	かずと かたちの あそび・はじめの一歩	not_started	0	0	10	0
-0	preschool	47	preschool.n47	normal	play	mixed	かずと かたちの あそび・れんしゅうの道	not_started	0	0	10	0
-0	preschool	48	preschool.n48	normal	play	mixed	かずと かたちの あそび・ひらめきの門	not_started	0	0	10	0
-0	preschool	49	preschool.n49	normal	play	mixed	かずと かたちの あそび・チャレンジの丘	not_started	0	0	10	0
-0	preschool	50	preschool.n50	normal	play	mixed	かずと かたちの あそび・マスターの宝箱	not_started	0	0	10	0
+0	preschool	46	preschool.n46	normal	play	mixed	あわせる・わける・くらべる・はじめの一歩	not_started	0	0	10	0
+0	preschool	47	preschool.n47	normal	play	mixed	あわせる・わける・くらべる・れんしゅうの道	not_started	0	0	10	0
+0	preschool	48	preschool.n48	normal	play	mixed	あわせる・わける・くらべる・ひらめきの門	not_started	0	0	10	0
+0	preschool	49	preschool.n49	normal	play	mixed	あわせる・わける・くらべる・チャレンジの丘	not_started	0	0	10	0
+0	preschool	50	preschool.n50	normal	play	mixed	あわせる・わける・くらべる・マスターの宝箱	not_started	0	0	10	0
 0	preschool	51	preschool.x01	extra	objects	count	EX・ものを かぞえる	not_started	0	0	10	0
 0	preschool	52	preschool.x02	extra	matching	count	EX・かずと すうじ	not_started	0	0	10	0
 0	preschool	53	preschool.x03	extra	tracing	tracing	EX・すうじの なぞりがき	not_started	0	0	10	0
 0	preschool	54	preschool.x04	extra	number-order	count	EX・かずの ならび	not_started	0	0	10	0
 0	preschool	55	preschool.x05	extra	comparison	comparison	EX・おおい・すくない	not_started	0	0	10	0
 0	preschool	56	preschool.x06	extra	sorting	sorting	EX・なかまわけ	not_started	0	0	10	0
-0	preschool	57	preschool.x07	extra	shapes	shape	EX・まる・さんかく・しかく	not_started	0	0	10	0
+0	preschool	57	preschool.x07	extra	shapes	shape	EX・かたちと おおきさ	not_started	0	0	10	0
 0	preschool	58	preschool.x08	extra	patterns	pattern	EX・つぎは なにかな	not_started	0	0	10	0
 0	preschool	59	preschool.x09	extra	position	position	EX・うえ・した・となり	not_started	0	0	10	0
-0	preschool	60	preschool.x10	extra	play	mixed	EX・かずと かたちの あそび	not_started	0	0	10	0
+0	preschool	60	preschool.x10	extra	play	mixed	EX・あわせる・わける・くらべる	not_started	0	0	10	0
 0	preschool	61	preschool.s01	secret	objects	discovery	ひみつ・数のひみつを発見	not_started	0	0	10	0
 0	preschool	62	preschool.s02	secret	matching	discovery	ひみつ・不思議な規則の旅	not_started	0	0	10	0
 0	preschool	63	preschool.s03	secret	tracing	discovery	ひみつ・数学の魔法を解こう	not_started	0	0	10	0
