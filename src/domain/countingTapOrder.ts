@@ -16,3 +16,19 @@ export function toggleCountingTap(selected: ReadonlySet<string>, id: string): Se
   else next.add(id);
   return next;
 }
+
+/** 左右の比較図は、それぞれ1から数える。
+ * Each tile is keyed as "row:column"; taps in the opposite row do not
+ * affect the badge number, even after tapping/untapping out of order.
+ */
+export function countingTapNumberInRow(selected: ReadonlySet<string>, id: string): number | undefined {
+  if (!selected.has(id)) return undefined;
+  const row=id.split(':',1)[0];
+  let number=0;
+  for(const selectedId of selected) {
+    if(selectedId.split(':',1)[0] !== row) continue;
+    number++;
+    if(selectedId===id) return number;
+  }
+  return undefined;
+}
