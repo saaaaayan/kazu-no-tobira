@@ -361,7 +361,7 @@ export function gradeOnePreviewBank(stage:Pick<WorldStage,'id'|'gradeId'|'kind'|
     // Children practice entering answers to simple equations; picture and
     // matching activities retain one-tap choices.
     const numericInput=source.format==='calculation'&&i%3!==0&&
-      /^\\d+\\s*[＋−]\\s*\\d+\\s*＝/u.test(source.question);
+      /^\d+\s*[＋−]\s*\d+\s*＝/u.test(source.question);
     return {
       id:'ui-preview-'+stage.id+'-curriculum-'+String(i+1).padStart(2,'0'),
       stageId:stage.id,
