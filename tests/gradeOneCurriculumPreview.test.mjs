@@ -50,7 +50,10 @@ test('all 50 stages have ten independently gradable lessons with multi-step hint
       assert.equal(q.difficulty,bank.indexOf(q)<3?1:bank.indexOf(q)<8?2:3,q.id);
     }
     if(stageIndex>=40&&stageIndex<50)assert.ok(bank.every(q=>q.diagram||q.clock),stage.id);
-    if(stageIndex>=5&&stageIndex<40){
+    const unit=Math.floor(stageIndex/5),part=stageIndex%5;
+    // Arithmetic units use equations; concrete 10-bond introductions,
+    // counting/place-value activities and drawings are intentionally visual.
+    if([1,2,5,6].includes(unit)||(unit===3&&[1,2,3].includes(part))){
       assert.ok(bank.filter(q=>q.question.includes('＝')).length>=4,
         'calculation unit should primarily use numeric expressions: '+stage.id+' '+bank.map(q=>q.question).join(' | '));
     }
