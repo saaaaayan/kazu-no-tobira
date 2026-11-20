@@ -7,6 +7,7 @@ import { checkMathAnswer, isValidMathAnswer } from './domain/mathAnswer';
 import { stageDisplayTitle,stageLabels, type Checkpoint } from './domain/stageStructure';
 import { stageCategoryName } from './domain/islandCurriculumView';
 import { preschoolStageMapInfo } from './domain/preschoolStageMapInfo';
+import { gradeOnePreviewStageInfo } from './domain/gradeOnePreviewCurriculum';
 import { shouldAutoGradePreschoolChoice } from './domain/preschoolAnswerFlow';
 import { displayedChoiceOptions } from './domain/choicePresentation';
 import { preschoolSpatialChoiceEmoji } from './domain/preschoolSpatialChoice';
@@ -18,7 +19,7 @@ import { hasStageBank,isBankQuestion } from './domain/questionBank';
 import { prepareStageRound } from './stageRounds';
 import { QuestionDiagram, WorkedSolution, WrittenSolution } from './components/QuestionSupport';
 import { emptyProgress, recordAttempt, type Progress } from './domain/progress';
-import { uiPreviewRound, uiPreviewPreschoolCheckpointOne, uiPreviewPreschoolCheckpoint } from './domain/uiPreviewRound';
+import { uiPreviewRound, uiPreviewPreschoolCheckpointOne, uiPreviewPreschoolCheckpoint, uiPreviewGradeOneCheckpoint } from './domain/uiPreviewRound';
 import { publicBankStageRound } from './domain/publicBankStageRound';
 import QuestionReadAloud from './components/QuestionReadAloud';
 import { canAccessFeature, canAccessStage, freeAccess, hasPremium, type Entitlement } from './domain/accessPlan';
@@ -243,11 +244,13 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
 
   function startCheckpoint(item:Checkpoint) {
     if (uiPreview) {
-      if(item.after.gradeId!=='preschool'||item.number<1||item.number>10){
+      if(!['preschool','e1'].includes(item.after.gradeId)||item.number<1||item.number>10){
         setStartError('この かくにんテストは じゅんびちゅうだよ。'); return;
       }
-      const problems=item.number===1?uiPreviewPreschoolCheckpointOne()
-        :uiPreviewPreschoolCheckpoint(item.number);
+      const problems=item.after.gradeId==='e1'
+        ? uiPreviewGradeOneCheckpoint(item.number)
+        : item.number===1?uiPreviewPreschoolCheckpointOne()
+          :uiPreviewPreschoolCheckpoint(item.number);
       if (problems.length!==10) {
         setStartError('かくにんテストの もんだいを ひらけなかったよ。'); return;
       }
@@ -271,6 +274,16 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   async function start(stage: WorldStage) {
     if (!progress || starting.current || submitting.current || lessonWrite.current) return;
     if (uiPreview) {
+      if (stage.gradeId==='e1' && stage.kind==='normal') {
+        // Grade-one trial uses the newly reviewed scope of ten per stage.
+        // Keep the archived 100-question banks intact for separate QA/migration.
+        const problems=uiPreviewRound(stage);
+        if(problems.length!==10){setStartError('この ステージは じゅんびちゅうだよ。');return;}
+        resetAnswer();setStartError('');setScreen('island');
+        setRound({stage,problems,index:0,correct:0,results:[],
+          dialogueOffset:0,usedHint:false,hintLevel:0});
+        return;
+      }
       if (hasStageBank(stage.id)) {
         // Public trial: these existing banks are now playable in the normal
         // adventure screen, without a login or a separate admin route.
@@ -503,7 +516,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {!round && screen !== 'lesson' && screen !== 'study-plan' && !preschoolMapFirst && <VersionNotice/>}
           {uiPreview && !preschoolChildView && <View style={styles.playPanel} testID="kazu-sample-only-preview">
             <Text accessibilityRole="header" style={styles.answerHeading}>数のトビラ 試作版</Text>
-            <Text style={styles.explanation}>小学1年生・賢者の島の43ステージで4,300問を公開中。各ステージ100問から10問ずつ挑戦できます。幼児01〜05も遊べます。試作版の回答記録は保存されません。</Text>
+            <Text style={styles.explanation}>小1は全50ステージのカリキュラム確認用10問ずつを公開中です。以前の100問バンクは別途保管し、教材の見直し後に再統合します。幼児65ステージも遊べます。試作版の回答記録は保存されません。</Text>
             <Text selectable style={styles.hintNote}>バージョン {process.env.EXPO_PUBLIC_KAZU_UI_PREVIEW_SHA}</Text>
           </View>}
           {__DEV__ && !review && !preschoolChildView && <View style={styles.navigation}>
@@ -574,7 +587,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                   <View style={styles.finishHero}>
                     {!testing && cleared && <SparkleBurst big/>}
                     {!testing && <Text style={styles.finishEmoji}>{perfect?'🌟':cleared?'✨':'🌱'}</Text>}
-                    <Text style={styles.finishStage}>{stageDisplayTitle(round.stage)}</Text>
+                    <Text style={styles.finishStage}>{uiPreview && gradeOnePreviewStageInfo(round.stage)?.title || stageDisplayTitle(round.stage)}</Text>
                     <Text accessibilityRole="header" style={styles.finishTitle}>
                       {testing || specialRound ? 'けっか' : perfect?'パーフェクト！':cleared?'ステージ クリア！':'おつかれさま！'}
                     </Text>
@@ -596,13 +609,13 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                 <>
                   <View style={styles.questionPanel}>
                     <View style={styles.questionHeader}>
-                      <Text style={styles.stageTitle}>{round.checkpoint ? 'かくにんテスト '+round.checkpoint.number : countingGuide ? preschoolGuideTitles[round.stage.id] : round.stage.gradeId==='preschool' ? preschoolStageMapInfo(round.stage).title : stageDisplayTitle(round.stage)}</Text>
+                      <Text style={styles.stageTitle}>{round.checkpoint ? 'かくにんテスト '+round.checkpoint.number : countingGuide ? preschoolGuideTitles[round.stage.id] : round.stage.gradeId==='preschool' ? preschoolStageMapInfo(round.stage).title : uiPreview && gradeOnePreviewStageInfo(round.stage)?.title || stageDisplayTitle(round.stage)}</Text>
                       <Text style={styles.questionIndex}>{countingGuide ? round.index+1 : '第'+(round.index+1)+'問'} / {round.problems.length}</Text>
                     </View>
                     <Text style={styles.stageCategory}>{round.checkpoint
                       ? '学習範囲：直前の冒険5ステージ'
-                      : '単元・カテゴリ：'+stageCategoryName(
-                          worldIslands.find(island=>island.id===round.stage.gradeId)!,round.stage)}</Text>
+                      : '単元・カテゴリ：'+(uiPreview && gradeOnePreviewStageInfo(round.stage)?.unit ||
+                          stageCategoryName(worldIslands.find(island=>island.id===round.stage.gradeId)!,round.stage))}</Text>
                     <MagicMeter results={round.results} total={round.problems.length}/>
                     <CompanionMoment compact onDark
                       mood={round.feedback === 'correct' ? 'correct' : round.feedback === 'incorrect' ? 'incorrect' : 'ready'}
