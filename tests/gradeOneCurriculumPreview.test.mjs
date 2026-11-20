@@ -52,7 +52,7 @@ test('all 50 stages have ten independently gradable lessons with multi-step hint
     if(stageIndex>=40&&stageIndex<50)assert.ok(bank.every(q=>q.diagram||q.clock),stage.id);
     if(stageIndex>=5&&stageIndex<40){
       assert.ok(bank.filter(q=>q.question.includes('＝')).length>=4,
-        'calculation unit should primarily use numeric expressions: '+stage.id);
+        'calculation unit should primarily use numeric expressions: '+stage.id+' '+bank.map(q=>q.question).join(' | '));
     }
   }
   assert.equal(ids.size,500);
@@ -109,7 +109,7 @@ test('every five-stage unit has a ten-question checkpoint with no unsupported st
     assert.equal(new Set(batch.map(q=>q.id)).size,10);
     const permitted=new Set(stages.slice((checkpoint-1)*5,checkpoint*5).map(x=>x.id));
     for(const q of batch){
-      assert.ok(permitted.has(q.stageId),q.id);
+      assert.ok(permitted.has(q.stageId),q.id+' stageId='+q.stageId+' permitted='+[...permitted].join(','));
       assert.equal(q.choices.filter(c=>checkMathAnswer(q,c)).length,1,q.id);
     }
     for(const id of permitted)assert.equal(batch.filter(q=>q.stageId===id).length,2,id);
