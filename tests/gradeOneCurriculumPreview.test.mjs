@@ -101,7 +101,9 @@ test('length, capacity and picture graphs have math-correct answers grounded in 
   for(const q of size(48)){
     assert.ok(q.clock?.read,q.id);
     assert.ok([0,30].includes(q.clock.start%60),q.id);
-    assert.equal(q.answer,String(Math.floor(q.clock.start/60)),q.id);
+    const half=q.clock.start%60===30;
+    assert.equal(q.answer,Math.floor(q.clock.start/60)+(half?'じはん':'じ'),q.id);
+    assert.ok(q.choices.every(value=>value.endsWith(half?'じはん':'じ')),q.id);
   }
 });
 
