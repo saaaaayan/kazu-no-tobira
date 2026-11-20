@@ -73,7 +73,7 @@ test('map pins, 65-stage curriculum navigation and game questions render categor
   const round=read('src/FullAdventure.tsx');
   assert.match(map,/style={\[styles\.pinCategoryBox/);
   assert.match(map,/stageCategoryName\(grade,stage\)/);
-  assert.match(map,/accessibilityLabel={stageDisplayTitle\(stage\)\+'、単元 '/);
+  assert.match(map,/gradeOnePreviewStageInfo\(stage\)\?\.title : stageDisplayTitle\(stage\)/);
   assert.match(map,/<IslandCurriculumPanel grade={grade} onStart={onStart}/);
   assert.match(panel,/この島のカリキュラム/);
   assert.match(panel,/data\.units\.map/);
@@ -82,7 +82,7 @@ test('map pins, 65-stage curriculum navigation and game questions render categor
   assert.match(panel,/data\.checkpoints\.map/);
   assert.match(panel,/category|カテゴリ|単元・カテゴリ/);
   assert.match(panel,/disabled={!state\.enabled}/);
-  assert.match(round,/単元・カテゴリ：'\+stageCategoryName/);
+  assert.match(round,/単元・カテゴリ：'\+\(uiPreview && gradeOnePreviewStageInfo/);
   assert.match(round,/学習範囲：直前の冒険5ステージ/);
   assert.equal(worldIslands.length,16);
   assert.ok(worldIslands.every(grade=>grade.stages.every(stage=>stageDisplayTitle(stage).length>0)));

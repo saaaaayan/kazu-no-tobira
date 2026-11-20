@@ -3,12 +3,14 @@ import {Pressable,StyleSheet,Text,View} from 'react-native';
 import {islandCurriculum,stageCategoryName} from '../domain/islandCurriculumView';
 import {stageDisplayTitle,stageLabels} from '../domain/stageStructure';
 import type {WorldGrade,WorldStage} from '../domain/worldCatalog';
+import {gradeOnePreviewStageInfo,gradeOnePreviewUnits} from '../domain/gradeOnePreviewCurriculum';
 
 type Availability={enabled:boolean;label:string};
 type Props={
   grade:WorldGrade;
   onStart:(stage:WorldStage)=>void;
   availability:(stage:WorldStage)=>Availability;
+  preview?:boolean;
 };
 
 function stageNumber(stage:WorldStage):string {
@@ -17,26 +19,37 @@ function stageNumber(stage:WorldStage):string {
       :String(stage.order-59).padStart(2,'0');
 }
 
-function StageCurriculumRow({grade,stage,onStart,availability}:Props&{stage:WorldStage}){
+function StageCurriculumRow({grade,stage,onStart,availability,preview}:Props&{stage:WorldStage}){
   const state=availability(stage);
   const prefix=stageLabels[stage.kind];
+  const previewInfo=preview&&grade.id==='e1'?gradeOnePreviewStageInfo(stage):undefined;
+  const stageName=previewInfo?.title??stageDisplayTitle(stage);
+  const categoryName=previewInfo?.unit??stageCategoryName(grade,stage);
   return <Pressable testID={'curriculum-stage-'+stage.id} accessibilityRole="button"
       accessibilityState={{disabled:!state.enabled}}
-      accessibilityLabel={prefix+' '+stageNumber(stage)+'、単元 '+stageCategoryName(grade,stage)+'、'+stageDisplayTitle(stage)+'、'+state.label}
+      accessibilityLabel={prefix+' '+stageNumber(stage)+'、単元 '+categoryName+'、'+stageName+'、'+state.label}
       onPress={()=>onStart(stage)} disabled={!state.enabled}
       style={({pressed})=>[styles.stageRow,!state.enabled&&styles.stageDisabled,pressed&&styles.pressed]}>
     <View style={styles.stageCopy}>
-      <Text style={styles.stageTitle}>{prefix} {stageNumber(stage)}　{stageDisplayTitle(stage)}</Text>
-      <Text style={styles.stageSubject}>{stage.kind==='secret'?'探究テーマ':'単元・カテゴリ'}：{stageCategoryName(grade,stage)}</Text>
+      <Text style={styles.stageTitle}>{prefix} {stageNumber(stage)}　{stageName}</Text>
+      <Text style={styles.stageSubject}>{stage.kind==='secret'?'探究テーマ':'単元・カテゴリ'}：{categoryName}</Text>
     </View>
     <Text style={[styles.stageAction,!state.enabled&&styles.stageActionDisabled]}>{state.label}</Text>
   </Pressable>;
 }
 
-export function IslandCurriculumPanel({grade,onStart,availability}:Props){
+export function IslandCurriculumPanel({grade,onStart,availability,preview=false}:Props){
   const [open,setOpen]=useState(false);
   const [section,setSection]=useState<string|null>(null);
-  const data=islandCurriculum(grade);
+  const original=islandCurriculum(grade);
+  // Only the public first-grade trial uses the newly rebalanced 50-stage
+  // progression. Do not mutate the archived/approved catalog or EX metadata.
+  const data=preview&&grade.id==='e1'
+    ? {...original,units:original.units.map((entry,index)=>({
+        ...entry,unit:{...entry.unit,title:gradeOnePreviewUnits[index].title},
+        stages:grade.stages.filter(s=>s.kind==='normal'&&Math.floor(s.order/5)===index),
+      }))}
+    : original;
   const expand=(key:string)=>setSection(old=>old===key?null:key);
   return <View style={styles.panel}>
     <Pressable testID="kazu-island-curriculum-toggle" accessibilityRole="button"
@@ -73,8 +86,8 @@ export function IslandCurriculumPanel({grade,onStart,availability}:Props){
           </Pressable>
           {expanded&&<View style={styles.sectionDetails}>
             {stages.map(stage=><StageCurriculumRow key={stage.id} grade={grade} stage={stage}
-                onStart={onStart} availability={availability}/>)}
-            {trial&&<Text style={styles.trialNote}>この単元の試練：{stageDisplayTitle(trial)}</Text>}
+                onStart={onStart} availability={availability} preview={preview}/>)}
+            {trial&&!(preview&&grade.id==='e1')&&<Text style={styles.trialNote}>この単元の試練：{stageDisplayTitle(trial)}</Text>}
           </View>}
         </View>;
       })}

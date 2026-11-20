@@ -6,7 +6,11 @@ import type { MathQuestion } from './worldQuestions.ts';
 import type { CountingToken } from './countingTokens.ts';
 import type { PictureNumberMatch } from './preschoolNumberConnections.ts';
 export type { CountingToken } from './countingTokens.ts';
-export type BankDiagram = { kind: 'preschoolSplit'; token: CountingToken; total: number; placedLeft: number }
+export type BankDiagram = { kind:'gradeOneNumberLine'; start:number; end:number; hidden:number; step:1|10 }
+  | { kind:'gradeOneShapes'; symbols:readonly ('●'|'▲'|'■')[]; arrangement?:'row'|'house' }
+  | { kind:'gradeOneCapacity'; first:number; second:number }
+  | { kind:'gradeOnePictureGraph'; rows:readonly {label:string;token:CountingToken;count:number}[] }
+  | { kind: 'preschoolSplit'; token: CountingToken; total: number; placedLeft: number }
   | { kind: 'magnitudeCompare'; metric: 'length' | 'size'; first: number; second: number }
   | { kind: 'plateCount'; token: CountingToken; count: 0 | 1 | 2 }
   | { kind: 'countingBoard'; guide?: true; spacing?: 'wide'; arrangement?: 'side-by-side' | 'position-row' | 'vertical-position'; rows: readonly { label?: string; tokens: readonly CountingToken[] }[]; targetToken?: CountingToken; layoutComparison?: { before:'wide-gaps'|'even-gaps'|'small'|'large'|'left-packed'; after:'wide-gaps'|'even-gaps'|'small'|'large'|'left-packed'; beforeRows?: readonly number[] } }

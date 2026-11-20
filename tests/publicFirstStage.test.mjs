@@ -91,7 +91,7 @@ test('unsupported stages remain unavailable and elementary sample remains separa
   assert.equal(uiPreviewSampleKind({...preschool,kind:'extra'}),undefined);
   assert.deepEqual(uiPreviewBank({...preschool,kind:'extra'}),[]);
   assert.deepEqual(uiPreviewRound({...preschool,kind:'extra'}),[]);
-  assert.equal(uiPreviewSampleKind(addition),'addition');
+  assert.equal(uiPreviewSampleKind(addition),'grade-one-curriculum');
   assert.equal(uiPreviewBank(addition).length,10);
   assert.equal(uiPreviewRound(addition).length,10);
 });

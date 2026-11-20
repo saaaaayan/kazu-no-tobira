@@ -1,8 +1,9 @@
-import type { WorldStage } from './worldCatalog';
+import {worldStageById,type WorldStage} from './worldCatalog.ts';
 import type { BankQuestion } from './questionBank';
 import { countingTokenArt, preschoolCountingTokens } from './countingTokens.ts';
 import { preschoolSample02to05 } from './preschoolSampleStages.ts';
 import { preschoolPrototypeBank } from './preschoolPlayableStages.ts';
+import { gradeOnePreviewBank } from './gradeOnePreviewBank.ts';
 import { elementaryPilotBanks } from './elementaryPilotBanks.ts';
 import { elementaryFollowupBanks } from './elementaryFollowupBanks.ts';
 import { secondaryPilotBanks } from './secondaryPilotBanks.ts';
@@ -26,6 +27,14 @@ export function uiPreviewSampleKind(stage: SampleStage) {
     return stage.kind===expected && stage.family!=='unknown' &&
       full.order===order && Number.isInteger(full.unitIndex)
       ?'preschool-activity':undefined;
+  }
+  if (stage.gradeId==='e1' && stage.kind==='normal' && stage.family!=='unknown') {
+    const canonical=worldStageById.get(stage.id);
+    if(canonical?.kind==='normal' && canonical.gradeId==='e1' &&
+       canonical.family===stage.family &&
+       ((stage as Partial<WorldStage>).order===undefined ||
+        canonical.order===(stage as Partial<WorldStage>).order))
+      return 'grade-one-curriculum';
   }
   if (stage.kind !== 'normal') return undefined;
   if (additionalStageLessonBanks[stage.id] && stage.id.startsWith(stage.gradeId+'.') &&
@@ -62,6 +71,7 @@ const countingPreviewBank: BankQuestion[] = preschoolCountingTokens.flatMap(toke
 export function uiPreviewBank(stage: SampleStage): BankQuestion[] {
   const kind=uiPreviewSampleKind(stage);
   if (!kind) return [];
+  if (kind==='grade-one-curriculum') return gradeOnePreviewBank(worldStageById.get(stage.id)!);
   if (kind==='island-first-stage') return [...firstStageLessonBanks[stage.id]];
   if (kind==='foundation-stage') return [...additionalStageLessonBanks[stage.id]];
   if (kind==='counting') return [...countingPreviewBank];
@@ -127,7 +137,7 @@ export function uiPreviewRound(stage: SampleStage, random: () => number = Math.r
   const kind=uiPreviewSampleKind(stage);
   if (!kind) return [];
   const bank=uiPreviewBank(stage);
-  return kind==='counting' ? randomCountingRound(bank,random) : kind==='preschool-sample'||kind==='preschool-activity'||kind==='island-first-stage'||kind==='foundation-stage' ? [...bank] : shuffled(bank,random).slice(0,10);
+  return kind==='counting' ? randomCountingRound(bank,random) : kind==='preschool-sample'||kind==='preschool-activity'||kind==='island-first-stage'||kind==='foundation-stage'||kind==='grade-one-curriculum' ? [...bank] : shuffled(bank,random).slice(0,10);
 }
 
 
@@ -164,4 +174,24 @@ export function uiPreviewPreschoolCheckpoint(number:number,random:()=>number=Mat
    out.push(...shuffled(bank,random).slice(0,2));
  }
  return out;
+}
+
+/** Grade-one trial checkpoints: two curriculum-aligned exercises from each
+ * of the five immediately preceding stages. All ten checkpoints are playable.
+ */
+export function uiPreviewGradeOneCheckpoint(number:number,random:()=>number=Math.random):BankQuestion[]{
+  if(!Number.isInteger(number)||number<1||number>10)return [];
+  const picked:BankQuestion[]=[];
+  // The three legacy first-grade IDs were deliberately moved in the map.
+  // Source checkpoints by canonical display order, NEVER by ID numbering.
+  const route=[...worldStageById.values()]
+    .filter(stage=>stage.gradeId==='e1'&&stage.kind==='normal')
+    .sort((left,right)=>left.order-right.order);
+  for(let offset=0;offset<5;offset++){
+    const stage=route[(number-1)*5+offset];
+    if(!stage)throw Error('Missing grade-one checkpoint stage');
+    const bank=gradeOnePreviewBank(stage);
+    picked.push(...shuffled(bank,random).slice(0,2));
+  }
+  return picked;
 }

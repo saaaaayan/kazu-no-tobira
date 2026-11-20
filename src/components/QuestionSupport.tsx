@@ -134,6 +134,64 @@ function CountingBoard({ diagram, phase }: {
 }
 
 export function QuestionDiagram({ diagram, phase }: { diagram: BankDiagram; phase: 'question' | 'hint' | 'solution' }) {
+  if (diagram.kind === 'gradeOneNumberLine') {
+    const values=Array.from({length:(diagram.end-diagram.start)/diagram.step+1},
+      (_,i)=>diagram.start+i*diagram.step);
+    return <View testID="grade-one-number-line" style={styles.gradeOneVisual}>
+      <Text style={styles.gradeOneVisualTitle}>かずの ならび</Text>
+      <View style={styles.gradeOneNumberLine}>
+        {values.map(value=><View key={value} style={styles.gradeOneNumberCell}
+          accessible accessibilityLabel={value===diagram.hidden?'はてなの ばしょ':value+'の ところ'}>
+          <Text style={[styles.gradeOneNumberText,value===diagram.hidden&&styles.gradeOneUnknown]}>
+            {value===diagram.hidden?'？':value}
+          </Text>
+        </View>)}
+      </View>
+    </View>;
+  }
+  if (diagram.kind === 'gradeOneShapes') {
+    const house=diagram.arrangement==='house';
+    return <View testID="grade-one-shapes" style={styles.gradeOneVisual}>
+      <Text style={styles.gradeOneVisualTitle}>かたちを みてね</Text>
+      <View style={[styles.gradeOneShapesRow,house&&styles.gradeOneShapesTower]}>
+        {diagram.symbols.map((shape,index)=><Text key={index}
+          style={styles.gradeOneShape} accessibilityLabel={shape==='●'?'まる':shape==='▲'?'さんかく':'しかく'}>
+          {shape}
+        </Text>)}
+      </View>
+    </View>;
+  }
+  if (diagram.kind === 'gradeOneCapacity') {
+    return <View testID="grade-one-capacity" style={styles.gradeOneVisual}>
+      <Text style={styles.gradeOneVisualTitle}>おなじ おおきさの コップ</Text>
+      <View style={styles.gradeOneCapacityRow}>
+        {([{name:'あか',value:diagram.first,color:'#dc7564'},
+           {name:'あお',value:diagram.second,color:'#5796d0'}] as const).map(cup=>
+          <View key={cup.name} testID={'grade-one-capacity-'+cup.name}
+            style={styles.gradeOneCapacityItem}
+            accessible accessibilityLabel={cup.name+'の コップ'}>
+            <Text style={styles.gradeOneCupLabel}>{cup.name}</Text>
+            <View style={styles.gradeOneCup}>
+              <View style={{height:cup.value*18,backgroundColor:cup.color,
+                borderBottomLeftRadius:7,borderBottomRightRadius:7,width:'100%'}}/>
+            </View>
+          </View>)}
+      </View>
+    </View>;
+  }
+  if (diagram.kind === 'gradeOnePictureGraph') {
+    return <View testID="grade-one-picture-graph" style={styles.gradeOneVisual}>
+      <Text style={styles.gradeOneVisualTitle}>えの かずを くらべよう</Text>
+      {diagram.rows.map(row=><View key={row.label} style={styles.gradeOneGraphRow}
+        accessible accessibilityLabel={row.label+'の え'}>
+        <Text style={styles.gradeOneGraphLabel}>{row.label}</Text>
+        <View style={styles.gradeOneGraphPictures}>
+          {Array.from({length:row.count},(_,i)=>
+            <Text key={i} style={styles.gradeOneGraphIcon}>{tokenArt[row.token][0]}</Text>)}
+        </View>
+      </View>)}
+    </View>;
+  }
   if (diagram.kind === 'preschoolSplit') {
     const toy=tokenArt[diagram.token][0];
     const remaining=diagram.total-diagram.placedLeft;
@@ -322,6 +380,26 @@ export function WorkedSolution({ question, wrongAnswer }: { question: BankQuesti
 }
 
 const styles = StyleSheet.create({
+  gradeOneVisual:{width:'100%',backgroundColor:'#edf4ff',padding:14,borderRadius:14,gap:12},
+  gradeOneVisualTitle:{fontSize:18,fontWeight:'900',color:'#233f68',textAlign:'center'},
+  gradeOneNumberLine:{flexDirection:'row',alignItems:'center',justifyContent:'center',gap:3},
+  gradeOneNumberCell:{flex:1,minWidth:0,alignItems:'center',justifyContent:'center',
+    borderBottomColor:'#334568',borderBottomWidth:3,paddingVertical:10},
+  gradeOneNumberText:{fontWeight:'900',fontSize:21,color:'#253b66'},
+  gradeOneUnknown:{color:'#a34d1e',fontSize:28},
+  gradeOneShapesRow:{flexDirection:'row',justifyContent:'center',alignItems:'center',gap:14},
+  gradeOneShapesTower:{flexDirection:'column'},
+  gradeOneShape:{fontSize:64,lineHeight:72,color:'#355a96',textAlign:'center'},
+  gradeOneCapacityRow:{flexDirection:'row',gap:20,justifyContent:'center'},
+  gradeOneCapacityItem:{alignItems:'center',gap:8,minWidth:90},
+  gradeOneCupLabel:{fontSize:20,fontWeight:'900',color:'#243e66'},
+  gradeOneCup:{width:76,height:116,borderColor:'#526d8c',borderWidth:4,
+    borderTopWidth:0,borderBottomLeftRadius:13,borderBottomRightRadius:13,
+    backgroundColor:'#fffefa',justifyContent:'flex-end',overflow:'hidden'},
+  gradeOneGraphRow:{flexDirection:'row',alignItems:'center',gap:12},
+  gradeOneGraphLabel:{width:70,fontSize:18,fontWeight:'900',color:'#233f68'},
+  gradeOneGraphPictures:{flexDirection:'row',flexWrap:'wrap',gap:7,flex:1},
+  gradeOneGraphIcon:{fontSize:30,lineHeight:39},
   splitScene:{width:'100%',padding:12,borderRadius:14,backgroundColor:'#edf4ff',gap:8},
   splitWhole:{gap:6,alignItems:'center',padding:10,borderRadius:11,backgroundColor:'#fff9e9'},
   splitHeading:{fontSize:18,fontWeight:'900',color:'#243f6b',textAlign:'center'},

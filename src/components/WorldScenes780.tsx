@@ -16,6 +16,7 @@ import { featureAccess } from '../domain/accessPlan';
 import { uiPreviewSampleKind } from '../domain/uiPreviewRound';
 import { stageCategoryName, stageRowCategoryName } from '../domain/islandCurriculumView';
 import { preschoolStageMapInfo } from '../domain/preschoolStageMapInfo';
+import { gradeOnePreviewStageInfo } from '../domain/gradeOnePreviewCurriculum';
 import { IslandCurriculumPanel } from './IslandCurriculumPanel';
 import { PreschoolPixelTerrain } from './PreschoolPixelTerrain';
 
@@ -301,10 +302,10 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
   // Other islands retain their original ordering.
   const supplementalPanels=(
     <>
-      <IslandCurriculumPanel grade={grade} onStart={onStart} availability={curriculumAvailability}/>
+      <IslandCurriculumPanel grade={grade} onStart={onStart} availability={curriculumAvailability} preview={preview}/>
       {preview && <View style={styles.previewCard}>
         {previewStage ? <>
-          <Text accessibilityRole="header" style={styles.previewHeading}>{hasStageBank(previewStage.id)
+          <Text accessibilityRole="header" style={styles.previewHeading}>{preview && grade.id==='e1' ? 'かずから じゅんに まなぼう！' : hasStageBank(previewStage.id)
             ? 'このステージから あそぼう！' : 'まずは ここから！'}</Text>
           <Pressable accessibilityRole="button" testID="kazu-preview-first-stage"
             accessibilityLabel={'ステージ '+stageText(previewStage)+' を はじめる'}
@@ -312,7 +313,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
             style={({pressed})=>[styles.previewStart,pressed&&styles.pressed]}>
             <Text style={styles.previewStartText}>▶ ステージ {stageText(previewStage)} {hasStageBank(previewStage.id)?'を はじめる':'を はじめる'}</Text>
           </Pressable>
-          <Text style={styles.hintText}>{hasStageBank(previewStage.id)
+          <Text style={styles.hintText}>{preview && grade.id==='e1' ? '50ステージ・各10問のカリキュラム試作版だよ。' : hasStageBank(previewStage.id)
             ? '100問のなかから、10問ずつ ちょうせんできるよ！'
             : 'えを みて、さわって、かぞえてみよう。'}</Text>
         </> : <>
@@ -345,7 +346,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
       </View>}
       {preview && <View style={styles.legend}>
         <Text style={styles.legendText}>✦ あそべる</Text>
-        {grade.stages.some(stage=>hasStageBank(stage.id)) &&
+        {grade.id!=='e1' && grade.stages.some(stage=>hasStageBank(stage.id)) &&
           <Text style={styles.legendText}>◆ 100問から10問ずつ</Text>}
         <Text style={styles.legendText}>● じゅんびちゅう</Text>
       </View>}
@@ -372,7 +373,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           <Text style={styles.eyebrow}>{grade.title} の ぼうけんマップ</Text>
           <Text style={styles.bannerHeading}>{grade.island}</Text>
           <Text style={styles.bannerDescription}>{grade.theme}</Text>
-          <Text style={styles.islandBannerCount}>{preview ? (grade.stages.some(stage=>hasStageBank(stage.id))
+          <Text style={styles.islandBannerCount}>{preview ? (grade.id==='e1' ? '冒険の道50ステージ・確認テスト10を あそべるよ' : grade.stages.some(stage=>hasStageBank(stage.id))
             ? '問題がある '+grade.stages.filter(stage=>hasStageBank(stage.id)).length+'ステージを あそべるよ'
             : '65ステージと10か所の確認テスト · サンプル表示') : isPlannedIsland(grade.id) ? '教材を準備中 · 65地点' : grade.id === 'sage' ? (testing || isIslandUnlocked(progress, grade.id)
             ? `${grade.stages.filter(stage => hasStageBank(stage.id)).length} / 65 地点で出題中` : '高校3年生の冒険の道50・試練の道10をクリアすると解放') : testing ? (hasPremium(access) ? "65ステージ すべてプレイできるよ" : "冒険の道50ステージを 自由に あそべるよ") : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
@@ -456,7 +457,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
               right:Math.max(68,Math.ceil(actual*.16)),
             }]}>
             <Text numberOfLines={2} style={styles.compactRowTopicText}>
-              {stageRowCategoryName(grade,row)}
+              {preview && grade.id==='e1' ? gradeOnePreviewStageInfo(grade.stages[row*5])?.unit : stageRowCategoryName(grade,row)}
             </Text>
           </View>;
         })}
@@ -467,13 +468,13 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
               width:84,left:Math.max(1,Math.min(actual-85,position.x-42)),
               top:position.y+marker/2+4,
             }]}>
-            <Text numberOfLines={2} style={styles.pinCategoryText}>{stageCategoryName(grade,stage)}</Text>
+            <Text numberOfLines={2} style={styles.pinCategoryText}>{preview && grade.id==='e1' ? gradeOnePreviewStageInfo(stage)?.title : stageCategoryName(grade,stage)}</Text>
           </View>;
         })}
         {checkpointsFor(grade).map(checkpoint=>{
           const end=geometry.positions[checkpoint.after.order];
           // All ten preschool five-stage checks are playable in preview.
-          const enabled=preview ? grade.id==='preschool' && checkpoint.number<=10
+          const enabled=preview ? (grade.id==='preschool'||grade.id==='e1') && checkpoint.number<=10
             : testing || checkpoint.sourceStageIds.every(id=>Boolean(progress.stages[id]?.clearedAt));
           const nextPoint=geometry.positions[checkpoint.after.order+1];
           const checkpointLayout=islandCheckpointLayout(actual,end,marker,nextPoint,grade.id==='preschool');
@@ -516,7 +517,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           return (
             <Pressable key={stage.id} accessibilityRole="button" disabled={!selectable}
               accessibilityState={{disabled:!selectable}}
-              accessibilityLabel={stageDisplayTitle(stage)+'、単元 '+stageCategoryName(grade,stage)+'、'+(grade.id==='preschool'?'学習内容 '+preschoolStageMapInfo(stage).title+'、':'')+(preview ? (hasStageBank(stage.id) ? '100問のなかから10問ずつ あそべる' : uiPreviewSampleKind(stage) ? 'サンプル問題' : '体験用問題は準備中') : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
+              accessibilityLabel={(preview && grade.id==='e1' ? gradeOnePreviewStageInfo(stage)?.title : stageDisplayTitle(stage))+'、単元 '+(preview && grade.id==='e1' ? gradeOnePreviewStageInfo(stage)?.unit : stageCategoryName(grade,stage))+'、'+(grade.id==='preschool'?'学習内容 '+preschoolStageMapInfo(stage).title+'、':'')+(preview ? (grade.id==='e1' && stage.kind==='normal' ? 'カリキュラム確認用10問' : hasStageBank(stage.id) ? '100問のなかから10問ずつ あそべる' : uiPreviewSampleKind(stage) ? 'サンプル問題' : '体験用問題は準備中') : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
                 styles.stagePin,grade.id==='preschool'&&styles.pixelStagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
