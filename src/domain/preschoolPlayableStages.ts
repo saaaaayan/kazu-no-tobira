@@ -62,9 +62,21 @@ function shapeTask(i:number,part:number):Task{
   if(part===2) return choose('しかくは どれかな？　'+seq([here,other,third]),'■',['●','▲'],
     {explanation:'しかくは、かどが 4つ あるよ。'});
   if(part===3) {
-    const rotated=['▲','▶','▼','◀'][i%4];
-    return choose('この かたちを くるっと まわすと？　'+rotated,'さんかく',
-      ['まる','しかく'],{explanation:'むきを かえても 3つの かどが あるよ。'});
+    // Rotational recognition: the child must apply the same turn as a worked
+    // picture example. Merely naming a rotated triangle is not sufficient.
+    const directions=['▲','▶','▼','◀'] as const;
+    const turns=i<4?1:i<8?-1:2;
+    const from=directions[i%4];
+    const to=directions[(i%4+turns+4)%4];
+    const sampleTo=directions[(turns+4)%4];
+    return choose('おてほん：▲ → '+sampleTo+'\nおなじように まわすと？　'+from+' → ？',
+      to,directions.filter(symbol=>symbol!==to),{
+        prompt:'おてほんと おなじ むきに まわそう。',
+        hints:['おてほんの ▲ が '+sampleTo+' に なる うごきを みてね。',
+          'とがった ほうが どちらへ むくか かんがえよう。',
+          from+' を おなじように まわして えらぼう。'],
+        explanation:'おてほんの ▲ → '+sampleTo+' と おなじように、'+from+' → '+to+' に なるよ。',
+      });
   }
   const pair=[['▲','■'],['●','●'],['●','■']][i%3];
   const answer=['おうち','ゆきだるま','くるま'][i%3];
