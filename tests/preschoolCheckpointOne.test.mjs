@@ -56,8 +56,8 @@ test('checkpoint 1 preview map is playable without unlocking all 5 normal stages
   const app=readFileSync(new URL('../src/FullAdventure.tsx',import.meta.url),'utf8');
   assert.match(source,/const enabled=preview \? \(grade\.id==='preschool'\|\|grade\.id==='e1'\) && checkpoint\.number<=10/);
   assert.match(source,/onPress=\{\(\)=>onCheckpoint\(checkpoint\)\}/);
-  assert.match(app,/item\.after\.gradeId!=='preschool'\|\|item\.number<1\|\|item\.number>10/);
-  assert.match(app,/const problems=item\.number===1\?uiPreviewPreschoolCheckpointOne\(\)/);
+  assert.match(app,/!\['preschool','e1'\]\.includes\(item\.after\.gradeId\)\|\|item\.number<1\|\|item\.number>10/);
+  assert.match(app,/item\.number===1\?uiPreviewPreschoolCheckpointOne\(\)/);
   assert.match(app,/checkpoint:\{id:item\.id,number:item\.number\}/);
   assert.match(app,/const specialRound=Boolean\(round\?\.checkpoint/);
   assert.match(app,/const nextStage = round && !round\.checkpoint/);
