@@ -18,7 +18,7 @@ const repeat=(token:CountingToken,count:number)=>Array.from({length:count},()=>t
 const cap=(text:string)=>text.replaceAll('　',' ').trim();
 
 function nums(value:number,max=100):string[]{
-  const options=[value,value>0?value-1:value+1,value<max?value+1:value-2].map(String);
+  const options=[value,value>0?value-1:value+1,value<max?value+1:value-2].filter(n=>n>=0&&n<=max).map(String);
   for(let n=0;new Set(options).size<3;n++){
     const candidate=String(n);
     if(!options.includes(candidate))options.push(candidate);
@@ -128,7 +128,7 @@ function tenParts(i:number,part:number):Task{
 function shapeTask(i:number,part:number):Task {
   const target=glyphs[i%3];
   const other=glyphs[(i+1)%3];
-  const shapes:readonly ('●'|'▲'|'■')[]=i%2===0?[target,other,target]:[other,target,other,target];
+  const shapes:readonly ('●'|'▲'|'■')[]=i%2===0?[target,other,glyphs[(i+2)%3]]:[glyphs[(i+2)%3],target,other,target];
   const baseDiagram:BankDiagram={kind:'gradeOneShapes',symbols:shapes,arrangement:'row'};
   const hints:[string,string,string]=[
     'えの かたちを みてね。','まる・さんかく・しかくを くらべよう。',
@@ -140,18 +140,20 @@ function shapeTask(i:number,part:number):Task {
     'まるは ●、さんかくは ▲、しかくは ■ だよ。',
     hints,baseDiagram,['●','▲','■']);
   if(part===2){
-    const bottom=i%2===0?'■':'●';
-    const house:BankDiagram={kind:'gradeOneShapes',symbols:['▲',bottom],arrangement:'house'};
-    const askTop=i%2===0;
-    return task(askTop?'うえの かたちは どれ？':'したの かたちは どれ？',
-      askTop?'▲':bottom,'position',
+    const bottom: '●'|'▲'|'■' = glyphs[(i+2)%3];
+    const top: '●'|'▲'|'■' = glyphs[i%3];
+    const middle: '●'|'▲'|'■'=glyphs[(i+1)%3];
+    const house:BankDiagram={kind:'gradeOneShapes',symbols:[top,middle,bottom],arrangement:'house'};
+    const position=i%3;
+    return task(position===0?'いちばん うえは どれ？':position===1?'まんなかは どれ？':'いちばん したは どれ？',
+      [top,middle,bottom][position],'position',
       'ふたつの かたちを たてに ならべたよ。',
       ['うえと したを みてね。','かたちを ひとつずつ たしかめよう。',
        'きかれた ばしょの かたちを えらぼう。'],house,['●','▲','■']);
   }
   if(part===3){
-    const a=glyphs[i%3],b=glyphs[(i+1)%3];
-    const pattern:BankDiagram={kind:'gradeOneShapes',symbols:[a,b,a,b],arrangement:'row'};
+    const a=glyphs[i%3],b=glyphs[(i+1+Math.floor(i/3))%3===i%3?(i+2)%3:(i+1+Math.floor(i/3))%3];
+    const pattern:BankDiagram={kind:'gradeOneShapes',symbols:i%2===0?[a,b,a,b]:[a,b,a,b,a],arrangement:'row'};
     return task('この ならびの つぎは どれ？',a,'sequence',
       a+'、'+b+'の じゅんばんが くりかえして いるよ。',
       ['ひだりから かたちを みてね。','ふたつずつ くりかえして いるよ。',
