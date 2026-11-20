@@ -66,16 +66,18 @@ function shapeTask(i:number,part:number):Task{
     // picture example. Merely naming a rotated triangle is not sufficient.
     const directions=['▲','▶','▼','◀'] as const;
     const turns=i<4?1:i<8?-1:2;
-    const from=directions[i%4];
-    const to=directions[(i%4+turns+4)%4];
-    const sampleTo=directions[(turns+4)%4];
-    return choose('おてほん：▲ → '+sampleTo+'\nおなじように まわすと？　'+from+' → ？',
+    const fromIndex=i%4,exampleIndex=(fromIndex+2)%4;
+    const from=directions[fromIndex];
+    const to=directions[(fromIndex+turns+4)%4];
+    const exampleFrom=directions[exampleIndex];
+    const exampleTo=directions[(exampleIndex+turns+4)%4];
+    return choose('おてほん：'+exampleFrom+' → '+exampleTo+'\nおなじように まわすと？　'+from+' → ？',
       to,directions.filter(symbol=>symbol!==to),{
         prompt:'おてほんと おなじ むきに まわそう。',
-        hints:['おてほんの ▲ が '+sampleTo+' に なる うごきを みてね。',
+        hints:['おてほんの '+exampleFrom+' が '+exampleTo+' に なる うごきを みてね。',
           'とがった ほうが どちらへ むくか かんがえよう。',
           from+' を おなじように まわして えらぼう。'],
-        explanation:'おてほんの ▲ → '+sampleTo+' と おなじように、'+from+' → '+to+' に なるよ。',
+        explanation:'おてほんの '+exampleFrom+' → '+exampleTo+' と おなじように、'+from+' → '+to+' に なるよ。',
       });
   }
   const pair=[['▲','■'],['●','●'],['●','■']][i%3];
