@@ -4,7 +4,7 @@ import { type BankDiagram, type BankQuestion, mistakenReason } from '../domain/q
 import type { SolutionStep } from '../domain/writtenSolution';
 import { MathDisplay, MathText } from './MathText';
 import { fitCountingBoardSizes, countingTileAppearance } from '../domain/countingBoardSizes';
-import { countingTapNumber, toggleCountingTap } from '../domain/countingTapOrder';
+import { countingTapNumber, countingTapNumberInRow, toggleCountingTap } from '../domain/countingTapOrder';
 
 import { countingTokenArt as tokenArt } from '../domain/countingTokens';
 
@@ -92,7 +92,7 @@ function CountingBoard({ diagram, phase }: {
             </View>
             <Text style={styles.emptyPlateCaption}>なにも のっていない おさら</Text>
           </View>;
-          const tapNumber = countingTapNumber(selected,id);
+          const tapNumber = sideBySide ? countingTapNumberInRow(selected,id) : countingTapNumber(selected,id);
           const lit = tapNumber!==undefined;
           const shape = tokenArt[token];
           // くま・丸・図形のすべてで、見た目の白い枠を使わない。
