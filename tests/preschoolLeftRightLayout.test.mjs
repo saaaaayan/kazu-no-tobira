@@ -53,11 +53,11 @@ test('counting diagram rendering preserves left-right order and never stacks com
   const bank=read('src/domain/questionBank.ts');
   assert.match(bank,/arrangement\?: 'side-by-side' \| 'position-row'/u);
   assert.match(support,/const sideBySide=diagram.arrangement==='side-by-side' && diagram.rows.length===2/u);
-  assert.match(support,/testID=\{sideBySide\?'counting-left-right-layout':undefined\}/u);
-  assert.match(support,/style=\{sideBySide \? styles.sideBySideCountingGroups : styles.stackedCountingGroups\}/u);
+  assert.match(support,/testID=\{sideBySide\?'counting-left-right-layout':verticalPosition\?'counting-up-down-layout':undefined\}/u);
+  assert.match(support,/style=\{sideBySide \? styles.sideBySideCountingGroups :\s*verticalPosition \? styles.verticalPositionCountingGroups : styles.stackedCountingGroups\}/u);
   assert.match(support,/sideBySideCountingGroups:\{flexDirection:'row',alignItems:'stretch',gap:8\}/u);
   assert.match(support,/sideBySideCountingGroup:\{flex:1,minWidth:0/g);
   assert.match(support,/sideBySide\?2:maxColumns/u);
-  assert.match(support,/const interactive=!positionRow/u);
-  assert.match(support,/flexWrap:\(diagram.guide\|\|positionRow\)\?'nowrap':'wrap'/u);
+  assert.match(support,/const interactive=!positionRow && !verticalPosition/u);
+  assert.match(support,/flexWrap:\(diagram.guide\|\|positionRow\|\|verticalPosition\)\?'nowrap':'wrap'/u);
 });

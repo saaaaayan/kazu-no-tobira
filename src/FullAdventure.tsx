@@ -9,6 +9,7 @@ import { stageCategoryName } from './domain/islandCurriculumView';
 import { preschoolStageMapInfo } from './domain/preschoolStageMapInfo';
 import { shouldAutoGradePreschoolChoice } from './domain/preschoolAnswerFlow';
 import { displayedChoiceOptions } from './domain/choicePresentation';
+import { preschoolVerticalChoiceEmoji } from './domain/preschoolSpatialChoice';
 import PreschoolTracePad from './components/PreschoolTracePad';
 import PreschoolPictureNumberMatch from './components/PreschoolPictureNumberMatch';
 import { liveOrigin, requestLiveRound, requestLiveGrade, requestLiveHint, type LiveMode, type LiveRound } from './domain/liveQuestions';
@@ -360,6 +361,8 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const choiceFeedback=Boolean(round?.feedback && question?.type==='choice');
   const displayedChoices=displayedChoiceOptions(question?.choices);
   const directionalChoices=Boolean(displayedChoices && displayedChoices!==question?.choices);
+  const verticalPictureChoices=Boolean(diagram?.kind==='countingBoard' &&
+    diagram.arrangement==='vertical-position');
   const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && (Boolean(liveCard) || Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0);
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
@@ -751,12 +754,21 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                               style={({pressed})=>[styles.preschoolNumberButton,styles.inlineChoiceButton,
                                 question.choices && question.choices.length>3 && styles.inlineChoiceWrap,
                                 (saving||pressed)&&styles.dim]}>
-                              <MathText value={option} style={[styles.preschoolNumberText,
-                                option.length>2&&styles.inlineChoiceMedium,
-                                option.length>5&&styles.inlineChoiceLong,
-                                option.length>9&&styles.inlineChoiceVeryLong,
-                                directionalChoices&&styles.inlineDirectionalChoiceText,
-                                directionalChoices&&viewport<400&&styles.inlineDirectionalChoiceTextNarrow]}/>
+                              {verticalPictureChoices ? (
+                                <View style={styles.verticalPictureChoice}>
+                                  <Text style={styles.verticalPictureChoiceEmoji}>
+                                    {preschoolVerticalChoiceEmoji(diagram,option)}
+                                  </Text>
+                                  <Text style={styles.verticalPictureChoiceName}>{option}</Text>
+                                </View>
+                              ) : (
+                                <MathText value={option} style={[styles.preschoolNumberText,
+                                  option.length>2&&styles.inlineChoiceMedium,
+                                  option.length>5&&styles.inlineChoiceLong,
+                                  option.length>9&&styles.inlineChoiceVeryLong,
+                                  directionalChoices&&styles.inlineDirectionalChoiceText,
+                                  directionalChoices&&viewport<400&&styles.inlineDirectionalChoiceTextNarrow]}/>
+                              )}
                             </Pressable>
                           ))}
                         </View>
@@ -1029,6 +1041,9 @@ const styles = StyleSheet.create({
   inlineChoiceVeryLong:{fontSize:13},
   inlineDirectionalChoiceText:{fontSize:30},
   inlineDirectionalChoiceTextNarrow:{fontSize:22},
+  verticalPictureChoice:{alignItems:'center',justifyContent:'center',gap:3},
+  verticalPictureChoiceEmoji:{fontSize:54,lineHeight:70,textAlign:'center'},
+  verticalPictureChoiceName:{fontSize:19,lineHeight:27,fontWeight:'900',color:'#27335c',textAlign:'center'},
   preschoolHintButton: { minHeight:56, backgroundColor:'#fff0be',
     borderRadius:14, paddingHorizontal:24, justifyContent:'center', alignItems:'center' },
   preschoolHintButtonText: { color:'#29345d', fontSize:19, fontWeight:'900' },

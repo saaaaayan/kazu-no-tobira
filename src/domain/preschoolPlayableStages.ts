@@ -191,9 +191,23 @@ function makeTask(n:number,i:number):Task{
  if(n>=36&&n<=40)return sequence(i,['two','double','three','shape','mixed'][n-36] as 'two'|'double'|'three'|'shape'|'mixed');
  if(n===41){
    const top=toys[(i+2)%toys.length],bottom=toys[(i+5)%toys.length];
-   return choose('うえ：'+image(top)+'　した：'+image(bottom)+'　うえに いるのは？',
-     name(top),[name(bottom),name(toys[(i+8)%toys.length])],
-     {explanation:'うえに いるのは '+name(top)+' だよ。'});
+   const askTop=i%2===0;
+   const target=askTop?top:bottom;
+   const place=askTop?'うえ':'した';
+   // Children must SEE one object above the other, not merely read
+   // "うえ / した" alongside emoji written on the same line.
+   // Only the two toys visible in the drawing are valid picture options.
+   // Do not invent a third choice that is absent from the learning scene.
+   return {question:place+'に いるのは だあれ？',
+     answer:name(target),choices:[name(top),name(bottom)],
+       spatial:true,
+       diagram:{kind:'countingBoard',arrangement:'vertical-position',
+         rows:[{label:'うえ',tokens:[top]},{label:'した',tokens:[bottom]}]},
+       hints:['うえと したの えを みてね。',
+         'いちばん '+place+'の えを さがそう。',
+         place+'に いるのは だれかな？'],
+       explanation:place+'に いるのは '+name(target)+' だよ。',
+     };
  }
  if(n===42)return position(i,i%2===0?1:2);
  if(n===43)return position(i,i%2===0?3:4);
@@ -256,9 +270,12 @@ export function preschoolPrototypeBank(stage:Pick<WorldStage,'id'|'gradeId'|'kin
    const q=makeTask(n,i);
    const hints=specificHints(q,n);
    const answer=q.answer, choices=q.choices;
-   if(!choices.includes(answer)||new Set(choices).size!==3)throw Error('Invalid prototype options '+n+':'+i);
+   const expectedOptions=q.diagram?.kind==='countingBoard' &&
+     q.diagram.arrangement==='vertical-position' ? 2 : 3;
+   if(!choices.includes(answer)||choices.length!==expectedOptions||new Set(choices).size!==expectedOptions)
+     throw Error('Invalid prototype options '+n+':'+i);
    // Correct answers must not always occupy the first button.
-   const shift=(n+i)%3;
+   const shift=(n+i)%choices.length;
    const displayedChoices=[...choices.slice(shift),...choices.slice(0,shift)];
    return {
      id:'ui-preview-'+stage.id+'-activity-'+String(i+1).padStart(2,'0'),

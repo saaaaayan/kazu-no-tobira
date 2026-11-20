@@ -17,14 +17,17 @@ function CountingBoard({ diagram, phase }: {
   const [boardWidth,setBoardWidth] = useState<number>();
   const sideBySide=diagram.arrangement==='side-by-side' && diagram.rows.length===2;
   const positionRow=diagram.arrangement==='position-row';
+  const verticalPosition=diagram.arrangement==='vertical-position' && diagram.rows.length===2;
   const maxColumns=Math.max(1,...diagram.rows.map(row=>row.tokens.length),
     ...(diagram.layoutComparison?.beforeRows ?? []));
   // A left/right question must stay left/right even on narrow phones. Each
   // half wraps its own toys internally rather than stacking the two groups.
   const availableWidth=Math.min(viewportWidth,boardWidth??320);
   const groupWidth=sideBySide ? Math.max(110,(availableWidth-34)/2) : availableWidth;
-  const sizes=fitCountingBoardSizes(groupWidth,Boolean(diagram.guide),sideBySide?2:maxColumns);
-  const interactive=!positionRow && (phase==='question' || (diagram.guide && phase==='hint'));
+  const sizes=fitCountingBoardSizes(groupWidth,Boolean(diagram.guide)||verticalPosition,
+    sideBySide?2:maxColumns);
+  const interactive=!positionRow && !verticalPosition &&
+    (phase==='question' || (diagram.guide && phase==='hint'));
   const numbered=diagram.guide && phase==='solution';
   const [taps,setTaps] = useState<{ forDiagram:BankDiagram; ids:Set<string> }>();
   const selected = taps?.forDiagram===diagram ? taps.ids : new Set<string>();
@@ -64,14 +67,17 @@ function CountingBoard({ diagram, phase }: {
       </Text>
       <Text style={{color:'#263f6a',fontWeight:'900',fontSize:20}}>② あと（こっちを さわってね）</Text>
     </View>}
-    <View testID={sideBySide?'counting-left-right-layout':undefined}
-      style={sideBySide ? styles.sideBySideCountingGroups : styles.stackedCountingGroups}>
+    <View testID={sideBySide?'counting-left-right-layout':verticalPosition?'counting-up-down-layout':undefined}
+      style={sideBySide ? styles.sideBySideCountingGroups :
+        verticalPosition ? styles.verticalPositionCountingGroups : styles.stackedCountingGroups}>
     {diagram.rows.map(({label,tokens},row) => <View key={row}
-      style={sideBySide ? styles.sideBySideCountingGroup : styles.stackedCountingGroup}>
+      testID={verticalPosition ? (row===0?'counting-up-scene':'counting-down-scene') : undefined}
+      style={sideBySide ? styles.sideBySideCountingGroup :
+        verticalPosition ? styles.verticalPositionCountingGroup : styles.stackedCountingGroup}>
       {label && <Text style={{ color:'#293f61', fontSize:18, fontWeight:'700' }}>{label}</Text>}
-      <View style={{ flexDirection:'row', flexWrap:(diagram.guide||positionRow)?'nowrap':'wrap',
+      <View style={{ flexDirection:'row', flexWrap:(diagram.guide||positionRow||verticalPosition)?'nowrap':'wrap',
         width:'100%', minWidth:0,
-        justifyContent:comparison?.after==='left-packed'?'flex-start':diagram.guide?'center':'flex-start',
+        justifyContent:verticalPosition?'center':comparison?.after==='left-packed'?'flex-start':diagram.guide?'center':'flex-start',
         gap:comparison?.after==='wide-gaps'?Math.max(10,sizes.gap+7):comparison?.after==='small'?2:diagram.guide ? sizes.gap : diagram.spacing==='wide'?20:8 }}>
         {tokens.map((token,column) => {
           const id = row+':'+column;
@@ -267,6 +273,10 @@ const styles = StyleSheet.create({
   sideBySideCountingGroups:{flexDirection:'row',alignItems:'stretch',gap:8},
   sideBySideCountingGroup:{flex:1,minWidth:0,gap:5,padding:5,borderRadius:9,
     backgroundColor:'#fff9e9',borderWidth:1,borderColor:'#c8d4e2'},
+  verticalPositionCountingGroups:{gap:12,alignItems:'center',paddingVertical:5},
+  verticalPositionCountingGroup:{width:'100%',maxWidth:340,alignItems:'center',
+    padding:10,gap:5,borderRadius:12,borderWidth:1,borderColor:'#c8d4e2',
+    backgroundColor:'#fff9e9'},
   // Same visual plate for 0, 1 and 2. Never print the answer on the plate.
   plateCountScene:{width:'100%',minHeight:170,alignItems:'center',justifyContent:'center',paddingVertical:12},
   plateCountOuter:{width:208,height:132,borderWidth:6,borderRadius:80,borderColor:'#8297b0',
