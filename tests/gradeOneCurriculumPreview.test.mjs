@@ -42,10 +42,9 @@ test('all 50 stages have ten independently gradable lessons with multi-step hint
       if(q.type==='choice'){
         assert.equal(q.choices.length,3,q.id);
         assert.equal(new Set(q.choices).size,3,q.id);
-        if(q.type==='choice')assert.equal(q.choices.filter(c=>checkMathAnswer(q,c)).length,1,q.id);
-      else assert.ok(checkMathAnswer(q,q.answer),q.id);
+        assert.equal(q.choices.filter(c=>checkMathAnswer(q,c)).length,1,q.id);
       }else{
-        assert.ok(/^\\d+$/u.test(q.answer),q.id);
+        assert.ok(/^\d+$/u.test(q.answer),q.id);
         assert.equal(q.choices,undefined,q.id);
       }
       assert.ok(checkMathAnswer(q,q.answer),q.id);
@@ -124,7 +123,8 @@ test('every five-stage unit has a ten-question checkpoint with no unsupported st
     const permitted=new Set(stages.slice((checkpoint-1)*5,checkpoint*5).map(x=>x.id));
     for(const q of batch){
       assert.ok(permitted.has(q.stageId),q.id+' stageId='+q.stageId+' permitted='+[...permitted].join(','));
-      assert.equal(q.choices.filter(c=>checkMathAnswer(q,c)).length,1,q.id);
+      if(q.type==='choice')assert.equal(q.choices.filter(c=>checkMathAnswer(q,c)).length,1,q.id);
+      else assert.ok(checkMathAnswer(q,q.answer),q.id);
     }
     for(const id of permitted)assert.equal(batch.filter(q=>q.stageId===id).length,2,id);
   }
