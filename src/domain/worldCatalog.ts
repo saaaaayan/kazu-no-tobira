@@ -302,10 +302,10 @@ tracing|すうじの なぞりがき|tracing
 number-order|かずの ならび|count
 comparison|おおい・すくない|comparison
 sorting|なかまわけ|sorting
-shapes|まる・さんかく・しかく|shape
+shapes|かたちと おおきさ|shape
 patterns|つぎは なにかな|pattern
 position|うえ・した・となり|position
-play|かずと かたちの あそび|mixed`),
+play|あわせる・わける・くらべる|mixed`),
 };
 
 const champion: Omit<WorldGrade, 'stages'> = {

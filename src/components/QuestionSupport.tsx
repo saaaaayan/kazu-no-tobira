@@ -4,7 +4,7 @@ import { type BankDiagram, type BankQuestion, mistakenReason } from '../domain/q
 import type { SolutionStep } from '../domain/writtenSolution';
 import { MathDisplay, MathText } from './MathText';
 import { fitCountingBoardSizes, countingTileAppearance } from '../domain/countingBoardSizes';
-import { countingTapNumber, toggleCountingTap } from '../domain/countingTapOrder';
+import { countingTapNumber, countingTapNumberInRow, toggleCountingTap } from '../domain/countingTapOrder';
 
 import { countingTokenArt as tokenArt } from '../domain/countingTokens';
 
@@ -92,7 +92,7 @@ function CountingBoard({ diagram, phase }: {
             </View>
             <Text style={styles.emptyPlateCaption}>なにも のっていない おさら</Text>
           </View>;
-          const tapNumber = countingTapNumber(selected,id);
+          const tapNumber = sideBySide ? countingTapNumberInRow(selected,id) : countingTapNumber(selected,id);
           const lit = tapNumber!==undefined;
           const shape = tokenArt[token];
           // くま・丸・図形のすべてで、見た目の白い枠を使わない。
@@ -134,6 +134,28 @@ function CountingBoard({ diagram, phase }: {
 }
 
 export function QuestionDiagram({ diagram, phase }: { diagram: BankDiagram; phase: 'question' | 'hint' | 'solution' }) {
+  if (diagram.kind === 'magnitudeCompare') {
+    const length=diagram.metric==='length';
+    return <View testID="preschool-magnitude-compare"
+      accessibilityLabel={length?'あかと あおの ひもの ながさを くらべる え':'あかと あおの まるの おおきさを くらべる え'}
+      style={styles.magnitudeScene}>
+      {([
+        {label:'あか',color:'#cc5149',amount:diagram.first},
+        {label:'あお',color:'#3577bd',amount:diagram.second},
+      ] as const).map(item=>{
+        const extent=length?42+item.amount*38:24+item.amount*22;
+        return <View key={item.label} testID={'preschool-magnitude-'+item.label}
+          style={styles.magnitudeRow}>
+          <Text style={styles.magnitudeLabel}>{item.label}</Text>
+          <View style={[styles.magnitudeShape,{
+            width:extent,height:length?18:extent,
+            borderRadius:length?9:extent/2,
+            backgroundColor:item.color,
+          }]}/>
+        </View>;
+      })}
+    </View>;
+  }
   if (diagram.kind === 'plateCount') {
     const toy=tokenArt[diagram.token];
     const label=diagram.count===0 ? 'なにも のっていない おさら'
@@ -268,6 +290,11 @@ export function WorkedSolution({ question, wrongAnswer }: { question: BankQuesti
 }
 
 const styles = StyleSheet.create({
+  magnitudeScene:{width:'100%',maxWidth:420,alignSelf:'center',padding:16,
+    backgroundColor:'#edf4ff',borderRadius:14,gap:18},
+  magnitudeRow:{flexDirection:'row',alignItems:'center',minHeight:80,gap:14},
+  magnitudeLabel:{width:55,color:'#27335c',fontWeight:'900',fontSize:22},
+  magnitudeShape:{borderWidth:1,borderColor:'#243d65'},
   stackedCountingGroups:{gap:8},
   stackedCountingGroup:{gap:5},
   sideBySideCountingGroups:{flexDirection:'row',alignItems:'stretch',gap:8},
