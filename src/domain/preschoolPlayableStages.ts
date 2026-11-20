@@ -92,15 +92,20 @@ function combineTask(i:number):Task{
 }
 
 function splitTask(i:number):Task{
- const token=t(i),total=3+i%6,left=1+(i*3)%(total-1),right=total-left;
- return numberTask(name(token)+'を ふたつの はこに わけたよ。みぎは いくつ？',right,{
-   diagram:{kind:'countingBoard',arrangement:'side-by-side',
-     rows:[{label:'ひだりの はこ',tokens:repeat(token,left)},
-       {label:'みぎの はこ',tokens:repeat(token,right)}]},
-   prompt:'みぎの はこを みてね。',
-   hints:['はこは ふたつ あるよ。','みぎの はこだけ かぞえよう。',
-     'ひだりと みぎを あわせると '+total+'こだよ。'],
-   explanation:'ぜんぶで '+total+'こ。ひだりは '+left+'こ、みぎは '+right+'こだよ。',
+ // Whole and one part are visible; the other part is deliberately hidden.
+ // Counting an already-filled right box would test counting, not splitting.
+ const pairs:[[number,number],...[number,number][]]=[
+   [3,1],[4,2],[5,3],[6,2],[7,4],
+   [8,5],[4,1],[6,4],[7,5],[8,3],
+ ];
+ const token=t(i),[total,placedLeft]=pairs[i%pairs.length],remaining=total-placedLeft;
+ return numberTask(name(token)+'が ぜんぶで '+total+'こ。ひだりの はこに '+placedLeft+'こ いれたよ。みぎには いくつ はいる？',remaining,{
+   diagram:{kind:'preschoolSplit',token,total,placedLeft},
+   prompt:'ぜんぶの かずから、ひだりに いれた ぶんを かんがえよう。',
+   hints:['さいしょの '+total+'こを みてね。',
+     'ひだりの はこに '+placedLeft+'こ いれたよ。',
+     'まだ はこに はいって いない ぶんを かぞえよう。'],
+   explanation:'さいしょは '+total+'こ。ひだりに '+placedLeft+'こ いれたから、のこりの '+remaining+'こが みぎに はいるよ。',
  });
 }
 
