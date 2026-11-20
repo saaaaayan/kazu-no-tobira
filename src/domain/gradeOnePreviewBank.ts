@@ -358,14 +358,19 @@ export function gradeOnePreviewBank(stage:Pick<WorldStage,'id'|'gradeId'|'kind'|
       throw new Error('Invalid grade-one options '+stage.id+' #'+(i+1)+': '+distinct.join(','));
     const offset=(stage.order+i)%3;
     const shifted=[...distinct.slice(offset),...distinct.slice(0,offset)];
+    // Children practice entering answers to simple equations; picture and
+    // matching activities retain one-tap choices.
+    const numericInput=source.format==='calculation'&&i%3!==0&&
+      /^\\d+\\s*[＋−]\\s*\\d+\\s*＝/u.test(source.question);
     return {
       id:'ui-preview-'+stage.id+'-curriculum-'+String(i+1).padStart(2,'0'),
       stageId:stage.id,
       skillId:'e1.preview.'+info.domain,
-      type:'choice',format:source.format,
+      type:numericInput?'number':'choice',format:source.format,
       difficulty:(i<3?1:i<8?2:3) as 1|2|3,
-      question:source.question,prompt:source.prompt??'こたえを えらぼう',
-      answer:source.answer,choices:shifted,
+      question:source.question,prompt:numericInput?'こたえを 数字で いれてね':
+        source.prompt??'こたえを えらぼう',
+      answer:source.answer,...(numericInput?{}:{choices:shifted}),
       hint:source.hints[0],hints:source.hints,
       explanation:source.explanation,
       steps:[{title:'かんがえかた',body:source.hints[1]},
