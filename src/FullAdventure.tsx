@@ -9,7 +9,7 @@ import { stageCategoryName } from './domain/islandCurriculumView';
 import { preschoolStageMapInfo } from './domain/preschoolStageMapInfo';
 import { shouldAutoGradePreschoolChoice } from './domain/preschoolAnswerFlow';
 import { displayedChoiceOptions } from './domain/choicePresentation';
-import { preschoolVerticalChoiceEmoji } from './domain/preschoolSpatialChoice';
+import { preschoolSpatialChoiceEmoji } from './domain/preschoolSpatialChoice';
 import PreschoolTracePad from './components/PreschoolTracePad';
 import PreschoolPictureNumberMatch from './components/PreschoolPictureNumberMatch';
 import { liveOrigin, requestLiveRound, requestLiveGrade, requestLiveHint, type LiveMode, type LiveRound } from './domain/liveQuestions';
@@ -361,8 +361,10 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const choiceFeedback=Boolean(round?.feedback && question?.type==='choice');
   const displayedChoices=displayedChoiceOptions(question?.choices);
   const directionalChoices=Boolean(displayedChoices && displayedChoices!==question?.choices);
-  const verticalPictureChoices=Boolean(diagram?.kind==='countingBoard' &&
-    diagram.arrangement==='vertical-position');
+  // Toy-identity questions should show the SAME toy picture as the scene,
+  // whether it is laid out vertically or left-to-right.
+  const spatialPictureChoices=Boolean(diagram?.kind==='countingBoard' &&
+    (diagram.arrangement==='vertical-position' || diagram.arrangement==='position-row'));
   const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && (Boolean(liveCard) || Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0);
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
@@ -754,10 +756,10 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                               style={({pressed})=>[styles.preschoolNumberButton,styles.inlineChoiceButton,
                                 question.choices && question.choices.length>3 && styles.inlineChoiceWrap,
                                 (saving||pressed)&&styles.dim]}>
-                              {verticalPictureChoices ? (
+                              {spatialPictureChoices ? (
                                 <View style={styles.verticalPictureChoice}>
                                   <Text style={styles.verticalPictureChoiceEmoji}>
-                                    {preschoolVerticalChoiceEmoji(diagram,option)}
+                                    {preschoolSpatialChoiceEmoji(diagram,option)}
                                   </Text>
                                   <Text style={styles.verticalPictureChoiceName}>{option}</Text>
                                 </View>
