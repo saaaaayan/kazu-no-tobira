@@ -134,6 +134,38 @@ function CountingBoard({ diagram, phase }: {
 }
 
 export function QuestionDiagram({ diagram, phase }: { diagram: BankDiagram; phase: 'question' | 'hint' | 'solution' }) {
+  if (diagram.kind === 'preschoolSplit') {
+    const toy=tokenArt[diagram.token][0];
+    const remaining=diagram.total-diagram.placedLeft;
+    const solved=phase==='solution';
+    const toys=(count:number)=>Array.from({length:count},(_,i)=>(
+      <Text key={i} style={styles.splitToy}>{toy}</Text>
+    ));
+    return <View testID="preschool-missing-part-scene"
+      style={styles.splitScene}>
+      <View style={styles.splitWhole} testID="preschool-split-whole"
+        accessibilityLabel={'さいしょは '+diagram.total+'こ'}>
+        <Text style={styles.splitHeading}>① さいしょ　ぜんぶで {diagram.total}こ</Text>
+        <View style={styles.splitTokens}>{toys(diagram.total)}</View>
+      </View>
+      <Text style={styles.splitArrow}>↓ はこに わける ↓</Text>
+      <Text style={styles.splitHeading}>② わけた あと</Text>
+      <View style={styles.splitBoxes}>
+        <View testID="preschool-split-left-box" style={styles.splitBox}
+          accessible accessibilityLabel={'ひだりの はこに '+diagram.placedLeft+'こ'}>
+          <Text style={styles.splitBoxLabel}>ひだりの はこ</Text>
+          <View style={styles.splitTokens}>{toys(diagram.placedLeft)}</View>
+        </View>
+        <View testID="preschool-split-hidden-right-box" style={styles.splitBox}
+          accessible accessibilityLabel={solved?'みぎの はこに '+remaining+'こ':'みぎの はこは いくつかな'}>
+          <Text style={styles.splitBoxLabel}>みぎの はこ</Text>
+          {solved
+            ? <View style={styles.splitTokens}>{toys(remaining)}</View>
+            : <Text style={styles.splitUnknown}>？</Text>}
+        </View>
+      </View>
+    </View>;
+  }
   if (diagram.kind === 'magnitudeCompare') {
     const length=diagram.metric==='length';
     return <View testID="preschool-magnitude-compare"
@@ -290,6 +322,17 @@ export function WorkedSolution({ question, wrongAnswer }: { question: BankQuesti
 }
 
 const styles = StyleSheet.create({
+  splitScene:{width:'100%',padding:12,borderRadius:14,backgroundColor:'#edf4ff',gap:8},
+  splitWhole:{gap:6,alignItems:'center',padding:10,borderRadius:11,backgroundColor:'#fff9e9'},
+  splitHeading:{fontSize:18,fontWeight:'900',color:'#243f6b',textAlign:'center'},
+  splitTokens:{flexDirection:'row',flexWrap:'wrap',justifyContent:'center',gap:5,minHeight:42},
+  splitToy:{fontSize:31,lineHeight:43,textAlign:'center'},
+  splitArrow:{fontSize:18,fontWeight:'900',textAlign:'center',color:'#324f85'},
+  splitBoxes:{flexDirection:'row',gap:10,alignItems:'stretch'},
+  splitBox:{flex:1,minWidth:0,minHeight:100,gap:5,alignItems:'center',padding:8,
+    borderRadius:12,borderWidth:2,borderColor:'#b9cbe2',backgroundColor:'#fff9e9'},
+  splitBoxLabel:{fontSize:17,fontWeight:'900',color:'#273f67',textAlign:'center'},
+  splitUnknown:{fontSize:42,lineHeight:50,color:'#243f6b',fontWeight:'900',textAlign:'center'},
   magnitudeScene:{width:'100%',maxWidth:420,alignSelf:'center',padding:16,
     backgroundColor:'#edf4ff',borderRadius:14,gap:18},
   magnitudeRow:{flexDirection:'row',alignItems:'center',minHeight:80,gap:14},
