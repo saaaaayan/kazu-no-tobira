@@ -74,5 +74,9 @@ export function gradeOnePreviewStageInfo(stage:Pick<WorldStage,'gradeId'|'kind'|
   if(stage.gradeId!=='e1'||stage.kind!=='normal'||stage.order<0||stage.order>=50)return undefined;
   const unit=units[Math.floor(stage.order/5)];
   const [title,goal]=unit.stages[stage.order%5];
-  return {title,goal,unit:unit.title,domain:unit.domain};
+  // The final five stages combine two official subject areas, so the
+  // individual stage—not the shared map row—owns its precise domain.
+  const domain=stage.order===49?'総合':stage.order===48?'データの活用':
+    stage.order>=45?'測定':unit.domain;
+  return {title,goal,unit:unit.title,domain};
 }
