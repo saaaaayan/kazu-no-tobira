@@ -16,6 +16,7 @@ function CountingBoard({ diagram, phase }: {
   // 図の実際の表示幅でサイズを決め、横並びのオブジェクトをはみ出させない。
   const [boardWidth,setBoardWidth] = useState<number>();
   const sideBySide=diagram.arrangement==='side-by-side' && diagram.rows.length===2;
+  const positionRow=diagram.arrangement==='position-row';
   const maxColumns=Math.max(1,...diagram.rows.map(row=>row.tokens.length),
     ...(diagram.layoutComparison?.beforeRows ?? []));
   // A left/right question must stay left/right even on narrow phones. Each
@@ -23,7 +24,7 @@ function CountingBoard({ diagram, phase }: {
   const availableWidth=Math.min(viewportWidth,boardWidth??320);
   const groupWidth=sideBySide ? Math.max(110,(availableWidth-34)/2) : availableWidth;
   const sizes=fitCountingBoardSizes(groupWidth,Boolean(diagram.guide),sideBySide?2:maxColumns);
-  const interactive=phase==='question' || (diagram.guide && phase==='hint');
+  const interactive=!positionRow && (phase==='question' || (diagram.guide && phase==='hint'));
   const numbered=diagram.guide && phase==='solution';
   const [taps,setTaps] = useState<{ forDiagram:BankDiagram; ids:Set<string> }>();
   const selected = taps?.forDiagram===diagram ? taps.ids : new Set<string>();
@@ -68,7 +69,7 @@ function CountingBoard({ diagram, phase }: {
     {diagram.rows.map(({label,tokens},row) => <View key={row}
       style={sideBySide ? styles.sideBySideCountingGroup : styles.stackedCountingGroup}>
       {label && <Text style={{ color:'#293f61', fontSize:18, fontWeight:'700' }}>{label}</Text>}
-      <View style={{ flexDirection:'row', flexWrap:diagram.guide?'nowrap':'wrap',
+      <View style={{ flexDirection:'row', flexWrap:(diagram.guide||positionRow)?'nowrap':'wrap',
         width:'100%', minWidth:0,
         justifyContent:comparison?.after==='left-packed'?'flex-start':diagram.guide?'center':'flex-start',
         gap:comparison?.after==='wide-gaps'?Math.max(10,sizes.gap+7):comparison?.after==='small'?2:diagram.guide ? sizes.gap : diagram.spacing==='wide'?20:8 }}>
