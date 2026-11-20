@@ -388,6 +388,36 @@ function makeTask(n:number,i:number):Task{
   }
   if(unit===7){
     if(part===2)return basicNumberLine(i,100);
+    if(part===4){
+      if(i<3){
+        const value=50+i*11;
+        return task('10の まとまりと ばらで いくつ？',value,'counting',
+          '10の まとまりが '+Math.floor(value/10)+'こ、ばらが '+value%10+'こだよ。',
+          hintsHundred,{kind:'bundlesAndOnes',tens:Math.floor(value/10),ones:value%10},
+          nums(value,100));
+      }
+      if(i<5)return basicNumberLine(i,100);
+      if(i<7){
+        const tens=2+i-5,ones=i-3,answer=tens*10+ones;
+        return task((tens*10)+' ＋ '+ones+' ＝ □',answer,'calculation',
+          '10の まとまりに '+ones+'を たすと '+answer+'だよ。',
+          ['10の まとまりを みよう。','ばらを '+ones+'こ たそう。',
+           '十の くらいと 一の くらいを あわせよう。'],
+          {kind:'bundlesAndOnes',tens,ones},nums(answer,100));
+      }
+      if(i<9){
+        const tens=i-3,ones=i-2,total=tens*10+ones;
+        return task(total+' − '+ones+' ＝ □',tens*10,'calculation',
+          'ばらの '+ones+'こを ひくと '+(tens*10)+'だよ。',
+          ['十の まとまりと ばらを みてね。','ばらを '+ones+'こ とろう。',
+           '十の まとまりは そのまま だよ。'],
+          {kind:'bundlesAndOnes',tens,ones},nums(tens*10,100));
+      }
+      return task('89と 98。おおきい かずは？',98,'comparison',
+        '十の くらいを くらべると、98の ほうが おおきいよ。',
+        ['十の くらいを みよう。','8と 9を くらべよう。',
+         '十の くらいが 9の ほうが おおきいよ。'],undefined,nums(98,100));
+    }
     const value=part===0?(i+1)*10:part===1?[9,19,29,39,49,59,69,79,89,100][i]:
       10+i*9;
     const more=13+i*8;
