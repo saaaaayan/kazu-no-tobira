@@ -214,18 +214,24 @@ function clockTask(i:number):Task{
 }
 function graphTask(i:number):Task{
   const names=['くま','ねこ','うさぎ'],ids:CountingToken[]=['bear','cat','rabbit'];
-  const base=[2,3,5];
-  const counts=[base[i%3],base[(i+1)%3],base[(i+2)%3]];
-  const row=counts.map((count,j)=>({label:names[j],token:ids[j],count}));
-  const biggest=counts.indexOf(5);
-  const askBiggest=i%2===0;
-  const answer=askBiggest?names[biggest]:names[counts.indexOf(2)];
-  return task(askBiggest?'いちばん おおい えは どれ？':'いちばん すくない えは どれ？',
-    answer,'comparison',
-    'えを かぞえて くらべると、'+answer+'だよ。',
-    ['えを よこに ならべて みてね。','それぞれの えを かぞえよう。',
-      askBiggest?'いちばん ながい ならびは どれかな？':'いちばん みじかい ならびは どれかな？'],
-    {kind:'gradeOnePictureGraph',rows:row},names);
+  // Ten different graphs, with a unique tallest/shortest row in each.
+  const pictures=[
+    [2,3,5],[1,4,3],[4,2,5],[5,1,3],[3,5,2],
+    [4,3,1],[2,5,4],[1,3,6],[5,2,1],[3,6,4]
+  ];
+  const counts=pictures[i%pictures.length];
+  const rows=counts.map((count,j)=>({label:names[j],token:ids[j],count}));
+  const mode=i%3;
+  const question=mode===0?names[i%3]+'の えは いくつ？'
+    :mode===1?'いちばん おおい えは どれ？':'いちばん すくない えは どれ？';
+  const answer=mode===0?String(counts[i%3])
+    :names[counts.indexOf(mode===1?Math.max(...counts):Math.min(...counts))];
+  return task(question,answer,'comparison',
+    'えを ひとつずつ かぞえて くらべると、こたえは '+answer+'だよ。',
+    ['えを よこに ならべて みよう。','それぞれの えを かぞえて みよう。',
+      mode===0?'きかれた どうぶつの えだけ かぞえよう。':
+        mode===1?'いちばん おおい ならびを さがそう。':'いちばん すくない ならびを さがそう。'],
+    {kind:'gradeOnePictureGraph',rows},mode===0?nums(Number(answer),6):names);
 }
 function makeTask(n:number,i:number):Task{
   const unit=Math.floor((n-1)/5),part=(n-1)%5,token=tokenFor(i);
@@ -310,7 +316,9 @@ function makeTask(n:number,i:number):Task{
   if(unit===6)return directSub(i,n,true);
   if(unit===7){
     if(part===2)return basicNumberLine(i,100);
-    const value=10+i*9,more=13+i*8;
+    const value=part===0?(i+1)*10:part===1?[9,19,29,39,49,59,69,79,89,100][i]:
+      10+i*9;
+    const more=13+i*8;
     if(part===3){
       const a=value,b=more,answer=Math.max(a,b);
       return task(a+'と '+b+'。おおきい かずは？',answer,'comparison',
@@ -332,8 +340,9 @@ function makeTask(n:number,i:number):Task{
     if(part===1)return measureTask(i,'capacity');
     if(part===2)return clockTask(i);
     if(part===3)return graphTask(i);
-    return i%5===0?measureTask(i,'length'):i%5===1?measureTask(i,'capacity'):
-      i%5===2?clockTask(i):i%5===3?graphTask(i):directAdd(i,n);
+    return i%7===0?measureTask(i,'length'):i%7===1?measureTask(i,'capacity'):
+      i%7===2?clockTask(i):i%7===3?graphTask(i):i%7===4?directAdd(i,n):
+      i%7===5?shapeTask(i,2):directSub(i,n);
   }
   throw new Error('Unknown grade-one unit: '+unit);
 }
