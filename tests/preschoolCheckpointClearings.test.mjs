@@ -96,7 +96,7 @@ test('checkpoint signs show the review range and the ten actual numbered tests',
  const src=code('src/components/WorldScenes780.tsx');
  assert.match(src,/checkpointsFor\(grade\)\.map/);
  assert.match(src,/testID=\{'island-checkpoint-'\+checkpoint\.number\}/);
- assert.match(src,/grade.id==='preschool' && checkpoint.number<=10/);
+ assert.match(src,/\(grade.id==='preschool'\|\|grade.id==='e1'\) && checkpoint.number<=10/);
  assert.match(src,/grade.id==='preschool' \? <>/);
  assert.match(src,/✓ かくにん/);
  assert.match(src,/テスト \{checkpoint\.number\}/);
