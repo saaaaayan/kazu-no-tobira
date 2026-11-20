@@ -50,7 +50,7 @@ test('all ten checkpoint lanes are playable without requiring an approved bank',
  const scenes=code('src/components/WorldScenes780.tsx');
  const game=code('src/FullAdventure.tsx');
  assert.match(scenes,/const enabled=preview \? \(grade\.id==='preschool'\|\|grade\.id==='e1'\) && checkpoint\.number<=10/);
- assert.match(game,/const problems=item\.number===1\?uiPreviewPreschoolCheckpointOne\(\)/);
+ assert.match(game,/item\.number===1\?uiPreviewPreschoolCheckpointOne\(\)/);
  assert.match(game,/uiPreviewPreschoolCheckpoint\(item\.number\)/);
  assert.match(game,/const problems=uiPreviewRound\(stage\)/);
  assert.match(game,/onPress=\{\(\)=>void submit\(\)\}/);
