@@ -302,7 +302,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
   // Other islands retain their original ordering.
   const supplementalPanels=(
     <>
-      <IslandCurriculumPanel grade={grade} onStart={onStart} availability={curriculumAvailability}/>
+      <IslandCurriculumPanel grade={grade} onStart={onStart} availability={curriculumAvailability} preview={preview}/>
       {preview && <View style={styles.previewCard}>
         {previewStage ? <>
           <Text accessibilityRole="header" style={styles.previewHeading}>{preview && grade.id==='e1' ? 'かずから じゅんに まなぼう！' : hasStageBank(previewStage.id)
