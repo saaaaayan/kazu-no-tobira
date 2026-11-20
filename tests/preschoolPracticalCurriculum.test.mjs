@@ -73,9 +73,11 @@ test('stage 49 equalizes two groups with one additional object, keeping both-sid
     assert.equal(q.diagram?.kind,'countingBoard',q.id);
     assert.equal(q.diagram.arrangement,'side-by-side',q.id);
     const a=q.diagram.rows[0].tokens.length,b=q.diagram.rows[1].tokens.length;
-    assert.ok(Math.abs(a-b)<=1,q.id);
-    assert.equal(q.answer,a===b?'おなじ':a<b?'ひだり':'みぎ',q.id);
-    assert.deepEqual(new Set(q.choices),new Set(['ひだり','おなじ','みぎ']),q.id);
+    assert.equal(Math.abs(a-b),1,q.id);
+    assert.equal(q.answer,a<b?'ひだり':'みぎ',q.id);
+    assert.deepEqual(new Set(q.choices),new Set(['ひだり','みぎ']),q.id);
+    assert.equal(q.choices.length,2,q.id);
+    assert.match(q.question,/どっちに 1こ おくと おなじ かずに なる/u);
     assert.match(q.explanation,/おなじ/u);
   }
 });

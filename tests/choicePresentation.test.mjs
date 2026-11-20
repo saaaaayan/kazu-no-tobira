@@ -22,9 +22,14 @@ test('all six permutations of positional choices display left, same, right witho
 });
 
 test('unrelated or partial selections keep their source ordering',()=>{
-  const examples=[['1','3','2'],['おなじ','ちがう','みぎ'],['ひだり','みぎ'],['さんかく','しかく','まる']];
+  const examples=[['1','3','2'],['おなじ','ちがう','みぎ'],['さんかく','しかく','まる']];
   for(const value of examples)assert.strictEqual(displayedChoiceOptions(value),value);
   assert.equal(displayedChoiceOptions(undefined),undefined);
+});
+
+test('two physical choices always show left on the left even if bank choices are shuffled',()=>{
+  assert.deepEqual(displayedChoiceOptions(['みぎ','ひだり']),['ひだり','みぎ']);
+  assert.deepEqual(displayedChoiceOptions(['ひだり','みぎ']),['ひだり','みぎ']);
 });
 
 test('all preschool compare-stage and checkpoint options have consistent presentation',()=>{

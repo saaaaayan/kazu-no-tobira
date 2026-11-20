@@ -12,7 +12,7 @@ import type { PictureNumberMatch } from './preschoolNumberConnections.ts';
 const toys: CountingToken[]=['bear','cat','dog','rabbit','chick','car','flower','star','apple','fish'];
 const shapes=['●','▲','■'] as const;
 type Task={question:string;answer:string;choices:string[];prompt?:string;diagram?:BankDiagram;
-  trace?:string; spatial?:true; explanation?:string;hints?:[string,string,string];
+  trace?:string; spatial?:true; twoOptions?:true; explanation?:string;hints?:[string,string,string];
   numeralPractice?:true;focalNumeral?:string;
   pictureNumberMatch?:PictureNumberMatch;
   twoRules?:{color:'あか'|'あお';shape:'まる'|'さんかく'|'しかく'};};
@@ -105,17 +105,19 @@ function splitTask(i:number):Task{
 }
 
 function equalizeTask(i:number):Task{
- const token=t(i),left=2+i%5,right=left+(i%3===0?0:i%3===1?1:-1);
- const answer=left===right?'おなじ':left<right?'ひだり':'みぎ';
- return choose('おなじ かずに するには？',
-   answer,['ひだり','おなじ','みぎ'],{
-     diagram:groups(repeat(token,left),repeat(token,right)),
-     prompt:'ひとつ ふやす ばしょを えらぼう。もう おなじなら「おなじ」。',
-     hints:['ひだりを かぞえてね。','みぎを かぞえてね。',
-       'すくない ほうに 1こ ふやそう。おなじなら そのまま。'],
-     explanation:left===right?'ひだりも みぎも '+left+'こ。もう おなじだよ。':
-       'ひだりは '+left+'こ、みぎは '+right+'こ。'+answer+'に 1こ ふやすと おなじだよ。',
-   });
+ // These questions ALWAYS show a difference of exactly one.
+ // A scene already equal on both sides is not an actionable "add one" task.
+ const token=t(i),left=3+i%4,right=left+(i%2===0?1:-1);
+ const answer=left<right?'ひだり':'みぎ';
+ return {
+   question:'どっちに 1こ おくと おなじ かずに なる？',
+   answer,choices:['ひだり','みぎ'],twoOptions:true,
+   diagram:groups(repeat(token,left),repeat(token,right)),
+   prompt:'すくない ほうを さわってね。',
+   hints:['ひだりの かずを かぞえてね。','みぎの かずも かぞえてね。',
+     '1こ すくない ほうに おくと おなじに なるよ。'],
+   explanation:'ひだりは '+left+'こ、みぎは '+right+'こ。'+answer+'に 1こ おくと おなじ かずに なるよ。',
+ };
 }
 function shapeTask(i:number,part:number):Task{
   const here=shapes[(i+part)%3],other=shapes[(i+part+1)%3],third=shapes[(i+part+2)%3];
@@ -161,9 +163,9 @@ function position(i:number,level:number):Task{
  const visual={diagram:{kind:'countingBoard' as const,arrangement:'position-row' as const,
    rows:[{tokens:items}]},spatial:true as const};
  const q=level%5;
- if(q===0)return choose('まんなかは だれ？',names[1],[names[0],names[2]],{...visual,explanation:'3つの えの まんなかは '+names[1]+' だよ。'});
- if(q===1)return choose('いちばん ひだりは だれ？',names[0],[names[1],names[2]],{...visual,explanation:'ひだりはしに いるのは '+names[0]+' だよ。'});
- if(q===2)return choose('いちばん みぎは だれ？',names[2],[names[0],names[1]],{...visual,explanation:'みぎはしに いるのは '+names[2]+' だよ。'});
+ if(q===0)return choose('まんなかは どれ？',names[1],[names[0],names[2]],{...visual,explanation:'3つの えの まんなかは '+names[1]+' だよ。'});
+ if(q===1)return choose('いちばん ひだりは どれ？',names[0],[names[1],names[2]],{...visual,explanation:'ひだりはしに いるのは '+names[0]+' だよ。'});
+ if(q===2)return choose('いちばん みぎは どれ？',names[2],[names[0],names[1]],{...visual,explanation:'みぎはしに いるのは '+names[2]+' だよ。'});
  if(q===3)return choose(names[1]+' の ひだりは？',names[0],[names[1],names[2]],{...visual,explanation:'まんなかの ひだりに '+names[0]+' が いるよ。'});
  return choose(names[1]+' の みぎは？',names[2],[names[0],names[1]],{...visual,explanation:'まんなかの みぎに '+names[2]+' が いるよ。'});
 }
@@ -328,8 +330,8 @@ export function preschoolPrototypeBank(stage:Pick<WorldStage,'id'|'gradeId'|'kin
    const q=makeTask(n,i);
    const hints=specificHints(q,n);
    const answer=q.answer, choices=q.choices;
-   const expectedOptions=q.diagram?.kind==='countingBoard' &&
-     q.diagram.arrangement==='vertical-position' ? 2 : 3;
+   const expectedOptions=q.twoOptions || (q.diagram?.kind==='countingBoard' &&
+     q.diagram.arrangement==='vertical-position') ? 2 : 3;
    if(!choices.includes(answer)||choices.length!==expectedOptions||new Set(choices).size!==expectedOptions)
      throw Error('Invalid prototype options '+n+':'+i);
    // Correct answers must not always occupy the first button.

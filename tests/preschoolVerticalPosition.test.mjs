@@ -5,7 +5,7 @@ import {worldIslands} from '../src/domain/worldCatalog.ts';
 import {uiPreviewBank,uiPreviewPreschoolCheckpoint} from '../src/domain/uiPreviewRound.ts';
 import {checkMathAnswer} from '../src/domain/mathAnswer.ts';
 import {countingTokenArt} from '../src/domain/countingTokens.ts';
-import {preschoolVerticalChoiceEmoji} from '../src/domain/preschoolSpatialChoice.ts';
+import {preschoolSpatialChoiceEmoji,preschoolVerticalChoiceEmoji} from '../src/domain/preschoolSpatialChoice.ts';
 
 const src=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const island=worldIslands.find(g=>g.id==='preschool');
@@ -69,10 +69,10 @@ test('vertical position scenes stay above and below, and do not apply counting t
 
 test('answer buttons display large matching emojis with kana labels without changing grading',()=>{
   const game=src('src/FullAdventure.tsx');
-  assert.match(game,/import \{ preschoolVerticalChoiceEmoji \} from '\.\/domain\/preschoolSpatialChoice';/);
-  assert.match(game,/const verticalPictureChoices=Boolean\(diagram\?\.kind==='countingBoard' &&/);
-  assert.match(game,/\{verticalPictureChoices \? \(/);
-  assert.match(game,/\{preschoolVerticalChoiceEmoji\(diagram,option\)\}/);
+  assert.match(game,/import \{ preschoolSpatialChoiceEmoji \} from '\.\/domain\/preschoolSpatialChoice';/);
+  assert.match(game,/const spatialPictureChoices=Boolean\(diagram\?\.kind==='countingBoard' &&/);
+  assert.match(game,/\{spatialPictureChoices \? \(/);
+  assert.match(game,/\{preschoolSpatialChoiceEmoji\(diagram,option\)\}/);
   assert.match(game,/<Text style=\{styles.verticalPictureChoiceName\}>\{option\}<\/Text>/);
   assert.match(game,/verticalPictureChoiceEmoji:\{fontSize:54,lineHeight:70,textAlign:'center'\}/);
   assert.match(game,/onPress=\{\(\)=>void submit\(option\)\}/);
