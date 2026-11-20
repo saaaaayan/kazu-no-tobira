@@ -38,10 +38,17 @@ test('all 50 stages have ten independently gradable lessons with multi-step hint
     for(const q of bank){
       assert.ok(!ids.has(q.id),q.id);
       ids.add(q.id);
-      assert.equal(q.type,'choice',q.id);
-      assert.equal(q.choices.length,3,q.id);
-      assert.equal(new Set(q.choices).size,3,q.id);
-      assert.equal(q.choices.filter(c=>checkMathAnswer(q,c)).length,1,q.id);
+      assert.ok(['choice','number'].includes(q.type),q.id);
+      if(q.type==='choice'){
+        assert.equal(q.choices.length,3,q.id);
+        assert.equal(new Set(q.choices).size,3,q.id);
+        if(q.type==='choice')assert.equal(q.choices.filter(c=>checkMathAnswer(q,c)).length,1,q.id);
+      else assert.ok(checkMathAnswer(q,q.answer),q.id);
+      }else{
+        assert.ok(/^\\d+$/u.test(q.answer),q.id);
+        assert.equal(q.choices,undefined,q.id);
+      }
+      assert.ok(checkMathAnswer(q,q.answer),q.id);
       assert.equal(q.hints.length,3,q.id);
       assert.ok(q.hints.every(h=>h.trim().length>=8),q.id);
       assert.ok(q.explanation.length>=8,q.id);
@@ -94,8 +101,10 @@ test('length, capacity and picture graphs have math-correct answers grounded in 
     const rows=q.diagram.rows;
     const counts=rows.map(r=>r.count);
     assert.equal(new Set(counts).size,3,q.id);
+    const isCount=q.question.includes('いくつ');
     const askMore=q.question.includes('おおい');
-    const expected=rows[counts.indexOf(askMore?Math.max(...counts):Math.min(...counts))].label;
+    const expected=isCount?String(rows.find(r=>q.question.startsWith(r.label))?.count):
+      rows[counts.indexOf(askMore?Math.max(...counts):Math.min(...counts))].label;
     assert.equal(q.answer,expected,q.id);
   }
   for(const q of size(48)){
