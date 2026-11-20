@@ -145,3 +145,91 @@ test('the trial does not overwrite archived hundred-question banks or approve an
   assert.equal(bank.questions.length,100);
   assert.ok(bank.questions.every(q=>q.id.startsWith('e1.n31:bank1:')));
 });
+
+test('no first-grade round repeats the same illustrated task within one stage',()=>{
+  let keypadExercises=0;
+  for(const stage of stages){
+    const items=uiPreviewBank(stage);
+    const signatures=items.map(q=>JSON.stringify({
+      text:q.question,diagram:q.diagram,clock:q.clock,answer:q.answer
+    }));
+    assert.equal(new Set(signatures).size,10,'duplicate learning task in '+stage.id);
+    keypadExercises+=items.filter(q=>q.type==='number').length;
+  }
+  assert.ok(keypadExercises>=30,'short equations must include typed number entry');
+});
+
+test('the 10-number lessons never ask children about numbers above ten',()=>{
+  const numberOrder=uiPreviewBank(stages[3]);
+  assert.equal(numberOrder.length,10);
+  for(const q of numberOrder){
+    assert.equal(q.diagram?.kind,'gradeOneNumberLine',q.id);
+    assert.ok(q.diagram.start>=0&&q.diagram.end<=10,q.id);
+    assert.ok(Number(q.answer)<=10,q.id);
+  }
+  const hundredLine=uiPreviewBank(stages[37]);
+  for(const q of hundredLine){
+    assert.equal(q.diagram?.kind,'gradeOneNumberLine',q.id);
+    assert.ok(q.diagram.end<=100&&q.diagram.hidden<=100,q.id);
+  }
+  const hundred=uiPreviewBank(stages[35]);
+  assert.ok(hundred.some(q=>q.answer==='100'),'10 tens must reach 100');
+});
+
+test('11–15 and 16–18 borrowing topics stay in range and really require borrowing',()=>{
+  for(const [index,min,max] of [[32,11,15],[33,16,18]]){
+    const stage=stages[index];
+    for(const q of uiPreviewBank(stage)){
+      assert.equal(q.diagram?.kind,'borrowTen',q.id);
+      const {total,used}=q.diagram;
+      assert.ok(total>=min&&total<=max,q.id);
+      assert.ok(used>total%10&&used<=9,q.id+' must borrow ones from ten');
+      assert.ok(checkMathAnswer(q,q.answer),q.id);
+      assert.ok(q.explanation.includes(String(total-used)),q.id);
+    }
+  }
+});
+
+test('each carry-addition stage has different exercises and teaches the ten bridge',()=>{
+  const signatures=new Set();
+  for(const stage of stages.slice(25,30)){
+    const cards=uiPreviewBank(stage);
+    assert.equal(cards.length,10,stage.id);
+    for(const q of cards){
+      assert.ok(q.diagram?.kind==='tenFrame',q.id);
+      assert.ok(q.diagram.first+q.diagram.second>10,q.id);
+      assert.ok(q.diagram.first+q.diagram.second<=20,q.id);
+      assert.ok(q.hints.some(h=>h.includes('10')),q.id);
+      const signature=JSON.stringify([q.question,q.answer]);
+      assert.ok(!signatures.has(signature),q.id+' repeats an earlier carry calculation');
+      signatures.add(signature);
+    }
+  }
+});
+
+test('every geometry and picture-graph exercise is grounded in its visible shapes and counts',()=>{
+  for(let stageNo=41;stageNo<=45;stageNo++){
+    for(const q of uiPreviewBank(stages[stageNo-1])){
+      assert.equal(q.diagram?.kind,'gradeOneShapes',q.id);
+      const symbols=q.diagram.symbols;
+      assert.ok(symbols.length>=3&&symbols.length<=4,q.id);
+      if(q.question.includes('いくつ')){
+        const target=q.question.includes('●')?'●':q.question.includes('▲')?'▲':'■';
+        assert.equal(q.answer,String(symbols.filter(symbol=>symbol===target).length),q.id);
+      }
+    }
+  }
+  const graphs=uiPreviewBank(stages[48]);
+  assert.equal(new Set(graphs.map(q=>JSON.stringify(q.diagram))).size,10);
+  assert.ok(graphs.some(q=>/いくつ/.test(q.question)),'a data chart also needs counting');
+  assert.ok(graphs.some(q=>/おおい/.test(q.question)));
+  assert.ok(graphs.some(q=>/すくない/.test(q.question)));
+});
+
+test('the final grade-one review mixes counting, calculations, shapes, time and measurement',()=>{
+  const cards=uiPreviewBank(stages[49]);
+  const kinds=new Set(cards.map(q=>q.diagram?.kind??(q.clock?'clock':null)));
+  for(const kind of ['magnitudeCompare','gradeOneCapacity','gradeOneShapes','gradeOnePictureGraph','tenFrame','takeAway','clock']){
+    assert.ok(kinds.has(kind),'review missing: '+kind);
+  }
+});
