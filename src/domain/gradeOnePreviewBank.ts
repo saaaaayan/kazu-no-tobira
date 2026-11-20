@@ -112,7 +112,7 @@ function basicNumberLine(i:number,upTo:20|100=20):Task{
     numberLine(start,step,offset),nums(missing,100));
 }
 function tenParts(i:number,part:number):Task{
-  const a=1+i%9,b=10-a;
+  const a=i%10,b=10-a;
   if(part===0)return task('ぜんぶで 10こ。ひだりに '+a+'こ。みぎに はいるのは？',
     b,'missingPart','10こを '+a+'こと '+b+'こに わけたよ。',
     hintsTen,{kind:'preschoolSplit',token:tokenFor(i),total:10,placedLeft:a},nums(b,10));
@@ -153,7 +153,7 @@ function shapeTask(i:number,part:number):Task {
   }
   if(part===3){
     const a=glyphs[i%3],b=glyphs[(i+1+Math.floor(i/3))%3===i%3?(i+2)%3:(i+1+Math.floor(i/3))%3];
-    const pattern:BankDiagram={kind:'gradeOneShapes',symbols:i%2===0?[a,b,a,b]:[a,b,a,b,a],arrangement:'row'};
+    const pattern:BankDiagram={kind:'gradeOneShapes',symbols:[a,b,a,b],arrangement:'row'};
     return task('この ならびの つぎは どれ？',a,'sequence',
       a+'、'+b+'の じゅんばんが くりかえして いるよ。',
       ['ひだりから かたちを みてね。','ふたつずつ くりかえして いるよ。',
@@ -186,13 +186,15 @@ function measureTask(i:number,kind:'length'|'capacity'):Task{
 function clockTask(i:number):Task{
   const hour=1+i%10,half=i%2===1;
   const time=hour*60+(half?30:0);
-  return task(half?'とけいは なんじはん？':'とけいは なんじ？',hour,'comparison',
+  const answer=hour+(half?'じはん':'じ');
+  const choices=[hour-1,hour,hour+1].map(h=>h+(half?'じはん':'じ'));
+  return task(half?'とけいは なんじはん？':'とけいは なんじ？',answer,'comparison',
     'ながい はりが '+(half?'6':'12')+'の とき、みじかい はりを みよう。'+hour+
       (half?'じはん':'じ')+'だよ。',
     ['ながい はりを みよう。','みじかい はりが さす じこくを みよう。',
       half?'ながい はりは 6、みじかい はりは ふたつの じの あいだだよ。':
       'ながい はりが 12なら、ちょうど なんじかな？'],
-    undefined,nums(hour,12),{start:time,end:time,read:true});
+    undefined,choices,{start:time,end:time,read:true});
 }
 function graphTask(i:number):Task{
   const names=['くま','ねこ','うさぎ'],ids:CountingToken[]=['bear','cat','rabbit'];
