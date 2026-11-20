@@ -98,7 +98,8 @@ function position(i:number,level:number):Task{
  const names=items.map(name);
  // The three toys are rendered as an actual one-row diagram, not inline
  // emoji text that may wrap across lines on narrow phone screens.
- const visual={diagram:groups(items),spatial:true as const};
+ const visual={diagram:{kind:'countingBoard' as const,arrangement:'position-row' as const,
+   rows:[{tokens:items}]},spatial:true as const};
  const q=level%5;
  if(q===0)return choose('まんなかは だれ？',names[1],[names[0],names[2]],{...visual,explanation:'3つの えの まんなかは '+names[1]+' だよ。'});
  if(q===1)return choose('いちばん ひだりは だれ？',names[0],[names[1],names[2]],{...visual,explanation:'ひだりはしに いるのは '+names[0]+' だよ。'});
