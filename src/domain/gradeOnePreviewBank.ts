@@ -287,7 +287,7 @@ function makeTask(n:number,i:number):Task{
         {kind:'takeAway',total:a,used:a},['0','1','2']);
     }
     if(part===3){
-      const a=4+i%6,b=1+i%(a-1),remain=a-b;
+      const a=4+i%6,b=1+Math.floor(i/6)+i%(a-1),remain=a-b;
       return task('□ ＋ '+b+' ＝ '+a,remain,'missingPart',
         remain+'＋'+b+'＝'+a+'だよ。',
         ['ぜんぶは '+a+'だよ。','たす かずを みてね。',
@@ -313,6 +313,20 @@ function makeTask(n:number,i:number):Task{
         ['ふたつの かずを みてね。','10より おおきい かずを かんがえよう。',
          '20までの ならびを おもいだそう。'],
         undefined,nums(answer,21));
+    }
+    if(part===4){
+      const value=11+i;
+      if(i%3===0)return task('10と いくつで '+value+'？',value-10,'decomposition',
+        '10と '+(value-10)+'で '+value+'だよ。',
+        hintsTwenty,{kind:'bundlesAndOnes',tens:1,ones:value-10},nums(value-10,10));
+      if(i%3===1){
+        const other=20-i,answer=Math.max(value,other);
+        return task(value+'と '+other+'。おおきい ほうは？',answer,'comparison',
+          'かずを くらべると '+answer+'が おおきいよ。',
+          ['ふたつの かずを みてね。','10を こえている かずを くらべよう。',
+           'おおきい ほうを えらぼう。'],undefined,nums(answer,20));
+      }
+      return basicNumberLine(i+11,20);
     }
     return basicNumberLine(i,20);
   }
