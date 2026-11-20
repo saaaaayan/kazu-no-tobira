@@ -305,7 +305,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
       <IslandCurriculumPanel grade={grade} onStart={onStart} availability={curriculumAvailability}/>
       {preview && <View style={styles.previewCard}>
         {previewStage ? <>
-          <Text accessibilityRole="header" style={styles.previewHeading}>{hasStageBank(previewStage.id)
+          <Text accessibilityRole="header" style={styles.previewHeading}>{preview && grade.id==='e1' ? 'かずから じゅんに まなぼう！' : hasStageBank(previewStage.id)
             ? 'このステージから あそぼう！' : 'まずは ここから！'}</Text>
           <Pressable accessibilityRole="button" testID="kazu-preview-first-stage"
             accessibilityLabel={'ステージ '+stageText(previewStage)+' を はじめる'}
@@ -313,7 +313,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
             style={({pressed})=>[styles.previewStart,pressed&&styles.pressed]}>
             <Text style={styles.previewStartText}>▶ ステージ {stageText(previewStage)} {hasStageBank(previewStage.id)?'を はじめる':'を はじめる'}</Text>
           </Pressable>
-          <Text style={styles.hintText}>{hasStageBank(previewStage.id)
+          <Text style={styles.hintText}>{preview && grade.id==='e1' ? '50ステージ・各10問のカリキュラム試作版だよ。' : hasStageBank(previewStage.id)
             ? '100問のなかから、10問ずつ ちょうせんできるよ！'
             : 'えを みて、さわって、かぞえてみよう。'}</Text>
         </> : <>
@@ -346,7 +346,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
       </View>}
       {preview && <View style={styles.legend}>
         <Text style={styles.legendText}>✦ あそべる</Text>
-        {grade.stages.some(stage=>hasStageBank(stage.id)) &&
+        {grade.id!=='e1' && grade.stages.some(stage=>hasStageBank(stage.id)) &&
           <Text style={styles.legendText}>◆ 100問から10問ずつ</Text>}
         <Text style={styles.legendText}>● じゅんびちゅう</Text>
       </View>}
@@ -373,7 +373,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           <Text style={styles.eyebrow}>{grade.title} の ぼうけんマップ</Text>
           <Text style={styles.bannerHeading}>{grade.island}</Text>
           <Text style={styles.bannerDescription}>{grade.theme}</Text>
-          <Text style={styles.islandBannerCount}>{preview ? (grade.stages.some(stage=>hasStageBank(stage.id))
+          <Text style={styles.islandBannerCount}>{preview ? (grade.id==='e1' ? '冒険の道50ステージ・確認テスト10を あそべるよ' : grade.stages.some(stage=>hasStageBank(stage.id))
             ? '問題がある '+grade.stages.filter(stage=>hasStageBank(stage.id)).length+'ステージを あそべるよ'
             : '65ステージと10か所の確認テスト · サンプル表示') : isPlannedIsland(grade.id) ? '教材を準備中 · 65地点' : grade.id === 'sage' ? (testing || isIslandUnlocked(progress, grade.id)
             ? `${grade.stages.filter(stage => hasStageBank(stage.id)).length} / 65 地点で出題中` : '高校3年生の冒険の道50・試練の道10をクリアすると解放') : testing ? (hasPremium(access) ? "65ステージ すべてプレイできるよ" : "冒険の道50ステージを 自由に あそべるよ") : `✦ ${stats.cleared} / 65 クリア　★ ${stats.perfect} パーフェクト`}</Text>
