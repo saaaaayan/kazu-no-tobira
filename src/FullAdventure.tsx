@@ -8,6 +8,7 @@ import { stageDisplayTitle,stageLabels, type Checkpoint } from './domain/stageSt
 import { stageCategoryName } from './domain/islandCurriculumView';
 import { preschoolStageMapInfo } from './domain/preschoolStageMapInfo';
 import { shouldAutoGradePreschoolChoice } from './domain/preschoolAnswerFlow';
+import { displayedChoiceOptions } from './domain/choicePresentation';
 import PreschoolTracePad from './components/PreschoolTracePad';
 import PreschoolPictureNumberMatch from './components/PreschoolPictureNumberMatch';
 import { liveOrigin, requestLiveRound, requestLiveGrade, requestLiveHint, type LiveMode, type LiveRound } from './domain/liveQuestions';
@@ -357,6 +358,8 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   // The memo is absent for choice questions, so the results must not keep
   // the old two-column desktop layout with an empty left side.
   const choiceFeedback=Boolean(round?.feedback && question?.type==='choice');
+  const displayedChoices=displayedChoiceOptions(question?.choices);
+  const directionalChoices=Boolean(displayedChoices && displayedChoices!==question?.choices);
   const hints = liveCard ? round?.liveHints ?? [] : bankQuestion?.hints ?? question?.guidedHints ?? (question ? [question.hint] : []);
   const handwritingAllowed = question?.type === 'number' && (Boolean(liveCard) || Number.isInteger(Number(question.answer)) && Number(question.answer) >= 0);
   const shownMode: AnswerMode = mode === 'handwriting' && !handwritingAllowed ? 'panel' : mode;
@@ -739,7 +742,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                           {question.choices?.every(option=>/^\d+$/u.test(option)) ? 'すうじを さわってね' : 'こたえを さわってね'}
                         </Text>
                         <View style={[styles.preschoolNumberRow,styles.inlineChoiceRow]}>
-                          {question.choices?.map(option=>(
+                          {displayedChoices?.map(option=>(
                             <Pressable key={option} testID={'kazu-inline-choice-'+option}
                               accessibilityRole="button" accessibilityLabel={option+' と こたえる'}
                               accessibilityHint="さわると こたえあわせを するよ"
@@ -751,7 +754,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                               <MathText value={option} style={[styles.preschoolNumberText,
                                 option.length>2&&styles.inlineChoiceMedium,
                                 option.length>5&&styles.inlineChoiceLong,
-                                option.length>9&&styles.inlineChoiceVeryLong]}/>
+                                option.length>9&&styles.inlineChoiceVeryLong,
+                                directionalChoices&&styles.inlineDirectionalChoiceText,
+                                directionalChoices&&viewport<400&&styles.inlineDirectionalChoiceTextNarrow]}/>
                             </Pressable>
                           ))}
                         </View>
@@ -778,7 +783,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                       choiceFeedback&&styles.choiceFeedbackArea]}>
                       {round.feedback ? (
                         <>
-                          <View accessibilityLiveRegion="polite" style={[styles.feedbackBox,round.feedback==='incorrect'&&styles.wrongBox]}>
+                          <View accessibilityLiveRegion="polite" style={[styles.feedbackBox,
+                            choiceFeedback&&styles.choiceFeedbackBox,
+                            round.feedback==='incorrect'&&styles.wrongBox]}>
                             {round.feedback==='correct' && <SparkleBurst/>}
                             <View style={styles.feedbackTop}>
                               <Text style={[styles.feedbackMark,round.feedback==='incorrect'&&styles.wrongMark]}>{round.feedback==='correct'?'〇':'✕'}</Text>
@@ -974,7 +981,8 @@ const styles = StyleSheet.create({
   answerArea: { gap: 9, backgroundColor: '#f0f4fc', borderRadius: 16, padding: 14, minWidth: 0 },
   answerWide: { width: 360 },
   choiceFeedbackWork: { alignItems: 'center' },
-  choiceFeedbackArea: { width: '100%', maxWidth: 760, alignSelf: 'center', padding: 12 },
+  choiceFeedbackArea: { width: '100%', alignSelf: 'stretch', padding: 0, backgroundColor: 'transparent' },
+  choiceFeedbackBox: { borderRadius: 19, padding: 18 },
   answerHeading: { color: '#29345d', fontWeight: '900', fontSize: 19 },
   modes: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
   mode: { backgroundColor: '#dfe5f5', borderRadius: 9, paddingVertical: 9, paddingHorizontal: 9, flex: 1, minHeight: 43, alignItems: 'center', justifyContent: 'center' },
@@ -1019,6 +1027,8 @@ const styles = StyleSheet.create({
   inlineChoiceMedium:{fontSize:26},
   inlineChoiceLong:{fontSize:17},
   inlineChoiceVeryLong:{fontSize:13},
+  inlineDirectionalChoiceText:{fontSize:30},
+  inlineDirectionalChoiceTextNarrow:{fontSize:22},
   preschoolHintButton: { minHeight:56, backgroundColor:'#fff0be',
     borderRadius:14, paddingHorizontal:24, justifyContent:'center', alignItems:'center' },
   preschoolHintButtonText: { color:'#29345d', fontSize:19, fontWeight:'900' },
