@@ -12,7 +12,7 @@ import type { PictureNumberMatch } from './preschoolNumberConnections.ts';
 const toys: CountingToken[]=['bear','cat','dog','rabbit','chick','car','flower','star','apple','fish'];
 const shapes=['●','▲','■'] as const;
 type Task={question:string;answer:string;choices:string[];prompt?:string;diagram?:BankDiagram;
-  trace?:string; explanation?:string;hints?:[string,string,string];
+  trace?:string; spatial?:true; explanation?:string;hints?:[string,string,string];
   numeralPractice?:true;focalNumeral?:string;
   pictureNumberMatch?:PictureNumberMatch;
   twoRules?:{color:'あか'|'あお';shape:'まる'|'さんかく'|'しかく'};};
@@ -98,7 +98,7 @@ function position(i:number,level:number):Task{
  const names=items.map(name);
  // The three toys are rendered as an actual one-row diagram, not inline
  // emoji text that may wrap across lines on narrow phone screens.
- const visual={diagram:groups(items)};
+ const visual={diagram:groups(items),spatial:true as const};
  const q=level%5;
  if(q===0)return choose('まんなかは だれ？',names[1],[names[0],names[2]],{...visual,explanation:'3つの えの まんなかは '+names[1]+' だよ。'});
  if(q===1)return choose('いちばん ひだりは だれ？',names[0],[names[1],names[2]],{...visual,explanation:'ひだりはしに いるのは '+names[0]+' だよ。'});
@@ -238,6 +238,7 @@ function makeTask(n:number,i:number):Task{
 const specificHints=(q:Task,n:number):[string,string,string]=>{
  if(q.hints)return q.hints;
  if(q.trace)return ['おてほんを みてね。','うえから ゆっくり ゆびを うごかそう。','かきおわったら、かたちを くらべよう。'];
+ if(q.spatial)return ['えを ひだりから みてね。','ひだり・まんなか・みぎを たしかめよう。','きかれた ばしょの えを えらぼう。'];
  if(q.diagram?.kind==='countingBoard')return [
    'えを よく みてね。',
    'ひとつずつ さわって かぞえよう。',
