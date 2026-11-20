@@ -4,13 +4,15 @@ import {readFileSync} from 'node:fs';
 
 const app=readFileSync(new URL('../src/FullAdventure.tsx',import.meta.url),'utf8');
 
-test('answer feedback for button-choice questions is centered below the question at a readable width',()=>{
+test('choice feedback fills the width of the question panel without a blank memo column',()=>{
   assert.match(app,/const choiceFeedback=Boolean\(round\?\.feedback && question\?\.type==='choice'\)/u);
   assert.match(app,/testID=\{choiceFeedback\?'choice-feedback-centered':undefined\}/u);
   assert.match(app,/choiceFeedback&&styles.choiceFeedbackWork/u);
   assert.match(app,/choiceFeedback&&styles.choiceFeedbackArea/u);
   assert.match(app,/choiceFeedbackWork: \{ alignItems: 'center' \}/u);
-  assert.match(app,/choiceFeedbackArea: \{ width: '100%', maxWidth: 760, alignSelf: 'center'/u);
+  assert.match(app,/choiceFeedbackArea: \{ width: '100%', alignSelf: 'stretch', padding: 0, backgroundColor: 'transparent' \}/u);
+  assert.match(app,/choiceFeedbackBox: \{ borderRadius: 19, padding: 18 \}/u);
+  assert.match(app,/choiceFeedback&&styles.choiceFeedbackBox/u);
   assert.match(app,/wide&&!countingGuide&&!numeralGuide&&question.type!=='choice'&&styles.workWide/u);
   assert.match(app,/wide&&!countingGuide&&!numeralGuide&&question.type!=='choice'&&styles.answerWide/u);
   assert.match(app,/!bankQuestion\?\.preschoolTrace && question.type!=='choice' &&\s*<CalculationMemo/u);
