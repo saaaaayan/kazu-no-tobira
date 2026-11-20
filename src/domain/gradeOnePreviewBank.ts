@@ -134,38 +134,45 @@ function tenParts(i:number,part:number):Task{
     hintsTen,{kind:'tenFrame',first:a,second:b},nums(10,11));
 }
 function shapeTask(i:number,part:number):Task {
-  const target=glyphs[i%3];
-  const other=glyphs[(i+1)%3];
-  const shapes:readonly ('●'|'▲'|'■')[]=i%2===0?[target,other,glyphs[(i+2)%3]]:[glyphs[(i+2)%3],target,other,target];
-  const baseDiagram:BankDiagram={kind:'gradeOneShapes',symbols:shapes,arrangement:'row'};
-  const hints:[string,string,string]=[
-    'えの かたちを みてね。','まる・さんかく・しかくを くらべよう。',
-    'こたえと おなじ かたちを さがそう。'
-  ];
-  if(part===0||part===1)return task(
-    (part===0?'まる':'さんかく')+'は どれ？',
-    part===0?'●':'▲','comparison',
-    'まるは ●、さんかくは ▲、しかくは ■ だよ。',
-    hints,baseDiagram,['●','▲','■']);
+  const masks=[[0],[1],[2],[3],[0,1],[0,2],[0,3],[1,2],[0,1,2],[1,2,3]];
+  if(part===0||part===1){
+    const target:'●'|'▲'|'■'=part===0?'●':i%2===0?'▲':'■';
+    const other:'●'|'▲'|'■'=target==='●'?(i%2===0?'▲':'■'):'●';
+    const marks=masks[i%10];
+    const symbols:Array<'●'|'▲'|'■'>=Array.from({length:4},(_,j)=>
+      marks.includes(j)?target:other);
+    return task('えの なかの '+target+' は いくつ？',
+      marks.length,'counting',
+      target+'を ひとつずつ かぞえると '+marks.length+'こ あるよ。',
+      ['きかれた かたちを みつけよう。','おなじ かたちに めを むけよう。',
+       'みつけた かたちを ひとつずつ かぞえよう。'],
+      {kind:'gradeOneShapes',symbols,arrangement:'row'},nums(marks.length,4));
+  }
   if(part===2){
-    const bottom: '●'|'▲'|'■' = glyphs[(i+2)%3];
-    const top: '●'|'▲'|'■' = glyphs[i%3];
-    const middle: '●'|'▲'|'■'=glyphs[(i+1)%3];
-    const house:BankDiagram={kind:'gradeOneShapes',symbols:[top,middle,bottom],arrangement:'house'};
+    // Three pieces can make many stacks; vary both the stack and the position.
+    const seed=(i*7+Math.floor(i/3))%27;
+    const symbols:Array<'●'|'▲'|'■'>=[
+      glyphs[seed%3],glyphs[Math.floor(seed/3)%3],glyphs[Math.floor(seed/9)%3]
+    ];
     const position=i%3;
-    return task(position===0?'いちばん うえは どれ？':position===1?'まんなかは どれ？':'いちばん したは どれ？',
-      [top,middle,bottom][position],'position',
-      'ふたつの かたちを たてに ならべたよ。',
-      ['うえと したを みてね。','かたちを ひとつずつ たしかめよう。',
-       'きかれた ばしょの かたちを えらぼう。'],house,['●','▲','■']);
+    return task(['いちばん うえ','まんなか','いちばん した'][position]+'の かたちは どれ？',
+      symbols[position],'position',
+      'みっつの かたちを たてに ならべたよ。'+['うえ','まんなか','した'][position]+'は '+symbols[position]+'だよ。',
+      ['うえから じゅんに みてね。','みっつの かたちを ひとつずつ みよう。',
+       'きかれた ばしょに ある かたちを えらぼう。'],
+      {kind:'gradeOneShapes',symbols,arrangement:'house'},['●','▲','■']);
   }
   if(part===3){
-    const a=glyphs[i%3],b=glyphs[(i+1+Math.floor(i/3))%3===i%3?(i+2)%3:(i+1+Math.floor(i/3))%3];
-    const pattern:BankDiagram={kind:'gradeOneShapes',symbols:[a,b,a,b],arrangement:'row'};
-    return task('この ならびの つぎは どれ？',a,'sequence',
-      a+'、'+b+'の じゅんばんが くりかえして いるよ。',
-      ['ひだりから かたちを みてね。','ふたつずつ くりかえして いるよ。',
-       'さいしょと おなじ かたちは どれかな？'],pattern,['●','▲','■']);
+    const a=glyphs[i%3],b=glyphs[(i%3+1+Math.floor(i/3)%2)%3];
+    const threePattern=i>=6;
+    const symbols:Array<'●'|'▲'|'■'>=threePattern?[a,a,b,a]:[a,b,a,b];
+    return task('つぎに くる かたちは どれ？',a,'sequence',
+      threePattern?a+'、'+a+'、'+b+'の ならびが くりかえすよ。':
+        a+'、'+b+'の ならびが くりかえすよ。',
+      ['ひだりから じゅんに みよう。',
+       threePattern?'3この かたちで ひとつの ならびだよ。':'2この かたちで ひとつの ならびだよ。',
+       'ひとつめと おなじ かたちに もどるかな？'],
+      {kind:'gradeOneShapes',symbols,arrangement:'row'},['●','▲','■']);
   }
   return shapeTask(i,i%4);
 }
