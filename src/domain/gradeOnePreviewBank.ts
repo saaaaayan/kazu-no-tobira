@@ -63,9 +63,16 @@ function limitedAdd(i:number,stage=6):readonly [number,number]{
   const group=stage>=6&&stage<=10 ? stage-6 : 0;
   return smallAddPairs[(group*10+i)%smallAddPairs.length];
 }
-function carryPair(i:number){
-  const a=7+i%3,b=4+Math.floor(i/3);
-  return [a,b] as const;
+/** Different objectives each use their own ten carry-addition examples. */
+function carryPair(i:number,stage:number):readonly [number,number]{
+  const batches:Readonly<Record<number,readonly [number,number][]>>={
+    26:[[6,5],[6,6],[6,7],[6,8],[7,4],[7,5],[7,6],[7,7],[8,3],[9,2]],
+    27:[[2,9],[3,8],[4,7],[5,6],[6,9],[7,8],[8,7],[9,6],[5,9],[4,9]],
+    28:[[9,3],[8,4],[9,4],[8,5],[9,5],[8,6],[9,6],[8,7],[9,7],[8,8]],
+    29:[[7,9],[6,8],[7,7],[4,8],[5,8],[3,9],[8,9],[9,8],[6,7],[5,7]],
+    30:[[6,5],[7,4],[8,4],[9,3],[7,9],[6,8],[9,5],[8,6],[7,8],[9,9]],
+  };
+  return batches[stage]?.[i%10]??batches[26][i%10];
 }
 function borrowPair(i:number,stage:number){
   // Stage 33 teaches 11–15, stage 34 teaches 16–18.
@@ -85,13 +92,20 @@ function countingTask(i:number,lower:number,upper:number):Task{
     hintsCount(tokenName(token)),board(token,n),nums(n,upper+1));
 }
 function directAdd(i:number,stage:number,cross=false):Task{
-  const [a,b]=cross?carryPair(i):limitedAdd(i,stage);
+  const [a,b]=cross?carryPair(i,stage):limitedAdd(i,stage);
   const value=a+b;
   const word=i%5===4;
+  const gap=10-a;
+  const hint:[string,string,string]=cross?[
+    '10の まとまりを つくろう。',
+    a+'から 10に するには、あと '+gap+'だよ。',
+    b+'を '+gap+'と '+(b-gap)+'に わけて たそう。'
+  ]:hintsSum;
+  const explain=cross?a+'＋'+gap+'＝10。のこりの '+(b-gap)+'を たして '+value+'だよ。':
+    a+'＋'+b+'＝'+value+'。かずを あわせると '+value+'だよ。';
   return task(word?'たまが '+a+'こ。'+b+'こ ふえたよ。ぜんぶで いくつ？':
     a+' ＋ '+b+' ＝ □',value,'calculation',
-    a+'＋'+b+'＝'+value+'。かずを あわせると '+value+'だよ。',
-    hintsSum,{kind:'tenFrame',first:a,second:b},nums(value,20));
+    explain,hint,{kind:'tenFrame',first:a,second:b},nums(value,20));
 }
 function directSub(i:number,stage:number,borrow=false):Task{
   const [a,b]=borrow?borrowPair(i,stage):[4+i%6,1+Math.floor(i/3)%3] as const;
@@ -303,6 +317,14 @@ function makeTask(n:number,i:number):Task{
     return basicNumberLine(i,20);
   }
   if(unit===5){
+    if(part===3){
+      const [a,b]=carryPair(i,n),sum=a+b,gap=10-a;
+      return task(a+' ＋ □ ＝ '+sum,b,'missingPart',
+        a+'を 10に するには '+gap+'。さらに '+(b-gap)+'を たすから、□は '+b+'だよ。',
+        ['10を つくる かずを みつけよう。',a+'から 10までは あと '+gap+'だよ。',
+          'のこりの '+(b-gap)+'も わすれずに たそう。'],
+        {kind:'tenFrame',first:a,second:b},nums(b,10));
+    }
     if(part===2){
       const b=3+i%7;
       return task('9 ＋ '+b+' ＝ □',9+b,'calculation',
