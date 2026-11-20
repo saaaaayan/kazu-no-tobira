@@ -17,6 +17,9 @@ test('grade one covers all official four mathematics domains in a 50-stage order
   const domains=new Set(gradeOnePreviewUnits.map(unit=>unit.domain));
   for(const name of required)assert.ok(domains.has(name),name);
   const goals=stages.map(s=>gradeOnePreviewStageInfo(s));
+  const stageDomains=new Set(goals.map(g=>g.domain));
+  for(const name of ['数と計算','図形','測定','データの活用','総合'])
+    assert.ok(stageDomains.has(name),'missing grade-one area: '+name);
   assert.ok(goals.every(Boolean));
   assert.ok(goals.every(item=>item.title&&item.goal&&item.unit&&item.domain));
   assert.equal(new Set(goals.map(g=>g.title)).size,50,'every map pin has a distinct learning goal');
@@ -232,4 +235,13 @@ test('the final grade-one review mixes counting, calculations, shapes, time and 
   for(const kind of ['magnitudeCompare','gradeOneCapacity','gradeOneShapes','gradeOnePictureGraph','tenFrame','takeAway','clock']){
     assert.ok(kinds.has(kind),'review missing: '+kind);
   }
+});
+
+test('the 100-number review includes simple two-digit addition and subtraction',()=>{
+  const bank=uiPreviewBank(stages[39]);
+  const equations=bank.filter(q=>/^\d+\s*[＋−]\s*\d+\s*＝/u.test(q.question));
+  assert.ok(equations.length>=4,'must practice easy two-digit operations');
+  assert.ok(equations.some(q=>q.question.includes('＋')));
+  assert.ok(equations.some(q=>q.question.includes('−')));
+  for(const q of equations)assert.ok(checkMathAnswer(q,q.answer),q.id);
 });
