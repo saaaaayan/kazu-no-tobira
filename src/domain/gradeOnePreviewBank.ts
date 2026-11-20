@@ -55,16 +55,24 @@ const hintsTwenty:[string,string,string]=[
 const hintsHundred:[string,string,string]=[
   '10の まとまりを さがそう。','十の くらいと 一の くらいを みよう。','まとまりの かずを 10ずつ かぞえよう。'
 ];
-function limitedAdd(i:number,limit=9){
-  const a=1+(i%5),b=1+((i*3+Math.floor(i/5))%4);
-  return [a,Math.min(b,limit-a)] as const;
+/** All 55 distinct equations up to 9, in increasing total order.
+ * Different consecutive stages use different equations. */
+const smallAddPairs:[number,number][]=Array.from({length:10},(_,sum)=>
+  Array.from({length:sum+1},(_,a)=>[a,sum-a] as [number,number])).flat();
+function limitedAdd(i:number,stage=6):readonly [number,number]{
+  const group=stage>=6&&stage<=10 ? stage-6 : 0;
+  return smallAddPairs[(group*10+i)%smallAddPairs.length];
 }
 function carryPair(i:number){
   const a=7+i%3,b=4+Math.floor(i/3);
   return [a,b] as const;
 }
-function borrowPair(i:number){
-  const a=11+i%8,b=a%10+1+Math.floor(i/8);
+function borrowPair(i:number,stage:number){
+  // Stage 33 teaches 11–15, stage 34 teaches 16–18.
+  const min=stage===33?11:stage===34?16:11;
+  const max=stage===33?15:18;
+  const width=max-min+1;
+  const a=min+i%width,b=a%10+1+Math.floor(i/width);
   return [a,b] as const;
 }
 function numberLine(start:number,step:1|10,hiddenOffset:number):BankDiagram{
@@ -77,16 +85,16 @@ function countingTask(i:number,lower:number,upper:number):Task{
     hintsCount(tokenName(token)),board(token,n),nums(n,upper+1));
 }
 function directAdd(i:number,stage:number,cross=false):Task{
-  const [a,b]=cross?carryPair(i):limitedAdd(i);
+  const [a,b]=cross?carryPair(i):limitedAdd(i,stage);
   const value=a+b;
   const word=i%5===4;
-  return task(word?'●が '+a+'こ、▲が '+b+'こ。ぜんぶで いくつ？':
+  return task(word?'たまが '+a+'こ。'+b+'こ ふえたよ。ぜんぶで いくつ？':
     a+' ＋ '+b+' ＝ □',value,'calculation',
     a+'＋'+b+'＝'+value+'。かずを あわせると '+value+'だよ。',
     hintsSum,{kind:'tenFrame',first:a,second:b},nums(value,20));
 }
 function directSub(i:number,stage:number,borrow=false):Task{
-  const [a,b]=borrow?borrowPair(i):[4+i%6,1+Math.floor(i/3)%3] as const;
+  const [a,b]=borrow?borrowPair(i,stage):[4+i%6,1+Math.floor(i/3)%3] as const;
   const value=a-b;
   const form=i%5===4? '●が '+a+'こ あり、'+b+'こ とったよ。のこりは？':
     a+' − '+b+' ＝ □';
@@ -99,9 +107,9 @@ function directSub(i:number,stage:number,borrow=false):Task{
     ]:hintsSub,borrow?{kind:'borrowTen',total:a,used:b}:{kind:'takeAway',total:a,used:b},
     nums(value,20));
 }
-function basicNumberLine(i:number,upTo:20|100=20):Task{
+function basicNumberLine(i:number,upTo:10|20|100=20):Task{
   const step=upTo===100?10:1;
-  const start=upTo===100?10+(i%4)*10:Math.max(0,1+i%9);
+  const start=upTo===100?10+(i%4)*10:upTo===10?i%6:Math.max(0,1+i%9);
   const offset=1+(i*3)%4;
   const missing=start+offset*step;
   return task('？ に はいる かずは？',missing,'sequence',
@@ -184,10 +192,11 @@ function measureTask(i:number,kind:'length'|'capacity'):Task{
       {kind:'gradeOneCapacity',first:a,second:b},['あか','あお','おなじ']);
 }
 function clockTask(i:number):Task{
-  const hour=1+i%10,half=i%2===1;
+  const hour=1+i%12,half=i%2===1;
   const time=hour*60+(half?30:0);
   const answer=hour+(half?'じはん':'じ');
-  const choices=[hour-1,hour,hour+1].map(h=>h+(half?'じはん':'じ'));
+  const choices=[hour===1?12:hour-1,hour,hour===12?1:hour+1]
+    .map(h=>h+(half?'じはん':'じ'));
   return task(half?'とけいは なんじはん？':'とけいは なんじ？',answer,'comparison',
     'ながい はりが '+(half?'6':'12')+'の とき、みじかい はりを みよう。'+hour+
       (half?'じはん':'じ')+'だよ。',
@@ -224,7 +233,7 @@ function makeTask(n:number,i:number):Task{
          'のこりが みぎに はいるよ。'],
         {kind:'preschoolSplit',token,total,placedLeft:left},nums(remain,10));
     }
-    if(part===3)return basicNumberLine(i,20);
+    if(part===3)return basicNumberLine(i,10);
     const left=1+i%6,right=2+(i*2)%7;
     return task('どちらが おおい？',left===right?'おなじ':left>right?'ひだり':'みぎ',
       'comparison','ひだりは '+left+'こ、みぎは '+right+'こ。',
@@ -234,12 +243,12 @@ function makeTask(n:number,i:number):Task{
   }
   if(unit===1){
     if(part===3){
-      const [a,b]=limitedAdd(i),total=a+b;
-      return task('□ ＋ '+b+' ＝ '+total,a,'missingPart',
-        a+'＋'+b+'＝'+total+'。□は '+a+'だよ。',
-        ['ぜんぶは '+total+'だよ。','すでに '+b+'を たして いるよ。',
-         'あと いくつ あると '+total+'に なるかな？'],
-        {kind:'preschoolSplit',token,total,placedLeft:b},nums(a,10));
+      const [a,b]=limitedAdd(i,n),total=a+b;
+      return task(a+' ＋ '+b+' ＝ □ ＋ '+a,b,'missingPart',
+        'たす じゅんばんを かえても おなじ。'+a+'＋'+b+'＝'+b+'＋'+a+'だよ。',
+        ['ひだりと みぎの しきを くらべよう。','たす じゅんばんを かえられるよ。',
+         a+'と '+b+'を いれかえて みよう。'],
+        {kind:'tenFrame',first:a,second:b},nums(b,10));
     }
     return directAdd(i,n);
   }
