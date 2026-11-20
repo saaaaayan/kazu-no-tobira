@@ -23,7 +23,8 @@ test('public prototype exposes all 65 preschool stages and the original school d
       if(stage.order<5) assert.ok(round.every(q=>q.diagram?.kind==='countingBoard'));
       assert.ok(round.every(q=>!/[＋+＝=]/.test(q.question)));
       assert.ok(round.every(q=>q.hints?.length===3 && q.steps?.length));
-    } else if(stage.gradeId==='e1') assert.ok(round.every(q=>q.type==='choice'&&q.choices?.includes(q.answer)&&q.hints?.length===3));
+    } else if(stage.gradeId==='e1') assert.ok(round.every(q=>
+      (q.type==='number'||(q.type==='choice'&&q.choices?.includes(q.answer)))&&q.hints?.length===3));
   }
 });
 

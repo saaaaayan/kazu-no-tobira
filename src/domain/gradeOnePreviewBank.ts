@@ -55,16 +55,31 @@ const hintsTwenty:[string,string,string]=[
 const hintsHundred:[string,string,string]=[
   '10の まとまりを さがそう。','十の くらいと 一の くらいを みよう。','まとまりの かずを 10ずつ かぞえよう。'
 ];
-function limitedAdd(i:number,limit=9){
-  const a=1+(i%5),b=1+((i*3+Math.floor(i/5))%4);
-  return [a,Math.min(b,limit-a)] as const;
+/** All 55 distinct equations up to 9, in increasing total order.
+ * Different consecutive stages use different equations. */
+const smallAddPairs:[number,number][]=Array.from({length:10},(_,sum)=>
+  Array.from({length:sum+1},(_,a)=>[a,sum-a] as [number,number])).flat();
+function limitedAdd(i:number,stage=6):readonly [number,number]{
+  const group=stage>=6&&stage<=10 ? stage-6 : 0;
+  return smallAddPairs[(group*10+i)%smallAddPairs.length];
 }
-function carryPair(i:number){
-  const a=7+i%3,b=4+Math.floor(i/3);
-  return [a,b] as const;
+/** Different objectives each use their own ten carry-addition examples. */
+function carryPair(i:number,stage:number):readonly [number,number]{
+  const batches:Readonly<Record<number,readonly [number,number][]>>={
+    26:[[6,5],[6,6],[6,7],[6,8],[7,4],[7,5],[7,6],[7,7],[8,3],[9,2]],
+    27:[[2,9],[3,8],[4,7],[5,6],[6,9],[7,8],[8,7],[9,6],[5,9],[4,9]],
+    28:[[9,3],[8,4],[9,4],[8,5],[9,5],[8,6],[8,9],[9,8],[9,7],[8,8]],
+    29:[[7,9],[6,8],[7,7],[4,8],[5,8],[3,9],[8,9],[9,8],[6,7],[5,7]],
+    30:[[6,5],[7,4],[8,4],[9,3],[7,9],[7,5],[9,5],[8,6],[7,8],[9,9]],
+  };
+  return batches[stage]?.[i%10]??batches[26][i%10];
 }
-function borrowPair(i:number){
-  const a=11+i%8,b=a%10+1+Math.floor(i/8);
+function borrowPair(i:number,stage:number){
+  // Stage 33 teaches 11–15, stage 34 teaches 16–18.
+  const min=stage===33?11:stage===34?16:11;
+  const max=stage===33?15:18;
+  const width=max-min+1;
+  const a=min+i%width,b=a%10+1+Math.floor(i/width);
   return [a,b] as const;
 }
 function numberLine(start:number,step:1|10,hiddenOffset:number):BankDiagram{
@@ -77,16 +92,23 @@ function countingTask(i:number,lower:number,upper:number):Task{
     hintsCount(tokenName(token)),board(token,n),nums(n,upper+1));
 }
 function directAdd(i:number,stage:number,cross=false):Task{
-  const [a,b]=cross?carryPair(i):limitedAdd(i);
+  const [a,b]=cross?carryPair(i,stage):limitedAdd(i,stage);
   const value=a+b;
   const word=i%5===4;
-  return task(word?'●が '+a+'こ、▲が '+b+'こ。ぜんぶで いくつ？':
+  const gap=10-a;
+  const hint:[string,string,string]=cross?[
+    '10の まとまりを つくろう。',
+    a+'から 10に するには、あと '+gap+'だよ。',
+    b+'を '+gap+'と '+(b-gap)+'に わけて たそう。'
+  ]:hintsSum;
+  const explain=cross?a+'＋'+gap+'＝10。のこりの '+(b-gap)+'を たして '+value+'だよ。':
+    a+'＋'+b+'＝'+value+'。かずを あわせると '+value+'だよ。';
+  return task(word?'たまが '+a+'こ。'+b+'こ ふえたよ。ぜんぶで いくつ？':
     a+' ＋ '+b+' ＝ □',value,'calculation',
-    a+'＋'+b+'＝'+value+'。かずを あわせると '+value+'だよ。',
-    hintsSum,{kind:'tenFrame',first:a,second:b},nums(value,20));
+    explain,hint,{kind:'tenFrame',first:a,second:b},nums(value,20));
 }
 function directSub(i:number,stage:number,borrow=false):Task{
-  const [a,b]=borrow?borrowPair(i):[4+i%6,1+Math.floor(i/3)%3] as const;
+  const [a,b]=borrow?borrowPair(i,stage):[4+i%6,1+Math.floor(i/3)%3] as const;
   const value=a-b;
   const form=i%5===4? '●が '+a+'こ あり、'+b+'こ とったよ。のこりは？':
     a+' − '+b+' ＝ □';
@@ -99,9 +121,9 @@ function directSub(i:number,stage:number,borrow=false):Task{
     ]:hintsSub,borrow?{kind:'borrowTen',total:a,used:b}:{kind:'takeAway',total:a,used:b},
     nums(value,20));
 }
-function basicNumberLine(i:number,upTo:20|100=20):Task{
+function basicNumberLine(i:number,upTo:10|20|100=20):Task{
   const step=upTo===100?10:1;
-  const start=upTo===100?10+(i%4)*10:Math.max(0,1+i%9);
+  const start=upTo===100?10+(i%5)*10:upTo===10?i%6:Math.max(0,1+i%9);
   const offset=1+(i*3)%4;
   const missing=start+offset*step;
   return task('？ に はいる かずは？',missing,'sequence',
@@ -126,38 +148,45 @@ function tenParts(i:number,part:number):Task{
     hintsTen,{kind:'tenFrame',first:a,second:b},nums(10,11));
 }
 function shapeTask(i:number,part:number):Task {
-  const target=glyphs[i%3];
-  const other=glyphs[(i+1)%3];
-  const shapes:readonly ('●'|'▲'|'■')[]=i%2===0?[target,other,glyphs[(i+2)%3]]:[glyphs[(i+2)%3],target,other,target];
-  const baseDiagram:BankDiagram={kind:'gradeOneShapes',symbols:shapes,arrangement:'row'};
-  const hints:[string,string,string]=[
-    'えの かたちを みてね。','まる・さんかく・しかくを くらべよう。',
-    'こたえと おなじ かたちを さがそう。'
-  ];
-  if(part===0||part===1)return task(
-    (part===0?'まる':'さんかく')+'は どれ？',
-    part===0?'●':'▲','comparison',
-    'まるは ●、さんかくは ▲、しかくは ■ だよ。',
-    hints,baseDiagram,['●','▲','■']);
+  const masks=[[0],[1],[2],[3],[0,1],[0,2],[0,3],[1,2],[0,1,2],[1,2,3]];
+  if(part===0||part===1){
+    const target:'●'|'▲'|'■'=part===0?'●':i%2===0?'▲':'■';
+    const other:'●'|'▲'|'■'=target==='●'?(i%2===0?'▲':'■'):'●';
+    const marks=masks[i%10];
+    const symbols:Array<'●'|'▲'|'■'>=Array.from({length:4},(_,j)=>
+      marks.includes(j)?target:other);
+    return task('えの なかの '+target+' は いくつ？',
+      marks.length,'counting',
+      target+'を ひとつずつ かぞえると '+marks.length+'こ あるよ。',
+      ['きかれた かたちを みつけよう。','おなじ かたちに めを むけよう。',
+       'みつけた かたちを ひとつずつ かぞえよう。'],
+      {kind:'gradeOneShapes',symbols,arrangement:'row'},nums(marks.length,4));
+  }
   if(part===2){
-    const bottom: '●'|'▲'|'■' = glyphs[(i+2)%3];
-    const top: '●'|'▲'|'■' = glyphs[i%3];
-    const middle: '●'|'▲'|'■'=glyphs[(i+1)%3];
-    const house:BankDiagram={kind:'gradeOneShapes',symbols:[top,middle,bottom],arrangement:'house'};
+    // Three pieces can make many stacks; vary both the stack and the position.
+    const seed=(i*7+Math.floor(i/3))%27;
+    const symbols:Array<'●'|'▲'|'■'>=[
+      glyphs[seed%3],glyphs[Math.floor(seed/3)%3],glyphs[Math.floor(seed/9)%3]
+    ];
     const position=i%3;
-    return task(position===0?'いちばん うえは どれ？':position===1?'まんなかは どれ？':'いちばん したは どれ？',
-      [top,middle,bottom][position],'position',
-      'ふたつの かたちを たてに ならべたよ。',
-      ['うえと したを みてね。','かたちを ひとつずつ たしかめよう。',
-       'きかれた ばしょの かたちを えらぼう。'],house,['●','▲','■']);
+    return task(['いちばん うえ','まんなか','いちばん した'][position]+'の かたちは どれ？',
+      symbols[position],'position',
+      'みっつの かたちを たてに ならべたよ。'+['うえ','まんなか','した'][position]+'は '+symbols[position]+'だよ。',
+      ['うえから じゅんに みてね。','みっつの かたちを ひとつずつ みよう。',
+       'きかれた ばしょに ある かたちを えらぼう。'],
+      {kind:'gradeOneShapes',symbols,arrangement:'house'},['●','▲','■']);
   }
   if(part===3){
-    const a=glyphs[i%3],b=glyphs[(i+1+Math.floor(i/3))%3===i%3?(i+2)%3:(i+1+Math.floor(i/3))%3];
-    const pattern:BankDiagram={kind:'gradeOneShapes',symbols:[a,b,a,b],arrangement:'row'};
-    return task('この ならびの つぎは どれ？',a,'sequence',
-      a+'、'+b+'の じゅんばんが くりかえして いるよ。',
-      ['ひだりから かたちを みてね。','ふたつずつ くりかえして いるよ。',
-       'さいしょと おなじ かたちは どれかな？'],pattern,['●','▲','■']);
+    const a=glyphs[i%3],b=glyphs[(i%3+1+Math.floor(i/3)%2)%3];
+    const threePattern=i>=6;
+    const symbols:Array<'●'|'▲'|'■'>=threePattern?[a,a,b,a]:[a,b,a,b];
+    return task('つぎに くる かたちは どれ？',a,'sequence',
+      threePattern?a+'、'+a+'、'+b+'の ならびが くりかえすよ。':
+        a+'、'+b+'の ならびが くりかえすよ。',
+      ['ひだりから じゅんに みよう。',
+       threePattern?'3この かたちで ひとつの ならびだよ。':'2この かたちで ひとつの ならびだよ。',
+       'ひとつめと おなじ かたちに もどるかな？'],
+      {kind:'gradeOneShapes',symbols,arrangement:'row'},['●','▲','■']);
   }
   return shapeTask(i,i%4);
 }
@@ -184,10 +213,11 @@ function measureTask(i:number,kind:'length'|'capacity'):Task{
       {kind:'gradeOneCapacity',first:a,second:b},['あか','あお','おなじ']);
 }
 function clockTask(i:number):Task{
-  const hour=1+i%10,half=i%2===1;
+  const hour=1+i%12,half=i%2===1;
   const time=hour*60+(half?30:0);
   const answer=hour+(half?'じはん':'じ');
-  const choices=[hour-1,hour,hour+1].map(h=>h+(half?'じはん':'じ'));
+  const choices=[hour===1?12:hour-1,hour,hour===12?1:hour+1]
+    .map(h=>h+(half?'じはん':'じ'));
   return task(half?'とけいは なんじはん？':'とけいは なんじ？',answer,'comparison',
     'ながい はりが '+(half?'6':'12')+'の とき、みじかい はりを みよう。'+hour+
       (half?'じはん':'じ')+'だよ。',
@@ -198,18 +228,24 @@ function clockTask(i:number):Task{
 }
 function graphTask(i:number):Task{
   const names=['くま','ねこ','うさぎ'],ids:CountingToken[]=['bear','cat','rabbit'];
-  const base=[2,3,5];
-  const counts=[base[i%3],base[(i+1)%3],base[(i+2)%3]];
-  const row=counts.map((count,j)=>({label:names[j],token:ids[j],count}));
-  const biggest=counts.indexOf(5);
-  const askBiggest=i%2===0;
-  const answer=askBiggest?names[biggest]:names[counts.indexOf(2)];
-  return task(askBiggest?'いちばん おおい えは どれ？':'いちばん すくない えは どれ？',
-    answer,'comparison',
-    'えを かぞえて くらべると、'+answer+'だよ。',
-    ['えを よこに ならべて みてね。','それぞれの えを かぞえよう。',
-      askBiggest?'いちばん ながい ならびは どれかな？':'いちばん みじかい ならびは どれかな？'],
-    {kind:'gradeOnePictureGraph',rows:row},names);
+  // Ten different graphs, with a unique tallest/shortest row in each.
+  const pictures=[
+    [2,3,5],[1,4,3],[4,2,5],[5,1,3],[3,5,2],
+    [4,3,1],[2,5,4],[1,3,6],[5,2,1],[3,6,4]
+  ];
+  const counts=pictures[i%pictures.length];
+  const rows=counts.map((count,j)=>({label:names[j],token:ids[j],count}));
+  const mode=i%3;
+  const question=mode===0?names[i%3]+'の えは いくつ？'
+    :mode===1?'いちばん おおい えは どれ？':'いちばん すくない えは どれ？';
+  const answer=mode===0?String(counts[i%3])
+    :names[counts.indexOf(mode===1?Math.max(...counts):Math.min(...counts))];
+  return task(question,answer,'comparison',
+    'えを ひとつずつ かぞえて くらべると、こたえは '+answer+'だよ。',
+    ['えを よこに ならべて みよう。','それぞれの えを かぞえて みよう。',
+      mode===0?'きかれた どうぶつの えだけ かぞえよう。':
+        mode===1?'いちばん おおい ならびを さがそう。':'いちばん すくない ならびを さがそう。'],
+    {kind:'gradeOnePictureGraph',rows},mode===0?nums(Number(answer),6):names);
 }
 function makeTask(n:number,i:number):Task{
   const unit=Math.floor((n-1)/5),part=(n-1)%5,token=tokenFor(i);
@@ -224,7 +260,7 @@ function makeTask(n:number,i:number):Task{
          'のこりが みぎに はいるよ。'],
         {kind:'preschoolSplit',token,total,placedLeft:left},nums(remain,10));
     }
-    if(part===3)return basicNumberLine(i,20);
+    if(part===3)return basicNumberLine(i,10);
     const left=1+i%6,right=2+(i*2)%7;
     return task('どちらが おおい？',left===right?'おなじ':left>right?'ひだり':'みぎ',
       'comparison','ひだりは '+left+'こ、みぎは '+right+'こ。',
@@ -234,24 +270,24 @@ function makeTask(n:number,i:number):Task{
   }
   if(unit===1){
     if(part===3){
-      const [a,b]=limitedAdd(i),total=a+b;
-      return task('□ ＋ '+b+' ＝ '+total,a,'missingPart',
-        a+'＋'+b+'＝'+total+'。□は '+a+'だよ。',
-        ['ぜんぶは '+total+'だよ。','すでに '+b+'を たして いるよ。',
-         'あと いくつ あると '+total+'に なるかな？'],
-        {kind:'preschoolSplit',token,total,placedLeft:b},nums(a,10));
+      const [a,b]=limitedAdd(i,n),total=a+b;
+      return task(a+' ＋ '+b+' ＝ □ ＋ '+a,b,'missingPart',
+        'たす じゅんばんを かえても おなじ。'+a+'＋'+b+'＝'+b+'＋'+a+'だよ。',
+        ['ひだりと みぎの しきを くらべよう。','たす じゅんばんを かえられるよ。',
+         a+'と '+b+'を いれかえて みよう。'],
+        {kind:'tenFrame',first:a,second:b},nums(b,10));
     }
     return directAdd(i,n);
   }
   if(unit===2){
     if(part===2){
-      const a=1+i%9;
+      const a=i;
       return task(a+' − '+a+' ＝ □',0,'calculation',
         'ぜんぶ とると 0だよ。',hintsSub,
         {kind:'takeAway',total:a,used:a},['0','1','2']);
     }
     if(part===3){
-      const a=4+i%6,b=1+i%(a-1),remain=a-b;
+      const a=4+i%6,b=1+Math.floor(i/6)+i%(a-1),remain=a-b;
       return task('□ ＋ '+b+' ＝ '+a,remain,'missingPart',
         remain+'＋'+b+'＝'+a+'だよ。',
         ['ぜんぶは '+a+'だよ。','たす かずを みてね。',
@@ -278,23 +314,113 @@ function makeTask(n:number,i:number):Task{
          '20までの ならびを おもいだそう。'],
         undefined,nums(answer,21));
     }
+    if(part===4){
+      const value=11+i;
+      if(i%3===0)return task('10と いくつで '+value+'？',value-10,'decomposition',
+        '10と '+(value-10)+'で '+value+'だよ。',
+        hintsTwenty,{kind:'bundlesAndOnes',tens:1,ones:value-10},nums(value-10,10));
+      if(i%3===1){
+        const other=20-i,answer=Math.max(value,other);
+        return task(value+'と '+other+'。おおきい ほうは？',answer,'comparison',
+          'かずを くらべると '+answer+'が おおきいよ。',
+          ['ふたつの かずを みてね。','10を こえている かずを くらべよう。',
+           'おおきい ほうを えらぼう。'],undefined,nums(answer,20));
+      }
+      return basicNumberLine(i+11,20);
+    }
     return basicNumberLine(i,20);
   }
   if(unit===5){
+    if(part===4){
+      const [a,b]=carryPair(i,n),sum=a+b,gap=10-a;
+      const explanation=a+'に '+gap+'を たして 10。のこりの '+(b-gap)+'を たすと '+sum+'だよ。';
+      const hints:[string,string,string]=[
+        '10の まとまりを つくろう。',
+        'はじめの '+a+'に '+gap+'を たすと 10だよ。',
+        'のこりの '+(b-gap)+'を たして たしかめよう。'
+      ];
+      return i%2===0?task('たまが '+a+'こ。'+b+'こ ふえたよ。ぜんぶで いくつ？',
+        sum,'story',explanation,hints,
+        {kind:'tenFrame',first:a,second:b},nums(sum,20)):
+        task(a+' ＋ □ ＝ '+sum,b,'missingPart',explanation,hints,
+          {kind:'tenFrame',first:a,second:b},nums(b,10));
+    }
+    if(part===3){
+      const [a,b]=carryPair(i,n),sum=a+b,gap=10-a;
+      return task(a+' ＋ □ ＝ '+sum,b,'missingPart',
+        a+'を 10に するには '+gap+'。さらに '+(b-gap)+'を たすから、□は '+b+'だよ。',
+        ['10を つくる かずを みつけよう。',a+'から 10までは あと '+gap+'だよ。',
+          'のこりの '+(b-gap)+'も わすれずに たそう。'],
+        {kind:'tenFrame',first:a,second:b},nums(b,10));
+    }
     if(part===2){
-      const b=3+i%7;
-      return task('9 ＋ '+b+' ＝ □',9+b,'calculation',
-        '9に 1を たして 10。のこりを たすと '+(9+b)+'だよ。',
-        ['9は あと 1で 10。','たす かずから 1を つかって 10に しよう。',
-         'のこりを 10に たそう。'],
-        {kind:'tenFrame',first:9,second:b},nums(9+b,20));
+      const [a,b]=carryPair(i,n);
+      return task(a+' ＋ '+b+' ＝ □',a+b,'calculation',
+        a+'を 10に するには '+(10-a)+'。のこりを たすと '+(a+b)+'だよ。',
+        ['10になるまで あと いくつ？',
+          a+'に '+(10-a)+'を たすと 10だよ。',
+         'のこりの '+(b-(10-a))+'を 10に たそう。'],
+        {kind:'tenFrame',first:a,second:b},nums(a+b,20));
     }
     return directAdd(i,n,true);
   }
-  if(unit===6)return directSub(i,n,true);
+  if(unit===6){
+    if(part===3){
+      // There are only six borrowing facts starting at 16,17,18.
+      // Use inverse equations for four additional, distinct exercises.
+      const pairs:[[number,number],...[number,number][]]=[
+        [16,7],[16,8],[16,9],[17,8],[17,9],[18,9]
+      ];
+      const [a,b]=pairs[i%pairs.length],left=a-b;
+      return i<6?task(a+' − '+b+' ＝ □',left,'calculation',
+        '10の まとまりを くずすと '+a+'−'+b+'＝'+left+'だよ。',
+        ['ばらだけで ひけるかな？','10の まとまりを くずそう。',
+         'のこった かずを たしかめよう。'],
+        {kind:'borrowTen',total:a,used:b},nums(left,20)):
+        task(a+' − □ ＝ '+left,b,'missingPart',
+          a+'から '+b+'を ひくと '+left+'だよ。',
+          ['10の まとまりを くずす しきだよ。',
+           'どれだけ ひくと '+left+'に なるか かんがえよう。',
+           left+'に □を たして '+a+'に なる かずを さがそう。'],
+          {kind:'borrowTen',total:a,used:b},nums(b,20));
+    }
+    return directSub(i,n,true);
+  }
   if(unit===7){
     if(part===2)return basicNumberLine(i,100);
-    const value=10+i*9,more=13+i*8;
+    if(part===4){
+      if(i<3){
+        const value=50+i*11;
+        return task('10の まとまりと ばらで いくつ？',value,'counting',
+          '10の まとまりが '+Math.floor(value/10)+'こ、ばらが '+value%10+'こだよ。',
+          hintsHundred,{kind:'bundlesAndOnes',tens:Math.floor(value/10),ones:value%10},
+          nums(value,100));
+      }
+      if(i<5)return basicNumberLine(i,100);
+      if(i<7){
+        const tens=2+i-5,ones=i-3,answer=tens*10+ones;
+        return task((tens*10)+' ＋ '+ones+' ＝ □',answer,'calculation',
+          '10の まとまりに '+ones+'を たすと '+answer+'だよ。',
+          ['10の まとまりを みよう。','ばらを '+ones+'こ たそう。',
+           '十の くらいと 一の くらいを あわせよう。'],
+          {kind:'bundlesAndOnes',tens,ones},nums(answer,100));
+      }
+      if(i<9){
+        const tens=i-3,ones=i-2,total=tens*10+ones;
+        return task(total+' − '+ones+' ＝ □',tens*10,'calculation',
+          'ばらの '+ones+'こを ひくと '+(tens*10)+'だよ。',
+          ['十の まとまりと ばらを みてね。','ばらを '+ones+'こ とろう。',
+           '十の まとまりは そのまま だよ。'],
+          {kind:'bundlesAndOnes',tens,ones},nums(tens*10,100));
+      }
+      return task('89と 98。おおきい かずは？',98,'comparison',
+        '十の くらいを くらべると、98の ほうが おおきいよ。',
+        ['十の くらいを みよう。','8と 9を くらべよう。',
+         '十の くらいが 9の ほうが おおきいよ。'],undefined,nums(98,100));
+    }
+    const value=part===0?(i+1)*10:part===1?[9,19,29,39,49,59,69,79,89,100][i]:
+      10+i*9;
+    const more=13+i*8;
     if(part===3){
       const a=value,b=more,answer=Math.max(a,b);
       return task(a+'と '+b+'。おおきい かずは？',answer,'comparison',
@@ -316,8 +442,9 @@ function makeTask(n:number,i:number):Task{
     if(part===1)return measureTask(i,'capacity');
     if(part===2)return clockTask(i);
     if(part===3)return graphTask(i);
-    return i%5===0?measureTask(i,'length'):i%5===1?measureTask(i,'capacity'):
-      i%5===2?clockTask(i):i%5===3?graphTask(i):directAdd(i,n);
+    return i%7===0?measureTask(i,'length'):i%7===1?measureTask(i,'capacity'):
+      i%7===2?clockTask(i):i%7===3?graphTask(i):i%7===4?directAdd(i,n):
+      i%7===5?shapeTask(i,2):directSub(i,n);
   }
   throw new Error('Unknown grade-one unit: '+unit);
 }
@@ -333,14 +460,19 @@ export function gradeOnePreviewBank(stage:Pick<WorldStage,'id'|'gradeId'|'kind'|
       throw new Error('Invalid grade-one options '+stage.id+' #'+(i+1)+': '+distinct.join(','));
     const offset=(stage.order+i)%3;
     const shifted=[...distinct.slice(offset),...distinct.slice(0,offset)];
+    // Children practice entering answers to simple equations; picture and
+    // matching activities retain one-tap choices.
+    const numericInput=source.format==='calculation'&&i%3!==0&&
+      /^\d+\s*[＋−]\s*\d+\s*＝/u.test(source.question);
     return {
       id:'ui-preview-'+stage.id+'-curriculum-'+String(i+1).padStart(2,'0'),
       stageId:stage.id,
       skillId:'e1.preview.'+info.domain,
-      type:'choice',format:source.format,
+      type:numericInput?'number':'choice',format:source.format,
       difficulty:(i<3?1:i<8?2:3) as 1|2|3,
-      question:source.question,prompt:source.prompt??'こたえを えらぼう',
-      answer:source.answer,choices:shifted,
+      question:source.question,prompt:numericInput?'こたえを 数字で いれてね':
+        source.prompt??'こたえを えらぼう',
+      answer:source.answer,...(numericInput?{}:{choices:shifted}),
       hint:source.hints[0],hints:source.hints,
       explanation:source.explanation,
       steps:[{title:'かんがえかた',body:source.hints[1]},
