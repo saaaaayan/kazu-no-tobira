@@ -49,7 +49,7 @@ const provisionalPreschoolStageInfo = [
   { id: 'preschool.n44', title: "まんなかは どこ？", goal: "まんなかに いるのは だあれ？" },
   { id: 'preschool.n45', title: "ばしょの たんけん", goal: "うえ・した・となりを よく みて さがそう。" },
   { id: 'preschool.n46', title: "あわせて いくつ", goal: "ふたつの ばしょの ぬいぐるみを あわせて かぞえよう。" },
-  { id: 'preschool.n47', title: "ふたつに わけよう", goal: "ぬいぐるみを ふたつの はこに わけて、かずを たしかめよう。" },
+  { id: 'preschool.n47', title: "ふたつに わけよう", goal: "ぜんぶを ふたつに わけよう。ひだりに いれた あと、みぎに はいる かずを かんがえよう。" },
   { id: 'preschool.n48', title: "ひとつずつ わけよう", goal: "みんなに ひとつずつ おやつを くばろう。" },
   { id: 'preschool.n49', title: "おなじ かずに しよう", goal: "すくない ほうに ひとつ ふやして、おなじ かずを つくろう。" },
   { id: 'preschool.n50', title: "ぬいぐるみの おまつり", goal: "ぬいぐるみと いっしょに ぜんぶの あそびに ちょうせん！" },
