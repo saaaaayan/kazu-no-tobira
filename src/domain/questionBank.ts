@@ -7,7 +7,7 @@ import type { CountingToken } from './countingTokens.ts';
 import type { PictureNumberMatch } from './preschoolNumberConnections.ts';
 export type { CountingToken } from './countingTokens.ts';
 export type BankDiagram = { kind: 'plateCount'; token: CountingToken; count: 0 | 1 | 2 }
-  | { kind: 'countingBoard'; guide?: true; spacing?: 'wide'; arrangement?: 'side-by-side'; rows: readonly { label?: string; tokens: readonly CountingToken[] }[]; targetToken?: CountingToken; layoutComparison?: { before:'wide-gaps'|'even-gaps'|'small'|'large'|'left-packed'; after:'wide-gaps'|'even-gaps'|'small'|'large'|'left-packed'; beforeRows?: readonly number[] } }
+  | { kind: 'countingBoard'; guide?: true; spacing?: 'wide'; arrangement?: 'side-by-side' | 'position-row'; rows: readonly { label?: string; tokens: readonly CountingToken[] }[]; targetToken?: CountingToken; layoutComparison?: { before:'wide-gaps'|'even-gaps'|'small'|'large'|'left-packed'; after:'wide-gaps'|'even-gaps'|'small'|'large'|'left-packed'; beforeRows?: readonly number[] } }
   | { kind: 'tenFrame'; first: number; second?: number; third?: number }
   | { kind: 'transferToTen'; inside: number; outside: number }
   | { kind: 'takeAway'; total: number; used: number }
