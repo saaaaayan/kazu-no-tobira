@@ -32,14 +32,14 @@ test('all preschool position questions show exactly three left-to-right pictures
   let positions=0;
   for(const stage of preschool.stages){
     for(const q of uiPreviewBank(stage)){
-      if(!/まんなかは だれ|いちばん ひだりは だれ|いちばん みぎは だれ|の ひだりは|の みぎは/u.test(q.question))continue;
+      if(!/まんなかは どれ|いちばん ひだりは どれ|いちばん みぎは どれ|の ひだりは|の みぎは/u.test(q.question))continue;
       assert.equal(q.diagram?.kind,'countingBoard',q.id);
       assert.equal(q.diagram.rows.length,1,q.id);
       assert.equal(q.diagram.rows[0].tokens.length,3,q.id);
       assert.equal(q.diagram.arrangement,'position-row',q.id);
       assert.doesNotMatch(q.question,/🐻|🐰|🐱|🐶|🐤|🌸|🍎|🚗|🐟|🐢/u,q.id);
       const names=q.diagram.rows[0].tokens.map(token=>countingTokenArt[token][1]);
-      const expected=q.question.includes('まんなかは だれ')?names[1]
+      const expected=q.question.includes('まんなかは どれ')?names[1]
         :q.question.includes('いちばん ひだり')||q.question.includes('の ひだりは')?names[0]:names[2];
       assert.equal(q.answer,expected,q.id);
       positions++;
