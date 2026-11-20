@@ -191,9 +191,21 @@ function makeTask(n:number,i:number):Task{
  if(n>=36&&n<=40)return sequence(i,['two','double','three','shape','mixed'][n-36] as 'two'|'double'|'three'|'shape'|'mixed');
  if(n===41){
    const top=toys[(i+2)%toys.length],bottom=toys[(i+5)%toys.length];
-   return choose('うえ：'+image(top)+'　した：'+image(bottom)+'　うえに いるのは？',
-     name(top),[name(bottom),name(toys[(i+8)%toys.length])],
-     {explanation:'うえに いるのは '+name(top)+' だよ。'});
+   const askTop=i%2===0;
+   const target=askTop?top:bottom,other=askTop?bottom:top;
+   const place=askTop?'うえ':'した';
+   // Children must SEE one object above the other, not merely read
+   // "うえ / した" alongside emoji written on the same line.
+   return choose(place+'に いるのは だあれ？',name(target),
+     [name(other),name(toys[(i+8)%toys.length])],{
+       spatial:true,
+       diagram:{kind:'countingBoard',arrangement:'vertical-position',
+         rows:[{label:'うえ',tokens:[top]},{label:'した',tokens:[bottom]}]},
+       hints:['うえと したの えを みてね。',
+         'いちばん '+place+'の えを さがそう。',
+         place+'に いるのは だれかな？'],
+       explanation:place+'に いるのは '+name(target)+' だよ。',
+     });
  }
  if(n===42)return position(i,i%2===0?1:2);
  if(n===43)return position(i,i%2===0?3:4);
