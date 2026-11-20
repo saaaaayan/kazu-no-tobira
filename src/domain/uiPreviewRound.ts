@@ -175,3 +175,19 @@ export function uiPreviewPreschoolCheckpoint(number:number,random:()=>number=Mat
  }
  return out;
 }
+
+/** Grade-one trial checkpoints: two curriculum-aligned exercises from each
+ * of the five immediately preceding stages. All ten checkpoints are playable.
+ */
+export function uiPreviewGradeOneCheckpoint(number:number,random:()=>number=Math.random):BankQuestion[]{
+  if(!Number.isInteger(number)||number<1||number>10)return [];
+  const picked:BankQuestion[]=[];
+  for(let offset=0;offset<5;offset++){
+    const stage=worldStageById.get(['e1.forest','e1.bridge','e1.tower'][((number-1)*5+offset)] ??
+      'e1.n'+String((number-1)*5+offset+1).padStart(2,'0'));
+    if(!stage)throw Error('Missing grade-one checkpoint stage');
+    const bank=gradeOnePreviewBank(stage);
+    picked.push(...shuffled(bank,random).slice(0,2));
+  }
+  return picked;
+}
