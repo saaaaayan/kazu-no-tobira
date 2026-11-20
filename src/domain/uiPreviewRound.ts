@@ -1,4 +1,4 @@
-import {worldStageById,type WorldStage} from './worldCatalog';
+import {worldStageById,type WorldStage} from './worldCatalog.ts';
 import type { BankQuestion } from './questionBank';
 import { countingTokenArt, preschoolCountingTokens } from './countingTokens.ts';
 import { preschoolSample02to05 } from './preschoolSampleStages.ts';
