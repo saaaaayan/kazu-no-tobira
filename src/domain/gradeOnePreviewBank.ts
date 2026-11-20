@@ -68,9 +68,9 @@ function carryPair(i:number,stage:number):readonly [number,number]{
   const batches:Readonly<Record<number,readonly [number,number][]>>={
     26:[[6,5],[6,6],[6,7],[6,8],[7,4],[7,5],[7,6],[7,7],[8,3],[9,2]],
     27:[[2,9],[3,8],[4,7],[5,6],[6,9],[7,8],[8,7],[9,6],[5,9],[4,9]],
-    28:[[9,3],[8,4],[9,4],[8,5],[9,5],[8,6],[9,6],[8,7],[9,7],[8,8]],
+    28:[[9,3],[8,4],[9,4],[8,5],[9,5],[8,6],[8,9],[9,8],[9,7],[8,8]],
     29:[[7,9],[6,8],[7,7],[4,8],[5,8],[3,9],[8,9],[9,8],[6,7],[5,7]],
-    30:[[6,5],[7,4],[8,4],[9,3],[7,9],[6,8],[9,5],[8,6],[7,8],[9,9]],
+    30:[[6,5],[7,4],[8,4],[9,3],[7,9],[7,5],[9,5],[8,6],[7,8],[9,9]],
   };
   return batches[stage]?.[i%10]??batches[26][i%10];
 }
@@ -331,6 +331,20 @@ function makeTask(n:number,i:number):Task{
     return basicNumberLine(i,20);
   }
   if(unit===5){
+    if(part===4){
+      const [a,b]=carryPair(i,n),sum=a+b,gap=10-a;
+      const explanation=a+'に '+gap+'を たして 10。のこりの '+(b-gap)+'を たすと '+sum+'だよ。';
+      const hints:[string,string,string]=[
+        '10の まとまりを つくろう。',
+        'はじめの '+a+'に '+gap+'を たすと 10だよ。',
+        'のこりの '+(b-gap)+'を たして たしかめよう。'
+      ];
+      return i%2===0?task('たまが '+a+'こ。'+b+'こ ふえたよ。ぜんぶで いくつ？',
+        sum,'story',explanation,hints,
+        {kind:'tenFrame',first:a,second:b},nums(sum,20)):
+        task(a+' ＋ □ ＝ '+sum,b,'missingPart',explanation,hints,
+          {kind:'tenFrame',first:a,second:b},nums(b,10));
+    }
     if(part===3){
       const [a,b]=carryPair(i,n),sum=a+b,gap=10-a;
       return task(a+' ＋ □ ＝ '+sum,b,'missingPart',
