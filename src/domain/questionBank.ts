@@ -6,7 +6,8 @@ import type { MathQuestion } from './worldQuestions.ts';
 import type { CountingToken } from './countingTokens.ts';
 import type { PictureNumberMatch } from './preschoolNumberConnections.ts';
 export type { CountingToken } from './countingTokens.ts';
-export type BankDiagram = { kind: 'plateCount'; token: CountingToken; count: 0 | 1 | 2 }
+export type BankDiagram = { kind: 'magnitudeCompare'; metric: 'length' | 'size'; first: number; second: number }
+  | { kind: 'plateCount'; token: CountingToken; count: 0 | 1 | 2 }
   | { kind: 'countingBoard'; guide?: true; spacing?: 'wide'; arrangement?: 'side-by-side' | 'position-row' | 'vertical-position'; rows: readonly { label?: string; tokens: readonly CountingToken[] }[]; targetToken?: CountingToken; layoutComparison?: { before:'wide-gaps'|'even-gaps'|'small'|'large'|'left-packed'; after:'wide-gaps'|'even-gaps'|'small'|'large'|'left-packed'; beforeRows?: readonly number[] } }
   | { kind: 'tenFrame'; first: number; second?: number; third?: number }
   | { kind: 'transferToTen'; inside: number; outside: number }
