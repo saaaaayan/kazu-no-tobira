@@ -36,7 +36,7 @@ test('all preschool position questions show exactly three left-to-right pictures
       assert.equal(q.diagram?.kind,'countingBoard',q.id);
       assert.equal(q.diagram.rows.length,1,q.id);
       assert.equal(q.diagram.rows[0].tokens.length,3,q.id);
-      assert.equal(q.diagram.arrangement,undefined,q.id);
+      assert.equal(q.diagram.arrangement,'position-row',q.id);
       assert.doesNotMatch(q.question,/🐻|🐰|🐱|🐶|🐤|🌸|🍎|🚗|🐟|🐢/u,q.id);
       const names=q.diagram.rows[0].tokens.map(token=>countingTokenArt[token][1]);
       const expected=q.question.includes('まんなかは だれ')?names[1]
@@ -51,12 +51,13 @@ test('all preschool position questions show exactly three left-to-right pictures
 test('counting diagram rendering preserves left-right order and never stacks compared groups',()=>{
   const support=read('src/components/QuestionSupport.tsx');
   const bank=read('src/domain/questionBank.ts');
-  assert.match(bank,/arrangement\?: 'side-by-side'/u);
+  assert.match(bank,/arrangement\?: 'side-by-side' \| 'position-row'/u);
   assert.match(support,/const sideBySide=diagram.arrangement==='side-by-side' && diagram.rows.length===2/u);
   assert.match(support,/testID=\{sideBySide\?'counting-left-right-layout':undefined\}/u);
   assert.match(support,/style=\{sideBySide \? styles.sideBySideCountingGroups : styles.stackedCountingGroups\}/u);
   assert.match(support,/sideBySideCountingGroups:\{flexDirection:'row',alignItems:'stretch',gap:8\}/u);
   assert.match(support,/sideBySideCountingGroup:\{flex:1,minWidth:0/g);
   assert.match(support,/sideBySide\?2:maxColumns/u);
-  assert.match(support,/flexWrap:diagram.guide\?'nowrap':'wrap'/u);
+  assert.match(support,/const interactive=!positionRow/u);
+  assert.match(support,/flexWrap:\(diagram.guide\|\|positionRow\)\?'nowrap':'wrap'/u);
 });
