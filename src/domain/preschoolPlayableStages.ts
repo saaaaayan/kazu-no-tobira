@@ -53,6 +53,70 @@ const sequence=(i:number,mode:'two'|'double'|'three'|'shape'|'mixed'):Task=>{
   return choose(seq(items)+'　？　つぎは どれ？',answer,pool,
     {explanation:'おなじ じゅんばんが くりかえしているよ。 '+answer+' が つづくよ。'});
 };
+/** Practical comparisons: unnumbered same-start ropes and circles, never
+ * rote shape naming or formulas. The illustrated sizes determine the answer.
+ */
+function magnitudeTask(i:number,metric:'length'|'size'):Task{
+ const pairs:[[number,number],...[number,number][]]=[
+   [4,2],[2,4],[3,3],[1,3],[4,1],[2,2],[3,1],[1,4],[2,3],[3,2],
+ ];
+ const [first,second]=pairs[i%pairs.length];
+ const positive=i%2===0;
+ const quality=metric==='length'?(positive?'ながい':'みじかい'):(positive?'おおきい':'ちいさい');
+ const answer=first===second?'おなじ':
+   (positive?(first>second):(first<second))?'あか':'あお';
+ const object=metric==='length'?'ひも':'まる';
+ return choose('あかい '+object+'と あおい '+object+'。'+quality+'のは どれ？',
+   answer,['あか','あお','おなじ'],{
+     diagram:{kind:'magnitudeCompare',metric,first,second},
+     prompt:'ふたつの えを みくらべよう。',
+     hints:[metric==='length'?'ひもの はじまりを そろえて みよう。':'まるを ふたつ みてね。',
+       metric==='length'?'どちらが さきまで のびているかな？':'どちらの まるが おおきいかな？',
+       'おなじ くらいなら「おなじ」を えらぼう。'],
+     explanation:first===second?'あかも あおも、おなじ '+quality+'だよ。':
+       answer+'の '+object+'が '+quality+'ね。',
+   });
+}
+
+function combineTask(i:number):Task{
+ const token=t(i),first=1+i%4,second=1+(i*3)%4,total=first+second;
+ return numberTask(name(token)+'が あつまったよ。ぜんぶで いくつ？',total,{
+   diagram:{kind:'countingBoard',arrangement:'side-by-side',
+     rows:[{label:'はじめ',tokens:repeat(token,first)},
+       {label:'あとから',tokens:repeat(token,second)}]},
+   prompt:'ふたつの ばしょを あわせて かぞえよう。',
+   hints:['はじめの えを かぞえてね。','あとから きた えも かぞえてね。',
+     'はじめから さいごまで、ぜんぶ かぞえよう。'],
+   explanation:'はじめに '+first+'こ、あとから '+second+'こ。あわせて '+total+'こだよ。',
+ });
+}
+
+function splitTask(i:number):Task{
+ const token=t(i),total=3+i%6,left=1+(i*3)%(total-1),right=total-left;
+ return numberTask(name(token)+'を ふたつの はこに わけたよ。みぎは いくつ？',right,{
+   diagram:{kind:'countingBoard',arrangement:'side-by-side',
+     rows:[{label:'ひだりの はこ',tokens:repeat(token,left)},
+       {label:'みぎの はこ',tokens:repeat(token,right)}]},
+   prompt:'みぎの はこを みてね。',
+   hints:['はこは ふたつ あるよ。','みぎの はこだけ かぞえよう。',
+     'ひだりと みぎを あわせると '+total+'こだよ。'],
+   explanation:'ぜんぶで '+total+'こ。ひだりは '+left+'こ、みぎは '+right+'こだよ。',
+ });
+}
+
+function equalizeTask(i:number):Task{
+ const token=t(i),left=2+i%5,right=left+(i%3===0?0:i%3===1?1:-1);
+ const answer=left===right?'おなじ':left<right?'ひだり':'みぎ';
+ return choose('1こ ふやして おなじに するなら、どっち？',
+   answer,['ひだり','おなじ','みぎ'],{
+     diagram:groups(repeat(token,left),repeat(token,right)),
+     prompt:'ひだりと みぎの かずを くらべよう。',
+     hints:['ひだりを かぞえてね。','みぎを かぞえてね。',
+       'すくない ほうに 1こ ふやすと どうなる？'],
+     explanation:left===right?'ひだりも みぎも '+left+'こ。もう おなじだよ。':
+       'ひだりは '+left+'こ、みぎは '+right+'こ。'+answer+'に 1こ ふやすと おなじだよ。',
+   });
+}
 function shapeTask(i:number,part:number):Task{
   const here=shapes[(i+part)%3],other=shapes[(i+part+1)%3],third=shapes[(i+part+2)%3];
   if(part===0) return choose('まるは どれかな？　'+seq([here,other,third]),'●',[other,third,'▲','■'],
@@ -61,25 +125,7 @@ function shapeTask(i:number,part:number):Task{
     {explanation:'さんかくは、かどが 3つ あるよ。'});
   if(part===2) return choose('しかくは どれかな？　'+seq([here,other,third]),'■',['●','▲'],
     {explanation:'しかくは、かどが 4つ あるよ。'});
-  if(part===3) {
-    // Rotational recognition: the child must apply the same turn as a worked
-    // picture example. Merely naming a rotated triangle is not sufficient.
-    const directions=['▲','▶','▼','◀'] as const;
-    const turns=i<4?1:i<8?-1:2;
-    const fromIndex=i%4,exampleIndex=(fromIndex+2)%4;
-    const from=directions[fromIndex];
-    const to=directions[(fromIndex+turns+4)%4];
-    const exampleFrom=directions[exampleIndex];
-    const exampleTo=directions[(exampleIndex+turns+4)%4];
-    return choose('おてほん：'+exampleFrom+' → '+exampleTo+'\nおなじように まわすと？　'+from+' → ？',
-      to,directions.filter(symbol=>symbol!==to),{
-        prompt:'おてほんと おなじ むきに まわそう。',
-        hints:['おてほんの '+exampleFrom+' が '+exampleTo+' に なる うごきを みてね。',
-          'とがった ほうが どちらへ むくか かんがえよう。',
-          from+' を おなじように まわして えらぼう。'],
-        explanation:'おてほんの '+exampleFrom+' → '+exampleTo+' と おなじように、'+from+' → '+to+' に なるよ。',
-      });
-  }
+  if(part===3)return magnitudeTask(i,'length');
   const pair=[['▲','■'],['●','●'],['●','■']][i%3];
   const answer=['おうち','ゆきだるま','くるま'][i%3];
   return choose(seq(pair)+' を つかって つくるよ。どの かたちが できそう？',answer,
@@ -201,7 +247,9 @@ function makeTask(n:number,i:number):Task{
      });
  }
  if(n===30)return classify(i,4);
- if(n>=31&&n<=35)return shapeTask(i,n-31);
+ if(n>=31&&n<=33)return shapeTask(i,n-31);
+ if(n===34)return magnitudeTask(i,'length');
+ if(n===35)return magnitudeTask(i,'size');
  if(n>=36&&n<=40)return sequence(i,['two','double','three','shape','mixed'][n-36] as 'two'|'double'|'three'|'shape'|'mixed');
  if(n===41){
    const top=toys[(i+2)%toys.length],bottom=toys[(i+5)%toys.length];
@@ -227,13 +275,8 @@ function makeTask(n:number,i:number):Task{
  if(n===43)return position(i,i%2===0?3:4);
  if(n===44)return position(i,0);
  if(n===45)return position(i,i%5);
- if(n===46)return match(i,10);
- if(n===47){
-   const token=toys[i],count=1+i%5;
-   return numberTask(name(token)+' は いくつ？　'+name(token)+' だけ かぞえよう。',
-     count,{diagram:groups([...repeat(token,count),...repeat(toys[(i+3)%toys.length],2)],undefined,token),
-       explanation:name(token)+' は '+count+'こ だよ。'},10);
- }
+ if(n===46)return combineTask(i);
+ if(n===47)return splitTask(i);
  if(n===48){
    const left=2+i%6,right=i%3===0?left:i%3===1?left-1:left+1;
    const answer=left===right?'ぴったり':left>right?'たりない':'あまる';
@@ -243,8 +286,9 @@ function makeTask(n:number,i:number):Task{
        explanation:'ぬいぐるみは '+left+'ひき。おやつは '+right+'こ。'+answer+' だよ。'
      });
  }
- if(n===49)return i%2===0?classify(i,3):sequence(i,'shape');
- if(n===50)return mixed(i,i%6);
+ if(n===49)return equalizeTask(i);
+ if(n===50)return i%5===0?magnitudeTask(i,'length'):
+   i%5===1?combineTask(i):i%5===2?splitTask(i):i%5===3?equalizeTask(i):mixed(i,i%6);
  if(n>=51&&n<=60){
    const theme=n-51;
    if(theme===0)return match(i,10);
