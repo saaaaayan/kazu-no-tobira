@@ -281,7 +281,7 @@ function makeTask(n:number,i:number):Task{
   }
   if(unit===2){
     if(part===2){
-      const a=1+i%9;
+      const a=i;
       return task(a+' − '+a+' ＝ □',0,'calculation',
         'ぜんぶ とると 0だよ。',hintsSub,
         {kind:'takeAway',total:a,used:a},['0','1','2']);
@@ -326,16 +326,38 @@ function makeTask(n:number,i:number):Task{
         {kind:'tenFrame',first:a,second:b},nums(b,10));
     }
     if(part===2){
-      const b=3+i%7;
-      return task('9 ＋ '+b+' ＝ □',9+b,'calculation',
-        '9に 1を たして 10。のこりを たすと '+(9+b)+'だよ。',
-        ['9は あと 1で 10。','たす かずから 1を つかって 10に しよう。',
-         'のこりを 10に たそう。'],
-        {kind:'tenFrame',first:9,second:b},nums(9+b,20));
+      const [a,b]=carryPair(i,n);
+      return task(a+' ＋ '+b+' ＝ □',a+b,'calculation',
+        a+'を 10に するには '+(10-a)+'。のこりを たすと '+(a+b)+'だよ。',
+        ['10になるまで あと いくつ？',
+          a+'に '+(10-a)+'を たすと 10だよ。',
+         'のこりの '+(b-(10-a))+'を 10に たそう。'],
+        {kind:'tenFrame',first:a,second:b},nums(a+b,20));
     }
     return directAdd(i,n,true);
   }
-  if(unit===6)return directSub(i,n,true);
+  if(unit===6){
+    if(part===3){
+      // There are only six borrowing facts starting at 16,17,18.
+      // Use inverse equations for four additional, distinct exercises.
+      const pairs:[[number,number],...[number,number][]]=[
+        [16,7],[16,8],[16,9],[17,8],[17,9],[18,9]
+      ];
+      const [a,b]=pairs[i%pairs.length],left=a-b;
+      return i<6?task(a+' − '+b+' ＝ □',left,'calculation',
+        '10の まとまりを くずすと '+a+'−'+b+'＝'+left+'だよ。',
+        ['ばらだけで ひけるかな？','10の まとまりを くずそう。',
+         'のこった かずを たしかめよう。'],
+        {kind:'borrowTen',total:a,used:b},nums(left,20)):
+        task(a+' − □ ＝ '+left,b,'missingPart',
+          a+'から '+b+'を ひくと '+left+'だよ。',
+          ['10の まとまりを くずす しきだよ。',
+           'どれだけ ひくと '+left+'に なるか かんがえよう。',
+           left+'に □を たして '+a+'に なる かずを さがそう。'],
+          {kind:'borrowTen',total:a,used:b},nums(b,20));
+    }
+    return directSub(i,n,true);
+  }
   if(unit===7){
     if(part===2)return basicNumberLine(i,100);
     const value=part===0?(i+1)*10:part===1?[9,19,29,39,49,59,69,79,89,100][i]:
