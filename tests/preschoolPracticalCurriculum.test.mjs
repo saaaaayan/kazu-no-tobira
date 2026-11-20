@@ -81,7 +81,7 @@ test('stage 49 equalizes two groups with one additional object, keeping both-sid
 });
 
 test('renamed learning targets match the playable banks and reach review checkpoints',()=>{
-  for(const [n,word] of [[34,'ながい'],[35,'おおきい'],[46,'あわせ'],[47,'わけ'],[49,'おなじ']]){
+  for(const [n,word] of [[34,'ながい'],[35,'おおきさ'],[46,'あわせ'],[47,'わけ'],[49,'おなじ']]){
     const stage=find(n);assert.ok(stage);
     assert.ok(preschoolStageMapInfo(stage).goal.includes(word),n);
     assert.equal(bank(n).length,10);
