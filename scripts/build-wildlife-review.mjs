@@ -6,7 +6,7 @@ export function spriteSvg(id,size=96,silhouette=false){
  const pixels=HERO_PIXEL_SPRITES[id].flatMap((row,y)=>[...row].flatMap((c,x)=>c==='.'?[]:[`<rect x="${x}" y="${y}" width="1" height="1" fill="${silhouette?'#354739':colors[c]}"/>`])).join('');
  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 32 32" shape-rendering="crispEdges" role="img">${pixels}</svg>`;
 }
-const names=['くま','うさぎ','きつね','りす','ふくろう','小鳥','ティラノサウルス','トリケラトプス','ブラキオサウルス','プテラノドン','ステゴサウルス'];
+const names=['くま','うさぎ','きつね','りす','ふくろう','小鳥','ティラノサウルス','トリケラトプス','ブラキオサウルス','プテラノドン','ステゴサウルス','はりねずみ','かえる','きつつき','ねずみ','アンキロサウルス','パラサウロロフス','ラプトル'];
 const entries=Object.keys(HERO_PIXEL_SPRITES);
 const cards=(forest)=>entries.filter(id=>id.startsWith(forest?'forest':'prehistoric')).map(id=>`<article><h3>${names[entries.indexOf(id)]}</h3><div class="samples">${[96,64,32].map(size=>`<figure>${spriteSvg(id,size)}<figcaption>${size}px</figcaption></figure>`).join('')}<figure>${spriteSvg(id,64,true)}<figcaption>輪郭</figcaption></figure></div><small>32 × 32 master · ${id}</small></article>`).join('');
 mkdirSync('public/art-review',{recursive:true});

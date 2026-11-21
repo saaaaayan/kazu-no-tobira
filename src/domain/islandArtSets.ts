@@ -41,7 +41,9 @@ export const ISLAND_ART_SETS = {
   e2:{
     large:['forestBear','forestRabbit','forestFox','forestDeer'],
     medium:['forestSquirrel','forestOwl','forestRaccoon','forestBird',
-      'forestTree','forestStump','forestMushroom','forestGrass'],
+      'forestHedgehog','forestFrog','forestWoodpecker','forestMouse',
+      'forestTree','forestStump','forestMushroom','forestGrass',
+      'forestPine','forestFallenLog','forestBerryBush'],
     small:['forestTracks','forestAcorn','forestLeaves','forestFlowers',
       'forestTwigs','forestBerries','forestFeather','forestTinyMushrooms'],
     ground:['forestGlade','forestGrove','forestGrass','forestLeafLitter'],
@@ -53,7 +55,8 @@ export const ISLAND_ART_SETS = {
   },
   e4:{
     large:['prehistoricRex','prehistoricTriceratops','prehistoricPterosaur',
-      'prehistoricLongneck','prehistoricStegosaurus','prehistoricVolcano'],
+      'prehistoricLongneck','prehistoricStegosaurus','prehistoricAnkylosaurus',
+      'prehistoricParasaurolophus','prehistoricRaptor','prehistoricVolcano'],
     medium:['prehistoricEggs','prehistoricBone','prehistoricSkeleton','prehistoricAmmonite',
       'prehistoricRockRidge','prehistoricFern','prehistoricPalm','prehistoricLavaCrack'],
     small:['prehistoricTracks','prehistoricPebbles','prehistoricFossilShard','prehistoricBoneChips',

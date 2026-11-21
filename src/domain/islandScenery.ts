@@ -112,16 +112,24 @@ export function islandScenery(id:StandardPixelIslandId,width:number,height:numbe
   const ground:GroundDecoration[]=[];
   const inside=(box:DecorationRect)=>box.left>=26&&box.right<=width-26&&box.top>=88&&box.bottom<=height-24;
   const clear=(box:DecorationRect)=>inside(box)&&!zones.some(zone=>boxesOverlap(box,zone));
-  function reserveForestSpecies() {
-    if(id!=='e2')return;
-    for(const kind of ['forestSquirrel','forestOwl','forestRaccoon','forestBird'] as const) {
+  // Reserve every species before terrain and tiny props consume the gaps.
+  // Main dinosaurs keep hero scale; small woodland animals retain readable
+  // medium scale. UI exclusion rectangles are identical to the other islands.
+  function reserveWildlifeSpecies(onlyHeroes=false) {
+    if(!wildlife)return;
+    const species=id==='e2'
+      ? [...art.large,...art.medium.filter(kind=>!['forestTree','forestStump','forestMushroom','forestGrass','forestPine','forestFallenLog','forestBerryBush'].includes(kind))]
+      : art.large.filter(kind=>kind!=='prehistoricVolcano');
+    for(const [speciesIndex,kind] of species.entries()) {
+      const hero=(art.large as readonly IslandSpriteId[]).includes(kind);
+      if((onlyHeroes&&!hero)||decorations.some(item=>item.kind===kind))continue;
       const sprite=ISLAND_SPRITES[kind];
       const aspect=sprite.length/Math.max(...sprite.map(row=>row.length));
-      for(let attempt=0;attempt<250;attempt++) {
-        const dimension=compact?(attempt<120?40:32):52;
-        const item:PixelDecoration={kind,size:'medium',
+      for(let attempt=0;attempt<600;attempt++) {
+        const dimension=hero?wildlifeHeroSize:compact?40:56;
+        const item:PixelDecoration={kind,size:hero?'large':'medium',
           x:Math.round(28+random()*(width-dimension-56)),
-          y:Math.round(90+random()*(height-dimension*aspect-120)),
+          y:Math.round(positions[((speciesIndex+Math.floor(attempt/40))%13)*5].y+90+random()*130),
           width:dimension,height:Math.round(dimension*aspect)};
         const box=sceneBounds(item,5);
         if(!clear(box)||occupied.some(old=>boxesOverlap(box,old)))continue;
@@ -145,7 +153,7 @@ export function islandScenery(id:StandardPixelIslandId,width:number,height:numbe
   }
     if(wildlife)for(const kind of art.ground) {
       if(ground.some(item=>item.kind===kind))continue;
-      for(let attempt=0;attempt<250;attempt++) {
+      for(let attempt=0;attempt<1600;attempt++) {
         const dimension=compact?30:46;
         const item:GroundDecoration={kind,x:Math.round(28+random()*(width-dimension-56)),
           y:Math.round(90+random()*(height-dimension-120)),width:dimension,
@@ -157,11 +165,16 @@ export function islandScenery(id:StandardPixelIslandId,width:number,height:numbe
     }
   }
   for(const size of ['large','medium','small'] as const) {
+    if(size==='large')reserveWildlifeSpecies(true);
     if(size==='small'&&wildlife)placeGround();
-    if(size==='medium'){reserveForestSpecies();if(!wildlife)placeGround();}
+    if(size==='medium'){reserveWildlifeSpecies();if(!wildlife)placeGround();}
     // Existing plush and toy heroes retain their detailed silhouettes.
     if(legacy&&size==='large')continue;
     const kinds=shuffled(art[size],random);
+    if(id==='e4'&&size==='large') {
+      kinds.splice(kinds.indexOf('prehistoricRex'),1);
+      kinds.unshift('prehistoricRex');
+    }
     const target=legacy?(size==='medium'?14:28)
       :wildlife?(size==='large'?(compact?30:44):size==='medium'?58:85)
       :size==='large'?16:size==='medium'?56:100;
