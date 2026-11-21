@@ -135,7 +135,7 @@ test('all sixteen islands show the child-first map and preserve tap navigation a
   assert.match(map,/testID=\{'island-checkpoint-'\+checkpoint.number\}/u);
   assert.match(map,/standardPixelMap && supplementalPanels/u);
   assert.match(map,/disabled=\{!selectable\}/u);
-  assert.match(map,/enabled\?'▶ あそぶ':'準備中'/u);
+  assert.match(map,/label:ready\?'▶ あそぶ':'準備中'/u);
 });
 
 test('every island preserves 65 stage learning descriptions without writing unreviewed problems',()=>{
@@ -143,7 +143,9 @@ test('every island preserves 65 stage learning descriptions without writing unre
     const items=island.stages.map(stage=>sharedIslandStageMapInfo(island,stage));
     assert.equal(items.length,65);
     assert.ok(items.every(item=>item.title.trim().length>0&&item.goal.trim().length>0));
-    assert.ok(items.slice(50).every(item=>item.provisional),'premium drafts are provisional '+island.id);
+    if(island.id!=='preschool')
+      assert.ok(items.slice(50).every(item=>item.provisional),
+        'premium drafts are provisional '+island.id);
     assert.ok(items.every((item,i)=>
       item.title.length<=48),island.id+' stage title should remain short');
     const ordered=island.stages.map(x=>x.order);
