@@ -8,9 +8,9 @@ const EULER_HOME_ART = require('../../assets/euler-math-title.png');
 const PUBLIC_HOME_URL = 'https://saaaaayan.github.io/kazu-no-tobira/';
 
 /**
- * Display the entire approved illustration at its natural 4:3 ratio,
- * including Euler's feet and the reflecting pond. Draw real, visible
- * controls underneath on every viewport; never crop the illustration.
+ * Use the gold start button already painted in the approved illustration.
+ * Preserve all pixels and draw other actions as matching dark-blue,
+ * beveled 8-bit controls. The transparent primary hit target is accessible.
  */
 export function ModeControls({ mode, onChange }: { mode: PlayMode; onChange: (mode: PlayMode) => void }) {
   return (
@@ -70,32 +70,31 @@ export default function AdventureHome({ mode, onMode, onStart, onTitles, loading
   return (
     <View style={styles.hero}>
       <View style={styles.illustrationClip}>
-        <Image source={EULER_HOME_ART} resizeMode="contain" style={styles.illustration} accessible
-          accessibilityLabel="数のトビラ。数学記号が浮かぶ星空と遺跡、輝くトビラの前に立つオイラーの黒いシルエット。" />
+        <Image source={EULER_HOME_ART} resizeMode="stretch" style={styles.illustration} accessible
+          accessibilityLabel="数のトビラ。数学記号が浮かぶ星空と遺跡、輝くトビラの黒いシルエット。" />
+        <Pressable accessibilityRole="button" accessibilityLabel="ぼうけんを つづける"
+          accessibilityState={{ disabled: loading }} disabled={loading} onPress={onStart}
+          hitSlop={8} style={styles.artStartHotspot} />
       </View>
       <View style={[styles.mobileControls, !compact && styles.wideControls]}>
-        <Pressable accessibilityRole="button" accessibilityState={{ disabled: loading }}
-          disabled={loading} onPress={onStart} style={styles.mobileStart}>
-          <Text style={styles.mobileStartLabel}>{loading ? 'じゅんびちゅう…' : '▶ ぼうけんを つづける'}</Text>
-        </Pressable>
         <Pressable accessibilityRole="button" onPress={switchIntro}
-          accessibilityState={{ expanded: introOpen }} style={styles.mobileIntro}>
-          <Text style={styles.mobileIntroLabel}>▶ はじめて あそぶ</Text>
+          accessibilityState={{ expanded: introOpen }} style={[styles.pixelFrame, styles.mobileIntro]}>
+          <Text style={[styles.pixelLabel, styles.mobileIntroLabel]}>▶ はじめて あそぶ</Text>
         </Pressable>
         <View style={styles.mobileRow}>
-          <Pressable accessibilityRole="button" onPress={switchPlayers} style={styles.mobileCard}>
-            <Text style={styles.mobileCardLabel}>♟ プレイヤー</Text>
+          <Pressable accessibilityRole="button" onPress={switchPlayers} style={[styles.pixelFrame, styles.mobileCard]}>
+            <Text style={[styles.pixelLabel, styles.mobileCardLabel]}>♟ プレイヤー</Text>
           </Pressable>
-          <Pressable accessibilityRole="button" onPress={onTitles ?? onStart} style={styles.mobileCard}>
-            <Text style={styles.mobileCardLabel}>🏆 しょうごう</Text>
+          <Pressable accessibilityRole="button" onPress={onTitles ?? onStart} style={[styles.pixelFrame, styles.mobileCard]}>
+            <Text style={[styles.pixelLabel, styles.mobileCardLabel]}>🏆 しょうごう</Text>
           </Pressable>
         </View>
         <View style={styles.mobileRow}>
-          {!preview && <Pressable accessibilityRole="button" onPress={() => setSettingsOpen(v => !v)} style={styles.mobileUtility}>
-            <Text style={styles.mobileUtilityLabel}>⚙ せってい</Text>
+          {!preview && <Pressable accessibilityRole="button" onPress={() => setSettingsOpen(v => !v)} style={[styles.pixelFrame, styles.mobileUtility]}>
+            <Text style={[styles.pixelLabel, styles.mobileUtilityLabel]}>⚙ せってい</Text>
           </Pressable>}
-          <Pressable accessibilityRole="button" onPress={shareHome} style={styles.mobileUtility}>
-            <Text style={styles.mobileUtilityLabel}>↥ きょうゆう</Text>
+          <Pressable accessibilityRole="button" onPress={shareHome} style={[styles.pixelFrame, styles.mobileUtility]}>
+            <Text style={[styles.pixelLabel, styles.mobileUtilityLabel]}>↥ きょうゆう</Text>
           </Pressable>
         </View>
       </View>
@@ -128,32 +127,28 @@ const styles = StyleSheet.create({
     width: '100%', maxWidth: 1050, alignSelf: 'center', backgroundColor: '#0c2140',
     borderRadius: 22, overflow: 'hidden', alignItems: 'center',
   },
-  // The source image is 1448 x 1086; maintain this exact ratio to show every pixel.
+  // Stretch image across its full 1448:1086 layout; no RN-web contain letterbox.
   illustrationClip: { position: 'relative', width: '100%', aspectRatio: 1448 / 1086, overflow: 'hidden' },
-  illustration: { width: '100%', aspectRatio: 1448 / 1086 },
-  mobileControls: { width: '100%', paddingHorizontal: 11, paddingBottom: 13, gap: 8 },
-  wideControls: { maxWidth: 760, alignSelf: 'center', paddingHorizontal: 18, paddingTop: 12, paddingBottom: 20, gap: 10 },
-  mobileStart: {
-    backgroundColor: '#f3ca70', borderWidth: 2, borderColor: '#ffedb0', borderRadius: 9,
-    minHeight: 56, alignItems: 'center', justifyContent: 'center',
+  illustration: { width: '100%', height: '100%' },
+  artStartHotspot: { position: 'absolute', left: '19%', top: '90%', width: '62%', height: '9%', borderRadius: 0 },
+  mobileControls: { width: '100%', paddingHorizontal: 12, paddingBottom: 16, paddingTop: 10, gap: 10 },
+  wideControls: { maxWidth: 760, alignSelf: 'center', paddingHorizontal: 18, paddingTop: 16, paddingBottom: 22, gap: 12 },
+  pixelFrame: {
+    borderRadius: 0, borderWidth: 3, backgroundColor: '#203b54',
+    borderTopColor: '#c0d5c8', borderLeftColor: '#c0d5c8',
+    borderRightColor: '#527076', borderBottomColor: '#527076',
+    shadowColor: '#091b32', shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.9, shadowRadius: 0, elevation: 3,
+    alignItems: 'center', justifyContent: 'center',
   },
-  mobileStartLabel: { color: '#0b2140', fontWeight: '900', fontSize: 19 },
-  mobileIntro: {
-    backgroundColor: '#122a4b', borderWidth: 2, borderColor: '#ffedb0', borderRadius: 9,
-    minHeight: 54, alignItems: 'center', justifyContent: 'center',
-  },
-  mobileIntroLabel: { color: '#fff0c8', fontWeight: '900', fontSize: 18 },
-  mobileRow: { flexDirection: 'row', gap: 8 },
-  mobileCard: {
-    flex: 1, minWidth: 0, minHeight: 50, borderWidth: 2, borderRadius: 8, borderColor: '#c4aa71',
-    backgroundColor: '#162c50', alignItems: 'center', justifyContent: 'center',
-  },
-  mobileCardLabel: { color: '#ffe9bc', fontWeight: '800', fontSize: 13 },
-  mobileUtility: {
-    flex: 1, borderWidth: 1, borderColor: '#788d9e', minHeight: 42, borderRadius: 8,
-    justifyContent: 'center', alignItems: 'center',
-  },
-  mobileUtilityLabel: { color: '#f3e1bd', fontSize: 13, fontWeight: '700' },
+  pixelLabel: { fontWeight: '900', textAlign: 'center' },
+  mobileIntro: { minHeight: 60, paddingHorizontal: 10 },
+  mobileIntroLabel: { color: '#f5ecd5', fontSize: 19 },
+  mobileRow: { flexDirection: 'row', gap: 10 },
+  mobileCard: { flex: 1, minWidth: 0, minHeight: 56, paddingHorizontal: 8 },
+  mobileCardLabel: { color: '#f5ecd5', fontSize: 15 },
+  mobileUtility: { flex: 1, minWidth: 0, minHeight: 50 },
+  mobileUtilityLabel: { color: '#f5ecd5', fontSize: 14 },
   note: { width: '96%', padding: 14, gap: 9, marginVertical: 7, borderRadius: 10, backgroundColor: '#203c52' },
   noteTitle: { color: '#f8e0ab', fontWeight: '900', fontSize: 19 },
   noteText: { color: '#f4eedb', fontSize: 14, fontWeight: '700', lineHeight: 22 },
