@@ -157,7 +157,7 @@ export function SharedThemedPixelTerrain({width,height,positions,grade,next}:{
 
 /** Tiny symmetrical map-title emblems. These are SVG pixel icons, not emoji. */
 export function IslandThemeStamp({id,compact=false,flipped=false}:{
-  id:StandardPixelIslandId;compact?:boolean;flipped?:boolean;
+  id:string;compact?:boolean;flipped?:boolean;
 }){
   const theme=ISLAND_PIXEL_PALETTES[id];
   const kind=theme.motifs[0] as IconKind;
