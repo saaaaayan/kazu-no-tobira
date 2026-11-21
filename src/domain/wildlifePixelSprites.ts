@@ -66,6 +66,23 @@ export const WILDLIFE_SPRITES = {
     box(28,12,1,1,'F');box(33,12,1,1,'F');box(30,17,3,2,'X');
     box(15,25,4,5,'X');box(27,25,4,5,'X');
   }),
+  forestPine:wildlifeSprite(({polygon,box})=>{
+    box(21,19,5,14,'A');
+    polygon([[23,2],[12,14],[17,14],[8,23],[14,23],[5,30],[40,30],[32,23],[37,23],[28,14],[33,14]]);
+    polygon([[23,4],[17,13],[23,12],[14,22],[24,20],[13,28],[23,27]],'F');
+  }),
+  forestFallenLog:wildlifeSprite(({polygon,line,box})=>{
+    polygon([[8,14],[32,8],[39,12],[40,21],[15,28],[8,24]],'A');
+    polygon([[7,15],[11,12],[16,16],[17,24],[13,29],[7,26]],'F');
+    line(11,17,13,24,'A');line(20,16,35,12,'X');line(22,23,37,19,'X');
+    box(27,5,4,8,'A');box(26,4,6,3,'F');
+    box(21,8,5,3,'B');box(31,22,6,3,'B');
+  }),
+  forestBerryBush:wildlifeSprite(({polygon,box})=>{
+    polygon([[7,24],[6,17],[11,13],[15,14],[18,8],[28,8],[31,13],[37,13],[41,20],[38,28],[12,29]]);
+    for(const [x,y] of [[12,18],[22,12],[32,19],[20,24]]){box(x,y,4,4,'R');box(x,y,1,1,'F');}
+    box(14,12,4,2,'F');box(31,25,4,2,'A');
+  }),
   forestTree:wildlifeSprite(({polygon,box,line})=>{
     box(20,16,5,16,'A');line(22,25,16,20,'X');line(22,22,29,16,'X');
     polygon([[8,10],[12,6],[16,6],[18,2],[27,2],[30,6],[35,7],[38,13],[35,19],[29,22],[15,21],[9,17]]);
@@ -212,6 +229,13 @@ export const WILDLIFE_SPRITES = {
 } as const;
 
 export const WILDLIFE_COLORS:Record<string,Partial<Record<string,string>>> = {
+  forestHedgehog:{X:'#504c3c',B:'#a09374',A:'#75664e',F:'#dfcfac'},
+  forestFrog:{X:'#3f5d48',B:'#87a469',A:'#617f53',F:'#d8ddb3'},
+  forestWoodpecker:{X:'#484c42',B:'#686e61',A:'#9a815e',F:'#e6dfc5',R:'#aa6e58'},
+  forestMouse:{X:'#5a5850',B:'#a2a398',A:'#808579',F:'#dedbcc',R:'#bf9890'},
+  prehistoricAnkylosaurus:{X:'#4c5141',B:'#96a07c',A:'#707a57',F:'#c9c7a2'},
+  prehistoricParasaurolophus:{X:'#52523d',B:'#b3a06c',A:'#887b51',F:'#e2d6af'},
+  prehistoricRaptor:{X:'#445149',B:'#7b9587',A:'#576f63',F:'#d5d9b9'},
   forestBear:{X:'#503d36',B:'#a17c57',A:'#816747',F:'#e0c9a0'},
   forestRabbit:{X:'#645b58',R:'#d6a1a0',B:'#d0cdb5',A:'#aa9388',F:'#eee8d2'},
   forestFox:{X:'#604536',B:'#cf945c',A:'#956d47',F:'#eee1c2'},
