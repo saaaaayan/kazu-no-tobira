@@ -23,10 +23,13 @@ test('gold pictured primary action is interactive and not duplicated', () => {
   assert.doesNotMatch(source, /style=\{styles\.mobileStart\}/);
 });
 
-test('all five other controls share one gold 8-bit button frame', () => {
+test('all five secondary controls share one muted bevelled 8-bit frame', () => {
   assert.equal((source.match(/styles\.pixelFrame/g) || []).length, 5);
   assert.equal((source.match(/styles\.pixelLabel/g) || []).length, 5);
-  assert.match(source, /pixelFrame:\s*\{\s*borderRadius:\s*0, borderWidth:\s*3/);
+  assert.match(source, /pixelFrame:\s*\{\s*borderRadius:\s*0, borderWidth:\s*3, backgroundColor:\s*'#203b54'/);
+  assert.match(source, /borderTopColor:\s*'#c0d5c8'/);
+  assert.doesNotMatch(source, /borderColor:\s*'#ffe5a0'/);
+  assert.doesNotMatch(source, /mobileIntro:\s*\{[^}]*backgroundColor:/);
 });
 
 test('home shows actionable start, help, player, titles, settings and share buttons', () => {
