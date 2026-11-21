@@ -1,6 +1,6 @@
-import type {WorldGrade,WorldStage} from './worldCatalog';
-import {preschoolStageMapInfo} from './preschoolStageMapInfo';
-import {gradeOneStageMapInfo} from './gradeOneStageMapInfo';
+import type {WorldGrade,WorldStage} from './worldCatalog.ts';
+import {preschoolStageMapInfo} from './preschoolStageMapInfo.ts';
+import {gradeOneStageMapInfo} from './gradeOneStageMapInfo.ts';
 
 /** Map copy only. No stage IDs, curricula, or question content are altered.
  * Normal stage labels combine the official unit with a concise stage step,
