@@ -17,7 +17,7 @@ import { uiPreviewSampleKind } from '../domain/uiPreviewRound';
 import { stageCategoryName, stageRowCategoryName } from '../domain/islandCurriculumView';
 import { preschoolStageMapInfo } from '../domain/preschoolStageMapInfo';
 import { gradeOnePreviewStageInfo } from '../domain/gradeOnePreviewCurriculum';
-import { gradeOneStageMapInfo } from '../domain/gradeOneStageMapInfo';
+
 import { IslandCurriculumPanel } from './IslandCurriculumPanel';
 import { PreschoolPixelTerrain, ToyPixelTerrain } from './PreschoolPixelTerrain';
 import { isStandardPixelIsland, standardPixelIslandConfig, islandPixelPalette } from '../domain/standardPixelIslandMap';
@@ -54,7 +54,7 @@ function ToyBlockStamp({flipped=false,compact=false}:{flipped?:boolean;compact?:
     accessible={false} width={compact?17:23} height={compact?17:23} viewBox="0 0 24 24">
     <G transform={flipped?'translate(24 0) scale(-1 1)':undefined}>
       <Rect x={2} y={9} width={10} height={11} fill="#c99981" stroke="#344454" strokeWidth={1.5}/>
-      <Rect x={12} y={4} width={9} height={16} fill="#94a995" stroke="#344454" strokeWidth={1.5}/>
+      <Rect x={12} y={4} width={9} height={16} fill="#b88974" stroke="#344454" strokeWidth={1.5}/>
       <Rect x={4} y={4} width={6} height={5} fill="#ddc68e"/>
     </G>
   </Svg>;
@@ -323,7 +323,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         )}
         {grade.id==='e1' && (
           <View testID="toy-map-top-title" pointerEvents="none"
-            style={[styles.preschoolMapTopTitle,compactStageMap&&styles.preschoolMapTopTitleCompact]}>
+            style={[styles.preschoolMapTopTitle,compactStageMap&&styles.preschoolMapTopTitleCompact,
+              {backgroundColor:'#f8e9d2',borderColor:'#b98173'}]}>
             <Text style={styles.preschoolMapTopGrade}>{standardTheme?.grade}</Text>
             <View style={styles.preschoolMapTopNameWithPaws}>
               <ToyBlockStamp compact={compactStageMap}/>
