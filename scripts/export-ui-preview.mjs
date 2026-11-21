@@ -93,6 +93,7 @@ writeFileSync(resolve(target,'version.json'),JSON.stringify({
   version,profile:'ui-preview',indexSha256:contentDigest(readFileSync(index)),entrySha256:contentDigest(bundle),
   publishedBankQuestions:publicBankIds.length*100,bankSha256:bankFiles,
   approvedWorldMapSha256:contentDigest(mapBytes),
+  pixelSceneryV2:true,
   preschoolPlushPixelV2:true,toyIslandPixelV1:true,allIslandPixelThemesV1:true,
   ...(pages ? {adminSha256:contentDigest(readFileSync(resolve(target,'admin/index.html')))} : {}),
 })+'\n');
