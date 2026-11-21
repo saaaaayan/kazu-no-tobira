@@ -8,10 +8,9 @@ const EULER_HOME_ART = require('../../assets/euler-math-title.png');
 const PUBLIC_HOME_URL = 'https://saaaaayan.github.io/kazu-no-tobira/';
 
 /**
- * The approved title illustration includes its UI artwork. On wide screens,
- * invisible, accessible hit targets align with the four pictured buttons.
- * On narrow screens we crop the illustrated buttons and render real, large
- * buttons beneath the same artwork to meet touch-target needs.
+ * Preserve the approved pixel-art title scene while cropping its painted
+ * button strip. Real, visible Pressables are rendered below the illustration
+ * on every viewport, so actions never depend on transparent image hotspots.
  */
 export function ModeControls({ mode, onChange }: { mode: PlayMode; onChange: (mode: PlayMode) => void }) {
   return (
@@ -70,30 +69,11 @@ export default function AdventureHome({ mode, onMode, onStart, onTitles, loading
 
   return (
     <View style={styles.hero}>
-      <View style={[styles.illustrationClip, compact && styles.illustrationClipCompact]}>
+      <View style={styles.illustrationClip}>
         <Image source={EULER_HOME_ART} resizeMode="stretch" style={styles.illustration} accessible
           accessibilityLabel="数のトビラ。数学記号が浮かぶ星空と遺跡、輝くトビラの前に立つオイラーの黒いシルエット。" />
-        {!compact && <>
-          <Pressable accessibilityRole="button" accessibilityLabel="ぼうけんを つづける"
-            accessibilityState={{ disabled: loading }} disabled={loading} onPress={onStart}
-            style={({ pressed }) => [styles.hotspot, styles.resumeHit, pressed && styles.hotspotPressed]} />
-          <Pressable accessibilityRole="button" accessibilityLabel="はじめて あそぶ"
-            accessibilityState={{ expanded: introOpen }} onPress={switchIntro}
-            style={({ pressed }) => [styles.hotspot, styles.introHit, pressed && styles.hotspotPressed]} />
-          <Pressable accessibilityRole="button" accessibilityLabel="プレイヤー きりかえ・ついか"
-            accessibilityState={{ expanded: playersOpen }} onPress={switchPlayers}
-            style={({ pressed }) => [styles.hotspot, styles.playersHit, pressed && styles.hotspotPressed]} />
-          <Pressable accessibilityRole="button" accessibilityLabel="しょうごう あつめたたからもの"
-            onPress={onTitles ?? onStart}
-            style={({ pressed }) => [styles.hotspot, styles.titlesHit, pressed && styles.hotspotPressed]} />
-          {!preview && <Pressable accessibilityRole="button" accessibilityLabel="せってい"
-            accessibilityState={{ expanded: settingsOpen }} onPress={() => setSettingsOpen(value => !value)}
-            style={({ pressed }) => [styles.hotspot, styles.settingsHit, pressed && styles.hotspotPressed]} />}
-          <Pressable accessibilityRole="button" accessibilityLabel="このアプリを 共有する" onPress={shareHome}
-            style={({ pressed }) => [styles.hotspot, styles.shareHit, pressed && styles.hotspotPressed]} />
-        </>}
       </View>
-      {compact && <View style={styles.mobileControls}>
+      <View style={[styles.mobileControls, !compact && styles.wideControls]}>
         <Pressable accessibilityRole="button" accessibilityState={{ disabled: loading }}
           disabled={loading} onPress={onStart} style={styles.mobileStart}>
           <Text style={styles.mobileStartLabel}>{loading ? 'じゅんびちゅう…' : '▶ ぼうけんを つづける'}</Text>
@@ -118,7 +98,7 @@ export default function AdventureHome({ mode, onMode, onStart, onTitles, loading
             <Text style={styles.mobileUtilityLabel}>↥ きょうゆう</Text>
           </Pressable>
         </View>
-      </View>}
+      </View>
       {introOpen && <View style={styles.note}>
         <Text style={styles.noteTitle}>はじめての ぼうけん</Text>
         <Text style={styles.noteText}>せかいちずから 島を えらんで、ステージの もんだいに ちょうせんしよう。</Text>
@@ -148,18 +128,11 @@ const styles = StyleSheet.create({
     width: '100%', maxWidth: 1050, alignSelf: 'center', backgroundColor: '#0c2140',
     borderRadius: 22, overflow: 'hidden', alignItems: 'center',
   },
-  illustrationClip: { position: 'relative', width: '100%', aspectRatio: 1448 / 1086, overflow: 'hidden' },
-  illustrationClipCompact: { aspectRatio: 1448 / 761 },
+  // Buttons in the artwork begin below y=761. Crop that strip on all screens.
+  illustrationClip: { position: 'relative', width: '100%', aspectRatio: 1448 / 761, overflow: 'hidden' },
   illustration: { width: '100%', aspectRatio: 1448 / 1086 },
-  hotspot: { position: 'absolute', borderRadius: 7 },
-  hotspotPressed: { backgroundColor: 'rgba(255,244,196,0.17)', borderWidth: 2, borderColor: '#ffebaa' },
-  resumeHit: { left: '18.5%', top: '70.5%', width: '60.7%', height: '7.3%' },
-  introHit: { left: '18.2%', top: '78.5%', width: '61.5%', height: '7%' },
-  playersHit: { left: '14.4%', top: '86%', width: '33.6%', height: '8%' },
-  titlesHit: { left: '49.4%', top: '86%', width: '33.7%', height: '8%' },
-  settingsHit: { left: '1.6%', top: '85.9%', width: '6.6%', height: '8.8%' },
-  shareHit: { left: '89.4%', top: '85.9%', width: '6.9%', height: '8.8%' },
   mobileControls: { width: '100%', paddingHorizontal: 11, paddingBottom: 13, gap: 8 },
+  wideControls: { maxWidth: 760, alignSelf: 'center', paddingHorizontal: 18, paddingTop: 12, paddingBottom: 20, gap: 10 },
   mobileStart: {
     backgroundColor: '#f3ca70', borderWidth: 2, borderColor: '#ffedb0', borderRadius: 9,
     minHeight: 56, alignItems: 'center', justifyContent: 'center',
