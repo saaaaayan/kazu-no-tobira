@@ -42,6 +42,10 @@ export function releaseClient(address) {
         !js.includes('toy-island-pixel-v1')) {
       throw new Error('The public bundle is missing the grade-one toy pixel map.');
     }
+    if (version.allIslandPixelThemesV1 === true &&
+        !js.includes('all-16-island-pixel-themes-v1')) {
+      throw new Error('The public bundle is missing the shared all-island pixel renderer.');
+    }
     if (profile && (version.indexSha256!==digest(index) || version.entrySha256!==digest(bundle))) {
       throw new Error('The sample HTML or JavaScript differs from the verified build.');
     }
