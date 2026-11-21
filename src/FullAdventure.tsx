@@ -592,11 +592,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {progress && !round && screen === 'world' &&
             <WorldMap780 progress={progress} mode={playMode} access={access} onGrade={openGrade} onTitles={()=>setScreen('titles')} preview={uiPreview}/>}
           {progress && !round && screen === 'island' &&
-            <View onLayout={event=>setMapTop(event.nativeEvent.layout.y)}>
-              <IslandStageMap key={grade.id} grade={grade} progress={progress} mode={playMode} access={access} onCheckpoint={startCheckpoint} onBack={()=>setScreen('world')}
-                onTitles={()=>setScreen('titles')} onStart={start} onLearn={openLesson} preview={uiPreview}
-                focusStageId={returnStageId} onFocusStagePosition={setMapStageOffset}/>
-            </View>}
+            <IslandStageMap key={grade.id} grade={grade} progress={progress} mode={playMode} access={access} onCheckpoint={startCheckpoint} onBack={()=>setScreen('world')}
+              onTitles={()=>setScreen('titles')} onStart={start} onLearn={openLesson} preview={uiPreview}
+              focusStageId={returnStageId} onFocusStagePosition={setMapStageOffset} onMapLayout={setMapTop}/>
           {progress && !round && screen === 'titles' &&
             <TitleAlbum progress={progress} onBack={()=>setScreen('world')}/>}
           {progress && screen === 'lesson' && !round && learning &&
