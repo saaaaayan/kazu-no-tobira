@@ -594,7 +594,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {progress && !round && screen === 'island' &&
             <IslandStageMap key={grade.id} grade={grade} progress={progress} mode={playMode} access={access} onCheckpoint={startCheckpoint} onBack={()=>setScreen('world')}
               onTitles={()=>setScreen('titles')} onStart={start} onLearn={openLesson} preview={uiPreview}
-              focusStageId={returnStageId} onFocusStagePosition={setMapStageOffset} onMapLayout={setMapTop}/>
+              focusStageId={returnStageId} onFocusStagePosition={setMapStageOffset} onMapLayout={setMapTop}/>}
           {progress && !round && screen === 'titles' &&
             <TitleAlbum progress={progress} onBack={()=>setScreen('world')}/>}
           {progress && screen === 'lesson' && !round && learning &&
