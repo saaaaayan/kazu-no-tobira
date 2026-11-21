@@ -17,6 +17,7 @@ import { uiPreviewSampleKind } from '../domain/uiPreviewRound';
 import { stageCategoryName, stageRowCategoryName } from '../domain/islandCurriculumView';
 import { preschoolStageMapInfo } from '../domain/preschoolStageMapInfo';
 import { gradeOnePreviewStageInfo } from '../domain/gradeOnePreviewCurriculum';
+import { gradeOneStageMapInfo } from '../domain/gradeOneStageMapInfo';
 import { IslandCurriculumPanel } from './IslandCurriculumPanel';
 import { PreschoolPixelTerrain, ToyPixelTerrain } from './PreschoolPixelTerrain';
 import { isStandardPixelIsland, standardPixelIslandConfig } from '../domain/standardPixelIslandMap';
@@ -297,7 +298,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
   const detailStage=standardPixelMap ? grade.stages.find(stage=>stage.id===detailStageId) : undefined;
   const stageInfo=(stage:WorldStage)=>{
     if(stage.gradeId==='preschool')return preschoolStageMapInfo(stage);
-    const info=gradeOnePreviewStageInfo(stage);
+    const info=gradeOneStageMapInfo(stage);
     return info??{title:stageCategoryName(grade,stage),goal:'この ステージで まなぼう。'};
   };
   const stats=gradeProgress(progress,grade.id);
