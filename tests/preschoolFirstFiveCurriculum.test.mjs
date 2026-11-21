@@ -37,7 +37,7 @@ test('stage 04 selects only target objects, while stage 05 counts varied scatter
 test('approved objectives are documented without marking drafted questions ready',()=>{
   const plan=source('docs/curriculum/PRESCHOOL_10_FIRST_65_STAGE_PLAN.md');
   const detailed=source('docs/curriculum/PRESCHOOL_ADVENTURE_50_DRAFT.md');
-  assert.match(plan,/2026-11-21に冒険01〜10のカリキュラム構成のみ正式承認/u);
+  assert.match(plan,/2026-11-21に冒険01〜15のカリキュラム構成のみ正式承認/u);
   assert.match(plan,/クマだけではない/u);
   assert.match(detailed,/カリキュラムのみ/u);
   assert.match(detailed,/前後の並べ替え・数量保存の比較は行わない/u);
@@ -62,5 +62,31 @@ test('preschool 06–10 numeral learning objectives are approved, while the exer
   const plan=source('docs/curriculum/PRESCHOOL_10_FIRST_65_STAGE_PLAN.md');
   assert.match(plan,/06〜10の承認内容/u);
   const detailed=source('docs/curriculum/PRESCHOOL_ADVENTURE_50_DRAFT.md');
-  assert.match(detailed,/11〜50のテーマ\/到達目標は引き続き提案/u);
+  assert.match(detailed,/16〜50のテーマ\/到達目標は引き続き提案/u);
+});
+
+test('preschool 11–15 tracing objectives and 10-task digit distributions are approved, but questions remain drafts',()=>{
+  const expected=[
+    {'1':4,'2':3,'3':3}, {'4':5,'5':5}, {'6':5,'7':5},
+    {'8':5,'9':5}, {'0':5,'10':5}
+  ];
+  for(let n=11;n<=15;n++){
+    const item=stage(n);
+    assert.ok(item,'stage '+n);
+    assert.equal(item.unitCode,'tracing');
+    assert.equal(item.reviewStatus,'draft');
+    assert.deepEqual(item.betaTenQuestionTargets,expected[n-11]);
+    assert.equal(Object.values(item.betaTenQuestionTargets).reduce((a,b)=>a+b,0),10);
+    assert.equal(preschoolStageMapInfo({id:item.stageId,title:item.title}).title,item.title);
+    assert.match(item.guard,/認識|揺れ|動き|不安定|抽象/u);
+  }
+  assert.match(stage(15).goal,/10は1と0の2文字/u);
+  assert.match(stage(15).guard,/0×5／10×5/u);
+  assert.match(preschoolStageMapInfo({id:stage(15).stageId,title:stage(15).title}).goal,/1と 0を ひとつずつ/u);
+  const plan=source('docs/curriculum/PRESCHOOL_10_FIRST_65_STAGE_PLAN.md');
+  const detailed=source('docs/curriculum/PRESCHOOL_ADVENTURE_50_DRAFT.md');
+  assert.match(plan,/冒険11〜15の承認内容/u);
+  assert.match(detailed,/ステージ11〜15の確定事項/u);
+  assert.match(detailed,/認識失敗を数学的な不正解として扱わない/u);
+  assert.match(detailed,/16〜50は引き続き第1稿・未承認/u);
 });
