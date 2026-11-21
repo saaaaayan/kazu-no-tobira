@@ -47,6 +47,11 @@ test('wildlife receives priority at the start and across the island without movi
       assert.ok(animals.length/large.length>=.7,id+' animal heroes must dominate');
       const kinds=new Set(animals.map(item=>item.kind));
       assert.equal(kinds.size,4,id+' show all four species across the island');
+      if(id==='e2'){
+        const allKinds=new Set(scene.decorations.map(item=>item.kind));
+        for(const species of [...ISLAND_ART_SETS.e2.large,'forestSquirrel','forestOwl','forestRaccoon','forestBird'])
+          assert.ok(allKinds.has(species),'missing '+species+' at '+width);
+      }
       assert.equal(new Set(scene.ground.map(item=>item.kind)).size,4);
     }
     assert.deepEqual(layout,saved);

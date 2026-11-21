@@ -112,6 +112,23 @@ export function islandScenery(id:StandardPixelIslandId,width:number,height:numbe
   const ground:GroundDecoration[]=[];
   const inside=(box:DecorationRect)=>box.left>=26&&box.right<=width-26&&box.top>=88&&box.bottom<=height-24;
   const clear=(box:DecorationRect)=>inside(box)&&!zones.some(zone=>boxesOverlap(box,zone));
+  function reserveForestSpecies() {
+    if(id!=='e2')return;
+    for(const kind of ['forestSquirrel','forestOwl','forestRaccoon','forestBird'] as const) {
+      const sprite=ISLAND_SPRITES[kind];
+      const aspect=sprite.length/Math.max(...sprite.map(row=>row.length));
+      for(let attempt=0;attempt<250;attempt++) {
+        const dimension=compact?(attempt<120?40:32):52;
+        const item:PixelDecoration={kind,size:'medium',
+          x:Math.round(28+random()*(width-dimension-56)),
+          y:Math.round(90+random()*(height-dimension*aspect-120)),
+          width:dimension,height:Math.round(dimension*aspect)};
+        const box=sceneBounds(item,5);
+        if(!clear(box)||occupied.some(old=>boxesOverlap(box,old)))continue;
+        decorations.push(item);occupied.push(box);break;
+      }
+    }
+  }
   function placeGround() {
   for(let i=0;i<(compact?55:140);i++) {
     const kind=art.ground[i%art.ground.length];
@@ -140,7 +157,7 @@ export function islandScenery(id:StandardPixelIslandId,width:number,height:numbe
     }
   }
   for(const size of ['large','medium','small'] as const) {
-    if(size==='medium')placeGround();
+    if(size==='medium'){reserveForestSpecies();placeGround();}
     // Existing plush and toy heroes retain their detailed silhouettes.
     if(legacy&&size==='large')continue;
     const kinds=shuffled(art[size],random);
