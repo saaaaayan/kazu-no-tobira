@@ -1,106 +1,150 @@
 import {useMemo} from 'react';
 import Svg,{G,Rect,Path} from 'react-native-svg';
 import type {WorldGrade} from '../domain/worldCatalog';
-import {ISLAND_PIXEL_PALETTES,type StandardPixelIslandId} from '../domain/standardPixelIslandMap';
-import {preschoolDecorationLayout} from '../domain/preschoolDecorLayout';
+import {ISLAND_PIXEL_PALETTES,type StandardPixelIslandId,type IslandPixelPalette} from '../domain/standardPixelIslandMap';
+import {islandScenery,type GroundDecoration,type IslandScene} from '../domain/islandScenery';
+import {ISLAND_ART_SETS} from '../domain/islandArtSets';
+import {ISLAND_SPRITES,ISLAND_SPRITE_RUNS,type IslandSpriteId} from '../domain/islandPixelSprites';
 import {islandRouteByKind,routeThrough} from '../domain/worldMapLayout';
 
-/** Small pixel silhouettes, never emoji. X=ink, B=body, A=accent, F=light.
- * The palette, land bands and set of landmarks differ for every island.
- */
-const ICON_ROWS={
-  tree:["....XX....","...XFFX...","..XFBBFX..",".XFBBBBFX.","XFBBBBBBFX","..XFBBFX..","...XFFX...","....XX....","....XX....","...XBBX..."],
-  rabbit:["..XX..XX..","..XFX.XFX.","..XFX.XFX.","...XFFFXX.","..XFFFFFX.","..XAXFFAX.","..XFFFFFX.","...XXXXX..","...XFFFXX.","..XFFFFFX."],
-  mushroom:["...XXXX...","..XAAAAX..",".XAAAAAAX.","XAAAAAAAAX","XXXXXXXXXX",".XFFFFFFX.","..XFXFFFX.","..XFFFFFFX.","..XXXXXXXX"],
-  cupcake:["..XAAAAAX.","..AAAAAAA.","..XFFFFFX.","...XFFFX..",".XXXXXXXX.",".XBBBBBBX.",".XBBBBBBX.","..XBBBBX..","..XXXXXX.."],
-  candy:["..........","...XX.....","..XAFX....",".XAAAXXXX.","XAXFFXAAAX","XXXXXAAX..","....XAX...",".....XX..."],
-  donut:["..XXXXXX..",".XAAAAAAX.","XAAFFFFAAX","XAFF..FFAX","XAFF..FFAX","XAAFFFFAAX",".XAAAAAAX.","..XXXXXX.."],
-  dinosaur:[".....XXX..","...XXBBXX.","..XBBFFBX.","..XBBBBBX.",".XBBBBXX..","XBBBBBXXX.","XBBBBBBXX.","XXXBBXBX..","..XBBX.X..","..X..X.X.."],
-  fossil:["..XX..XX..","..XFFFFX..","XXXFFFFXXX","XFFFXFFFX","XXFFXFFXX.","..XFFFFX..","..XFFFFX..","XXXFFFFXXX","..XXXXXX.."],
-  volcano:["....XX....","...XAAX...","..XAAAAX..","..XBBXBBX..",".XBBXBBBX.","XBBXXBBBX.","XBBXXBBBX.","XXXXXXXXX."],
-  gear:["..XX.XX...","..XBBBX...","XXXBBBXXX","XBBXFXBBX","XBBFFFBBX","XBBXFXBBX","XXXBBBXXX","..XBBBX...","..XX.XX..."],
-  factory:["..XX..XX..","..XAX.XAX.","..XAX.XAX.","XXXXXXXXXX","XBBBBBBBBX","XBFXXFBFXX","XBFXXFBFBX","XBBBBBBBBX","XXXXXXXXXX"],
-  robot:["....XX....","..XXXXXX..","..XBBBBX..","..XFAAFX..","..XBBBBX..","...XXXX...",".XXBBBBXX.","..XBFFBX..","..XBBBBX..","..XX..XX.."],
-  column:["..XXXXXXXX","..XFFFFFFX","...XFFFFX.","...XBBFBX.","...XBBFBX.","...XBBFBX.","...XBBFBX.","..XFFFFFFX","..XXXXXXXX"],
-  pyramid:["....XX....","...XBBX...","..XBBBBX..",".XBBBBBBX.","XBBBBBBBBX","XXXXXXXXXX"],
-  amphora:["..XX..XX..","..XAXXAX..","..XAAAAX.","...XAAX..","...XBBX...","..XBBBBX..","..XBBBBX..","...XXXX..."],
-  maze:["XXXXXXXXXX","XFFFFBFFFX","XFXXFBXXFX","XFXXFXXFFX","XFFFXXFFXX","XXXFFFFBFX","XFFFBXXFFX","XFXXFFFFFX","XXXXXXXXXX"],
-  key:["....XXXX..","...XFFFFX.","...XFXFFX.","...XFFFFX.","....XXXX..",".....XX...",".....XX...",".....XXXX.",".....X.XX."],
-  torch:["....AA....","...AAAA...","...XAAX..","....XX....","...XBBX...","...XBBX...","...XBBX...","...XXXX..."],
-  mirror:["..XXXXXXXX","..XFFFFFFX","..XFFFFFFX","..XFAXAFX","..XFFFFFFX","..XFFFFFFX","..XXXXXXXX",".....XX...","...XXXXXX."],
-  gem:["....XX....","..XXAAXX..",".XAAAAAAX.","XAAAAAAAAX","XXAAAAAAX","..XAAAAX.","...XAAX..","....XX...."],
-  arch:["..XXXXXXXX","..XBBBBBBX","..XFFFFFBX","..XF...FBX","..XF...FBX","..XF...FBX","..XF...FBX","..XX...XXX"],
-  lantern:["....XX....","...XBBX...","..XXXXXX..","..XFFFFX..","..XFAAFX..","..XFFFFX..","..XXXXXX..","...XBBX..."],
-  prism:["....XX....","...XFFX...","..XFFFFX..",".XFFFFFBX.","XFFFFFBBBX","XXXXXXBBBX","..A..B..A."],
-  moon:["...XXXXX..","..XFFFFFX.","..XFFFFX..",".XFFFFX...","XFFFFX....","XFFFFX....",".XFFFFX...","..XFFFFXX.","...XXXXX.."],
-  constellation:[".X........","...A..X...","..A..A....",".....A....",".X..A..X..","..A.A.....","...X......"],
-  telescope:["....XX....","...XFFX...","..XFFFFXX.","..XAAAAAX.","...XXXXXX.",".....XX...","....XXXX..","...XX..XX.","..XX....XX"],
-  planet:["...XXXX...","..XBBBBX..",".XBBFFBBX.","XBBFFFFBBX","XBBFFFFBBX",".XBBFFBBX.","..XBBBBX..","...XXXX...","..AAAAAA.."],
-  mountain:["....XX....","...XFFX...","..XFFBBX..",".XFFBBBBX.","XFFBBBBBBX","XXXXXXXXXX"],
-  waterfall:["XXXFFFXXX","XBBBBBBBX","XFFBFFBFX","XFFBFFBFX","XFFBFFBFX","XFFBFFBFX","XAABAAABX","AAAAAAAAA"],
-  pine:["....XX....","...XBBX...","..XBBBBX..",".XBBBBBBX.","..XBBBBX..",".XBBBBBBX.","XBBBBBBBBX","....XX....","....XX...."],
-  book:["XX......XX","XFFFFFFFFX","XFFFAAAFFX","XFFFFFFFFX","XFFFFFFFFX","XFFFFFFFBX","XXBBBBBBXX","..XXXXXX.."],
-  compass:["....XX....","...XAXX...","..XAAAFX..","XXAAFAAXXX","XAAFAAAAAX","XXAAFAAXXX","..XFFAFX..","...XXXX..."],
-  hat:[".....XX...","....XAAX..","...XAAAAX.","..XAAAAAAX",".XAAAAAAAX","XXXXXXXXXXX","..XBBBBBX"],
-  spellbook:["XXXXXXXXXX","XAAAAAFAAX","XAAFAAAAAX","XAAFAAAAAX","XAAAAAAAAX","XFFFFFFAAX","XXXXXXXXXX"],
-  crystal:["....XX....","...XFFX...",".XXFFFXX.","XFFFAFFFFX",".XFFFFFFX.","..XFFFFX..","...XFFX...","....XX...."],
-  castle:["XX......XX","XBX.XXXXBX","XBX.XBBXBX","XBBXXBBXBX","XBBBBBBBBX","XBBBFFBBBX","XBBXFFXBBX","XXXXXXXXXX"],
-  crown:["X........X","XAA..XX..AX","XAAAAXAAAX","XAAAAAAAAX","XAAAAAAAAX","XXXXXXXXXXX"],
-  shield:["..XXXXXX..",".XBBBBBBX.","XBBBBBBBBX","XBBBAABBBX",".XBBBBBBX.","..XBBBBX..","...XBBX...","....XX...."],
-  satellite:["XX......XX","XFX....XFX","XXX.XX.XXX","...XFFX...","...XAFX...","..XFFFFX..","...XXXX..."],
-  rocket:["....XX....","...XAAX..","..XAAAAX.","..XFFAFX..","..XFFAFX..",".XXFFAXX.","XAXFFFXAX","XAX...XAX","..A...A.."],
-} as const;
-type IconKind=keyof typeof ICON_ROWS;
-type PixelRun={x:number;y:number;w:number;value:string};
-function compileIcon(lines:readonly string[]):PixelRun[]{
-  const out:PixelRun[]=[];
-  for(let y=0;y<lines.length;y++){
-    const line=lines[y];
-    for(let x=0;x<line.length;){
-      const value=line[x];
-      if(value==='.'||value===' '){x++;continue;}
-      let end=x+1;
-      while(end<line.length&&line[end]===value)end++;
-      out.push({x,y,w:end-x,value});
-      x=end;
-    }
-  }
-  return out;
-}
-const ICON_RUNS=Object.fromEntries(Object.entries(ICON_ROWS).map(([name,lines])=>
-  [name,compileIcon(lines)])) as Record<IconKind,PixelRun[]>;
-
-function Landmark({kind,x,y,scale,color,accent,light,ink}:{
-  kind:IconKind;x:number;y:number;scale:number;
-  color:string;accent:string;light:string;ink:string;
-}){
-  const pixels=ICON_RUNS[kind];
-  const source=ICON_ROWS[kind],width=Math.max(...source.map(row=>row.length));
-  const unit=3;
-  return <G transform={`translate(${x-width*unit*scale/2} ${y-16*scale}) scale(${scale})`}>
-    {pixels.map((p,i)=><Rect key={i} x={p.x*unit} y={p.y*unit}
-      width={p.w*unit+.12} height={unit+.12}
-      fill={p.value==='X'?ink:p.value==='B'?color:p.value==='A'?accent:light}/>)}
+export function PixelLandmark({kind,x,y,width,height,theme}:{
+  kind:IslandSpriteId;x:number;y:number;width:number;height:number;theme:IslandPixelPalette;
+}) {
+  const rows=ISLAND_SPRITES[kind];
+  const sourceWidth=Math.max(...rows.map(row=>row.length));
+  const pixel=Math.min(width/sourceWidth,height/rows.length);
+  const colors:Record<string,string>={X:theme.ink,B:theme.stripe,A:theme.accent,F:theme.paper,R:'#b36d59'};
+  return <G transform={'translate('+x+' '+y+') scale('+pixel+')'}>
+    {ISLAND_SPRITE_RUNS[kind].map((run,index)=><Rect key={index}
+      x={run.x} y={run.y} width={run.width} height={1} fill={colors[run.color]}/>)}
   </G>;
 }
 
-/** Shared map silhouette and routes. Uses the preschool layout's geometry,
- * exclusion rectangles, scattered ornament positions, and accessible overlay.
- * No independent per-island route layout exists.
+function GroundTile({item,theme}:{item:GroundDecoration;theme:IslandPixelPalette}) {
+  const {kind,variant}=item;
+  const family=Object.entries(ISLAND_ART_SETS).find(([,art])=>
+    (art.ground as readonly string[]).includes(kind))?.[0];
+  const rectangle=(x:number,y:number,w:number,h:number,color:string=theme.stripe)=>
+    <Rect x={x} y={y} width={w} height={h} fill={color}/>;
+  let drawing;
+  switch(family) {
+    case 'preschool':
+      drawing=kind==='stitches'?<Path d="M1 3H4M7 3H10M13 3H16M3 1V5M10 1V5" stroke={theme.ink} strokeWidth={.6}/>
+        :kind==='buttons'?<><Rect x={4} y={3} width={10} height={10} fill={theme.accent}/>{rectangle(6,5,2,2,theme.paper)}{rectangle(10,9,2,2,theme.paper)}</>
+        :kind==='patchwork'?<><Rect x={1} y={2} width={15} height={12} fill={theme.accent}/><Path d="M3 3H15V12H3Z" fill="none" stroke={theme.paper} strokeDasharray="2 2"/></>
+        :<Path d="M1 3H17M1 8H17M1 13H17M4 0V16M10 0V16M16 0V16" stroke={theme.stripe} strokeWidth={1}/>;
+      break;
+    case 'e1':
+      drawing=kind==='rails'?<><Path d="M3 0V16M13 0V16" stroke={theme.ink} strokeWidth={1}/><Path d="M1 2H15M1 7H15M1 12H15" stroke={theme.accent} strokeWidth={2}/></>
+        :kind==='blocks'?<>{rectangle(1,6,7,9)}{rectangle(9,2,7,13,theme.accent)}{rectangle(2,4,4,2,theme.paper)}{rectangle(11,0,3,2,theme.paper)}</>
+        :kind==='woodgrain'?<Path d="M1 3H17M1 8H17M1 13H17M5 4H8V6H5Z" stroke={theme.stripe} fill="none"/>
+        :<Path d="M1 1H7V7H1ZM9 9H16V16H9Z" stroke={theme.accent} fill="none"/>;
+      break;
+    case 'e2':case 'h2':
+      drawing=kind==='river'||kind==='lake'?<><Path d="M0 5H3V2H12V4H17V12H13V15H3V12H0Z" fill={theme.water}/><Path d="M3 8H8M10 11H14" stroke={theme.paper} strokeWidth={.7}/></>
+        :kind==='mountainRidges'?<Path d="M1 14L6 4L11 14M8 14L13 2L18 14" stroke={theme.stripe} strokeWidth={2} fill="none"/>
+        :kind==='roots'?<Path d="M8 0V6H3V10H0M8 6H14V12H18M8 6V16" stroke={theme.accent} strokeWidth={1.5} fill="none"/>
+        :<Path d={variant%2?'M1 8V4L4 7V2M10 13V9L13 12V7':'M2 6L7 3L6 8ZM10 12L15 8L14 14Z'} stroke={theme.stripe} strokeWidth={1.2} fill="none"/>;
+      break;
+    case 'e3':
+      drawing=kind==='chocolateTiles'?<><Rect x={1} y={1} width={16} height={14} fill={theme.ink} opacity={.4}/><Path d="M2 2H16M2 8H16M6 1V15M12 1V15" stroke={theme.accent} strokeWidth={2}/></>
+        :kind==='wafer'?<Path d="M1 3H17M1 7H17M1 11H17M3 1V15M7 1V15M11 1V15M15 1V15" stroke={theme.accent} strokeWidth={.8}/>
+        :kind==='icing'?<Path d="M1 3H17V6H14V9H11V6H8V10H5V6H1Z" fill={theme.paper}/>
+        :<>{rectangle(2,3,2,2,theme.accent)}{rectangle(10,9,3,2,theme.ink)}{rectangle(6,13,2,2,theme.paper)}</>;
+      break;
+    case 'e4':
+      drawing=kind==='lavaFlow'?<><Path d="M2 0V5H7V10H13V16" stroke={theme.accent} strokeWidth={5} fill="none"/><Path d="M2 0V5H7V10H13V16" stroke={theme.paper} strokeWidth={1} fill="none"/></>
+        :kind==='strata'?<Path d="M0 3H9V5H18M0 8H5V10H18M0 14H18" stroke={theme.stripe} strokeWidth={2} fill="none"/>
+        :kind==='fossilBed'?<Path d="M2 2H15V14H4V5H12V11H7V8H10" stroke={theme.paper} strokeWidth={2} fill="none"/>
+        :<Path d="M8 0V5L4 9L2 16M4 9L13 11L17 15M8 5L16 3" stroke={theme.stripe} fill="none"/>;
+      break;
+    case 'e5':
+      drawing=kind==='pipelines'?<><Path d="M0 3H10V12H18" stroke={theme.ink} strokeWidth={5} fill="none"/><Path d="M0 3H10V12H18" stroke={theme.paper} strokeWidth={2} fill="none"/></>
+        :kind==='circuit'?<Path d="M1 1H7V8H15V14H18M1 6H4V14H10" stroke={theme.accent} strokeWidth={1} fill="none"/>
+        :kind==='rivets'?<>{[2,12].flatMap(x=>[2,12].map(y=><Rect key={x+':'+y} x={x} y={y} width={3} height={3} fill={theme.paper}/>))}</>
+        :<><Rect x={1} y={1} width={16} height={14} fill={theme.stripe}/><Path d="M2 3H15M3 2V13M15 3V13" stroke={theme.paper} strokeWidth={1}/></>;
+      break;
+    case 'e6':
+      drawing=kind==='hieroglyphs'?<Path d="M2 2V13M2 3H6V7H2M10 2H15L12 6V13M10 10H15" stroke={theme.accent} strokeWidth={1.4} fill="none"/>
+        :kind==='mosaicTiles'?<Path d="M1 1H8V8H1ZM10 10H17V17H10ZM10 1H17V8H10Z" fill={theme.accent} opacity={.6}/>
+        :kind==='sandRipples'?<Path d="M1 3H8V5H16M1 8H8V10H16M1 13H8V15H16" stroke={theme.stripe} fill="none"/>
+        :<Path d="M0 1H18V16H0ZM0 8H18M7 1V8M12 8V16" stroke={theme.stripe} strokeWidth={1.2} fill="none"/>;
+      break;
+    case 'j1':
+      drawing=kind==='gravel'?<>{rectangle(2,3,3,2)}{rectangle(12,12,2,2)}{rectangle(8,5,2,2)}</>
+        :<Path d={kind==='mortar'?'M0 4H18M0 11H18M5 4V11M13 11V17':'M1 1H17V16H1ZM2 8H16M8 2V7M12 9V15'} stroke={theme.stripe} fill="none"/>;
+      break;
+    case 'j2':
+      drawing=<><Path d={kind==='reflection'?'M2 1H7V15H2ZM11 1H16V15H11Z':kind==='diamondTiles'?'M9 1L17 8L9 15L1 8Z':'M1 1H17V16H1ZM9 1V16M1 8H17'}
+        fill={kind==='glassTiles'?theme.paper:'none'} stroke={theme.accent} strokeWidth={1}/>
+        <Path d="M4 5L7 2M11 14L15 10" stroke={theme.paper} strokeWidth={1.4}/></>;
+      break;
+    case 'j3':
+      drawing=kind==='lightField'?<Rect x={2} y={0} width={12} height={16} fill={theme.paper} opacity={.3}/>
+        :kind==='shadowField'?<Path d="M2 2H12V7H17V16H7V11H2Z" fill={theme.ink} opacity={.25}/>
+        :kind==='prismTiles'?<Path d="M2 15L9 2L17 15ZM9 2V15" fill="none" stroke={theme.accent}/>
+        :<Path d="M12 1H6V4H3V12H6V15H12V12H9V4H12Z" fill={theme.accent}/>;
+      break;
+    case 'h1':case 'cosmos':
+      drawing=kind==='starChart'||kind==='starGrid'?<><Path d="M2 4L7 10L14 5L17 12" stroke={theme.accent} strokeWidth={.7} fill="none"/>
+        {[ [2,4],[7,10],[14,5],[17,12] ].map(([x,y])=><Rect key={x} x={x-1} y={y-1} width={2} height={2} fill={theme.paper}/>)}</>
+        :kind==='craters'?<><Path d="M3 3H13V5H16V12H13V15H3V12H1V5H3Z" fill={theme.stripe}/>{rectangle(5,6,8,6,theme.ink)}{rectangle(5,5,7,1,theme.paper)}</>
+        :kind==='orbits'||kind==='orbitChart'?<><Path d="M0 7L5 2H13L18 7V11L13 16H5L0 11Z" stroke={theme.accent} strokeWidth={.8} fill="none"/>{rectangle(10,2,3,3,theme.paper)}</>
+        :kind==='nebula'?<Path d="M1 3H8V1H14V6H18V12H12V16H5V12H1Z" fill={theme.accent} opacity={.25}/>
+        :<Path d="M1 4H6M3 2V7M11 12H16M13 10V15" stroke={theme.stripe} fill="none"/>;
+      break;
+    case 'h3':
+      drawing=kind==='compassRose'?<Path d="M9 0V17M0 9H18M9 1L12 9L9 16L6 9Z" fill="none" stroke={theme.accent}/>
+        :kind==='libraryTiles'?<Path d="M1 2H8V15H1ZM10 2H17V15H10ZM3 5H6M12 12H15" stroke={theme.accent} fill="none"/>
+        :<Path d="M0 0H18V17H0ZM0 8H18M5 0V8M12 8V17" stroke={theme.stripe} strokeWidth={1} fill="none"/>;
+      break;
+    case 'sage':
+      drawing=kind==='magicCircle'?<Path d="M5 1H13L18 6V12L13 17H5L0 12V6ZM9 3L15 14H3ZM3 5L15 5L9 15Z" stroke={theme.accent} strokeWidth={.8} fill="none"/>
+        :kind==='runes'?<Path d="M3 2V15M3 2L8 6L3 9M12 3V15M9 11L16 6" stroke={theme.accent} strokeWidth={1.2} fill="none"/>
+        :<Path d="M1 1H17V16H1ZM4 4L14 13M14 4L4 13" stroke={theme.stripe} fill="none"/>;
+      break;
+    case 'champion':
+      drawing=kind==='fortress'||kind==='battlements'?<Path d="M1 15V5H4V2H7V5H11V2H14V5H17V15ZM2 10H16M6 6V10M12 11V15" stroke={theme.ink} opacity={.5} fill={theme.stripe}/>
+        :kind==='copperTiles'?<><Rect x={1} y={1} width={16} height={14} fill={theme.accent} opacity={.6}/><Path d="M2 4H16M3 2V13" stroke={theme.paper} strokeWidth={1}/></>
+        :<Path d="M1 1H8V7H1ZM10 3H17V10H10ZM2 10H8V16H2ZM11 12H17V17H11Z" fill="none" stroke={theme.stripe}/>;
+      break;
+  }
+  return <G transform={'translate('+item.x+' '+item.y+') scale('+item.width/18+' '+item.height/18+')'}>
+    {drawing}
+  </G>;
+}
+
+export function IslandSceneryLayer({id,width,height,positions,layer}:{
+  id:StandardPixelIslandId;width:number;height:number;positions:readonly {x:number;y:number}[];
+  layer:'ground'|'objects';
+}) {
+  const theme=ISLAND_PIXEL_PALETTES[id];
+  const scene=useMemo(()=>islandScenery(id,width,height,positions),[id,width,height,positions]);
+  return <G testID={'island-scenery-'+layer+'-'+id}>
+    {layer==='ground'?<>
+      {scene.ground.map((item,index)=><GroundTile key={index} item={item} theme={theme}/>)}
+      {scene.walls.length>0&&<G testID="labyrinth-stone-walls">
+        <Path d={wallPath(scene)} fill="none" stroke={theme.stripe} strokeWidth={5} strokeLinejoin="miter" strokeLinecap="butt"/>
+        <Path d={wallPath(scene)} fill="none" stroke={theme.paper} strokeWidth={1} strokeLinejoin="miter" strokeLinecap="butt" opacity={.5}/>
+      </G>}
+    </>:scene.decorations.map((item,index)=><PixelLandmark key={index} {...item} theme={theme}/>)}
+  </G>;
+}
+function wallPath(scene:IslandScene) {
+  return scene.walls.map(wall=>'M'+wall.x1+' '+wall.y1+'H'+wall.x2+'V'+wall.y2).join('');
+}
+
+/** Geometry, numbered pins and all ten checkpoint hit targets are inherited.
+ * Themes contain artwork only and have no access to stage progression.
  */
 export function SharedThemedPixelTerrain({width,height,positions,grade,next}:{
-  width:number;height:number;positions:readonly {x:number;y:number}[];
-  grade:WorldGrade;next:number;
-}){
+  width:number;height:number;positions:readonly {x:number;y:number}[];grade:WorldGrade;next:number;
+}) {
+  const id=grade.id as StandardPixelIslandId;
   const theme=ISLAND_PIXEL_PALETTES[grade.id as StandardPixelIslandId];
   const routes=islandRouteByKind(grade.stages,positions.map((p,order)=>({
     ...p,order,row:Math.floor(order/5),column:order%5,
   })));
-  const ornaments=useMemo(()=>preschoolDecorationLayout(width,height,positions),
-    [width,height,positions.length,positions[0]?.y,positions[positions.length-1]?.y]);
-  // The preschool and grade-one legacy art retain their exact appearance;
-  // only other themes enter this shared parameterised renderer.
-  const types=theme.motifs as readonly string[];
   return <Svg testID={'all-16-island-pixel-themes-v1-'+grade.id}
     width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}
     preserveAspectRatio="none" accessible={false}>
@@ -113,59 +157,35 @@ export function SharedThemedPixelTerrain({width,height,positions,grade,next}:{
       const y=positions[row*5].y;
       return <G key={row}>
         <Rect x={26} y={y-50} width={width-52} height={75}
-          fill={row<10?(row%2===0?theme.bandA:theme.bandB):
-            row<12?theme.trialBand:theme.legendBand}/>
-        <Rect x={24} y={y+53} width={width-48} height={6}
-          fill={theme.stripe}/>
+          fill={row<10?(row%2===0?theme.bandA:theme.bandB):row<12?theme.trialBand:theme.legendBand}/>
+        {id==='j3'&&<Rect x={width/2} y={y-45} width={width/2-26} height={200} fill={theme.ink} opacity={.1}/>}
       </G>;
     })}
-    {/* Organic, collision-checked icon scatter. Every category has an
-        actual themed silhouette and never covers route/pin/name/sign. */}
-    {ornaments.map((item,i)=>{
-      if(item.kind==='flower'){
-        return <G key={'texture-'+i}>
-          <Rect x={item.x-3*item.scale} y={item.y-4*item.scale}
-            width={6*item.scale} height={6*item.scale} fill={theme.accent}/>
-          <Rect x={item.x-1.5*item.scale} y={item.y-2*item.scale}
-            width={3*item.scale} height={3*item.scale} fill={theme.paper}/>
-        </G>;
-      }
-      const index=item.kind==='blocks'?(i+1)%types.length:i%types.length;
-      const kind=types[index] as IconKind;
-      return <Landmark key={'landmark-'+i} kind={kind} x={item.x} y={item.y}
-        scale={item.scale*(item.kind==='blocks'?.75:1)}
-        color={theme.stripe} accent={theme.accent} light={theme.paper} ink={theme.ink}/>;
-    })}
+    <IslandSceneryLayer id={id} width={width} height={height} positions={positions} layer="ground"/>
+    <IslandSceneryLayer id={id} width={width} height={height} positions={positions} layer="objects"/>
     {[50,60].map((order,index)=><Rect key={order} x={24} y={positions[order].y-65}
       width={width-48} height={4} fill={index===0?theme.trialBand:theme.legendBand}/>)}
-    <Path d={routeThrough(routes.normal)} fill="none" stroke={theme.pathBorder}
-      strokeWidth={12} strokeLinejoin="miter"/>
-    <Path d={routeThrough(routes.normal)} fill="none" stroke={theme.path}
-      strokeWidth={8} strokeLinejoin="miter"/>
-    <Path d={routeThrough(routes.normal)} fill="none" stroke={theme.paper}
-      strokeWidth={2} strokeDasharray="5 8"/>
+    <Path d={routeThrough(routes.normal)} fill="none" stroke={theme.pathBorder} strokeWidth={12} strokeLinejoin="miter"/>
+    <Path d={routeThrough(routes.normal)} fill="none" stroke={theme.path} strokeWidth={8} strokeLinejoin="miter"/>
+    <Path d={routeThrough(routes.normal)} fill="none" stroke={theme.paper} strokeWidth={2} strokeDasharray="5 8"/>
     <Path d={routeThrough(routes.extra)} fill="none" stroke={theme.pathBorder} strokeWidth={10}/>
-    <Path d={routeThrough(routes.extra)} fill="none" stroke={theme.paper}
-      strokeWidth={3} strokeDasharray="5 8"/>
+    <Path d={routeThrough(routes.extra)} fill="none" stroke={theme.paper} strokeWidth={3} strokeDasharray="5 8"/>
     <Path d={routeThrough(routes.secret)} fill="none" stroke={theme.accent} strokeWidth={10}/>
-    <Path d={routeThrough(routes.secret)} fill="none" stroke={theme.paper}
-      strokeWidth={3} strokeDasharray="5 8"/>
-    {next>=0&&<Rect x={positions[next].x-29} y={positions[next].y-29}
-      width={58} height={58} fill="none" stroke={theme.accent} strokeWidth={2}/>}
+    <Path d={routeThrough(routes.secret)} fill="none" stroke={theme.paper} strokeWidth={3} strokeDasharray="5 8"/>
+    {next>=0&&<Rect x={positions[next].x-29} y={positions[next].y-29} width={58} height={58}
+      fill="none" stroke={theme.accent} strokeWidth={2}/>}
   </Svg>;
 }
 
-/** Tiny symmetrical map-title emblems. These are SVG pixel icons, not emoji. */
 export function IslandThemeStamp({id,compact=false,flipped=false}:{
   id:string;compact?:boolean;flipped?:boolean;
-}){
+}) {
   const theme=ISLAND_PIXEL_PALETTES[id as StandardPixelIslandId];
-  const kind=theme.motifs[0] as IconKind;
+  const kind=ISLAND_ART_SETS[id as StandardPixelIslandId].large[0];
   return <Svg testID={'island-stamp-'+id+(flipped?'-right':'-left')}
     width={compact?17:23} height={compact?17:23} viewBox="0 0 32 32" accessible={false}>
     <G transform={flipped?'translate(32 0) scale(-1 1)':undefined}>
-      <Landmark kind={kind} x={16} y={21} scale={0.76}
-        color={theme.stripe} accent={theme.accent} light={theme.paper} ink={theme.ink}/>
+      <PixelLandmark kind={kind} x={1} y={1} width={30} height={30} theme={theme}/>
     </G>
   </Svg>;
 }

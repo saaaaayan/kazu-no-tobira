@@ -68,6 +68,10 @@ export function releaseClient(address) {
     }
     // For the 4,300-question public trial, verify that each of the 43 data
     // files is actually accessible at the hosted site, not merely in GitHub.
+    if (version.pixelSceneryV2 === true &&
+        (!js.includes('island-scenery-') || !js.includes('labyrinth-stone-walls'))) {
+      throw new Error('The public bundle is missing the new themed scenery.');
+    }
     const publishedBanks=[];
     if (version.bankSha256 !== undefined) {
       const entries=Object.entries(version.bankSha256);

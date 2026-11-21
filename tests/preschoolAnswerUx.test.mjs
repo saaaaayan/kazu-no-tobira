@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
 
-const code=readFileSync(new URL('../src/FullAdventure.tsx',import.meta.url),'utf8');
+const code=readFileSync(new URL('../src/FullAdventure.tsx',import.meta.url),'utf8').replaceAll('\r\n','\n');
 
 test('preschool counting numbers are large, accessible, and directly under the picture',()=>{
   const diagram=code.indexOf('<QuestionDiagram diagram={diagram} phase={round.hintLevel');

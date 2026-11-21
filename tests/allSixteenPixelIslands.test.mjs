@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {ISLAND_SPRITES} from '../src/domain/islandPixelSprites.ts';
+import {ISLAND_ART_SETS} from '../src/domain/islandArtSets.ts';
 import {worldIslands} from '../src/domain/worldCatalog.ts';
 import {
   isStandardPixelIsland,standardPixelIslandConfig,ISLAND_PIXEL_PALETTES,islandPixelPalette
@@ -87,22 +89,23 @@ test('land palettes are not duplicates, and toy coral differs strongly from pres
   assert.match(toyArt,/theme==='toys'\?'#d9ae99':'#a9cb83'/u);
   assert.match(toyArt,/theme==='toys'\?'#688dad':'#80adc4'/u);
   assert.match(toyArt,/theme==='toys'\?'#835a57':'#506d5e'/u);
-  assert.match(toyArt,/kind="puzzle"/u);
+  assert.match(toyArt,/ISLAND_ART_SETS.e1.small/u);
 });
 
 test('all fourteen additional islands use their own pixel emblems with the shared collision mask',()=>{
   const art=read('src/components/SharedThemedPixelTerrain.tsx');
-  assert.match(art,/preschoolDecorationLayout\(width,height,positions\)/u);
+  assert.match(art,/islandScenery\(id,width,height,positions\)/u);
   assert.match(art,/ISLAND_PIXEL_PALETTES\[grade.id as StandardPixelIslandId\]/u);
   assert.match(art,/all-16-island-pixel-themes-v1/u);
   assert.match(art,/function IslandThemeStamp|export function IslandThemeStamp/u);
-  const iconMatch=art.match(/const ICON_ROWS=\{([\s\S]*?)\} as const;/u);
-  assert.ok(iconMatch);
-  const keys=[...iconMatch[1].matchAll(/^\s+([a-z]+):\[/gm)].map(x=>x[1]);
-  assert.ok(keys.length>=35);
   for(const island of worldIslands.filter(x=>!['preschool','e1'].includes(x.id))){
-    for(const kind of islandPixelPalette(island.id).motifs)
-      assert.ok(keys.includes(kind),island.id+' missing themed icon '+kind);
+    const set=ISLAND_ART_SETS[island.id];
+    assert.ok(set.large.length>=3);
+    assert.ok(set.medium.length>=6);
+    assert.ok(set.small.length>=8);
+    assert.ok(set.ground.length>=3);
+    for(const kind of [...set.large,...set.medium,...set.small])
+      assert.ok(ISLAND_SPRITES[kind],island.id+' missing themed icon '+kind);
   }
   for(const width of [320,375,620,940]){
     const layout=islandStageLayout(width,65,PRESCHOOL_MAP_TITLE_INSET,true);

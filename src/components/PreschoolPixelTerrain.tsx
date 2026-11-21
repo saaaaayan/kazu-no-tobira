@@ -1,3 +1,6 @@
+import {ISLAND_ART_SETS} from '../domain/islandArtSets';
+import {ISLAND_PIXEL_PALETTES} from '../domain/standardPixelIslandMap';
+import {IslandSceneryLayer,PixelLandmark} from './SharedThemedPixelTerrain';
 import { useMemo } from 'react';
 import Svg, { G, Path, Rect } from 'react-native-svg';
 import { islandRouteByKind, routeThrough } from '../domain/worldMapLayout';
@@ -317,6 +320,10 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next,theme='
             row<10?'#94bc77':row<12?'#88a99e':'#aa98a8'}/>
       </G>;
     })}
+    <IslandSceneryLayer id={theme==='toys'?'e1':'preschool'} width={width} height={height}
+      positions={positions} layer="ground"/>
+    <IslandSceneryLayer id={theme==='toys'?'e1':'preschool'} width={width} height={height}
+      positions={positions} layer="objects"/>
     {/* Stable, collision-checked organic scattering. Never obscure checkpoint
         signs, stage circles, names, routes or the three area headings. */}
     {decorations.map((item,i)=>theme==='toys'
@@ -326,8 +333,10 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next,theme='
             x={item.x} y={item.y} scale={item.scale}/>
         : item.kind==='blocks'
           ? <ToyBlocks key={'toy-blocks-'+i} x={item.x} y={item.y} scale={item.scale}/>
-          : <ToyPixelIcon key={'toy-charm-'+i} kind="puzzle"
-              x={item.x} y={item.y} scale={item.scale*.55}/>
+          : <PixelLandmark key={'toy-charm-'+i}
+              kind={ISLAND_ART_SETS.e1.small[i%ISLAND_ART_SETS.e1.small.length]}
+              x={item.x-8*item.scale} y={item.y-18*item.scale}
+              width={16*item.scale} height={16*item.scale} theme={ISLAND_PIXEL_PALETTES.e1}/>
       : item.kind==='plush'
         ? <Plush key={'plush-'+i} animal={item.animal}
             x={item.x} y={item.y} scale={item.scale}/>
