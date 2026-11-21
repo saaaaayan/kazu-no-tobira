@@ -97,15 +97,15 @@ test('checkpoint signs show the review range and the ten actual numbered tests',
  assert.match(src,/checkpointsFor\(grade\)\.map/);
  assert.match(src,/testID=\{'island-checkpoint-'\+checkpoint\.number\}/);
  assert.match(src,/\(grade.id==='preschool'\|\|grade.id==='e1'\) && checkpoint.number<=10/);
- assert.match(src,/grade.id==='preschool' \? <>/);
+ assert.match(src,/standardPixelMap \? <>/);
  assert.match(src,/✓ かくにん/);
  assert.match(src,/テスト \{checkpoint\.number\}/);
  assert.match(src,/\{\(checkpoint\.number-1\)\*5\+1\}〜\{checkpoint\.number\*5\} の もんだい/);
  assert.match(src,/styles\.preschoolCheckpointTitle/);
  assert.match(src,/styles\.preschoolCheckpointRange/);
  assert.match(src,/onPress=\{\(\)=>onCheckpoint\(checkpoint\)\}/);
- assert.match(src,/borderWidth:grade.id==='preschool'\?3:1/);
- assert.match(src,/grade.id==='preschool'&&styles\.preschoolCheckpointSign/);
+ assert.match(src,/borderWidth:standardPixelMap\?3:1/);
+ assert.match(src,/standardPixelMap&&styles\.preschoolCheckpointSign/);
 });
 
 test('checkpoint clearings use collision-safe organic plush, flowers and blocks',()=>{

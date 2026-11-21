@@ -10,8 +10,8 @@ test('The preschool island uses live pixel plush SVG behind all interactive stag
   const catalog=read('src/domain/worldCatalog.ts');
   const app=read('src/FullAdventure.tsx');
   assert.match(catalog,/id: 'preschool', title: '就学前'/);
-  assert.match(source,/import \{ PreschoolPixelTerrain \}/);
-  assert.match(source,/testID=\{grade\.id==='preschool'\?'preschool-plush-pixel-v2':undefined\}/);
+  assert.match(source,/import \{ PreschoolPixelTerrain, ToyPixelTerrain \}/);
+  assert.match(source,/testID=\{grade.id==='preschool'\?'preschool-plush-pixel-v2':grade.id==='e1'\?'toy-island-pixel-v1':undefined\}/);
   assert.match(source,/grade\.id === 'preschool'/);
   assert.match(source,/<PreschoolPixelTerrain width=\{width\} height=\{height\}/);
   assert.match(art,/preschool-plush-pixel-v2/);
@@ -55,11 +55,11 @@ test('All 65 preschool stages have their own title and tap-to-read learning goal
   const names=read('src/domain/preschoolStageMapInfo.ts');
   const domain=read('src/domain/islandCurriculumView.ts');
   const catalog=read('src/domain/worldCatalog.ts');
-  assert.match(ui,/grade.id==='preschool' && grade.stages.map/);
+  assert.match(ui,/standardPixelMap && grade.stages.map/);
   assert.match(ui,/preschoolStageMapInfo\(stage\)/);
-  assert.match(ui,/testID=\{'preschool-stage-topic-'\+String\(index\+1\)\}/);
+  assert.match(ui,/testID=\{\(grade.id==='preschool'\?'preschool-stage-topic-':'toy-stage-topic-'\)\+String\(index\+1\)\}/);
   assert.match(ui,/numberOfLines=\{compactStageMap\?3:2\}/);
-  assert.match(ui,/testID="preschool-stage-info-card"/);
+  assert.match(ui,/testID=\{grade.id==='preschool'\?'preschool-stage-info-card':'toy-stage-info-card'\}/);
   assert.match(ui,/onPress=\{\(\)=>onStart\(stage\)\}/);
   assert.match(ui,/onPress=\{\(\)=>onStart\(detailStage\)\}/);
   assert.match(domain,/export function stageCategoryName/);
@@ -76,7 +76,7 @@ test('Preschool terrain uses stable organic scatter instead of repeated per-row 
   const plan=read('src/domain/preschoolDecorLayout.ts');
   const map=read('src/components/WorldScenes780.tsx');
   assert.match(art,/preschoolDecorationLayout\(width,height,positions\)/);
-  assert.match(art,/decorations.map\(\(item,i\)=>item.kind==='plush'/);
+  assert.match(art,/decorations.map\(\(item,i\)=>theme==='toys'/);
   assert.match(art,/<ToyBlocks key=\{'toy-blocks-'\+i\}/);
   assert.match(art,/<Flower key=\{'flower-'\+i\}/);
   assert.doesNotMatch(art,/compactScatter|desktopScatter|checkpoint-clearing-plush-/);
@@ -84,13 +84,13 @@ test('Preschool terrain uses stable organic scatter instead of repeated per-row 
   assert.match(plan,/preschoolMapExclusionZones/);
   assert.match(plan,/preschoolDecorationBounds/);
   assert.match(plan,/shuffled\(PRESCHOOL_PLUSH_ANIMALS,rand\)/);
-  assert.match(map,/grade.id==='preschool'\?PRESCHOOL_MAP_TITLE_INSET:0,grade.id==='preschool'/);
+  assert.match(map,/standardPixelMap\?PRESCHOOL_MAP_TITLE_INSET:0,standardPixelMap/);
   assert.match(map,/const nextPoint=geometry.positions\[checkpoint.after.order\+1\]/);
 });
 test('The in-map preschool title is visible above plush mascots and the first area',()=>{
   const ui=read('src/components/WorldScenes780.tsx');
   const terrain=read('src/components/PreschoolPixelTerrain.tsx');
-  assert.match(ui,/grade\.id==='preschool'\?PRESCHOOL_MAP_TITLE_INSET:0/);
+  assert.match(ui,/standardPixelMap\?PRESCHOOL_MAP_TITLE_INSET:0/);
   assert.match(ui,/testID="preschool-map-top-title"/);
   assert.match(ui,/<Text style=\{styles\.preschoolMapTopGrade\}>就学前<\/Text>/);
   assert.match(ui,/<Text style=\{\[styles\.preschoolMapTopName,compactStageMap&&styles\.preschoolMapTopNameCompact\]\}>ぬいぐるみの島<\/Text>/);

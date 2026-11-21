@@ -49,5 +49,5 @@ test('pixel paws and fixed plush artwork do not alter map geometry or decoration
   assert.match(planner,/preschoolMapExclusionZones/);
   assert.match(planner,/preschoolDecorationBounds/);
   assert.match(ui,/preschoolStageLabelLayout\(actual,position,marker\)/);
-  assert.match(ui,/islandCheckpointLayout\(actual,end,marker,nextPoint,grade.id==='preschool'\)/);
+  assert.match(ui,/islandCheckpointLayout\(actual,end,marker,nextPoint,standardPixelMap\)/);
 });

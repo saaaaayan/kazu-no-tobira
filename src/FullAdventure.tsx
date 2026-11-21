@@ -506,20 +506,24 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   // Prototype details remain accessible from the home and world map.
   const preschoolMapFirst = !round && screen === 'island' && grade.id === 'preschool';
   const preschoolChildView = preschoolMapFirst || Boolean(!review && round?.stage.gradeId === 'preschool');
+  const standardIslandMapFirst = preschoolMapFirst ||
+    (!round && screen === 'island' && grade.id === 'e1');
+  const standardIslandChildView = preschoolChildView || standardIslandMapFirst ||
+    Boolean(!review && round?.stage.gradeId === 'e1');
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" scrollEnabled={!drawing}
-        contentContainerStyle={[styles.scroll,preschoolMapFirst&&styles.preschoolScroll]}>
+        contentContainerStyle={[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll]}>
         <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}
-          style={[styles.shell,preschoolMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell]}>
-          {!round && screen !== 'lesson' && screen !== 'study-plan' && !preschoolMapFirst && <VersionNotice/>}
-          {uiPreview && !preschoolChildView && <View style={styles.playPanel} testID="kazu-sample-only-preview">
+          style={[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell]}>
+          {!round && screen !== 'lesson' && screen !== 'study-plan' && !standardIslandMapFirst && <VersionNotice/>}
+          {uiPreview && !standardIslandChildView && <View style={styles.playPanel} testID="kazu-sample-only-preview">
             <Text accessibilityRole="header" style={styles.answerHeading}>数のトビラ 試作版</Text>
             <Text style={styles.explanation}>小1は全50ステージのカリキュラム確認用10問ずつを公開中です。以前の100問バンクは別途保管し、教材の見直し後に再統合します。幼児65ステージも遊べます。試作版の回答記録は保存されません。</Text>
             <Text selectable style={styles.hintNote}>バージョン {process.env.EXPO_PUBLIC_KAZU_UI_PREVIEW_SHA}</Text>
           </View>}
-          {__DEV__ && !review && !preschoolChildView && <View style={styles.navigation}>
+          {__DEV__ && !review && !standardIslandChildView && <View style={styles.navigation}>
             <Text style={styles.logo}>開発用プラン　{hasPremium(access) ? '有料ユーザー' : '無料ユーザー'}</Text>
             <View style={styles.navigationHeader}>
               <GameButton label="無料ユーザー" secondary disabled={loadingRound || saving} onPress={() => { setAccess(freeAccess); setShowPlanInfo(false); }} />
@@ -540,7 +544,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
               {process.env.EXPO_PUBLIC_KAZU_ONLINE_REVIEW === '1' && typeof window !== 'undefined' &&
                 <GameButton label="管理者ログイン" secondary onPress={() => window.location.assign('/kazu-no-tobira/admin/')} />}
             </>
-          ) : !preschoolChildView ? (
+          ) : !standardIslandChildView ? (
             <View style={styles.navigation}>
               <View style={styles.navigationHeader}>
                 {round ? <Text style={styles.logo}>数のトビラ</Text> : (

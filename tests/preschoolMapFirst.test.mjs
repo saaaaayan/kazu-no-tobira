@@ -16,10 +16,10 @@ test('preschool island map appears before curriculum, start shortcut, legend and
   assert.match(panels,/styles\.nextButton/);
 
   const actualRender=render.slice(panelsEnd);
-  const topSupplement=actualRender.indexOf("{grade.id!=='preschool' && supplementalPanels}");
+  const topSupplement=actualRender.indexOf("{!standardPixelMap && supplementalPanels}");
   const mapHeading=actualRender.indexOf('<View style={styles.mapHeading}>');
   const mapTerrain=actualRender.indexOf('<View style={[styles.ocean');
-  const bottomSupplement=actualRender.indexOf("{grade.id==='preschool' && supplementalPanels}");
+  const bottomSupplement=actualRender.indexOf("{standardPixelMap && supplementalPanels}");
   const footer=actualRender.indexOf('styles.footer');
   assert.ok(topSupplement>0&&topSupplement<mapHeading,'other islands keep their prior top panels');
   assert.ok(topSupplement<mapTerrain&&mapTerrain<bottomSupplement,
@@ -30,7 +30,7 @@ test('preschool island map appears before curriculum, start shortcut, legend and
 });
 
 test('preschool map navigation stays playable without scrolling through curriculum first',()=>{
-  assert.match(ui,/styles\.stagePin,grade.id==='preschool'&&styles\.pixelStagePin/);
+  assert.match(ui,/styles\.stagePin,standardPixelMap&&styles\.pixelStagePin/);
   assert.match(ui,/onPress=\{\(\)=>onStart\(stage\)\}/);
   assert.match(ui,/testID=\{'island-checkpoint-'\+checkpoint\.number\}/);
   assert.match(ui,/testID="preschool-map-top-title"/);
