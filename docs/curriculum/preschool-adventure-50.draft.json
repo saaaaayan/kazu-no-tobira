@@ -218,11 +218,16 @@
       "unitCode": "tracing",
       "unitName": "すうじの なぞりがき",
       "title": "1・2・3を なぞろう",
-      "goal": "数字1・2・3の書き始めと線の方向をなぞって体験する",
-      "interaction": "大きなガイド線のなぞり／再生・やり直し",
+      "goal": "数字1・2・3を大きな薄いガイドに沿ってなぞり、書き始めと線の流れに慣れる",
+      "interaction": "大きなガイド線を指でなぞる／お手本を見る／何度でも書き直す",
       "difficulty": "低",
-      "guard": "形が崩れても即不正解にしない",
-      "reviewStatus": "draft"
+      "guard": "手指の発達差や線の揺れに寛容にし、入力認識失敗を誤答扱いにしない",
+      "reviewStatus": "draft",
+      "betaTenQuestionTargets": {
+        "1": 4,
+        "2": 3,
+        "3": 3
+      }
     },
     {
       "stageId": "preschool.n12",
@@ -230,11 +235,15 @@
       "unitCode": "tracing",
       "unitName": "すうじの なぞりがき",
       "title": "4・5を なぞろう",
-      "goal": "数字4・5の形を手指でなぞる",
-      "interaction": "ガイド線のなぞり／手本アニメ",
+      "goal": "数字4・5の線の組み合わせや曲線をガイドに沿ってゆっくりなぞる",
+      "interaction": "薄いガイド線を指でなぞる／お手本の補助／やり直し",
       "difficulty": "低→中",
-      "guard": "書体の違いを不必要に誤判定しない",
-      "reviewStatus": "draft"
+      "guard": "書体差や指の動きの揺れを理由に即不正解とせず、再挑戦を支援する",
+      "reviewStatus": "draft",
+      "betaTenQuestionTargets": {
+        "4": 5,
+        "5": 5
+      }
     },
     {
       "stageId": "preschool.n13",
@@ -242,11 +251,15 @@
       "unitCode": "tracing",
       "unitName": "すうじの なぞりがき",
       "title": "6・7を なぞろう",
-      "goal": "数字6・7の形と書く流れを体験する",
-      "interaction": "なぞり／手本の再生",
+      "goal": "数字6・7の丸みや折れ線を指でなぞり、数字の形と書く流れをつかむ",
+      "interaction": "大きなガイド線をゆっくりなぞる／お手本の補助／やり直し",
       "difficulty": "中",
-      "guard": "読字能力より手指操作の発達差に配慮",
-      "reviewStatus": "draft"
+      "guard": "まだ手指が不安定でも意欲を損なわず、文字の形を覚える経験を重視する",
+      "reviewStatus": "draft",
+      "betaTenQuestionTargets": {
+        "6": 5,
+        "7": 5
+      }
     },
     {
       "stageId": "preschool.n14",
@@ -254,11 +267,15 @@
       "unitCode": "tracing",
       "unitName": "すうじの なぞりがき",
       "title": "8・9を なぞろう",
-      "goal": "数字8・9の線のつながりを体験する",
-      "interaction": "なぞり／拡大できる手本",
+      "goal": "数字8・9の輪と曲線を大きなお手本でなぞり、数字の形に慣れる",
+      "interaction": "拡大可能なガイド線を指でなぞる／お手本の補助／やり直し",
       "difficulty": "中→高",
-      "guard": "認識失敗は誤答扱いにしない",
-      "reviewStatus": "draft"
+      "guard": "認識できないことと数字を理解できないことを区別し、失敗しても何度でも試せる",
+      "reviewStatus": "draft",
+      "betaTenQuestionTargets": {
+        "8": 5,
+        "9": 5
+      }
     },
     {
       "stageId": "preschool.n15",
@@ -266,11 +283,15 @@
       "unitCode": "tracing",
       "unitName": "すうじの なぞりがき",
       "title": "0と 10を なぞろう",
-      "goal": "数字0の形と、10が1と0の2文字で表せることを確かめる",
-      "interaction": "0のなぞり／1と0を順に指でなぞる",
+      "goal": "数字0をなぞり、10は1と0の2文字をそれぞれなぞって表せると経験する",
+      "interaction": "0は1文字をなぞる／10は1と0を順にそれぞれなぞる／やり直し",
       "difficulty": "まとめ",
-      "guard": "数の位取りの抽象説明はしない",
-      "reviewStatus": "draft"
+      "guard": "位取りの抽象説明は行わず、現行試作の0・1・0・10繰り返しは確定配分の0×5／10×5に後で修正する",
+      "reviewStatus": "draft",
+      "betaTenQuestionTargets": {
+        "0": 5,
+        "10": 5
+      }
     },
     {
       "stageId": "preschool.n16",
