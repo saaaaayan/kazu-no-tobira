@@ -8,9 +8,9 @@ const EULER_HOME_ART = require('../../assets/euler-math-title.png');
 const PUBLIC_HOME_URL = 'https://saaaaayan.github.io/kazu-no-tobira/';
 
 /**
- * Preserve the approved pixel-art title scene while cropping its painted
- * button strip. Real, visible Pressables are rendered below the illustration
- * on every viewport, so actions never depend on transparent image hotspots.
+ * Display the entire approved illustration at its natural 4:3 ratio,
+ * including Euler's feet and the reflecting pond. Draw real, visible
+ * controls underneath on every viewport; never crop the illustration.
  */
 export function ModeControls({ mode, onChange }: { mode: PlayMode; onChange: (mode: PlayMode) => void }) {
   return (
@@ -70,7 +70,7 @@ export default function AdventureHome({ mode, onMode, onStart, onTitles, loading
   return (
     <View style={styles.hero}>
       <View style={styles.illustrationClip}>
-        <Image source={EULER_HOME_ART} resizeMode="stretch" style={styles.illustration} accessible
+        <Image source={EULER_HOME_ART} resizeMode="contain" style={styles.illustration} accessible
           accessibilityLabel="数のトビラ。数学記号が浮かぶ星空と遺跡、輝くトビラの前に立つオイラーの黒いシルエット。" />
       </View>
       <View style={[styles.mobileControls, !compact && styles.wideControls]}>
@@ -128,8 +128,8 @@ const styles = StyleSheet.create({
     width: '100%', maxWidth: 1050, alignSelf: 'center', backgroundColor: '#0c2140',
     borderRadius: 22, overflow: 'hidden', alignItems: 'center',
   },
-  // Buttons in the artwork begin below y=761. Crop that strip on all screens.
-  illustrationClip: { position: 'relative', width: '100%', aspectRatio: 1448 / 761, overflow: 'hidden' },
+  // The source image is 1448 x 1086; maintain this exact ratio to show every pixel.
+  illustrationClip: { position: 'relative', width: '100%', aspectRatio: 1448 / 1086, overflow: 'hidden' },
   illustration: { width: '100%', aspectRatio: 1448 / 1086 },
   mobileControls: { width: '100%', paddingHorizontal: 11, paddingBottom: 13, gap: 8 },
   wideControls: { maxWidth: 760, alignSelf: 'center', paddingHorizontal: 18, paddingTop: 12, paddingBottom: 20, gap: 10 },
