@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import Svg, { G, Path, Rect } from 'react-native-svg';
 import { islandRouteByKind, routeThrough } from '../domain/worldMapLayout';
-import {preschoolDecorationLayout, type PreschoolPlushAnimal} from '../domain/preschoolDecorLayout';
+import {preschoolDecorationLayout, PRESCHOOL_PLUSH_ANIMALS, type PreschoolPlushAnimal} from '../domain/preschoolDecorLayout';
 import type { WorldGrade } from '../domain/worldCatalog';
 
 // The preschool island is an actual interactive map. This artwork is drawn
@@ -190,16 +190,110 @@ function ToyBlocks({x,y,scale}:{x:number;y:number;scale:number}) {
     <Rect x={-8} y={-31} width={16} height={16} fill="#d4a3a0" stroke={INK} strokeWidth={2}/>
   </G>;
 }
-export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
+/** Shared pixel-art landmarks for the standard island map.
+ * The preschool collision-checked positions are reused unchanged; only the
+ * toy silhouettes are swapped for the first-grade theme.
+ * All drawing stays inside the same plush decoration bounding box.
+ */
+const TOY_SYMBOLS=['robot','car','train','ball','blocks','top','rocket','kite','house','puzzle','drum','boat'] as const;
+type ToySymbol=typeof TOY_SYMBOLS[number];
+function ToyPixelIcon({kind,x,y,scale}:{kind:ToySymbol;x:number;y:number;scale:number}){
+  const ink='#344454',cream='#f7ecd1',wood='#d8bd84',
+    red='#ba817b',blue='#7b9eaf',green='#8fa987';
+  return <G transform={`translate(${x} ${y}) scale(${scale})`}>
+    {kind==='robot'&&<G>
+      <Rect x={-19} y={-27} width={38} height={30} fill={blue} stroke={ink} strokeWidth={3}/>
+      <Rect x={-13} y={-20} width={8} height={7} fill={cream}/>
+      <Rect x={5} y={-20} width={8} height={7} fill={cream}/>
+      <Rect x={-5} y={-8} width={10} height={3} fill={ink}/>
+      <Rect x={-14} y={5} width={28} height={17} fill={wood} stroke={ink} strokeWidth={2}/>
+      <Rect x={-23} y={7} width={8} height={13} fill={blue} stroke={ink} strokeWidth={2}/>
+      <Rect x={15} y={7} width={8} height={13} fill={blue} stroke={ink} strokeWidth={2}/>
+      <Rect x={-9} y={22} width={6} height={6} fill={ink}/><Rect x={3} y={22} width={6} height={6} fill={ink}/>
+      <Rect x={-2} y={-37} width={4} height={10} fill={ink}/>
+    </G>}
+    {kind==='car'&&<G>
+      <Rect x={-25} y={-2} width={50} height={17} fill={red} stroke={ink} strokeWidth={3}/>
+      <Path d="M-15 -2L-8 -19H12L20 -2Z" fill={blue} stroke={ink} strokeWidth={3}/>
+      <Rect x={-6} y={-16} width={12} height={11} fill={cream}/>
+      <Rect x={-17} y={13} width={10} height={10} fill={ink}/>
+      <Rect x={9} y={13} width={10} height={10} fill={ink}/>
+    </G>}
+    {kind==='train'&&<G>
+      <Rect x={-25} y={-21} width={23} height={33} fill={green} stroke={ink} strokeWidth={3}/>
+      <Rect x={-19} y={-17} width={12} height={11} fill={cream}/>
+      <Rect x={-2} y={-12} width={26} height={24} fill={wood} stroke={ink} strokeWidth={3}/>
+      <Rect x={7} y={-19} width={12} height={7} fill={red} stroke={ink} strokeWidth={2}/>
+      <Rect x={-19} y={12} width={9} height={9} fill={ink}/><Rect x={-1} y={12} width={9} height={9} fill={ink}/>
+      <Rect x={14} y={12} width={9} height={9} fill={ink}/>
+    </G>}
+    {kind==='ball'&&<G>
+      <Rect x={-17} y={-21} width={34} height={37} fill={wood} stroke={ink} strokeWidth={3}/>
+      <Rect x={-24} y={-12} width={48} height={20} fill={red} stroke={ink} strokeWidth={2}/>
+      <Rect x={-6} y={-27} width={12} height={47} fill={blue}/>
+      <Rect x={-6} y={-6} width={12} height={11} fill={cream} stroke={ink} strokeWidth={2}/>
+    </G>}
+    {kind==='blocks'&&<G>
+      <Rect x={-25} y={-8} width={22} height={23} fill={wood} stroke={ink} strokeWidth={3}/>
+      <Rect x={3} y={-8} width={22} height={23} fill={green} stroke={ink} strokeWidth={3}/>
+      <Rect x={-11} y={-33} width={22} height={24} fill={red} stroke={ink} strokeWidth={3}/>
+      <Rect x={-6} y={-26} width={11} height={11} fill={cream}/>
+    </G>}
+    {kind==='top'&&<G>
+      <Rect x={-4} y={-35} width={8} height={13} fill={ink}/>
+      <Rect x={-18} y={-21} width={36} height={16} fill={blue} stroke={ink} strokeWidth={3}/>
+      <Rect x={-25} y={-5} width={50} height={11} fill={red} stroke={ink} strokeWidth={3}/>
+      <Path d="M-16 7L0 24L16 7Z" fill={wood} stroke={ink} strokeWidth={3}/>
+    </G>}
+    {kind==='rocket'&&<G>
+      <Path d="M0 -40L-14 -20V15H14V-20Z" fill={blue} stroke={ink} strokeWidth={3}/>
+      <Rect x={-7} y={-16} width={14} height={15} fill={cream} stroke={ink} strokeWidth={2}/>
+      <Path d="M-14 3L-24 18H-14ZM14 3L24 18H14Z" fill={red} stroke={ink} strokeWidth={2}/>
+      <Rect x={-4} y={16} width={8} height={10} fill={wood}/>
+    </G>}
+    {kind==='kite'&&<G>
+      <Path d="M0 -39L21 -15L0 9L-21 -15Z" fill={green} stroke={ink} strokeWidth={3}/>
+      <Path d="M0 -39V9M-21 -15H21" fill="none" stroke={cream} strokeWidth={3}/>
+      <Path d="M0 9V27M0 19H-8M0 25H7" fill="none" stroke={ink} strokeWidth={2}/>
+    </G>}
+    {kind==='house'&&<G>
+      <Rect x={-21} y={-13} width={42} height={33} fill={wood} stroke={ink} strokeWidth={3}/>
+      <Path d="M-27 -13L0 -39L27 -13Z" fill={red} stroke={ink} strokeWidth={3}/>
+      <Rect x={-7} y={0} width={14} height={20} fill={cream} stroke={ink} strokeWidth={2}/>
+      <Rect x={-17} y={-9} width={9} height={9} fill={blue}/>
+    </G>}
+    {kind==='puzzle'&&<G>
+      <Rect x={-22} y={-27} width={44} height={44} fill={green} stroke={ink} strokeWidth={3}/>
+      <Rect x={-5} y={-27} width={10} height={44} fill={cream}/>
+      <Rect x={-22} y={-9} width={44} height={10} fill={cream}/>
+      <Rect x={-13} y={-19} width={9} height={9} fill={wood}/>
+      <Rect x={9} y={6} width={9} height={8} fill={red}/>
+    </G>}
+    {kind==='drum'&&<G>
+      <Rect x={-22} y={-23} width={44} height={35} fill={red} stroke={ink} strokeWidth={3}/>
+      <Rect x={-24} y={-27} width={48} height={8} fill={cream} stroke={ink} strokeWidth={2}/>
+      <Rect x={-24} y={10} width={48} height={8} fill={wood} stroke={ink} strokeWidth={2}/>
+      <Path d="M-18 -15L18 9M18 -15L-18 9" stroke={cream} strokeWidth={3}/>
+    </G>}
+    {kind==='boat'&&<G>
+      <Path d="M-27 6H27L17 22H-15Z" fill={wood} stroke={ink} strokeWidth={3}/>
+      <Rect x={-2} y={-37} width={4} height={44} fill={ink}/>
+      <Path d="M2 -33L20 -3H2Z" fill={blue} stroke={ink} strokeWidth={2}/>
+      <Path d="M-4 -22L-20 -3H-4Z" fill={red} stroke={ink} strokeWidth={2}/>
+    </G>}
+  </G>;
+}
+
+export function PreschoolPixelTerrain({width,height,positions,grade,next,theme='plush'}:{
   width:number;height:number;positions:readonly {x:number;y:number}[];
-  grade:WorldGrade;next:number;
+  grade:WorldGrade;next:number;theme?:'plush'|'toys';
 }) {
   const paths=islandRouteByKind(grade.stages,positions.map((spot,order)=>({
     ...spot,order,row:Math.floor(order/5),column:order%5,
   })));
   const decorations=useMemo(()=>preschoolDecorationLayout(width,height,positions),
     [width,height,positions.length,positions[0]?.y,positions[positions.length-1]?.y]);
-  return <Svg testID="preschool-plush-pixel-v2" width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}
+  return <Svg testID={theme==='toys'?'toy-island-pixel-v1':'preschool-plush-pixel-v2'} width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}
     preserveAspectRatio="none" accessible={false}>
     <Rect width={width} height={height} fill="#80adc4"/>
     <Rect x={10} y={10} width={width-20} height={height-20}
@@ -221,12 +315,20 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
     })}
     {/* Stable, collision-checked organic scattering. Never obscure checkpoint
         signs, stage circles, names, routes or the three area headings. */}
-    {decorations.map((item,i)=>item.kind==='plush'
-      ? <Plush key={'plush-'+i} animal={item.animal}
-          x={item.x} y={item.y} scale={item.scale}/>
-      : item.kind==='blocks'
-        ? <ToyBlocks key={'toy-blocks-'+i} x={item.x} y={item.y} scale={item.scale}/>
-        : <Flower key={'flower-'+i} x={item.x} y={item.y} scale={item.scale}/>)}
+    {decorations.map((item,i)=>theme==='toys'
+      ? item.kind==='plush'
+        ? <ToyPixelIcon key={'toy-'+i}
+            kind={TOY_SYMBOLS[PRESCHOOL_PLUSH_ANIMALS.indexOf(item.animal)%TOY_SYMBOLS.length]}
+            x={item.x} y={item.y} scale={item.scale}/>
+        : item.kind==='blocks'
+          ? <ToyBlocks key={'toy-blocks-'+i} x={item.x} y={item.y} scale={item.scale}/>
+          : <Flower key={'flower-'+i} x={item.x} y={item.y} scale={item.scale}/>
+      : item.kind==='plush'
+        ? <Plush key={'plush-'+i} animal={item.animal}
+            x={item.x} y={item.y} scale={item.scale}/>
+        : item.kind==='blocks'
+          ? <ToyBlocks key={'toy-blocks-'+i} x={item.x} y={item.y} scale={item.scale}/>
+          : <Flower key={'flower-'+i} x={item.x} y={item.y} scale={item.scale}/>)}
     {/* Quiet separators mark the trial and legendary zones without
         interrupting the stage path or covering the clickable nodes. */}
     {[50,60].map((order,index)=>
@@ -251,4 +353,13 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next}:{
     {next>=0&&<Rect x={positions[next].x-29} y={positions[next].y-29}
       width={58} height={58} fill="none" stroke="#d8aa68" strokeWidth={2}/>}
   </Svg>;
+}
+
+/** Grade one uses exactly the preschool landscape, route, and collision-safe
+ * scatter engine, replacing plush toys with understated pixel-art toys only. */
+export function ToyPixelTerrain(props:{
+  width:number;height:number;positions:readonly {x:number;y:number}[];
+  grade:WorldGrade;next:number;
+}){
+  return <PreschoolPixelTerrain {...props} theme="toys"/>;
 }
