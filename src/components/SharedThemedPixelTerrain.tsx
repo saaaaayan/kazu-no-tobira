@@ -1,3 +1,4 @@
+import {WILDLIFE_COLORS} from '../domain/wildlifePixelSprites';
 import {useMemo} from 'react';
 import Svg,{G,Rect,Path} from 'react-native-svg';
 import type {WorldGrade} from '../domain/worldCatalog';
@@ -13,7 +14,7 @@ export function PixelLandmark({kind,x,y,width,height,theme}:{
   const rows=ISLAND_SPRITES[kind];
   const sourceWidth=Math.max(...rows.map(row=>row.length));
   const pixel=Math.min(width/sourceWidth,height/rows.length);
-  const colors:Record<string,string>={X:theme.ink,B:theme.stripe,A:theme.accent,F:theme.paper,R:'#b36d59'};
+  const colors:Record<string,string>={X:theme.ink,B:theme.stripe,A:theme.accent,F:theme.paper,R:'#b36d59',...WILDLIFE_COLORS[kind]};
   return <G transform={'translate('+x+' '+y+') scale('+pixel+')'}>
     {ISLAND_SPRITE_RUNS[kind].map((run,index)=><Rect key={index}
       x={run.x} y={run.y} width={run.width} height={1} fill={colors[run.color]}/>)}
@@ -40,7 +41,23 @@ export function GroundTile({item,theme}:{item:GroundDecoration;theme:IslandPixel
         :kind==='woodgrain'?<Path d="M1 3H17M1 8H17M1 13H17M5 4H8V6H5Z" stroke={theme.stripe} fill="none"/>
         :<Path d="M1 1H7V7H1ZM9 9H16V16H9Z" stroke={theme.accent} fill="none"/>;
       break;
-    case 'e2':case 'h2':
+    case 'e2':
+      drawing=<>
+        <Path d="M2 3H7V1H13V3H17V12H14V16H5V14H1V7H2Z"
+          fill={kind==='forestGlade'?'#b7bf98':kind==='forestLeafLitter'?'#9ca77d':'#809c79'}/>
+        {kind==='forestGrove'?<>
+          <Path d="M3 10H6V14H3ZM11 8H14V13H11Z" fill="#806e52"/>
+          <Path d="M1 7H3V4H7V6H9V10H2ZM9 4H11V2H15V5H17V8H10Z" fill="#597c58"/>
+          <Path d="M3 5H6M11 3H14" stroke="#91aa7b" strokeWidth={1.2}/>
+        </>:kind==='forestGrass'?<Path d="M3 12V8L5 11L7 7M10 13V9L12 12L14 8"
+          stroke="#4f7955" strokeWidth={1} fill="none"/>
+        :kind==='forestLeafLitter'?<>
+          <Path d="M3 6L7 4L6 8ZM10 12L15 9L14 14Z" fill="#b9a674"/>
+          <Path d="M5 12L10 14M10 4L13 6" stroke="#687d55" strokeWidth={.8}/>
+        </>:<Path d="M3 9H6M11 7H14M8 13H11" stroke="#d1d3ab" strokeWidth={.8}/>}
+      </>;
+      break;
+    case 'h2':
       drawing=kind==='river'||kind==='lake'?<><Path d="M0 5H3V2H12V4H17V12H13V15H3V12H0Z" fill={theme.water}/><Path d="M3 8H8M10 11H14" stroke={theme.paper} strokeWidth={.7}/></>
         :kind==='mountainRidges'?<Path d="M1 14L6 4L11 14M8 14L13 2L18 14" stroke={theme.stripe} strokeWidth={2} fill="none"/>
         :kind==='roots'?<Path d="M8 0V6H3V10H0M8 6H14V12H18M8 6V16" stroke={theme.accent} strokeWidth={1.5} fill="none"/>
@@ -53,10 +70,23 @@ export function GroundTile({item,theme}:{item:GroundDecoration;theme:IslandPixel
         :<>{rectangle(2,3,2,2,theme.accent)}{rectangle(10,9,3,2,theme.ink)}{rectangle(6,13,2,2,theme.paper)}</>;
       break;
     case 'e4':
-      drawing=kind==='lavaFlow'?<><Path d="M2 0V5H7V10H13V16" stroke={theme.accent} strokeWidth={5} fill="none"/><Path d="M2 0V5H7V10H13V16" stroke={theme.paper} strokeWidth={1} fill="none"/></>
-        :kind==='strata'?<Path d="M0 3H9V5H18M0 8H5V10H18M0 14H18" stroke={theme.stripe} strokeWidth={2} fill="none"/>
-        :kind==='fossilBed'?<Path d="M2 2H15V14H4V5H12V11H7V8H10" stroke={theme.paper} strokeWidth={2} fill="none"/>
-        :<Path d="M8 0V5L4 9L2 16M4 9L13 11L17 15M8 5L16 3" stroke={theme.stripe} fill="none"/>;
+      drawing=<>
+        <Path d="M2 2H12V4H17V12H14V16H4V14H1V6H2Z"
+          fill={kind==='prehistoricFernBed'?'#8d9b73':kind==='prehistoricRocks'?'#9e9279':'#ae956e'}/>
+        {kind==='prehistoricLava'?<>
+          <Path d="M3 1V5H8V10H13V17" stroke="#796851" strokeWidth={4} fill="none"/>
+          <Path d="M3 1V5H8V10H13V17" stroke="#b47956" strokeWidth={1.5} fill="none"/>
+        </>:kind==='prehistoricFossils'?<>
+          <Path d="M4 11L13 6M6 10L7 14M9 8L10 12M12 6L13 10"
+            stroke="#ddd0a6" strokeWidth={1.5} fill="none"/>
+          <Path d="M2 4H5M13 13H16" stroke="#877557" strokeWidth={1}/>
+        </>:kind==='prehistoricFernBed'?<Path d="M8 15V4M8 7L3 4M8 7L13 4M8 11L2 7M8 11L14 7M8 14L3 11M8 14L13 11"
+          stroke="#5c7c53" strokeWidth={1.2} fill="none"/>
+        :<>
+          <Path d="M3 12V6H8V12ZM11 14V10H16V14Z" fill="#7f7867"/>
+          <Path d="M4 6H7M12 10H15" stroke="#d0c39d" strokeWidth={1}/>
+        </>}
+      </>;
       break;
     case 'e5':
       drawing=kind==='pipelines'?<><Path d="M0 3H10V12H18" stroke={theme.ink} strokeWidth={5} fill="none"/><Path d="M0 3H10V12H18" stroke={theme.paper} strokeWidth={2} fill="none"/></>

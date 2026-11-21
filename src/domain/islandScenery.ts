@@ -1,3 +1,4 @@
+import {ISLAND_SPRITES} from './islandPixelSprites.ts';
 import type {MapPoint} from './worldMapLayout.ts';
 import {preschoolMapExclusionZones,preschoolDecorationLayout,preschoolDecorationBounds,
   type DecorationRect} from './preschoolDecorLayout.ts';
@@ -102,6 +103,8 @@ export function islandScenery(id:StandardPixelIslandId,width:number,height:numbe
   if(width<244||height<220||positions.length!==65)return {decorations:[],ground:[],walls:[]};
   const art=ISLAND_ART_SETS[id],random=randomFor(id,width);
   const compact=width<620;
+  const wildlife=id==='e2'||id==='e4';
+  const wildlifeHeroSize=compact?(width<280?64:78):108;
   const zones=preschoolMapExclusionZones(width,positions);
   const legacy=id==='preschool'||id==='e1';
   const occupied=legacy?preschoolDecorationLayout(width,height,positions).map(preschoolDecorationBounds):[];
@@ -114,31 +117,50 @@ export function islandScenery(id:StandardPixelIslandId,width:number,height:numbe
     const kind=art.ground[i%art.ground.length];
     if(kind==='stoneMaze')continue;
     for(let attempt=0;attempt<25;attempt++) {
-      const dimension=Math.round((compact?27:38)*(1+random()*.7));
+      const dimension=Math.round((wildlife?(compact?43:68):(compact?27:38))*(1+random()*.7));
       const item:GroundDecoration={kind,x:Math.round(28+random()*(width-dimension-56)),
         y:Math.round(90+random()*(height-dimension-120)),
-        width:dimension,height:dimension,variant:Math.floor(random()*4)};
+        width:dimension,height:wildlife?Math.round(dimension*.7):dimension,variant:Math.floor(random()*4)};
       const box=sceneBounds(item,3);
       if(!clear(box)||occupied.some(old=>boxesOverlap(box,old)))continue;
       ground.push(item);occupied.push(box);break;
     }
   }
+    if(wildlife)for(const kind of art.ground) {
+      if(ground.some(item=>item.kind===kind))continue;
+      for(let attempt=0;attempt<250;attempt++) {
+        const dimension=compact?30:46;
+        const item:GroundDecoration={kind,x:Math.round(28+random()*(width-dimension-56)),
+          y:Math.round(90+random()*(height-dimension-120)),width:dimension,
+          height:Math.round(dimension*.7),variant:0};
+        const box=sceneBounds(item,3);
+        if(!clear(box)||occupied.some(old=>boxesOverlap(box,old)))continue;
+        ground.push(item);occupied.push(box);break;
+      }
+    }
   }
   for(const size of ['large','medium','small'] as const) {
     if(size==='medium')placeGround();
     // Existing plush and toy heroes retain their detailed silhouettes.
     if(legacy&&size==='large')continue;
     const kinds=shuffled(art[size],random);
-    const target=legacy?(size==='medium'?14:28):size==='large'?16:size==='medium'?56:100;
+    const target=legacy?(size==='medium'?14:28)
+      :wildlife?(size==='large'?(compact?30:44):size==='medium'?58:85)
+      :size==='large'?16:size==='medium'?56:100;
     for(let i=0;i<target;i++) {
       const kind=kinds[i%kinds.length];
       for(let attempt=0;attempt<100;attempt++) {
-        const pixels=size==='large'?(compact?58:80):size==='medium'?(compact?36:48):(compact?20:25);
+        const pixels=kind==='prehistoricTracks'?(compact?36:46):wildlife
+          ?size==='large'?wildlifeHeroSize:size==='medium'?(compact?40:52):(compact?23:29)
+          :size==='large'?(compact?58:80):size==='medium'?(compact?36:48):(compact?20:25);
         const dimension=Math.round(pixels*(.88+random()*.22));
         const row=i%13;
         const y=positions[row*5].y+90+random()*130;
         const x=28+random()*(width-56-dimension);
-        const item:PixelDecoration={kind,size,x:Math.round(x),y:Math.round(y),width:dimension,height:dimension};
+        const sprite=ISLAND_SPRITES[kind];
+        const aspect=wildlife?sprite.length/Math.max(...sprite.map(row=>row.length)):1;
+        const item:PixelDecoration={kind,size,x:Math.round(x),y:Math.round(y),
+          width:dimension,height:Math.round(dimension*aspect)};
         const box=sceneBounds(item,5);
         if(!clear(box)||occupied.some(old=>boxesOverlap(box,old)))continue;
         if(decorations.some(old=>old.kind===kind&&Math.hypot(old.x-item.x,old.y-item.y)<(compact?110:170)))continue;
