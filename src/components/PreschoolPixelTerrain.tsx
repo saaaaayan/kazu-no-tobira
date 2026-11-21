@@ -1,6 +1,7 @@
 import {ISLAND_ART_SETS} from '../domain/islandArtSets';
 import {ISLAND_PIXEL_PALETTES} from '../domain/standardPixelIslandMap';
-import {IslandSceneryLayer,PixelLandmark} from './SharedThemedPixelTerrain';
+import {islandScenery} from '../domain/islandScenery';
+import {IslandSceneryLayer,PixelLandmark,GroundTile} from './SharedThemedPixelTerrain';
 import { useMemo } from 'react';
 import Svg, { G, Path, Rect } from 'react-native-svg';
 import { islandRouteByKind, routeThrough } from '../domain/worldMapLayout';
@@ -296,6 +297,10 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next,theme='
   })));
   const decorations=useMemo(()=>preschoolDecorationLayout(width,height,positions),
     [width,height,positions.length,positions[0]?.y,positions[positions.length-1]?.y]);
+  const sceneryId=theme==='toys'?'e1':'preschool';
+  const scenery=useMemo(()=>islandScenery(sceneryId,width,height,positions),
+    [sceneryId,width,height,positions]);
+  const groundTheme=ISLAND_PIXEL_PALETTES[sceneryId];
   return <Svg testID={theme==='toys'?'toy-island-pixel-v1':'preschool-plush-pixel-v2'} width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}
     preserveAspectRatio="none" accessible={false}>
     <Rect width={width} height={height} fill={theme==='toys'?'#688dad':'#80adc4'}/>
@@ -320,13 +325,20 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next,theme='
             row<10?'#94bc77':row<12?'#88a99e':'#aa98a8'}/>
       </G>;
     })}
-    <IslandSceneryLayer id={theme==='toys'?'e1':'preschool'} width={width} height={height}
-      positions={positions} layer="ground"/>
-    <IslandSceneryLayer id={theme==='toys'?'e1':'preschool'} width={width} height={height}
-      positions={positions} layer="objects"/>
+    <IslandSceneryLayer id={sceneryId} scene={scenery} layer="ground"/>
+    {/* Reuse some existing flower clearings for cloth/wood textures on narrow
+        maps. They inherit the same tested bounds as the original small art. */}
+    {decorations.map((item,i)=>item.kind==='flower'&&i%3===0
+      ? <GroundTile key={'legacy-ground-'+i} theme={groundTheme} item={{
+          kind:ISLAND_ART_SETS[sceneryId].ground[Math.floor(i/3)%4],
+          x:item.x-8*item.scale,y:item.y-18*item.scale,width:16*item.scale,
+          height:16*item.scale,variant:Math.floor(i/3)%4,
+        }}/>
+      : null)}
+    <IslandSceneryLayer id={sceneryId} scene={scenery} layer="objects"/>
     {/* Stable, collision-checked organic scattering. Never obscure checkpoint
         signs, stage circles, names, routes or the three area headings. */}
-    {decorations.map((item,i)=>theme==='toys'
+    {decorations.map((item,i)=>item.kind==='flower'&&i%3===0?null:theme==='toys'
       ? item.kind==='plush'
         ? <ToyPixelIcon key={'toy-'+i}
             kind={TOY_SYMBOLS[PRESCHOOL_PLUSH_ANIMALS.indexOf(item.animal)%TOY_SYMBOLS.length]}
