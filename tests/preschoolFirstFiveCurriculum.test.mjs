@@ -37,9 +37,30 @@ test('stage 04 selects only target objects, while stage 05 counts varied scatter
 test('approved objectives are documented without marking drafted questions ready',()=>{
   const plan=source('docs/curriculum/PRESCHOOL_10_FIRST_65_STAGE_PLAN.md');
   const detailed=source('docs/curriculum/PRESCHOOL_ADVENTURE_50_DRAFT.md');
-  assert.match(plan,/2026-11-21に冒険01〜05のカリキュラム構成のみ正式承認/u);
+  assert.match(plan,/2026-11-21に冒険01〜10のカリキュラム構成のみ正式承認/u);
   assert.match(plan,/クマだけではない/u);
   assert.match(detailed,/カリキュラムのみ/u);
   assert.match(detailed,/前後の並べ替え・数量保存の比較は行わない/u);
   assert.equal(proposal.stages.length,50);
+});
+
+test('preschool 06–10 numeral learning objectives are approved, while the exercise review state stays draft',()=>{
+  for(const n of [6,7,8,9,10]){
+    const item=stage(n);
+    assert.ok(item);
+    assert.equal(item.unitCode,'matching');
+    assert.equal(item.reviewStatus,'draft');
+    assert.equal(preschoolStageMapInfo({id:item.stageId,title:item.title}).title,item.title);
+  }
+  assert.match(stage(6).goal,/数字1・2・3/u);
+  assert.match(stage(7).goal,/数字4・5/u);
+  assert.match(stage(8).goal,/数字6〜10/u);
+  assert.match(stage(9).goal,/何もない場面を数字0/u);
+  assert.match(stage(10).goal,/0〜10の数量・数字・読み/u);
+  assert.match(stage(10).guard,/試作コードの1〜5限定/u);
+  assert.match(preschoolStageMapInfo({id:stage(10).stageId,title:stage(10).title}).goal,/0から 10まで/u);
+  const plan=source('docs/curriculum/PRESCHOOL_10_FIRST_65_STAGE_PLAN.md');
+  assert.match(plan,/06〜10の承認内容/u);
+  const detailed=source('docs/curriculum/PRESCHOOL_ADVENTURE_50_DRAFT.md');
+  assert.match(detailed,/11〜50のテーマ\/到達目標は引き続き提案/u);
 });
