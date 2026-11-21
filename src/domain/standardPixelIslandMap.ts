@@ -34,7 +34,7 @@ export function standardPixelIslandConfig(id:string){
  */
 export const ISLAND_PIXEL_PALETTES={
   preschool:{water:"#80adc4",land:"#a9cb83",bandA:"#b2d28e",bandB:"#aacb83",stripe:"#94bc77",ink:"#344454",shore:"#e9dfb6",path:"#efe0b3",pathBorder:"#506d5e",accent:"#9e856e",paper:"#f5edce",trialBand:"#aac4b8",legendBand:"#c5b5c4",motifs:["plush"]},
-  e1:{water:"#7d9fba",land:"#d8c49e",bandA:"#dbc9aa",bandB:"#d3bf9b",stripe:"#c5ac85",ink:"#344454",shore:"#ebdcb9",path:"#f6e4c3",pathBorder:"#655e63",accent:"#b98076",paper:"#f4e8d3",trialBand:"#bcb3b5",legendBand:"#c6b5c5",motifs:["toys"]},
+  e1:{water:"#688dad",land:"#d9ae99",bandA:"#e5bba7",bandB:"#dcae9b",stripe:"#bc8c7b",ink:"#344454",shore:"#e9dfb6",path:"#f1d6a4",pathBorder:"#835a57",accent:"#b98173",paper:"#f8e9d2",trialBand:"#bcb3b5",legendBand:"#c6b5c5",motifs:["toys"]},
   e2:{water:"#6f9daa",land:"#91ad8e",bandA:"#9eba94",bandB:"#91ae8c",stripe:"#7e9d7c",ink:"#294c4a",shore:"#e7d8ba",path:"#f4e6c2",pathBorder:"#426a59",accent:"#a97c59",paper:"#e9ead6",trialBand:"#9ab3ad",legendBand:"#b1a0b6",motifs:["tree","rabbit","mushroom"]},
   e3:{water:"#9e9bc5",land:"#e5b8ac",bandA:"#ebc4b6",bandB:"#e0b3ac",stripe:"#d4a6a8",ink:"#563e58",shore:"#f7e4c9",path:"#fff0d1",pathBorder:"#99768d",accent:"#be796f",paper:"#f8e5db",trialBand:"#c5b0cf",legendBand:"#cfb3b8",motifs:["cupcake","candy","donut"]},
   e4:{water:"#849b97",land:"#c3a16f",bandA:"#cbb181",bandB:"#c19a6b",stripe:"#ab865d",ink:"#4e493e",shore:"#e8d5ad",path:"#f8e2ae",pathBorder:"#80664a",accent:"#647f66",paper:"#f3e3c5",trialBand:"#acaf8b",legendBand:"#b9a28e",motifs:["dinosaur","fossil","volcano"]},
