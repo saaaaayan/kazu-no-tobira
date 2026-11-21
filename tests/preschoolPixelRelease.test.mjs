@@ -76,7 +76,9 @@ test('Preschool terrain uses stable organic scatter instead of repeated per-row 
   const plan=read('src/domain/preschoolDecorLayout.ts');
   const map=read('src/components/WorldScenes780.tsx');
   assert.match(art,/preschoolDecorationLayout\(width,height,positions\)/);
-  assert.match(art,/decorations.map\(\(item,i\)=>theme==='toys'/);
+  assert.match(art,/decorations.map\(\(item,i\)=>/);
+  assert.match(art,/item.kind==='flower'&&i%3===0\?null:theme==='toys'/);
+  assert.match(art,/key=\{'legacy-ground-'\+i\}/);
   assert.match(art,/<ToyBlocks key=\{'toy-blocks-'\+i\}/);
   assert.match(art,/<Flower key=\{'flower-'\+i\}/);
   assert.doesNotMatch(art,/compactScatter|desktopScatter|checkpoint-clearing-plush-/);

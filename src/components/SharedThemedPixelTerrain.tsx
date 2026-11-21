@@ -20,7 +20,7 @@ export function PixelLandmark({kind,x,y,width,height,theme}:{
   </G>;
 }
 
-function GroundTile({item,theme}:{item:GroundDecoration;theme:IslandPixelPalette}) {
+export function GroundTile({item,theme}:{item:GroundDecoration;theme:IslandPixelPalette}) {
   const {kind,variant}=item;
   const family=Object.entries(ISLAND_ART_SETS).find(([,art])=>
     (art.ground as readonly string[]).includes(kind))?.[0];
@@ -114,12 +114,10 @@ function GroundTile({item,theme}:{item:GroundDecoration;theme:IslandPixelPalette
   </G>;
 }
 
-export function IslandSceneryLayer({id,width,height,positions,layer}:{
-  id:StandardPixelIslandId;width:number;height:number;positions:readonly {x:number;y:number}[];
-  layer:'ground'|'objects';
+export function IslandSceneryLayer({id,scene,layer}:{
+  id:StandardPixelIslandId;scene:IslandScene;layer:'ground'|'objects';
 }) {
   const theme=ISLAND_PIXEL_PALETTES[id];
-  const scene=useMemo(()=>islandScenery(id,width,height,positions),[id,width,height,positions]);
   return <G testID={'island-scenery-'+layer+'-'+id}>
     {layer==='ground'?<>
       {scene.ground.map((item,index)=><GroundTile key={index} item={item} theme={theme}/>)}
@@ -142,6 +140,7 @@ export function SharedThemedPixelTerrain({width,height,positions,grade,next}:{
 }) {
   const id=grade.id as StandardPixelIslandId;
   const theme=ISLAND_PIXEL_PALETTES[grade.id as StandardPixelIslandId];
+  const scene=useMemo(()=>islandScenery(id,width,height,positions),[id,width,height,positions]);
   const routes=islandRouteByKind(grade.stages,positions.map((p,order)=>({
     ...p,order,row:Math.floor(order/5),column:order%5,
   })));
@@ -161,8 +160,8 @@ export function SharedThemedPixelTerrain({width,height,positions,grade,next}:{
         {id==='j3'&&<Rect x={width/2} y={y-45} width={width/2-26} height={200} fill={theme.ink} opacity={.1}/>}
       </G>;
     })}
-    <IslandSceneryLayer id={id} width={width} height={height} positions={positions} layer="ground"/>
-    <IslandSceneryLayer id={id} width={width} height={height} positions={positions} layer="objects"/>
+    <IslandSceneryLayer id={id} scene={scene} layer="ground"/>
+    <IslandSceneryLayer id={id} scene={scene} layer="objects"/>
     {[50,60].map((order,index)=><Rect key={order} x={24} y={positions[order].y-65}
       width={width-48} height={4} fill={index===0?theme.trialBand:theme.legendBand}/>)}
     <Path d={routeThrough(routes.normal)} fill="none" stroke={theme.pathBorder} strokeWidth={12} strokeLinejoin="miter"/>
