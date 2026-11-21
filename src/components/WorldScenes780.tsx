@@ -18,7 +18,8 @@ import { stageCategoryName, stageRowCategoryName } from '../domain/islandCurricu
 import { preschoolStageMapInfo } from '../domain/preschoolStageMapInfo';
 import { gradeOnePreviewStageInfo } from '../domain/gradeOnePreviewCurriculum';
 import { IslandCurriculumPanel } from './IslandCurriculumPanel';
-import { PreschoolPixelTerrain } from './PreschoolPixelTerrain';
+import { PreschoolPixelTerrain, ToyPixelTerrain } from './PreschoolPixelTerrain';
+import { isStandardPixelIsland, standardPixelIslandConfig } from '../domain/standardPixelIslandMap';
 
 const palette = [
   { land: '#b6d793', dark: '#609d77', detail: '#306d6e', roof: '#efb6a0' },
@@ -63,6 +64,16 @@ function PreschoolPawStamp({flipped=false,compact=false}:{
   </Svg>;
 }
 
+function ToyBlockStamp({flipped=false,compact=false}:{flipped?:boolean;compact?:boolean}){
+  return <Svg testID={flipped?'toy-title-block-right':'toy-title-block-left'}
+    accessible={false} width={compact?17:23} height={compact?17:23} viewBox="0 0 24 24">
+    <G transform={flipped?'translate(24 0) scale(-1 1)':undefined}>
+      <Rect x={2} y={9} width={10} height={11} fill="#c99981" stroke="#344454" strokeWidth={1.5}/>
+      <Rect x={12} y={4} width={9} height={16} fill="#94a995" stroke="#344454" strokeWidth={1.5}/>
+      <Rect x={4} y={4} width={6} height={5} fill="#ddc68e"/>
+    </G>
+  </Svg>;
+}
 function OceanTexture({ width, height, seed = 0 }: { width: number; height: number; seed?: number }) {
   return (
     <G>
@@ -189,6 +200,9 @@ function IslandTerrain({gradeIndex,width,height,positions,grade,next}: {
   if (grade.id === 'preschool') {
     return <PreschoolPixelTerrain width={width} height={height} positions={positions} grade={grade} next={next}/>;
   }
+  if (grade.id === 'e1') {
+    return <ToyPixelTerrain width={width} height={height} positions={positions} grade={grade} next={next}/>;
+  }
   const p=palette[gradeIndex];
   const paths=islandRouteByKind(grade.stages,positions.map((spot,order)=>({...spot,order,row:Math.floor(order/5),column:0})));
   return (
@@ -276,9 +290,16 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
   const [detailStageId,setDetailStageId]=useState<string|null>(null);
   const actual=measuredWidth(width);
   const compactStageMap=compactIslandStageMap(actual);
+  const standardPixelMap=isStandardPixelIsland(grade.id);
+  const standardTheme=standardPixelIslandConfig(grade.id);
   const geometry=islandStageLayout(actual,grade.stages.length,
-    grade.id==='preschool'?PRESCHOOL_MAP_TITLE_INSET:0,grade.id==='preschool');
-  const detailStage=grade.id==='preschool' ? grade.stages.find(stage=>stage.id===detailStageId) : undefined;
+    standardPixelMap?PRESCHOOL_MAP_TITLE_INSET:0,standardPixelMap);
+  const detailStage=standardPixelMap ? grade.stages.find(stage=>stage.id===detailStageId) : undefined;
+  const stageInfo=(stage:WorldStage)=>{
+    if(stage.gradeId==='preschool')return preschoolStageMapInfo(stage);
+    const info=gradeOnePreviewStageInfo(stage);
+    return info??{title:stageCategoryName(grade,stage),goal:'この ステージで まなぼう。'};
+  };
   const stats=gradeProgress(progress,grade.id);
   const gradeIndex=worldIslands.findIndex(g=>g.id===grade.id);
   const testing = mode === 'test';
@@ -364,11 +385,11 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
     </>
   );
   return (
-    <View style={[styles.screen,grade.id==='preschool'&&styles.preschoolScreen]}>
+    <View style={[styles.screen,standardPixelMap&&styles.preschoolScreen]}>
       <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
-        <Text style={styles.backText}>{grade.id==='preschool'?'‹ せかいちずへ':'‹ 世界地図に もどる'}</Text>
+        <Text style={styles.backText}>{standardPixelMap?'‹ せかいちずへ':'‹ 世界地図に もどる'}</Text>
       </Pressable>
-      {grade.id!=='preschool' && <View style={styles.islandBanner}>
+      {!standardPixelMap && <View style={styles.islandBanner}>
         <View style={styles.islandBannerText}>
           <Text style={styles.eyebrow}>{grade.title} の ぼうけんマップ</Text>
           <Text style={styles.bannerHeading}>{grade.island}</Text>
@@ -380,17 +401,17 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         </View>
         <CompanionAvatar size={88} mood={stats.mainPerfect?'clear':'ready'}/>
       </View>}
-      {grade.id!=='preschool' && supplementalPanels}
-      {grade.id==='preschool' && <Text testID="preschool-map-quick-hint" style={styles.preschoolMapHint}>すうじを さわってね</Text>}
-      {grade.id!=='preschool' && <View style={styles.mapHeading}>
+      {!standardPixelMap && supplementalPanels}
+      {standardPixelMap && <Text testID={grade.id==='preschool'?'preschool-map-quick-hint':'toy-map-quick-hint'} style={styles.preschoolMapHint}>すうじを さわってね</Text>}
+      {!standardPixelMap && <View style={styles.mapHeading}>
         <Text style={styles.mapTitle}>島のぼうけんルート</Text>
         <Text style={styles.hintText}>地図の丸い地点をタッチして ステージへ進もう！</Text>
       </View>}
-      <View style={[styles.ocean,grade.id==='preschool'&&styles.pixelOcean,{height:geometry.height}]} onLayout={event=>{
+      <View style={[styles.ocean,standardPixelMap&&styles.pixelOcean,{height:geometry.height}]} onLayout={event=>{
         const nextWidth=Math.round(event.nativeEvent.layout.width);
         if(nextWidth>0&&nextWidth!==width)setWidth(nextWidth);
       }}>
-        <View pointerEvents="none" testID={grade.id==='preschool'?'preschool-plush-pixel-v2':undefined}
+        <View pointerEvents="none" testID={grade.id==='preschool'?'preschool-plush-pixel-v2':grade.id==='e1'?'toy-island-pixel-v1':undefined}
           style={StyleSheet.absoluteFill}>
           <IslandTerrain gradeIndex={gradeIndex} width={actual} height={geometry.height}
             positions={geometry.positions} grade={grade} next={next?.order ?? -1}/>
@@ -403,6 +424,19 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
               <PreschoolPawStamp compact={compactStageMap}/>
               <Text style={[styles.preschoolMapTopName,compactStageMap&&styles.preschoolMapTopNameCompact]}>ぬいぐるみの島</Text>
               <PreschoolPawStamp flipped compact={compactStageMap}/>
+            </View>
+          </View>
+        )}
+        {grade.id==='e1' && (
+          <View testID="toy-map-top-title" pointerEvents="none"
+            style={[styles.preschoolMapTopTitle,compactStageMap&&styles.preschoolMapTopTitleCompact]}>
+            <Text style={styles.preschoolMapTopGrade}>{standardTheme?.grade}</Text>
+            <View style={styles.preschoolMapTopNameWithPaws}>
+              <ToyBlockStamp compact={compactStageMap}/>
+              <Text style={[styles.preschoolMapTopName,compactStageMap&&styles.preschoolMapTopNameCompact]}>
+                {standardTheme?.title}
+              </Text>
+              <ToyBlockStamp flipped compact={compactStageMap}/>
             </View>
           </View>
         )}
@@ -419,13 +453,13 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
             <View key={area.kind} testID={'island-area-'+area.kind} pointerEvents="none"
               style={[
                 styles.zoneLabel,
-                grade.id==='preschool'&&styles.pixelZoneLabel,
-                grade.id!=='preschool'&&area.kind==='extra'&&styles.extraAreaLabel,
-                grade.id!=='preschool'&&area.kind==='secret'&&styles.secretAreaLabel,
-                {top:y-(grade.id==='preschool'?68:60),left:inset,right:inset,alignItems:'center'},
+                standardPixelMap&&styles.pixelZoneLabel,
+                !standardPixelMap&&area.kind==='extra'&&styles.extraAreaLabel,
+                !standardPixelMap&&area.kind==='secret'&&styles.secretAreaLabel,
+                {top:y-(standardPixelMap?68:60),left:inset,right:inset,alignItems:'center'},
               ]}>
               <Text style={[
-                styles.zoneName,grade.id==='preschool'&&styles.pixelZoneName,
+                styles.zoneName,standardPixelMap&&styles.pixelZoneName,
               ]}>{area.title}　{area.count}ステージ</Text>
             </View>
           );
@@ -433,13 +467,13 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         {/* On the preschool island, every stage displays its own learning
             title. Tap a title for the full objective; tap the round pin to play.
             Other islands keep the existing compact/wide curriculum labels. */}
-        {grade.id==='preschool' && grade.stages.map((stage,index)=>{
+        {standardPixelMap && grade.stages.map((stage,index)=>{
           const position=geometry.positions[index];
-          const info=preschoolStageMapInfo(stage);
+          const info=stageInfo(stage);
           const labelLayout=preschoolStageLabelLayout(actual,position,marker);
           return <Pressable key={'stage-topic-'+stage.id}
             accessibilityRole="button" accessibilityLabel={'ステージ '+String(index+1)+' の ないようを みる '+info.title}
-            testID={'preschool-stage-topic-'+String(index+1)}
+            testID={(grade.id==='preschool'?'preschool-stage-topic-':'toy-stage-topic-')+String(index+1)}
             onPress={()=>setDetailStageId(stage.id)}
             style={[styles.preschoolStageTopic,labelLayout]}>
             <Text numberOfLines={compactStageMap?3:2}
@@ -448,7 +482,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
             </Text>
           </Pressable>;
         })}
-        {grade.id!=='preschool' && compactStageMap && Array.from({length:Math.ceil(grade.stages.length/5)},(_,row)=>{
+        {!standardPixelMap && compactStageMap && Array.from({length:Math.ceil(grade.stages.length/5)},(_,row)=>{
           const position=geometry.positions[row*5];
           return <View key={'row-topic-'+row} testID={'island-row-topic-'+row}
             pointerEvents="none" style={[styles.compactRowTopic,{
@@ -461,7 +495,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
             </Text>
           </View>;
         })}
-        {grade.id!=='preschool' && !compactStageMap && grade.stages.map((stage,index)=>{
+        {!standardPixelMap && !compactStageMap && grade.stages.map((stage,index)=>{
           const position=geometry.positions[index];
           return <View key={'category-'+stage.id} pointerEvents="none"
             style={[styles.pinCategoryBox,{
@@ -477,21 +511,21 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           const enabled=preview ? (grade.id==='preschool'||grade.id==='e1') && checkpoint.number<=10
             : testing || checkpoint.sourceStageIds.every(id=>Boolean(progress.stages[id]?.clearedAt));
           const nextPoint=geometry.positions[checkpoint.after.order+1];
-          const checkpointLayout=islandCheckpointLayout(actual,end,marker,nextPoint,grade.id==='preschool');
+          const checkpointLayout=islandCheckpointLayout(actual,end,marker,nextPoint,standardPixelMap);
           return <Pressable key={checkpoint.id} accessibilityRole="button"
             testID={'island-checkpoint-'+checkpoint.number}
             accessibilityLabel={'確認テスト '+checkpoint.number+(enabled?' を はじめる':' は準備中')} disabled={!enabled} onPress={()=>onCheckpoint(checkpoint)}
             style={[{position:'absolute',left:checkpointLayout.left,top:checkpointLayout.top,
               width:checkpointLayout.width,height:checkpointLayout.height,
-              borderRadius:grade.id==='preschool'?7:10,
+              borderRadius:standardPixelMap?7:10,
               justifyContent:'center',alignItems:'center',
-              backgroundColor:grade.id==='preschool'
+              backgroundColor:standardPixelMap
                 ? (enabled?'#f4e9c7':'#d9dfdf')
                 : (enabled?'#fff0b5':'#d2d9e9'),
-              borderWidth:grade.id==='preschool'?3:1,
-              borderColor:grade.id==='preschool'?'#344454':'#66769a'},
-              grade.id==='preschool'&&styles.preschoolCheckpointSign]}>
-            {grade.id==='preschool' ? <>
+              borderWidth:standardPixelMap?3:1,
+              borderColor:standardPixelMap?'#344454':'#66769a'},
+              standardPixelMap&&styles.preschoolCheckpointSign]}>
+            {standardPixelMap ? <>
               <Text style={styles.preschoolCheckpointHeading}>✓ かくにん</Text>
               <Text style={styles.preschoolCheckpointTitle}>テスト {checkpoint.number}</Text>
               <Text style={styles.preschoolCheckpointRange}>
@@ -520,7 +554,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
               accessibilityLabel={(preview && grade.id==='e1' ? gradeOnePreviewStageInfo(stage)?.title : stageDisplayTitle(stage))+'、単元 '+(preview && grade.id==='e1' ? gradeOnePreviewStageInfo(stage)?.unit : stageCategoryName(grade,stage))+'、'+(grade.id==='preschool'?'学習内容 '+preschoolStageMapInfo(stage).title+'、':'')+(preview ? (grade.id==='e1' && stage.kind==='normal' ? 'カリキュラム確認用10問' : hasStageBank(stage.id) ? '100問のなかから10問ずつ あそべる' : uiPreviewSampleKind(stage) ? 'サンプル問題' : '体験用問題は準備中') : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
-                styles.stagePin,grade.id==='preschool'&&styles.pixelStagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
+                styles.stagePin,standardPixelMap&&styles.pixelStagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
                 !unlocked&&styles.lockedPin,cleared&&styles.clearedPin,perfect&&styles.perfectPin,
                 current&&styles.currentPin,pressed&&styles.pressed,
                 {width:marker,height:marker,left:position.x-marker/2,top:position.y-marker/2},
@@ -535,12 +569,12 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           );
         })}
         {detailStage && (()=>{
-          const info=preschoolStageMapInfo(detailStage);
+          const info=stageInfo(detailStage);
           const position=geometry.positions[detailStage.order];
           const playable=preview
             ? Boolean(uiPreviewSampleKind(detailStage)) || hasStageBank(detailStage.id)
             : ['play','learn'].includes(worldStageAction(mode,progress,detailStage,access));
-          return <View testID="preschool-stage-info-card"
+          return <View testID={grade.id==='preschool'?'preschool-stage-info-card':'toy-stage-info-card'}
             style={[styles.preschoolStageInfoCard,{
               top:Math.min(geometry.height-188,position.y+marker/2+48),
               left:compactStageMap?12:Math.max(30,Math.round(actual*.2)),
@@ -566,7 +600,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           </View>;
         })()}
       </View>
-      {grade.id==='preschool' && supplementalPanels}
+      {standardPixelMap && supplementalPanels}
       {!testing && <View style={styles.footer}>
         <Text style={styles.footerTitle}>✦ この島には 65のステージ</Text>
         <Text style={styles.footerInfo}>冒険の道 50こ → 試練の道 10こ → 伝説のトビラ 5こ。伝説のトビラは最初の60ステージをぜんぶパーフェクトにすると開くよ。</Text>
