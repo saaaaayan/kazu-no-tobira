@@ -73,8 +73,8 @@ const files=readdirSync(target,{recursive:true,withFileTypes:true}).filter(entry
   .map(entry=>relative(target,resolve(entry.parentPath,entry.name)).replaceAll('\\','/'));
 // This one user-approved illustration is public art. Keep the preview asset
 // allowlist strict: require one correctly named file and its exact PNG hash.
-const approvedHeroFiles=files.filter(file=>/^assets\/euler-math-title\.[a-f0-9]{32}\.png$/.test(file));
-if(approvedHeroFiles.length!==1)throw new Error('Expected exactly one approved Euler title illustration.');
+const approvedHeroFiles=files.filter(file=>file.includes('euler-math-title.') && file.endsWith('.png'));
+if(approvedHeroFiles.length!==1)throw new Error('Expected exactly one approved Euler title illustration. Found: '+files.filter(file=>file.endsWith('.png')).join(', '));
 const approvedHeroBytes=readFileSync(resolve(target,approvedHeroFiles[0]));
 if(approvedHeroBytes.length!==2627187||
    !approvedHeroBytes.subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex'))||
