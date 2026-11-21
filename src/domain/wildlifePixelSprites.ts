@@ -1,3 +1,4 @@
+import {HERO_PIXEL_SPRITES} from './heroPixelSprites.ts';
 type PixelPainter = {
   box:(x:number,y:number,width:number,height:number,color?:string)=>void;
   polygon:(points:readonly (readonly [number,number])[],color?:string)=>void;
@@ -47,34 +48,6 @@ function wildlifeSprite(paint:(p:PixelPainter)=>void):readonly string[] {
 }
 
 export const WILDLIFE_SPRITES = {
-  forestBear:wildlifeSprite(({polygon,box})=>{
-    polygon([[5,13],[8,9],[22,9],[27,13],[26,22],[8,22],[4,18]]);
-    polygon([[22,8],[25,5],[32,5],[35,10],[34,17],[29,20],[24,17]]);
-    box(24,3,4,4);box(31,3,4,4);box(27,5,2,2,'A');
-    box(32,12,6,4,'F');box(37,12,2,2,'X');box(31,9,2,2,'X');
-    box(7,20,5,7);box(21,20,5,7);box(10,19,4,5,'A');box(25,19,3,6,'A');
-    box(6,26,7,2,'X');box(20,26,7,2,'X');box(4,12,3,3,'A');
-    polygon([[10,18],[23,18],[22,21],[10,21]],'A');
-  }),
-  forestRabbit:wildlifeSprite(({polygon,box,line})=>{
-    polygon([[6,20],[7,14],[12,10],[21,11],[26,17],[24,25],[9,25]]);
-    polygon([[21,12],[23,8],[30,8],[33,13],[32,19],[26,21],[22,18]],'F');
-    polygon([[23,9],[22,2],[25,1],[27,9]],'F');
-    polygon([[28,9],[29,1],[32,2],[31,10]],'F');
-    line(24,3,25,8,'A');line(30,3,30,8,'A');
-    box(29,12,2,2,'X');box(32,15,2,1,'A');
-    box(4,19,4,4,'F');box(10,23,9,3,'A');box(23,23,10,3,'F');
-    line(27,17,29,18,'A');
-  }),
-  forestFox:wildlifeSprite(({polygon,box,line})=>{
-    polygon([[5,20],[2,14],[3,10],[8,12],[13,20],[12,25],[6,24]],'A');
-    polygon([[2,12],[3,10],[7,12],[5,16]],'F');
-    polygon([[10,16],[16,12],[27,13],[30,20],[24,24],[12,23]]);
-    polygon([[25,13],[25,5],[29,9],[33,4],[34,12],[39,15],[32,20],[27,19]]);
-    polygon([[28,14],[36,14],[32,18]],'F');box(38,15,2,1,'X');box(32,11,2,2,'X');
-    line(26,7,27,11,'A');line(33,6,33,10,'A');
-    box(13,23,3,6,'X');box(25,22,3,7,'X');box(17,22,2,5,'A');
-  }),
   forestDeer:wildlifeSprite(({polygon,box,line})=>{
     polygon([[6,14],[11,11],[26,13],[28,20],[23,23],[8,21]]);
     polygon([[23,14],[27,7],[31,5],[34,7],[34,11],[29,16],[27,21]]);
@@ -84,23 +57,6 @@ export const WILDLIFE_SPRITES = {
     for(const x of [9,14,23,27]){box(x,21,2,10);box(x,30,3,2,'X');}
     for(const x of [11,16,20])box(x,15+(x%2),2,2,'F');
   }),
-  forestSquirrel:wildlifeSprite(({polygon,box,line})=>{
-    polygon([[12,23],[5,22],[3,17],[4,9],[8,5],[13,6],[16,12],[14,17],[10,17],[9,13]],'A');
-    polygon([[13,16],[18,13],[25,16],[27,24],[23,29],[15,28]]);
-    polygon([[20,14],[20,7],[23,4],[26,7],[28,10],[27,16],[23,19]]);
-    box(21,3,2,4);box(25,3,2,4);box(25,9,1,2,'X');box(27,12,2,1,'X');
-    polygon([[18,20],[22,19],[24,26],[19,27]],'F');
-    box(16,28,11,2,'A');line(22,19,28,21,'B');box(28,20,3,3,'A');
-  }),
-  forestOwl:wildlifeSprite(({polygon,box,line})=>{
-    polygon([[13,9],[11,3],[18,7],[24,7],[31,3],[29,10],[31,16],[29,25],[24,29],[16,29],[11,25],[10,16]]);
-    polygon([[14,12],[18,9],[21,13],[24,9],[28,12],[27,19],[23,22],[17,22],[13,18]],'F');
-    box(16,13,3,4,'X');box(24,13,3,4,'X');box(16,13,1,1,'F');box(24,13,1,1,'F');
-    polygon([[20,18],[23,18],[21,21]],'A');
-    line(12,19,15,25,'A');line(29,19,26,25,'A');
-    for(const x of [17,23]){box(x,28,2,3,'A');box(x-1,30,4,1,'X');}
-    box(8,31,26,2,'A');
-  }),
   forestRaccoon:wildlifeSprite(({polygon,box,line})=>{
     polygon([[4,14],[7,11],[12,13],[15,22],[12,27],[7,26],[4,21]],'A');
     line(5,16,11,15,'X');line(7,21,13,20,'X');line(9,26,13,24,'X');
@@ -109,13 +65,6 @@ export const WILDLIFE_SPRITES = {
     box(26,5,3,4,'X');box(33,5,3,4,'X');box(26,12,9,3,'X');
     box(28,12,1,1,'F');box(33,12,1,1,'F');box(30,17,3,2,'X');
     box(15,25,4,5,'X');box(27,25,4,5,'X');
-  }),
-  forestBird:wildlifeSprite(({polygon,box,line})=>{
-    polygon([[13,16],[16,10],[23,9],[28,13],[27,20],[22,24],[16,22]]);
-    polygon([[16,17],[7,14],[12,21],[18,21]],'A');
-    polygon([[26,13],[32,15],[27,17]],'A');
-    box(24,12,2,2,'X');line(18,23,18,28,'A');line(23,23,24,28,'A');
-    box(15,28,5,1,'X');box(23,28,5,1,'X');line(17,16,23,19,'F');
   }),
   forestTree:wildlifeSprite(({polygon,box,line})=>{
     box(20,16,5,16,'A');line(22,25,16,20,'X');line(22,22,29,16,'X');
@@ -173,41 +122,6 @@ export const WILDLIFE_SPRITES = {
       box(x+4,y+3,3,7,'F');polygon([[x,y+3],[x+2,y-2],[x+8,y-2],[x+11,y+3]],'A');
       box(x+4,y,2,2,'F');
     }
-  }),
-  prehistoricRex:wildlifeSprite(({polygon,box,line})=>{
-    polygon([[4,19],[11,19],[18,14],[24,13],[28,18],[28,25],[20,28],[14,25],[9,24]]);
-    polygon([[23,16],[24,8],[28,4],[39,4],[42,7],[42,13],[32,15],[29,23]]);
-    box(37,6,2,2,'X');box(32,11,11,2,'X');
-    for(const x of [33,36,39])box(x,11,1,2,'F');
-    polygon([[24,18],[27,17],[28,23],[24,25]],'F');
-    polygon([[16,24],[21,24],[20,31],[14,31]],'A');box(13,31,8,2,'X');
-    polygon([[25,24],[29,24],[31,30],[34,30],[34,32],[27,32]],'B');
-    line(28,18,33,20,'A');line(33,20,34,18,'A');
-    box(4,18,3,1,'A');
-  }),
-  prehistoricTriceratops:wildlifeSprite(({polygon,box,line})=>{
-    polygon([[3,17],[10,14],[25,13],[31,17],[31,25],[23,28],[11,27],[7,23]]);
-    polygon([[26,12],[28,7],[33,6],[38,10],[39,17],[36,23],[30,24],[27,19]],'A');
-    polygon([[32,15],[39,14],[43,18],[43,22],[35,24]],'B');
-    polygon([[34,14],[35,7],[37,15]],'F');polygon([[39,16],[42,10],[42,18]],'F');
-    polygon([[41,18],[46,17],[43,21]],'F');box(37,17,2,2,'X');
-    for(const x of [10,16,28,33]){box(x,25,4,7,'B');box(x,31,5,2,'X');}
-    line(29,11,29,19,'F');line(31,10,31,21,'F');
-  }),
-  prehistoricPterosaur:wildlifeSprite(({polygon,box,line})=>{
-    polygon([[21,18],[16,12],[5,5],[7,15],[14,16],[18,23]],'A');
-    polygon([[25,18],[31,11],[43,5],[40,16],[33,16],[28,23]],'A');
-    polygon([[20,15],[22,9],[26,8],[29,11],[27,15],[27,24],[23,27],[20,22]],'B');
-    polygon([[26,10],[36,13],[27,14]],'F');polygon([[22,9],[17,4],[25,8]],'B');
-    box(25,10,1,1,'X');line(23,25,20,29,'X');line(25,25,28,29,'X');
-    line(8,10,18,17,'F');line(39,10,29,17,'F');
-  }),
-  prehistoricLongneck:wildlifeSprite(({polygon,box,line})=>{
-    polygon([[4,24],[12,24],[17,20],[29,19],[33,22],[33,27],[27,29],[16,28],[11,27]],'B');
-    polygon([[28,24],[28,11],[30,5],[32,3],[37,3],[39,6],[38,9],[34,9],[33,24]],'B');
-    box(37,5,1,1,'X');box(34,9,2,14,'F');
-    for(const x of [17,22,28,32]){box(x,27,3,6,'B');box(x,32,4,1,'X');}
-    line(14,24,26,23,'A');
   }),
   prehistoricVolcano:wildlifeSprite(({polygon,box,line})=>{
     polygon([[3,30],[9,23],[15,12],[19,10],[28,10],[33,16],[37,25],[44,30]],'B');
@@ -294,21 +208,23 @@ export const WILDLIFE_SPRITES = {
     polygon([[24,17],[29,9],[37,7],[34,16]],'B');
     line(15,16,22,22,'A');line(26,15,33,11,'A');
   }),
+  ...HERO_PIXEL_SPRITES,
 } as const;
 
 export const WILDLIFE_COLORS:Record<string,Partial<Record<string,string>>> = {
-  forestBear:{B:'#a17c57',A:'#816747',F:'#e0c9a0'},
-  forestRabbit:{B:'#d0cdb5',A:'#aa9388',F:'#eee8d2'},
-  forestFox:{B:'#b58455',A:'#956d47',F:'#eee1c2'},
+  forestBear:{X:'#503d36',B:'#a17c57',A:'#816747',F:'#e0c9a0'},
+  forestRabbit:{X:'#645b58',R:'#d6a1a0',B:'#d0cdb5',A:'#aa9388',F:'#eee8d2'},
+  forestFox:{X:'#604536',B:'#cf945c',A:'#956d47',F:'#eee1c2'},
   forestDeer:{B:'#b09a70',A:'#846c4b',F:'#e7d8b7'},
   forestSquirrel:{B:'#ad8459',A:'#8f704d',F:'#e6d4ac'},
   forestOwl:{B:'#8d8167',A:'#ad9870',F:'#e6ddbe'},
   forestRaccoon:{B:'#999b8c',A:'#7e8272',F:'#dfdfc8'},
-  forestBird:{B:'#83958b',A:'#ac966b',F:'#ddd9bc'},
+  forestBird:{X:'#394f52',B:'#7ca4a4',A:'#ac966b',F:'#ddd9bc'},
   forestTree:{B:'#64805d',A:'#859869',F:'#a3b584'},
   forestStump:{B:'#8d7457',A:'#9c825f',F:'#d4bc8c'},
   forestMushroom:{B:'#809164',A:'#a28b66',F:'#e3d6b6',R:'#a97c69'},
-  prehistoricRex:{B:'#7d9169',A:'#5e7658',F:'#d6d0a4'},
+  prehistoricStegosaurus:{X:'#464b3b',B:'#8da077',A:'#637c5e',F:'#d5dbad',R:'#bd815d'},
+  prehistoricRex:{X:'#3e503e',B:'#7d9169',A:'#5e7658',F:'#d6d0a4'},
   prehistoricTriceratops:{B:'#a4a17b',A:'#80855f',F:'#e4d8b7'},
   prehistoricPterosaur:{B:'#a28b70',A:'#b8a184',F:'#dcc9a2'},
   prehistoricLongneck:{B:'#839c8b',A:'#5d7d70',F:'#d7d9b7'},

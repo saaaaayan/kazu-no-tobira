@@ -49,6 +49,10 @@ export function releaseClient(address) {
     if (profile && (version.indexSha256!==digest(index) || version.entrySha256!==digest(bundle))) {
       throw new Error('The sample HTML or JavaScript differs from the verified build.');
     }
+    if(version.wildlifeReviewSha256!==undefined){
+      const review=Buffer.from(await (await get('art-review/index.html')).arrayBuffer());
+      if(digest(review)!==version.wildlifeReviewSha256)throw new Error('The wildlife review differs from the verified artwork.');
+    }
     // Validate the original AVIF on previous releases, and the new exact PNG
     // on updated releases. This also allows recovery snapshots during migration.
     let approvedMap;

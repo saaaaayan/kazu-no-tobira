@@ -1,0 +1,251 @@
+/** Hand-pixelled 32 × 32 masters. X outline, B body, A shadow,
+ * F highlight / markings, R warm detail. No shared creature geometry.
+ * Padding is part of the master so the review sheet and map use identical art. */
+function master(rows:string):readonly string[] {
+  const lines=rows.trim().split('\n').map(row=>row.replaceAll(' ','.'));
+  if(lines.length>32||lines.some(row=>row.length>32))throw new Error('Hero exceeds 32px master');
+  const width=Math.max(...lines.map(row=>row.length));
+  const left=Math.floor((32-width)/2);
+  const top=Math.floor((32-lines.length)/2);
+  return Array.from({length:32},(_,y)=>{
+    const row=lines[y-top]??'';
+    return ('.'.repeat(left)+row).padEnd(32,'.');
+  });
+}
+export const HERO_PIXEL_SPRITES = {
+  forestBear:master(`.....XXXX......XXXX
+....XAAAAX....XAAAAX
+....XABBAAXXXXAABBAX
+.....XBBBBBBBBBBBBX
+....XBBBBBBBBBBBBBBX
+...XBBFFBBBBBBBBFFBBX
+...XBFBBBBBBBBBBBBFBX
+...XBBBBXXBBBBXXBBBBX
+...XBBBBXXBBBBXXBBBBX
+...XBBBBBFFFFFFBBBBBX
+....XBBBFFXXXXFFBBBX
+.....XBBFFFXXFFFBBX
+......XBBFFFFFFBBX
+....XXXBBBBBBBBBBXXX
+...XABBBBFBBBBFBBBBAX
+...XABBBFFFFFFFBBB BAX
+....XXBBFFFFFFBBXX
+.....XBBFFFFFFBBX
+.....XBBBFFFFBBBX
+.....XAABBBBBBAAX
+....XAAAAAXXAAAAAX
+....XXXXXX..XXXXXX`),
+  forestRabbit:master(`........XXX....XXX
+.......XFFFX..XFFFX
+.......XFRFX..XFRFX
+.......XFRFX..XFRFX
+.......XFRFX..XFRFX
+.......XFRFX..XFRFX
+........XFFXXXXFFX
+.......XFFFFFFFFFFX
+......XFFFFFFFFFFFFX
+......XFFXXFFFFXXFFX
+......XFFXXFFFFXXFFX
+......XFFFFFFRFFFFFX
+.......XFFFFRFRFFFX
+........XXFFFFFFXX
+........XFFFFFFFFX
+.......XFFFFBBFFFFX
+...XXX.XFFFBBBBFFFX
+..XFFFXFFFFBBBBFFFX
+..XFFFXFFFFBBBBFFFX
+...XXXXBFFFBBFFFBX
+.....XBBFFFFFFFFBBX
+.....XXXXXXXXXXXXXX`),
+  forestFox:master(`.................XX.....XX
+................XABX...XBAX
+................XABBX.XBBAX
+................XABBBXBBBAX
+.................XBBBBBBBX
+.................XBBBBBBBX
+..XXXX..........XBBXBBBXBBX
+.XFFFFX.........XFBXBBBXBFX
+XFFFFFFX........XFFBBBBBFFX
+XFFFBBBBX........XFFBXBFFX
+XFFBBBBBBX........XFFFFFX
+.XBBBBBBBBX....XXXXBBFBBX
+..XBBBBBBBBXXXXBBBBBFFFBBX
+...XBBBBBBBBBBBBBBBFFFFBX
+....XXXBBBBBBBBBBBBFFFFBX
+.......XXXBBBBBBBBBBFBBX
+..........XXBBBBBBBBBBX
+............XABBXXBBAX
+............XABBX.XBAX
+............XXXXX.XXXX`),
+  forestSquirrel:master(`....XXXXX
+..XXAAAAAXX
+.XAABBBBBAAX
+XABBBBBBBBBAAX
+XABBBXXXBBBAAX
+XABBX...XBB AAX.....XX..XX
+XABBX....XBBAAX....XBBXXBBX
+XABBX....XBBAAX....XBBBBBBX
+XABBBX...XBAAX....XBBXBBBBX
+.XABBBX..XBAAX....XBBXBBBX
+..XABBBXXXAAX.....XBBBBXXX
+...XABBBBBAX.....XXBFFBX
+....XXAAAAAX...XXBBFFBX
+......XXXXXX..XBBBFFFBBXX
+........XBBBXXBBBBFFXBBAAX
+.......XBBBBBBBBBFFFXAAAX
+.......XBBBBBBBBBFFFFXXX
+.......XBBBBBBBBBFFFFX
+........XABBBBBBBFFFX
+.........XAAABBBBFFX
+..........XXXXXXXXXX`),
+  forestOwl:master(`...XX............XX
+...XBX..........XBX
+...XBBXXXXXXXXXXBBX
+....XBBBBBBBBBBBBX
+...XBBFFFFBBFFFFBBX
+..XBBFFFFFF FFFFFBBX
+..XBF FXXFFFFXXF FBX
+..XBFFFX XFFX XFFFBX
+..XBFFFXXFFFFXXFFFBX
+..XBBFFFFFFAFFFFFBBX
+..XBBBFFFFAAAFFFBBBX
+..XABBBFFFFAFFFBBBAX
+..XAABBBFFFFFFBBBAAX
+..XAAABBBFFFFBBBAAAX
+...XAABBFBFFBF BBAAX
+...XAABBBFBBFBBBAAX
+....XABBBBBBBBBBAX
+.....XXXBBBBBBXXX
+.......XAX..XAX
+......XXXX..XXXX`),
+  forestBird:master(`............XXXXX
+..........XXBBBBBXX
+.........XBBFFFBBBBX
+.........XBBFFFFBXBX
+.........XBBFFFFBXBX
+.........XBBFFFFBBBBXXX
+.........XBBBFFFFBBXAAAX
+..XX.....XBBBBFFFBBXXXX
+..XBX...XBBBBBBFFBBX
+..XBBXXXBBBBAAABBBBX
+...XBBBBBBBAAAAABBBX
+....XBBBBBBAAFAABBBX
+.....XBBBBBBAAABBBX
+......XXBBBBBBBBXX
+........XXXBBXXX
+..........XAXAX
+.........XXAXAXX`),
+  prehistoricRex:master(`.................XXXXXXXXXX
+................XBBBBBBBBBBX
+...............XBBFFBBBBBBBBX
+...............XBBBBBBX FBBBX
+...............XBBBBBBXXBBBBX
+...............XBBBBBBBBBBBBX
+................XBBXXXXXXXXX
+................XBBB F F F X
+................XBBXXXXXXXX
+...............XBBBFFX
+..............XBBBBFFX
+..XX.........XBBBBBFFX
+..XBX.......XBBBBBBFFXXX
+...XBBX....XBBBBBBBFFXBAX
+....XBBXXXXBBBBBBBBFFX.XX
+.....XBBBBBBBBBBBBBFFX
+......XBBBBBBBBBBBBFFX
+.......XXBBBBBBBBBFFX
+.........XBBBBAABBFFX
+.........XBBBAAAABFX
+.........XBBBAAAAXX
+..........XBAAAX.XBBX
+..........XBAAX...XBBX
+.........XBBAAX...XBBFFX
+.........XXXXXXX..XXXXXX`),
+  prehistoricTriceratops:master(`.....................XX
+....................XFFX
+................XXXXFFFX..XX
+...............XA A XFFX.XFFX
+..............XAAAAAAXFX.XFFX
+..............XAAFAAAAXXXFFX
+......XXXXXXXXXAAAAFAAXBBFX
+.....XBBBBBBBBBXAAAAAAXBBBX
+....XBBFFBBBBBBXAAFA A XBBBX
+...XBBBBBBBBBBBBXAAAAAXBBXBX
+..XBBBBBBBBBBBBBBXAAAXBBBBBXXX
+.XBBBBBBBBBBBBBBBBXXXBBBBBBXFFX
+XBBBXXBBBBBBBBBBBBBBBBBBBBBBXX
+.XXX.XBBBBBBBBBBBBBBBBBBBBBX
+.....XBBBBBBBBBBBBBBBBBBBBX
+......XBBBAABBBBBBBBAABBBX
+......XBBAAAXXXXXXBBAABBX
+......XBBAAX.....XBBAABX
+......XBBFFX.....XBBFFBX
+......XXXXXX.....XXXXXXX`),
+  prehistoricLongneck:master(`.....................XXXXXX
+....................XBBBBBBX
+....................XBFBBXBX
+....................XBBBBBBX
+.....................XBBFFF X
+.....................XBBFXXX
+.....................XBBFX
+.....................XBBFX
+.....................XBBFX
+.....................XBBFX
+....................XBBBFX
+....................XBBBFX
+....................XBBBFX
+...................XBBBBFX
+...........XXXXXXXXBBBBBFX
+.........XXBBFFBBBBBBBBBFX
+........XBBBBBBBBBBBBBBBFX
+..XX...XBBBBBBBBBBBBBBBBFX
+..XBBXXBBBBBBBBBBBBBBBBBFX
+...XBBBBBBBBBBBBBBBBBBBBFX
+....XXXBBBBBBBBBBBBBBBBFX
+.......XXBBBAABBBBBAABBBX
+.........XBBAAXXXBBAABBBX
+.........XBBAAX..XBAAXBBX
+.........XBBFFX..XBFFXFFX
+.........XXXXXX..XXXXXXXX`),
+  prehistoricPterosaur:master(`.XX..........................XX
+.XBX........................XBX
+..XBBX....................XBBX
+..XBFBBX................XBBFBX
+...XBFFBBX............XBBFFBX
+...XBFFFBBX..........XBBFFFBX
+....XBFFFFBBX......XBBFFFFBX
+.....XBFFFFFBBX..XBBFFFFFBX
+......XBFFFFFBBXXBBFFFFBX
+.......XBAFFFFBBBBFFFFBX
+........XXAAFFFBBFFFFAX
+..........XXAFFBBFFAXX
+............XBBBBBBX
+.............XBBBBX
+.............XBBBX...XX
+.............XBBBBXXXXBBX
+..............XBBBXXB XBBXXXXXX
+..............XBBBBBBXXFFFFFFFX
+...............XXBBBX..XXXXXXX
+................XBBX
+...............XAXAX
+..............XX..XX`),
+  prehistoricStegosaurus:master(`.........XX....XX
+........XRRX..XRRX...XX
+.......XRRRRXXRRRRX.XRRX
+...XX..XRRRRXXRRRRXXRRRRX
+..XRRX..XRRX..XRRRRXXRRRX
+.XRRRRX..XX....XRRX..XRRX
+..XRRX..XXXXXXXXXXXX..XX
+...XX.XXBBBBBBBBBBBBXX
+.....XBBBBFFBBBBBBBBBBXX
+....XBBBBBBBBBBBBBBBBBBBX
+...XBBBBBBBBBBBBBBBBBBBBBXXX
+..XBBBBBBBBBBBBBBBBBBBBBBBBBX
+.XBBBXXBBBBBBBBBBBBBBBBBBBXBX
+XBBXX.XBBBBBBBBBBBBBBBBBBBBBX
+.XX...XBBBBBBBBBBBBBBBBBBXXX
+.......XBBBAABBBBBBAABBBX
+.......XBBAAAXXXXBBAABBX
+.......XBBAAX...XBBAABX
+.......XBBFFX...XBBFFBX
+.......XXXXXX...XXXXXXX`),
+} as const;

@@ -53,7 +53,7 @@ export const ISLAND_ART_SETS = {
   },
   e4:{
     large:['prehistoricRex','prehistoricTriceratops','prehistoricPterosaur',
-      'prehistoricLongneck','prehistoricVolcano'],
+      'prehistoricLongneck','prehistoricStegosaurus','prehistoricVolcano'],
     medium:['prehistoricEggs','prehistoricBone','prehistoricSkeleton','prehistoricAmmonite',
       'prehistoricRockRidge','prehistoricFern','prehistoricPalm','prehistoricLavaCrack'],
     small:['prehistoricTracks','prehistoricPebbles','prehistoricFossilShard','prehistoricBoneChips',
