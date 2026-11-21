@@ -159,7 +159,7 @@ export function SharedThemedPixelTerrain({width,height,positions,grade,next}:{
 export function IslandThemeStamp({id,compact=false,flipped=false}:{
   id:string;compact?:boolean;flipped?:boolean;
 }){
-  const theme=ISLAND_PIXEL_PALETTES[id];
+  const theme=ISLAND_PIXEL_PALETTES[id as StandardPixelIslandId];
   const kind=theme.motifs[0] as IconKind;
   return <Svg testID={'island-stamp-'+id+(flipped?'-right':'-left')}
     width={compact?17:23} height={compact?17:23} viewBox="0 0 32 32" accessible={false}>
