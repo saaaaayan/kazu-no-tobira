@@ -12,7 +12,7 @@ test('all sixteen art libraries have recognizable pixel silhouettes in three siz
     assert.ok(art.large.length>=3,id);
     assert.ok(art.medium.length>=6,id);
     assert.ok(art.small.length>=8,id);
-    assert.equal(new Set([...art.large,...art.medium,...art.small]).size,18,id);
+    assert.ok(new Set([...art.large,...art.medium,...art.small]).size>=18,id);
     assert.equal(new Set(art.ground).size,4,id);
     const silhouettes = new Set();
     for(const kind of [...art.large,...art.medium,...art.small]){

@@ -1,3 +1,4 @@
+import {WILDLIFE_SPRITES} from './wildlifePixelSprites.ts';
 const legacySprites={
   tree:["....XX....","...XFFX...","..XFBBFX..",".XFBBBBFX.","XFBBBBBBFX","..XFBBFX..","...XFFX...","....XX....","....XX....","...XBBX..."],
   rabbit:["..XX..XX..","..XFX.XFX.","..XFX.XFX.","...XFFFXX.","..XFFFFFX.","..XAXFFAX.","..XFFFFFX.","...XXXXX..","...XFFFXX.","..XFFFFFX."],
@@ -286,7 +287,7 @@ const additions = {
   kendama:draw(({frame,box,line})=>{frame(7,1,7,7,'A');box(9,8,3,10,'B');box(4,9,13,3,'X');line(7,5,2,15);}),
 } as const;
 
-export const ISLAND_SPRITES = {...legacySprites,...additions};
+export const ISLAND_SPRITES = {...legacySprites,...additions,...WILDLIFE_SPRITES};
 export type IslandSpriteId = keyof typeof ISLAND_SPRITES;
 
 export type PixelRun = {x:number;y:number;width:number;color:string};

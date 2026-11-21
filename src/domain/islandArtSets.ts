@@ -14,6 +14,8 @@ export type GroundPattern =
   | 'lightField'|'shadowField'|'prismTiles'|'moonTiles'
   | 'starChart'|'orbitChart'|'starGrid'|'nightTiles'
   | 'lake'|'forestFloor'|'mountainRidges'|'meadow'
+  | 'forestGlade'|'forestGrove'|'forestGrass'|'forestLeafLitter'
+  | 'prehistoricLava'|'prehistoricFossils'|'prehistoricFernBed'|'prehistoricRocks'
   | 'courtyard'|'libraryTiles'|'compassRose'|'paving'
   | 'magicCircle'|'runes'|'alchemyTiles'|'violetStone'
   | 'fortress'|'copperTiles'|'cobblestones'|'battlements'
@@ -37,9 +39,12 @@ export const ISLAND_ART_SETS = {
     ground:['rails','blocks','woodgrain','playmat'],
   },
   e2:{
-    large:['tree','cottage','deer'],medium:['bear','rabbit','fox','owl','squirrel','raccoon','nest'],
-    small:['bird','acorn','paw','leaf','mushroom','stump','flowers','mouse'],
-    ground:['river','grass','roots','leaves'],
+    large:['forestBear','forestRabbit','forestFox','forestDeer'],
+    medium:['forestSquirrel','forestOwl','forestRaccoon','forestBird',
+      'forestTree','forestStump','forestMushroom','forestGrass'],
+    small:['forestTracks','forestAcorn','forestLeaves','forestFlowers',
+      'forestTwigs','forestBerries','forestFeather','forestTinyMushrooms'],
+    ground:['forestGlade','forestGrove','forestGrass','forestLeafLitter'],
   },
   e3:{
     large:['sweetHouse','cake','parfait'],medium:['donut','pudding','macaron','icecream','cupcake','chocolate','lollipop'],
@@ -47,9 +52,13 @@ export const ISLAND_ART_SETS = {
     ground:['wafer','chocolateTiles','icing','crumbs'],
   },
   e4:{
-    large:['volcano','dinosaur','triceratops'],medium:['pterosaur','cliff','palm','egg','jaw','ammonite','fossil'],
-    small:['bone','footprint','fern','rock','lava','leaf','shard','crater'],
-    ground:['lavaFlow','strata','fossilBed','crackedEarth'],
+    large:['prehistoricRex','prehistoricTriceratops','prehistoricPterosaur',
+      'prehistoricLongneck','prehistoricVolcano'],
+    medium:['prehistoricEggs','prehistoricBone','prehistoricSkeleton','prehistoricAmmonite',
+      'prehistoricRockRidge','prehistoricFern','prehistoricPalm','prehistoricLavaCrack'],
+    small:['prehistoricTracks','prehistoricPebbles','prehistoricFossilShard','prehistoricBoneChips',
+      'prehistoricAsh','prehistoricGroundCrack','prehistoricLeaves','prehistoricSprout'],
+    ground:['prehistoricLava','prehistoricFossils','prehistoricFernBed','prehistoricRocks'],
   },
   e5:{
     large:['factory','gear','engine'],medium:['robot','arm','conveyor','pipe','meter','valve','piston'],
