@@ -71,6 +71,17 @@ copyFileSync(mapSource,resolve(target,'world-map-approved.png'));
 const allowed=new Set(['index.html','metadata.json','world-map-approved.png']);
 const files=readdirSync(target,{recursive:true,withFileTypes:true}).filter(entry=>!entry.isDirectory())
   .map(entry=>relative(target,resolve(entry.parentPath,entry.name)).replaceAll('\\','/'));
+// This one user-approved illustration is public art. Keep the preview asset
+// allowlist strict: require one correctly named file and its exact PNG hash.
+const approvedHeroFiles=files.filter(file=>/^assets\/euler-math-title\.[a-f0-9]{32}\.png$/.test(file));
+if(approvedHeroFiles.length!==1)throw new Error('Expected exactly one approved Euler title illustration.');
+const approvedHeroBytes=readFileSync(resolve(target,approvedHeroFiles[0]));
+if(approvedHeroBytes.length!==2627187||
+   !approvedHeroBytes.subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex'))||
+   approvedHeroBytes.readUInt32BE(16)!==1448||approvedHeroBytes.readUInt32BE(20)!==1086||
+   contentDigest(approvedHeroBytes)!=='1cc48410896328e54df0af7b3ab857cfa465d3894695c79b05269353d525eeef')
+  throw new Error('Unexpected Euler title illustration bytes.');
+allowed.add(approvedHeroFiles[0]);
 if (files.some(file=>!allowed.has(file) && !/^_expo\/static\/js\/web\/[A-Za-z0-9._-]+\.js$/.test(file) &&
     !/^question-banks\/(?:e1|sage)\.[a-z0-9]+\.v1\.json$/.test(file))) {
   throw new Error('Unexpected file in the sample-only preview artifact.');
@@ -96,7 +107,7 @@ else writeFileSync(index,readFileSync(index,'utf8').replace('<head>',
 writeFileSync(resolve(target,'version.json'),JSON.stringify({
   version,profile:'ui-preview',indexSha256:contentDigest(readFileSync(index)),entrySha256:contentDigest(bundle),
   publishedBankQuestions:publicBankIds.length*100,bankSha256:bankFiles,
-  approvedWorldMapSha256:contentDigest(mapBytes),
+  approvedWorldMapSha256:contentDigest(mapBytes),approvedEulerHeroSha256:contentDigest(approvedHeroBytes),
   wildlifeReviewSha256:contentDigest(readFileSync(resolve(target,'art-review/index.html'))),
   pixelSceneryV2:true,
   preschoolPlushPixelV2:true,toyIslandPixelV1:true,allIslandPixelThemesV1:true,
