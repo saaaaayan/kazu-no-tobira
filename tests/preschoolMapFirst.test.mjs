@@ -21,9 +21,9 @@ test('preschool island map appears before curriculum, start shortcut, legend and
   const mapTerrain=actualRender.indexOf('<View style={[styles.ocean');
   const bottomSupplement=actualRender.indexOf("{standardPixelMap && supplementalPanels}");
   const footer=actualRender.indexOf('styles.footer');
-  assert.ok(topSupplement>0&&topSupplement<mapHeading,'other islands keep their prior top panels');
+  assert.ok(topSupplement>0&&topSupplement<mapHeading,'legacy panels stay behind the conditional branch');
   assert.ok(topSupplement<mapTerrain&&mapTerrain<bottomSupplement,
-    'preschool island must show the navigable map before supporting cards');
+    'every standard island shows the navigable map before supporting cards');
   assert.ok(bottomSupplement<footer,'reference material is still available below map');
   assert.equal((actualRender.match(/<IslandCurriculumPanel/g)||[]).length,0,
     'all curriculum instances should be rendered from the grade-conditional panel');
