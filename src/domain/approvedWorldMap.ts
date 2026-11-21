@@ -8,7 +8,7 @@ export const approvedWorldMap = {
   width: 1452,
   height: 1083,
   filename: 'world-map-approved.png',
-  sha256: 'c8f621c995ef97cab28dc8f2e423718ee0f355a1b468de2ec7dc8624d5712e68',
+  sha256: '742a476a0bda353bdcf298fd512b178711e327e54f6baf63e14d4d1fc7af73a2',
 } as const;
 export const approvedWorldMapHotspots = [
   {x:.118,y:.180}, // 01 preschool – plush toys
@@ -30,7 +30,7 @@ export const approvedWorldMapHotspots = [
 ] as const;
 
 export const approvedWorldMapImageUrl =
-  '/kazu-no-tobira/world-map-approved.png?v=c8f621c9';
+  '/kazu-no-tobira/world-map-approved.png?v=742a476a';
 
 export function approvedWorldMapDimensions(viewWidth:number,zoomed:boolean) {
   const actualWidth=Math.max(244,viewWidth||360);

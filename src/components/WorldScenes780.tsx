@@ -83,7 +83,7 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
   };
   return <View style={styles.screen}>
     <View style={styles.worldBanner}>
-      <Text accessibilityRole="header" style={styles.bannerHeading}>数のトビラの世界地図</Text>
+      <Text accessibilityRole="header" style={styles.bannerHeading}>数のトビラ 世界地図</Text>
       <Text style={styles.bannerDescription}>01から16へ、点線にそって進もう。島をタップすると学習マップが開くよ。</Text>
       <View style={styles.stats}>
         <Text style={styles.stat}>{worldIslands.length}の島 · {allWorldStages.length.toLocaleString('ja-JP')}地点</Text>
@@ -109,7 +109,7 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
         style={{height:imageHeight}} nestedScrollEnabled>
         <View style={{width:imageWidth,height:imageHeight}}>
           <Image source={{uri:approvedWorldMapImageUrl}} resizeMode="stretch"
-            accessibilityLabel="16島それぞれのテーマを幾何学的な線画で描いた、数のトビラの世界地図"
+            accessibilityLabel="16島それぞれのテーマを3つのドット絵で描いた、数のトビラの世界地図"
             style={{width:imageWidth,height:imageHeight}} />
           {worldIslands.map((grade,index)=>{
             const spot=approvedWorldMapHotspots[index];

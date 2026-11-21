@@ -62,8 +62,9 @@ for(const id of publicBankIds){
 // Keep the exact user-approved world image as a separate, cacheable public asset.
 const mapSource=resolve('public/world-map-approved.png');
 const mapBytes=readFileSync(mapSource);
-if(mapBytes.length<1_000_000||mapBytes.length>3_000_000||
-   !mapBytes.subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex')))
+if(mapBytes.length<10_000||mapBytes.length>3_000_000||
+   !mapBytes.subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex'))||
+   mapBytes.readUInt32BE(16)!==1452||mapBytes.readUInt32BE(20)!==1083)
   throw new Error('The approved 16-island map is not a valid PNG asset.');
 copyFileSync(mapSource,resolve(target,'world-map-approved.png'));
 
