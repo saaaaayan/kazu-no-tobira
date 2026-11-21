@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ComponentRef } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { worldGrades, worldIslands, type WorldGrade, type WorldStage } from './domain/worldCatalog';
+import { isStandardPixelIsland } from './domain/standardPixelIslandMap';
 import type { MathQuestion } from './domain/worldQuestions';
 import { checkMathAnswer, isValidMathAnswer } from './domain/mathAnswer';
 import { stageDisplayTitle,stageLabels, type Checkpoint } from './domain/stageStructure';
@@ -506,8 +507,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   // Prototype details remain accessible from the home and world map.
   const preschoolMapFirst = !round && screen === 'island' && grade.id === 'preschool';
   const preschoolChildView = preschoolMapFirst || Boolean(!review && round?.stage.gradeId === 'preschool');
-  const standardIslandMapFirst = preschoolMapFirst ||
-    (!round && screen === 'island' && grade.id === 'e1');
+  const standardIslandMapFirst = !round && screen === 'island' && isStandardPixelIsland(grade.id);
   const standardIslandChildView = preschoolChildView || standardIslandMapFirst ||
     Boolean(!review && round?.stage.gradeId === 'e1');
 

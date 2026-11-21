@@ -295,22 +295,26 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next,theme='
     [width,height,positions.length,positions[0]?.y,positions[positions.length-1]?.y]);
   return <Svg testID={theme==='toys'?'toy-island-pixel-v1':'preschool-plush-pixel-v2'} width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}
     preserveAspectRatio="none" accessible={false}>
-    <Rect width={width} height={height} fill="#80adc4"/>
+    <Rect width={width} height={height} fill={theme==='toys'?'#688dad':'#80adc4'}/>
     <Rect x={10} y={10} width={width-20} height={height-20}
-      rx={9} fill="#a9cb83" stroke="#e9dfb6" strokeWidth={7}/>
+      rx={9} fill={theme==='toys'?'#d9ae99':'#a9cb83'} stroke="#e9dfb6" strokeWidth={7}/>
     <Rect x={18} y={18} width={width-36} height={height-36}
-      rx={3} fill="none" stroke="#7a9d6d" strokeWidth={2}/>
+      rx={3} fill="none" stroke={theme==='toys'?'#b98173':'#7a9d6d'} strokeWidth={2}/>
     {Array.from({length:13},(_,row)=>{
       const y=positions[row*5].y;
       return <G key={row}>
         <Rect x={26} y={y-50} width={width-52} height={75}
-          fill={row<10
+          fill={theme==='toys'
+            ? (row<10?(row%2===0?'#e5bba7':'#dcae9b'):
+              row<12?'#bcb3b5':'#c6b5c5')
+            : row<10
             ? (row%2===0?'#b2d28e':'#aacb83')
             : row<12
               ? (row%2===0?'#aac4b8':'#a2bdb0')
               : '#c5b5c4'}/>
         <Rect x={24} y={y+53} width={width-48} height={6}
-          fill={row<10?'#94bc77':row<12?'#88a99e':'#aa98a8'}/>
+          fill={theme==='toys'?(row<10?'#bc8c7b':row<12?'#a99ea3':'#b6a0b0'):
+            row<10?'#94bc77':row<12?'#88a99e':'#aa98a8'}/>
       </G>;
     })}
     {/* Stable, collision-checked organic scattering. Never obscure checkpoint
@@ -322,7 +326,8 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next,theme='
             x={item.x} y={item.y} scale={item.scale}/>
         : item.kind==='blocks'
           ? <ToyBlocks key={'toy-blocks-'+i} x={item.x} y={item.y} scale={item.scale}/>
-          : <Flower key={'flower-'+i} x={item.x} y={item.y} scale={item.scale}/>
+          : <ToyPixelIcon key={'toy-charm-'+i} kind="puzzle"
+              x={item.x} y={item.y} scale={item.scale*.55}/>
       : item.kind==='plush'
         ? <Plush key={'plush-'+i} animal={item.animal}
             x={item.x} y={item.y} scale={item.scale}/>
@@ -334,24 +339,25 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next,theme='
     {[50,60].map((order,index)=>
       <Rect key={'area-divider-'+order}
         x={24} y={positions[order].y-65} width={width-48} height={4}
-        fill={index===0?'#759c8c':'#9a8495'} />
+        fill={theme==='toys'?(index===0?'#ac8fa2':'#ba8ba3'):
+          index===0?'#759c8c':'#9a8495'} />
     )}
     <Path d={routeThrough(paths.normal)} fill="none"
-      stroke="#506d5e" strokeWidth={12} strokeLinejoin="miter"/>
+      stroke={theme==='toys'?'#835a57':'#506d5e'} strokeWidth={12} strokeLinejoin="miter"/>
     <Path d={routeThrough(paths.normal)} fill="none"
-      stroke="#efe0b3" strokeWidth={8} strokeLinejoin="miter"/>
+      stroke={theme==='toys'?'#f1d6a4':'#efe0b3'} strokeWidth={8} strokeLinejoin="miter"/>
     <Path d={routeThrough(paths.normal)} fill="none"
-      stroke="#fff6d9" strokeWidth={2} strokeDasharray="5 8"/>
+      stroke={theme==='toys'?'#fff3d8':'#fff6d9'} strokeWidth={2} strokeDasharray="5 8"/>
     <Path d={routeThrough(paths.extra)} fill="none"
-      stroke="#6b6685" strokeWidth={10}/>
+      stroke={theme==='toys'?'#806b91':'#6b6685'} strokeWidth={10}/>
     <Path d={routeThrough(paths.extra)} fill="none"
       stroke="#e5d8c2" strokeWidth={3} strokeDasharray="5 8"/>
     <Path d={routeThrough(paths.secret)} fill="none"
-      stroke="#846b74" strokeWidth={10}/>
+      stroke={theme==='toys'?'#965f75':'#846b74'} strokeWidth={10}/>
     <Path d={routeThrough(paths.secret)} fill="none"
       stroke="#f6dfc6" strokeWidth={3} strokeDasharray="5 8"/>
     {next>=0&&<Rect x={positions[next].x-29} y={positions[next].y-29}
-      width={58} height={58} fill="none" stroke="#d8aa68" strokeWidth={2}/>}
+      width={58} height={58} fill="none" stroke={theme==='toys'?'#a96353':'#d8aa68'} strokeWidth={2}/>}
   </Svg>;
 }
 

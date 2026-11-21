@@ -11,8 +11,8 @@ test('The preschool island uses live pixel plush SVG behind all interactive stag
   const app=read('src/FullAdventure.tsx');
   assert.match(catalog,/id: 'preschool', title: '就学前'/);
   assert.match(source,/import \{ PreschoolPixelTerrain, ToyPixelTerrain \}/);
-  assert.match(source,/testID=\{grade.id==='preschool'\?'preschool-plush-pixel-v2':grade.id==='e1'\?'toy-island-pixel-v1':undefined\}/);
-  assert.match(source,/grade\.id === 'preschool'/);
+  assert.match(source,/testID=\{grade.id==='preschool'\?'preschool-plush-pixel-v2':grade.id==='e1'\?'toy-island-pixel-v1':'pixel-island-'\+grade.id\}/);
+  assert.match(source,/grade.id==='preschool'/);
   assert.match(source,/<PreschoolPixelTerrain width=\{width\} height=\{height\}/);
   assert.match(art,/preschool-plush-pixel-v2/);
   for (const species of ['bear','bunny','panda','elephant','dog','cat','lion','penguin','lamb','fox','koala','chick','giraffe']) {
@@ -56,10 +56,10 @@ test('All 65 preschool stages have their own title and tap-to-read learning goal
   const domain=read('src/domain/islandCurriculumView.ts');
   const catalog=read('src/domain/worldCatalog.ts');
   assert.match(ui,/standardPixelMap && grade.stages.map/);
-  assert.match(ui,/preschoolStageMapInfo\(stage\)/);
-  assert.match(ui,/testID=\{\(grade.id==='preschool'\?'preschool-stage-topic-':'toy-stage-topic-'\)\+String\(index\+1\)\}/);
+  assert.match(ui,/sharedIslandStageMapInfo\(grade,stage\)/);
+  assert.match(ui,/grade.id==='e1'\?'toy-stage-topic-':'island-stage-topic-'/);
   assert.match(ui,/numberOfLines=\{compactStageMap\?3:2\}/);
-  assert.match(ui,/testID=\{grade.id==='preschool'\?'preschool-stage-info-card':'toy-stage-info-card'\}/);
+  assert.match(ui,/grade.id==='e1'\?'toy-stage-info-card':'island-stage-info-card-'/);
   assert.match(ui,/onPress=\{\(\)=>onStart\(stage\)\}/);
   assert.match(ui,/onPress=\{\(\)=>onStart\(detailStage\)\}/);
   assert.match(domain,/export function stageCategoryName/);

@@ -19,7 +19,7 @@ test('all three preschool area headings have small text-only frames, not giant f
 });
 test('65 stage-title frames wrap just the words and sit below the stage pins',()=>{
  assert.match(ui,/standardPixelMap && grade.stages.map/);
- assert.match(ui,/testID=\{\(grade.id==='preschool'\?'preschool-stage-topic-':'toy-stage-topic-'\)\+String\(index\+1\)\}/);
+ assert.match(ui,/grade.id==='e1'\?'toy-stage-topic-':'island-stage-topic-'/);
  assert.match(ui,/onPress=\{\(\)=>setDetailStageId\(stage.id\)\}/);
  assert.match(ui,/numberOfLines=\{compactStageMap\?3:2\}/);
  assert.match(ui,/const labelLayout=preschoolStageLabelLayout\(actual,position,marker\)/);
@@ -30,7 +30,7 @@ test('65 stage-title frames wrap just the words and sit below the stage pins',()
  assert.match(ui,/backgroundColor:'rgba\(247,241,219,0\.95\)',borderWidth:1,borderColor:'#8d9f86'/);
  assert.match(ui,/preschoolStageTopicSmall:\{fontSize:10,lineHeight:14\}/);
  assert.match(ui,/borderRadius:3,paddingHorizontal:2,paddingVertical:2,overflow:'hidden'/);
- assert.match(ui,/testID=\{grade.id==='preschool'\?'preschool-stage-info-card':'toy-stage-info-card'\}/);
+ assert.match(ui,/grade.id==='e1'\?'toy-stage-info-card':'island-stage-info-card-'/);
 });
 test('the regular other-island zone labels remain unchanged',()=>{
  assert.match(ui,/zoneLabel:\{position:'absolute',paddingVertical:5,paddingHorizontal:9,backgroundColor:'#fff8dd'/);

@@ -83,6 +83,8 @@ if(!bundle.toString('utf8').includes('preschool-plush-pixel-v2'))
   throw new Error('The compiled preview does not contain the preschool plush map view.');
 if(!bundle.toString('utf8').includes('toy-island-pixel-v1'))
   throw new Error('The compiled preview does not contain the grade-one toy map.');
+if(!bundle.toString('utf8').includes('all-16-island-pixel-themes-v1'))
+  throw new Error('The compiled preview does not contain the sixteen thematic map renderer.');
 const index=resolve(target,'index.html');
 if (pages) writePagesAdminEntry(target);
 else writeFileSync(index,readFileSync(index,'utf8').replace('<head>',
@@ -91,7 +93,7 @@ writeFileSync(resolve(target,'version.json'),JSON.stringify({
   version,profile:'ui-preview',indexSha256:contentDigest(readFileSync(index)),entrySha256:contentDigest(bundle),
   publishedBankQuestions:publicBankIds.length*100,bankSha256:bankFiles,
   approvedWorldMapSha256:contentDigest(mapBytes),
-  preschoolPlushPixelV2:true,toyIslandPixelV1:true,
+  preschoolPlushPixelV2:true,toyIslandPixelV1:true,allIslandPixelThemesV1:true,
   ...(pages ? {adminSha256:contentDigest(readFileSync(resolve(target,'admin/index.html')))} : {}),
 })+'\n');
 console.log('Verified public prototype with '+(publicBankIds.length*100)+' bank questions at '+version);

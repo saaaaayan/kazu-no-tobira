@@ -19,7 +19,8 @@ test('preschool and grade-one island share identical geometries at phone and des
   assert.equal(gradeOne.stages.length,65);
   assert.ok(isStandardPixelIsland('preschool'));
   assert.ok(isStandardPixelIsland('e1'));
-  assert.ok(!isStandardPixelIsland('e2'),'future islands opt into common styling per theme');
+  assert.equal(worldIslands.filter(island=>isStandardPixelIsland(island.id)).length,16,
+    'the preschool map standard must be active for all sixteen islands');
   for(const width of [244,320,375,430,610,620,920,1220]){
     const preschoolMap=islandStageLayout(width,preschool.stages.length,PRESCHOOL_MAP_TITLE_INSET,true);
     const gradeOneMap=islandStageLayout(width,gradeOne.stages.length,PRESCHOOL_MAP_TITLE_INSET,true);
@@ -51,7 +52,7 @@ test('toy and plush themes use the same calm artwork and collision-safe scatteri
   assert.match(art,/TOY_SYMBOLS=\['robot','car','train','ball','blocks','top','rocket','kite','house','puzzle','drum','boat'\]/u);
   for(const kind of ['robot','car','train','ball','blocks','top','rocket','kite','house','puzzle','drum','boat'])
     assert.ok(art.includes("kind==='"+kind+"'"),kind);
-  assert.match(config,/other|Other islands keep their legacy map/u);
+  assert.match(config,/ISLAND_PIXEL_PALETTES/u);
 });
 
 test('toy ornaments never cover routes, stage pins, title labels, or checkpoint signs',()=>{
@@ -79,11 +80,11 @@ test('the grade-one map has the same child-first structure, all ten signs and 65
   assert.ok(map.includes('<ToyBlockStamp compact={compactStageMap}/>'));
   assert.ok(map.includes('<ToyBlockStamp flipped compact={compactStageMap}/>'));
   assert.match(map,/\{standardPixelMap && grade.stages.map\(\(stage,index\)=>\{/u);
-  assert.match(map,/testID=\{\(grade.id==='preschool'\?'preschool-stage-topic-':'toy-stage-topic-'\)\+String\(index\+1\)\}/u);
+  assert.match(map,/grade.id==='e1'\?'toy-stage-topic-':'island-stage-topic-'/u);
   assert.match(map,/onPress=\{\(\)=>setDetailStageId\(stage.id\)\}/u);
   assert.match(map,/onPress=\{\(\)=>onStart\(stage\)\}/u);
   assert.match(map,/standardPixelMap && supplementalPanels/u);
-  assert.match(app,/const standardIslandMapFirst = preschoolMapFirst \|\|/u);
+  assert.match(app,/const standardIslandMapFirst = !round && screen === 'island' && isStandardPixelIsland\(grade.id\)/u);
   assert.match(app,/styles.scroll,standardIslandMapFirst&&styles.preschoolScroll/u);
   assert.match(app,/!standardIslandMapFirst && <VersionNotice\/>/u);
   assert.match(map,/\{standardPixelMap \? <>/u);
@@ -119,7 +120,7 @@ test('every toy-island stage has a distinct title, and premium-only stages remai
   assert.ok(items.slice(0,50).every(info=>!info.provisional));
   assert.ok(items.slice(50).every(info=>info.provisional));
   const source=read('src/components/WorldScenes780.tsx');
-  assert.match(source,/const info=gradeOneStageMapInfo\(stage\)/u);
+  assert.match(source,/sharedIslandStageMapInfo\(grade,stage\)/u);
 });
 
 test('release manifests and public URL verifier require the live toy map bundle',()=>{

@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Rect, Stop, Text as SvgText } from 'react-native-svg';
+import Svg, {G,Rect} from 'react-native-svg';
 import { CompanionAvatar } from './AdventureCompanion';
 import { allWorldStages, hasGeneratedWorldQuestions, isPlannedIsland, worldIslands, type WorldGrade, type WorldStage } from '../domain/worldCatalog';
 import { hasPremium, type Entitlement } from '../domain/accessPlan';
 import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldProgress';
 import { worldStageAction, type PlayMode } from '../domain/playMode';
 import { checkpointsFor, stageDisplayTitle, stageLabels, type Checkpoint } from '../domain/stageStructure';
-import { PRESCHOOL_MAP_TITLE_INSET, compactIslandStageMap, islandCheckpointLayout, preschoolStageLabelLayout, islandRouteByKind, islandStageLayout, routeThrough } from '../domain/worldMapLayout';
+import { PRESCHOOL_MAP_TITLE_INSET, compactIslandStageMap, islandCheckpointLayout, preschoolStageLabelLayout, islandStageLayout } from '../domain/worldMapLayout';
 import { approvedWorldMapDimensions, approvedWorldMapHotspots, approvedWorldMapImageUrl } from '../domain/approvedWorldMap';
 import { hasStageBank } from '../domain/questionBank';
 import type { Progress } from '../domain/progress';
@@ -17,29 +17,13 @@ import { uiPreviewSampleKind } from '../domain/uiPreviewRound';
 import { stageCategoryName, stageRowCategoryName } from '../domain/islandCurriculumView';
 import { preschoolStageMapInfo } from '../domain/preschoolStageMapInfo';
 import { gradeOnePreviewStageInfo } from '../domain/gradeOnePreviewCurriculum';
-import { gradeOneStageMapInfo } from '../domain/gradeOneStageMapInfo';
+
 import { IslandCurriculumPanel } from './IslandCurriculumPanel';
 import { PreschoolPixelTerrain, ToyPixelTerrain } from './PreschoolPixelTerrain';
-import { isStandardPixelIsland, standardPixelIslandConfig } from '../domain/standardPixelIslandMap';
+import { isStandardPixelIsland, standardPixelIslandConfig, islandPixelPalette } from '../domain/standardPixelIslandMap';
+import { sharedIslandStageMapInfo } from '../domain/sharedIslandStageMapInfo';
+import { SharedThemedPixelTerrain, IslandThemeStamp } from './SharedThemedPixelTerrain';
 
-const palette = [
-  { land: '#b6d793', dark: '#609d77', detail: '#306d6e', roof: '#efb6a0' },
-  { land: '#8fcb86', dark: '#4e8f65', detail: '#315f5c', roof: '#cf8c63' },
-  { land: '#9fcf75', dark: '#477d68', detail: '#31576a', roof: '#f3c06a' },
-  { land: '#a2c3a0', dark: '#507b86', detail: '#285d73', roof: '#bf85a4' },
-  { land: '#c7be8d', dark: '#8f906f', detail: '#585479', roof: '#d8a26b' },
-  { land: '#97d1ba', dark: '#4a9a9d', detail: '#347a8e', roof: '#f2bf91' },
-  { land: '#aebfd8', dark: '#6d8ab1', detail: '#515e94', roof: '#f4e0a9' },
-  { land: '#c0c6a1', dark: '#6e8a82', detail: '#395a63', roof: '#c18b94' },
-  { land: '#9fbb90', dark: '#5b947b', detail: '#5579a1', roof: '#d1be74' },
-  { land: '#b6abd1', dark: '#77749e', detail: '#4c5c87', roof: '#e2c3e7' },
-  { land: '#d4c7a8', dark: '#929c9e', detail: '#56718d', roof: '#f1cd8c' },
-  { land: '#a8afcf', dark: '#737fb0', detail: '#465787', roof: '#a7d2c7' },
-  { land: '#c5b3cd', dark: '#7375b1', detail: '#50528c', roof: '#ffe5a1' },
-  { land: '#8676b6', dark: '#474066', detail: '#2c284d', roof: '#f9d28b' },
-  { land: '#cc9b76', dark: '#925a59', detail: '#57364d', roof: '#ffe2a1' },
-  { land: '#a1addc', dark: '#4f5f96', detail: '#354172', roof: '#a9ebed' },
-] as const;
 const legacy = new Set(['e1.forest','e1.bridge','e1.tower']);
 
 function measuredWidth(width: number) {
@@ -70,24 +54,11 @@ function ToyBlockStamp({flipped=false,compact=false}:{flipped?:boolean;compact?:
     accessible={false} width={compact?17:23} height={compact?17:23} viewBox="0 0 24 24">
     <G transform={flipped?'translate(24 0) scale(-1 1)':undefined}>
       <Rect x={2} y={9} width={10} height={11} fill="#c99981" stroke="#344454" strokeWidth={1.5}/>
-      <Rect x={12} y={4} width={9} height={16} fill="#94a995" stroke="#344454" strokeWidth={1.5}/>
+      <Rect x={12} y={4} width={9} height={16} fill="#b88974" stroke="#344454" strokeWidth={1.5}/>
       <Rect x={4} y={4} width={6} height={5} fill="#ddc68e"/>
     </G>
   </Svg>;
 }
-function OceanTexture({ width, height, seed = 0 }: { width: number; height: number; seed?: number }) {
-  return (
-    <G>
-      {Array.from({ length: Math.ceil(height / 120) * 6 }, (_, i) => {
-        const x = (i * 127 + seed * 73) % Math.max(1, width - 35) + 12;
-        const y = ((i * 113 + seed * 23) % Math.max(1, height - 40)) + 18;
-        return <Path key={i} d={`M${x - 11} ${y}q10-5 20 0m-14 7q7-3 14 0`}
-          fill="none" stroke="#e3faf7" strokeWidth={2} opacity={i % 4 === 0 ? 0.5 : 0.2}/>;
-      })}
-    </G>
-  );
-}
-
 export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview = false }: {
   progress: Progress; mode: PlayMode; access: Entitlement;
   onGrade: (grade: WorldGrade) => void; onTitles: () => void; preview?: boolean;
@@ -181,96 +152,22 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
   </View>;
 }
 
-function longIslandCoast(width:number,height:number): string {
-  const count=17;
-  const left=Array.from({length:count},(_,i)=>{
-    const y=24+(height-48)*i/(count-1);
-    return {x:17+9*Math.sin(i*1.7)+5*Math.cos(i*2.6),y};
-  });
-  const right=Array.from({length:count},(_,i)=>{
-    const y=24+(height-48)*i/(count-1);
-    return {x:width-17-9*Math.sin(i*2.3+1)-5*Math.cos(i*1.6),y};
-  }).reverse();
-  return 'M'+[...left,...right].map(p=>`${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' L')+' Z';
-}
-
-function IslandTerrain({gradeIndex,width,height,positions,grade,next}: {
-  gradeIndex:number;width:number;height:number;
-  positions:readonly {x:number;y:number}[];grade:WorldGrade;next:number;
-}) {
-  if (grade.id === 'preschool') {
-    return <PreschoolPixelTerrain width={width} height={height} positions={positions} grade={grade} next={next}/>;
-  }
-  if (grade.id === 'e1') {
-    return <ToyPixelTerrain width={width} height={height} positions={positions} grade={grade} next={next}/>;
-  }
-  const p=palette[gradeIndex];
-  const paths=islandRouteByKind(grade.stages,positions.map((spot,order)=>({...spot,order,row:Math.floor(order/5),column:0})));
-  return (
-    <Svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" accessible={false}>
-      <Defs>
-        <LinearGradient id="island-water" x1="0" y1="0" x2="0.8" y2="1">
-          <Stop offset="0" stopColor="#528eaf"/><Stop offset="1" stopColor="#94c9cb"/>
-        </LinearGradient>
-        <LinearGradient id="island-land" x1="0" y1="0" x2="1" y2="1">
-          <Stop offset="0" stopColor={p.land}/><Stop offset=".63" stopColor={p.land}/><Stop offset="1" stopColor={p.dark}/>
-        </LinearGradient>
-      </Defs>
-      <Rect width={width} height={height} fill="url(#island-water)"/>
-      <OceanTexture width={width} height={height} seed={gradeIndex+3}/>
-      <Path d={longIslandCoast(width,height)} transform="translate(0 10)"
-        fill="#2a5f82" opacity={0.38}/>
-      <Path d={longIslandCoast(width,height)}
-        fill="url(#island-land)" stroke="#f7e8bb" strokeWidth={8} strokeLinejoin="round"/>
-      {Array.from({length:13},(_,row)=>{
-        const y=130+row*119;
-        const side=row%2===0?width*0.12:width*0.82;
-        return (
-          <G key={row}>
-            <Ellipse cx={width/2} cy={y} rx={width*0.40} ry={43}
-              fill={row>=12?'#d4acd8':row>=10?'#e8d39a':p.dark} opacity={row>=10?0.32:0.18}/>
-            <G transform={`translate(${side} ${y-42})`}>
-              <Path d="M-23 21L-7-14 11 21Z" fill={p.detail} opacity={0.77}/>
-              <Path d="M-9 21L13-27 34 21Z" fill={p.detail} opacity={0.85}/>
-              <Path d="M6-12L13-27 21-9Z" fill="#fff3d8"/>
-              <Path d="M-15 2L-7-14 2 3Z" fill="#e0e6df"/>
-            </G>
-            {Array.from({length:3},(_,k)=>{
-              const tx=width*(0.15+((row*3+k*2)%7)/10);
-              const ty=y+31+(k%2)*12;
-              return <G key={k} transform={`translate(${tx} ${ty})`}>
-                <Path d="M-3 11V0H3V11Z" fill="#795f57"/>
-                <Path d="M-12 2L0-24 12 2Z" fill={p.detail}/>
-                <Path d="M-9-7L0-24 5-9Z" fill="#b7e8b9" opacity={0.55}/>
-              </G>;
-            })}
-          </G>
-        );
-      })}
-      <Path d={routeThrough(paths.normal)}
-        fill="none" stroke="#46685d" strokeWidth={15} strokeLinecap="round" opacity={0.55}/>
-      <Path d={routeThrough(paths.normal)}
-        fill="none" stroke="#f8e4ac" strokeWidth={10} strokeLinecap="round"/>
-      <Path d={routeThrough(paths.normal)}
-        fill="none" stroke="#fff9df" strokeWidth={2} strokeDasharray="3 8" strokeLinecap="round"/>
-      <Path d={routeThrough(paths.extra)}
-        fill="none" stroke="#705aa2" strokeWidth={10} strokeLinecap="round"/>
-      <Path d={routeThrough(paths.extra)}
-        fill="none" stroke="#e9d0ff" strokeWidth={2} strokeDasharray="3 7"/>
-      <Path d={routeThrough(paths.secret)}
-        fill="none" stroke="#8a5d87" strokeWidth={10} strokeLinecap="round"/>
-      <Path d={routeThrough(paths.secret)}
-        fill="none" stroke="#ffe9bb" strokeWidth={2} strokeDasharray="3 7"/>
-      {next>=0 && (
-        <G>
-          <Circle cx={positions[next].x} cy={positions[next].y}
-            r={31} fill="#ffe09d" opacity={0.37}/>
-          <Circle cx={positions[next].x} cy={positions[next].y}
-            r={33} stroke="#fff8bc" strokeDasharray="4 6" strokeWidth={2} fill="none"/>
-        </G>
-      )}
-    </Svg>
-  );
+/** Every island shares the approved preschool stage/path geometry.
+ * The two approved child-island silhouettes are preserved, while the other
+ * fourteen use a palette-driven pixel terrain with collision-safe landmarks.
+ */
+function IslandTerrain({width,height,positions,grade,next}:{
+  width:number;height:number;positions:readonly {x:number;y:number}[];
+  grade:WorldGrade;next:number;
+}){
+  if(grade.id==='preschool')
+    return <PreschoolPixelTerrain width={width} height={height}
+      positions={positions} grade={grade} next={next}/>;
+  if(grade.id==='e1')
+    return <ToyPixelTerrain width={width} height={height}
+      positions={positions} grade={grade} next={next}/>;
+  return <SharedThemedPixelTerrain width={width} height={height}
+    positions={positions} grade={grade} next={next}/>;
 }
 
 function stageText(stage:WorldStage):string {
@@ -293,16 +190,12 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
   const compactStageMap=compactIslandStageMap(actual);
   const standardPixelMap=isStandardPixelIsland(grade.id);
   const standardTheme=standardPixelIslandConfig(grade.id);
+  const islandColors=islandPixelPalette(grade.id);
   const geometry=islandStageLayout(actual,grade.stages.length,
     standardPixelMap?PRESCHOOL_MAP_TITLE_INSET:0,standardPixelMap);
   const detailStage=standardPixelMap ? grade.stages.find(stage=>stage.id===detailStageId) : undefined;
-  const stageInfo=(stage:WorldStage)=>{
-    if(stage.gradeId==='preschool')return preschoolStageMapInfo(stage);
-    const info=gradeOneStageMapInfo(stage);
-    return info??{title:stageCategoryName(grade,stage),goal:'この ステージで まなぼう。'};
-  };
+  const stageInfo=(stage:WorldStage)=>sharedIslandStageMapInfo(grade,stage);
   const stats=gradeProgress(progress,grade.id);
-  const gradeIndex=worldIslands.findIndex(g=>g.id===grade.id);
   const testing = mode === 'test';
   const next = testing ? undefined : grade.stages.find(stage => ['play', 'learn'].includes(worldStageAction(mode, progress, stage, access)) && !progress.stages[stage.id]);
   const lessons = unitLessons.filter(lesson => lesson.grade === grade.id);
@@ -412,9 +305,9 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         const nextWidth=Math.round(event.nativeEvent.layout.width);
         if(nextWidth>0&&nextWidth!==width)setWidth(nextWidth);
       }}>
-        <View pointerEvents="none" testID={grade.id==='preschool'?'preschool-plush-pixel-v2':grade.id==='e1'?'toy-island-pixel-v1':undefined}
+        <View pointerEvents="none" testID={grade.id==='preschool'?'preschool-plush-pixel-v2':grade.id==='e1'?'toy-island-pixel-v1':'pixel-island-'+grade.id}
           style={StyleSheet.absoluteFill}>
-          <IslandTerrain gradeIndex={gradeIndex} width={actual} height={geometry.height}
+          <IslandTerrain width={actual} height={geometry.height}
             positions={geometry.positions} grade={grade} next={next?.order ?? -1}/>
         </View>
         {grade.id==='preschool' && (
@@ -430,7 +323,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         )}
         {grade.id==='e1' && (
           <View testID="toy-map-top-title" pointerEvents="none"
-            style={[styles.preschoolMapTopTitle,compactStageMap&&styles.preschoolMapTopTitleCompact]}>
+            style={[styles.preschoolMapTopTitle,compactStageMap&&styles.preschoolMapTopTitleCompact,
+              {backgroundColor:'#f8e9d2',borderColor:'#b98173'}]}>
             <Text style={styles.preschoolMapTopGrade}>{standardTheme?.grade}</Text>
             <View style={styles.preschoolMapTopNameWithPaws}>
               <ToyBlockStamp compact={compactStageMap}/>
@@ -438,6 +332,20 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
                 {standardTheme?.title}
               </Text>
               <ToyBlockStamp flipped compact={compactStageMap}/>
+            </View>
+          </View>
+        )}
+        {standardPixelMap && grade.id!=='preschool' && grade.id!=='e1' && (
+          <View testID={'themed-map-top-title-'+grade.id} pointerEvents="none"
+            style={[styles.preschoolMapTopTitle,compactStageMap&&styles.preschoolMapTopTitleCompact,
+              {backgroundColor:islandColors?.paper??'#f5edce',borderColor:islandColors?.accent??'#7e9a73'}]}>
+            <Text style={styles.preschoolMapTopGrade}>{standardTheme?.grade}</Text>
+            <View style={styles.preschoolMapTopNameWithPaws}>
+              <IslandThemeStamp id={grade.id} compact={compactStageMap}/>
+              <Text style={[styles.preschoolMapTopName,compactStageMap&&styles.preschoolMapTopNameCompact]}>
+                {standardTheme?.title}
+              </Text>
+              <IslandThemeStamp id={grade.id} flipped compact={compactStageMap}/>
             </View>
           </View>
         )}
@@ -474,7 +382,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           const labelLayout=preschoolStageLabelLayout(actual,position,marker);
           return <Pressable key={'stage-topic-'+stage.id}
             accessibilityRole="button" accessibilityLabel={'ステージ '+String(index+1)+' の ないようを みる '+info.title}
-            testID={(grade.id==='preschool'?'preschool-stage-topic-':'toy-stage-topic-')+String(index+1)}
+            testID={(grade.id==='preschool'?'preschool-stage-topic-':
+              grade.id==='e1'?'toy-stage-topic-':'island-stage-topic-'+grade.id+'-')+String(index+1)}
             onPress={()=>setDetailStageId(stage.id)}
             style={[styles.preschoolStageTopic,labelLayout]}>
             <Text numberOfLines={compactStageMap?3:2}
@@ -575,7 +484,8 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
           const playable=preview
             ? Boolean(uiPreviewSampleKind(detailStage)) || hasStageBank(detailStage.id)
             : ['play','learn'].includes(worldStageAction(mode,progress,detailStage,access));
-          return <View testID={grade.id==='preschool'?'preschool-stage-info-card':'toy-stage-info-card'}
+          return <View testID={grade.id==='preschool'?'preschool-stage-info-card':
+            grade.id==='e1'?'toy-stage-info-card':'island-stage-info-card-'+grade.id}
             style={[styles.preschoolStageInfoCard,{
               top:Math.min(geometry.height-188,position.y+marker/2+48),
               left:compactStageMap?12:Math.max(30,Math.round(actual*.2)),
