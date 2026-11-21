@@ -9,8 +9,8 @@ const PUBLIC_HOME_URL = 'https://saaaaayan.github.io/kazu-no-tobira/';
 
 /**
  * Use the gold start button already painted in the approved illustration.
- * Preserve all pixels and draw other actions as matching gold-trimmed
- * 8-bit controls. The transparent primary hit target is accessible.
+ * Preserve all pixels and draw other actions as matching dark-blue,
+ * beveled 8-bit controls. The transparent primary hit target is accessible.
  */
 export function ModeControls({ mode, onChange }: { mode: PlayMode; onChange: (mode: PlayMode) => void }) {
   return (
@@ -134,19 +134,21 @@ const styles = StyleSheet.create({
   mobileControls: { width: '100%', paddingHorizontal: 12, paddingBottom: 16, paddingTop: 10, gap: 10 },
   wideControls: { maxWidth: 760, alignSelf: 'center', paddingHorizontal: 18, paddingTop: 16, paddingBottom: 22, gap: 12 },
   pixelFrame: {
-    borderRadius: 0, borderWidth: 3, borderColor: '#ffe5a0',
+    borderRadius: 0, borderWidth: 3, backgroundColor: '#203b54',
+    borderTopColor: '#c0d5c8', borderLeftColor: '#c0d5c8',
+    borderRightColor: '#527076', borderBottomColor: '#527076',
     shadowColor: '#091b32', shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 0.9, shadowRadius: 0, elevation: 3,
     alignItems: 'center', justifyContent: 'center',
   },
   pixelLabel: { fontWeight: '900', textAlign: 'center' },
-  mobileIntro: { backgroundColor: '#f2bf54', minHeight: 60, paddingHorizontal: 10 },
-  mobileIntroLabel: { color: '#122846', fontSize: 19 },
+  mobileIntro: { minHeight: 60, paddingHorizontal: 10 },
+  mobileIntroLabel: { color: '#f5ecd5', fontSize: 19 },
   mobileRow: { flexDirection: 'row', gap: 10 },
-  mobileCard: { flex: 1, minWidth: 0, minHeight: 56, backgroundColor: '#233858', paddingHorizontal: 8 },
-  mobileCardLabel: { color: '#ffebbb', fontSize: 15 },
-  mobileUtility: { flex: 1, minWidth: 0, minHeight: 50, backgroundColor: '#192e4e' },
-  mobileUtilityLabel: { color: '#ffebbb', fontSize: 14 },
+  mobileCard: { flex: 1, minWidth: 0, minHeight: 56, paddingHorizontal: 8 },
+  mobileCardLabel: { color: '#f5ecd5', fontSize: 15 },
+  mobileUtility: { flex: 1, minWidth: 0, minHeight: 50 },
+  mobileUtilityLabel: { color: '#f5ecd5', fontSize: 14 },
   note: { width: '96%', padding: 14, gap: 9, marginVertical: 7, borderRadius: 10, backgroundColor: '#203c52' },
   noteTitle: { color: '#f8e0ab', fontWeight: '900', fontSize: 19 },
   noteText: { color: '#f4eedb', fontSize: 14, fontWeight: '700', lineHeight: 22 },
