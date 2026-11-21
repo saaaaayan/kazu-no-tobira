@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, {G,Rect} from 'react-native-svg';
 import { CompanionAvatar } from './AdventureCompanion';
@@ -178,13 +178,16 @@ function stageText(stage:WorldStage):string {
   return '伝'+String(stage.order-59);
 }
 
-export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitles,onLearn,onCheckpoint,preview=false}: {
+export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitles,onLearn,onCheckpoint,preview=false,focusStageId,onFocusStagePosition}: {
   grade:WorldGrade;progress:Progress;mode:PlayMode;access:Entitlement;onBack:()=>void;onStart:(stage:WorldStage)=>void;onTitles:()=>void;
   onLearn:(lesson:UnitLesson)=>void;
   onCheckpoint:(item:Checkpoint)=>void;
   preview?:boolean;
+  focusStageId?:string;
+  onFocusStagePosition?:(position:number)=>void;
 }) {
   const [width,setWidth]=useState(0);
+  const [oceanTop,setOceanTop]=useState<number | undefined>();
   const [detailStageId,setDetailStageId]=useState<string|null>(null);
   const actual=measuredWidth(width);
   const compactStageMap=compactIslandStageMap(actual);
@@ -194,6 +197,12 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
   const geometry=islandStageLayout(actual,grade.stages.length,
     standardPixelMap?PRESCHOOL_MAP_TITLE_INSET:0,standardPixelMap);
   const detailStage=standardPixelMap ? grade.stages.find(stage=>stage.id===detailStageId) : undefined;
+  const focusStage=focusStageId ? grade.stages.find(stage=>stage.id===focusStageId) : undefined;
+  useEffect(() => {
+    if (width <= 0 || oceanTop === undefined || !focusStage || !onFocusStagePosition) return;
+    const position=geometry.positions[focusStage.order];
+    if (position) onFocusStagePosition(oceanTop + position.y);
+  }, [width, oceanTop, focusStage?.id, geometry.height, onFocusStagePosition]);
   const stageInfo=(stage:WorldStage)=>sharedIslandStageMapInfo(grade,stage);
   const stats=gradeProgress(progress,grade.id);
   const testing = mode === 'test';
@@ -304,6 +313,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
       <View style={[styles.ocean,standardPixelMap&&styles.pixelOcean,{height:geometry.height}]} onLayout={event=>{
         const nextWidth=Math.round(event.nativeEvent.layout.width);
         if(nextWidth>0&&nextWidth!==width)setWidth(nextWidth);
+        setOceanTop(event.nativeEvent.layout.y);
       }}>
         <View pointerEvents="none" testID={grade.id==='preschool'?'preschool-plush-pixel-v2':grade.id==='e1'?'toy-island-pixel-v1':'pixel-island-'+grade.id}
           style={StyleSheet.absoluteFill}>
