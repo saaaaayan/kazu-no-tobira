@@ -78,7 +78,7 @@ test('preschool 11–15 tracing objectives and 10-task digit distributions are a
     assert.deepEqual(item.betaTenQuestionTargets,expected[n-11]);
     assert.equal(Object.values(item.betaTenQuestionTargets).reduce((a,b)=>a+b,0),10);
     assert.equal(preschoolStageMapInfo({id:item.stageId,title:item.title}).title,item.title);
-    assert.match(item.guard,/なぞ|入力|揺れ|動き|抽象/u);
+    assert.match(item.guard,/認識|揺れ|動き|不安定|抽象/u);
   }
   assert.match(stage(15).goal,/10は1と0の2文字/u);
   assert.match(stage(15).guard,/0×5／10×5/u);
