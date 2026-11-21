@@ -85,6 +85,9 @@ if(!bundle.toString('utf8').includes('toy-island-pixel-v1'))
   throw new Error('The compiled preview does not contain the grade-one toy map.');
 if(!bundle.toString('utf8').includes('all-16-island-pixel-themes-v1'))
   throw new Error('The compiled preview does not contain the sixteen thematic map renderer.');
+// The visual-only atlas has no scripts, storage, API, or question data.
+mkdirSync(resolve(target,'art-review'),{recursive:true});
+copyFileSync(resolve('public/art-review/index.html'),resolve(target,'art-review/index.html'));
 const index=resolve(target,'index.html');
 if (pages) writePagesAdminEntry(target);
 else writeFileSync(index,readFileSync(index,'utf8').replace('<head>',
@@ -93,6 +96,7 @@ writeFileSync(resolve(target,'version.json'),JSON.stringify({
   version,profile:'ui-preview',indexSha256:contentDigest(readFileSync(index)),entrySha256:contentDigest(bundle),
   publishedBankQuestions:publicBankIds.length*100,bankSha256:bankFiles,
   approvedWorldMapSha256:contentDigest(mapBytes),
+  wildlifeReviewSha256:contentDigest(readFileSync(resolve(target,'art-review/index.html'))),
   pixelSceneryV2:true,
   preschoolPlushPixelV2:true,toyIslandPixelV1:true,allIslandPixelThemesV1:true,
   ...(pages ? {adminSha256:contentDigest(readFileSync(resolve(target,'admin/index.html')))} : {}),

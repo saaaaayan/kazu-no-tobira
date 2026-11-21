@@ -13,9 +13,10 @@ export function PixelLandmark({kind,x,y,width,height,theme}:{
 }) {
   const rows=ISLAND_SPRITES[kind];
   const sourceWidth=Math.max(...rows.map(row=>row.length));
-  const pixel=Math.min(width/sourceWidth,height/rows.length);
+  const inset=kind==='forestRabbit'?.1:0;
+  const pixel=Math.min(width/sourceWidth,height/rows.length)*(1-inset*2);
   const colors:Record<string,string>={X:theme.ink,B:theme.stripe,A:theme.accent,F:theme.paper,R:'#b36d59',...WILDLIFE_COLORS[kind]};
-  return <G transform={'translate('+x+' '+y+') scale('+pixel+')'}>
+  return <G transform={'translate('+(x+width*inset)+' '+(y+height*inset)+') scale('+pixel+')'}>
     {ISLAND_SPRITE_RUNS[kind].map((run,index)=><Rect key={index}
       x={run.x} y={run.y} width={run.width} height={1} fill={colors[run.color]}/>)}
   </G>;

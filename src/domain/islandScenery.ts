@@ -130,7 +130,7 @@ export function islandScenery(id:StandardPixelIslandId,width:number,height:numbe
     }
   }
   function placeGround() {
-  for(let i=0;i<(compact?55:140);i++) {
+  for(let i=0;i<(wildlife?(compact?20:45):(compact?55:140));i++) {
     const kind=art.ground[i%art.ground.length];
     if(kind==='stoneMaze')continue;
     for(let attempt=0;attempt<25;attempt++) {
@@ -157,7 +157,8 @@ export function islandScenery(id:StandardPixelIslandId,width:number,height:numbe
     }
   }
   for(const size of ['large','medium','small'] as const) {
-    if(size==='medium'){reserveForestSpecies();placeGround();}
+    if(size==='small'&&wildlife)placeGround();
+    if(size==='medium'){reserveForestSpecies();if(!wildlife)placeGround();}
     // Existing plush and toy heroes retain their detailed silhouettes.
     if(legacy&&size==='large')continue;
     const kinds=shuffled(art[size],random);
@@ -166,6 +167,9 @@ export function islandScenery(id:StandardPixelIslandId,width:number,height:numbe
       :size==='large'?16:size==='medium'?56:100;
     for(let i=0;i<target;i++) {
       const kind=kinds[i%kinds.length];
+      // Small bone-like marks compete with the living silhouettes. Keep them
+      // in the atlas, but let plants, eggs and rocks carry this island.
+      if(id==='e4'&&['prehistoricSkeleton','prehistoricBoneChips','prehistoricAsh','prehistoricLavaCrack'].includes(kind))continue;
       for(let attempt=0;attempt<100;attempt++) {
         const pixels=kind==='prehistoricTracks'?(compact?36:46):wildlife
           ?size==='large'?wildlifeHeroSize:size==='medium'?(compact?40:52):(compact?23:29)

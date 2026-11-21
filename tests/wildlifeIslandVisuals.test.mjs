@@ -19,15 +19,16 @@ test('forest heroes are four different whole-body animals, with wildlife and nat
   assert.equal(art.small.length,8);
 });
 
-test('prehistoric heroes include four recognizable dinosaur silhouettes plus a volcano',()=>{
+test('prehistoric heroes include five recognizable dinosaur silhouettes plus a volcano',()=>{
   const art=ISLAND_ART_SETS.e4;
-  assert.deepEqual(art.large,['prehistoricRex','prehistoricTriceratops','prehistoricPterosaur','prehistoricLongneck','prehistoricVolcano']);
+  assert.deepEqual(art.large,['prehistoricRex','prehistoricTriceratops','prehistoricPterosaur','prehistoricLongneck','prehistoricStegosaurus','prehistoricVolcano']);
   const wing=WILDLIFE_SPRITES.prehistoricPterosaur;
   const neck=WILDLIFE_SPRITES.prehistoricLongneck;
-  assert.ok(wing[0].length>wing.length,'pterosaur has a broad wingspan');
+  assert.equal(wing[0].length,32);
+  assert.equal(wing.length,32);
   assert.ok(neck.length>25,'longneck has a tall silhouette');
   assert.ok([...art.large,...art.medium,...art.small].every(kind=>kind.startsWith('prehistoric')));
-  assert.equal(new Set(art.large.map(kind=>WILDLIFE_SPRITES[kind].join(''))).size,5);
+  assert.equal(new Set(art.large.map(kind=>WILDLIFE_SPRITES[kind].join(''))).size,6);
   assert.equal(art.medium.length,8);
   assert.equal(art.small.length,8);
 });
@@ -46,7 +47,7 @@ test('wildlife receives priority at the start and across the island without movi
       const animals=large.filter(item=>item.kind!=='prehistoricVolcano');
       assert.ok(animals.length/large.length>=.7,id+' animal heroes must dominate');
       const kinds=new Set(animals.map(item=>item.kind));
-      assert.equal(kinds.size,4,id+' show all four species across the island');
+      assert.equal(kinds.size,id==='e2'?4:5,id+' show every principal species across the island');
       if(id==='e2'){
         const allKinds=new Set(scene.decorations.map(item=>item.kind));
         for(const species of [...ISLAND_ART_SETS.e2.large,'forestSquirrel','forestOwl','forestRaccoon','forestBird'])
