@@ -77,8 +77,10 @@ export function GroundTile({item,theme}:{item:GroundDecoration;theme:IslandPixel
           <Path d="M3 1V5H8V10H13V17" stroke="#796851" strokeWidth={4} fill="none"/>
           <Path d="M3 1V5H8V10H13V17" stroke="#b47956" strokeWidth={1.5} fill="none"/>
         </>:kind==='prehistoricFossils'?<>
-          <Path d="M4 11L13 6M6 10L7 14M9 8L10 12M12 6L13 10"
+          <Path d="M2 12L13 6M3 12L1 14M6 10L7 14M9 8L10 12M12 6L13 10"
             stroke="#ddd0a6" strokeWidth={1.5} fill="none"/>
+          <Path d="M12 3H16L18 5V8H13L12 6Z" fill="#ddd0a6"/>
+          <Rect x={15} y={4} width={1} height={1} fill="#796851"/>
           <Path d="M2 4H5M13 13H16" stroke="#877557" strokeWidth={1}/>
         </>:kind==='prehistoricFernBed'?<Path d="M8 15V4M8 7L3 4M8 7L13 4M8 11L2 7M8 11L14 7M8 14L3 11M8 14L13 11"
           stroke="#5c7c53" strokeWidth={1.2} fill="none"/>
