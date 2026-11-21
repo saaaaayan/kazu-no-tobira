@@ -86,6 +86,11 @@ test('all twenty living species have unique silhouettes and recur without adjace
     for(const [id,kinds] of [['e2',forest],['e4',dinosaurs]]){
       const scene=islandScenery(id,width,layout.height,layout.positions);
       for(const kind of kinds)assert.ok(scene.decorations.some(item=>item.kind===kind),kind+' absent at '+width);
+      for(let row=0;row<13;row++){
+        const inGap=scene.decorations.filter(item=>item.y>=layout.positions[row*5].y
+          &&item.y<(layout.positions[(row+1)*5]?.y??layout.height));
+        assert.equal(new Set(inGap.map(item=>item.kind)).size,inGap.length,id+' repeats in gap '+row+' at '+width);
+      }
       for(const [index,item] of scene.decorations.entries())for(const other of scene.decorations.slice(index+1)){
         if(item.kind!==other.kind)continue;
         assert.ok(Math.hypot(item.x-other.x,item.y-other.y)>=(width<620?110:170),item.kind+' repeated too close');
