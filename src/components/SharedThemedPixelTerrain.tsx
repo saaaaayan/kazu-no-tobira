@@ -101,7 +101,7 @@ export function SharedThemedPixelTerrain({width,height,positions,grade,next}:{
   // The preschool and grade-one legacy art retain their exact appearance;
   // only other themes enter this shared parameterised renderer.
   const types=theme.motifs as readonly string[];
-  return <Svg testID={'pixel-island-'+grade.id}
+  return <Svg testID={'all-16-island-pixel-themes-v1-'+grade.id}
     width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}
     preserveAspectRatio="none" accessible={false}>
     <Rect width={width} height={height} fill={theme.water}/>
