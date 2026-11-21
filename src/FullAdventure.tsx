@@ -604,7 +604,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {round && question && (isolated || canAccessStage(access, round.stage)) && (
             <View style={styles.playPanel}>
               <Pressable accessibilityRole="button" disabled={saving} onPress={goToIsland} style={styles.back}>
-                <Text style={styles.backText}>{review ? '‹ 審査に戻る' : countingGuide ? '‹ もどる' : '‹ '+grade.island+'のマップへ'}</Text>
+                <Text style={styles.backText}>{review ? '‹ 審査に戻る' : '‹ '+grade.island+'のマップへ'}</Text>
               </Pressable>
               {round.complete ? (
                 <View style={styles.finish}>
