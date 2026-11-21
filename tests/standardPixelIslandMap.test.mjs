@@ -8,6 +8,7 @@ import {PRESCHOOL_MAP_TITLE_INSET,islandStageLayout,
 import {preschoolDecorationLayout,preschoolMapExclusionZones,
   preschoolDecorationBounds} from '../src/domain/preschoolDecorLayout.ts';
 import {gradeOnePreviewStageInfo} from '../src/domain/gradeOnePreviewCurriculum.ts';
+import {gradeOneStageMapInfo} from '../src/domain/gradeOneStageMapInfo.ts';
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 
 test('preschool and grade-one island share identical geometries at phone and desktop widths',()=>{
@@ -106,4 +107,17 @@ test('the permanent all-island design decision is stored in the project',()=>{
   assert.match(document,/共通テンプレート/u);
   assert.match(document,/おもちゃの島/u);
   assert.match(document,/確認テスト/u);
+});
+
+test('every toy-island stage has a distinct title, and premium-only stages remain proposals',()=>{
+  const gradeOne=worldIslands.find(grade=>grade.id==='e1');
+  assert.ok(gradeOne);
+  const items=gradeOne.stages.map(gradeOneStageMapInfo);
+  assert.equal(items.length,65);
+  assert.ok(items.every(info=>Boolean(info?.title)&&Boolean(info?.goal)));
+  assert.equal(new Set(items.map(info=>info.title)).size,65);
+  assert.ok(items.slice(0,50).every(info=>!info.provisional));
+  assert.ok(items.slice(50).every(info=>info.provisional));
+  const source=read('src/components/WorldScenes780.tsx');
+  assert.match(source,/const info=gradeOneStageMapInfo\(stage\)/u);
 });
