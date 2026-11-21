@@ -121,3 +121,12 @@ test('every toy-island stage has a distinct title, and premium-only stages remai
   const source=read('src/components/WorldScenes780.tsx');
   assert.match(source,/const info=gradeOneStageMapInfo\(stage\)/u);
 });
+
+test('release manifests and public URL verifier require the live toy map bundle',()=>{
+  const exporter=read('scripts/export-ui-preview.mjs');
+  const verifier=read('scripts/verify-web-release.mjs');
+  assert.match(exporter,/toyIslandPixelV1:true/u);
+  assert.match(exporter,/includes\('toy-island-pixel-v1'\)/u);
+  assert.match(verifier,/version.toyIslandPixelV1 === true/u);
+  assert.match(verifier,/js.includes\('toy-island-pixel-v1'\)/u);
+});
