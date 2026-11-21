@@ -178,13 +178,14 @@ function stageText(stage:WorldStage):string {
   return '伝'+String(stage.order-59);
 }
 
-export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitles,onLearn,onCheckpoint,preview=false,focusStageId,onFocusStagePosition}: {
+export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitles,onLearn,onCheckpoint,preview=false,focusStageId,onFocusStagePosition,onMapLayout}: {
   grade:WorldGrade;progress:Progress;mode:PlayMode;access:Entitlement;onBack:()=>void;onStart:(stage:WorldStage)=>void;onTitles:()=>void;
   onLearn:(lesson:UnitLesson)=>void;
   onCheckpoint:(item:Checkpoint)=>void;
   preview?:boolean;
   focusStageId?:string;
   onFocusStagePosition?:(position:number)=>void;
+  onMapLayout?:(position:number)=>void;
 }) {
   const [width,setWidth]=useState(0);
   const [oceanTop,setOceanTop]=useState<number | undefined>();
@@ -288,7 +289,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
     </>
   );
   return (
-    <View style={[styles.screen,standardPixelMap&&styles.preschoolScreen]}>
+    <View style={[styles.screen,standardPixelMap&&styles.preschoolScreen]} onLayout={event=>onMapLayout?.(event.nativeEvent.layout.y)}>
       <Pressable accessibilityRole="button" onPress={onBack} style={styles.back}>
         <Text style={styles.backText}>{standardPixelMap?'‹ せかいちずへ':'‹ 世界地図に もどる'}</Text>
       </Pressable>
