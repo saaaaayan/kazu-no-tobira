@@ -1,8 +1,8 @@
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
+import Svg, { Circle, G, Path, Rect, Text as SvgText } from 'react-native-svg';
 import { worldIslands } from '../domain/worldCatalog';
 import type { PlayMode } from '../domain/playMode';
-import { CompanionAvatar } from './AdventureCompanion';
 import VersionNotice from './VersionNotice';
 
 export function ModeControls({ mode, onChange }: { mode: PlayMode; onChange: (mode: PlayMode) => void }) {
@@ -27,48 +27,89 @@ export function ModeBadge({ mode }: { mode: PlayMode }) {
   </Text>;
 }
 
-function PortalArt() {
+/** Crisp, scalable 8-bit style art, with the OFFICIAL Euler silhouette.
+ * The same floppy hat, feather, cape and infinity staff define Euler in color and silhouette.
+ * Drawn with SVG geometry so the hero needs no remote image and stays sharp at any viewport.
+ */
+function EulerPixelPortal() {
+  const stars: ReadonlyArray<readonly [number, number, number]> = [
+    [52,39,2],[121,77,3],[188,40,2],[262,112,3],[318,44,2],[590,35,2],
+    [646,96,3],[711,48,2],[798,102,2],[852,39,3],[91,169,2],[779,164,2],
+    [217,196,2],[693,193,3],[362,116,2],[542,113,2],
+  ];
+  const symbols: ReadonlyArray<readonly [string,number,number,number]> = [
+    ['π',105,112,34],['∞',201,76,31],['Σ',304,153,26],
+    ['∫',611,94,35],['e',710,138,31],['i',783,79,28],
+    ['√',127,209,27],['x²',762,221,26],
+  ];
   return (
-    <Svg width="100%" height="100%" viewBox="0 0 580 500" preserveAspectRatio="xMidYMid slice" accessible={false}>
-      <Defs>
-        <LinearGradient id="homeSky" x2="0%" y2="100%">
-          <Stop offset="0" stopColor="#142d49" /><Stop offset=".57" stopColor="#35616a" /><Stop offset="1" stopColor="#b2a471" />
-        </LinearGradient>
-        <RadialGradient id="homeHalo">
-          <Stop offset="0" stopColor="#ffec9c" stopOpacity={0.88} /><Stop offset="1" stopColor="#f2ca72" stopOpacity={0} />
-        </RadialGradient>
-        <LinearGradient id="homeDoor" x2="0%" y2="100%">
-          <Stop offset="0" stopColor="#fff5bd" /><Stop offset=".55" stopColor="#b1edd3" /><Stop offset="1" stopColor="#59a99c" />
-        </LinearGradient>
-      </Defs>
-      <Rect width={580} height={500} fill="url(#homeSky)" />
-      <Circle cx={298} cy={231} r={226} fill="url(#homeHalo)" />
-      <G fill="#e0e6c1" opacity={0.35}>
-        <Path d="M0 186Q44 174 74 186Q109 165 164 190H0ZM368 148Q421 122 455 143Q483 128 530 150Z" />
-        <Path d="M74 106Q124 86 165 104Q198 88 239 113H53Z" />
-      </G>
-      <Path d="M0 264L71 208 117 243 187 207 251 277 347 219 413 247 476 186 580 256V500H0Z" fill="#467378" />
-      <Path d="M0 316Q74 244 139 283Q176 272 227 312Q305 249 365 277Q464 223 580 311V500H0Z" fill="#355c66" />
-      <Path d="M0 378Q119 303 225 337Q310 373 410 314Q503 288 580 350V500H0Z" fill="#204650" />
-      <Path d="M204 500Q346 449 279 415Q249 382 287 346L313 345Q292 392 346 413Q410 456 359 500Z"
-        fill="#e2c481" opacity={0.52} />
-      <Ellipse cx={300} cy={361} rx={102} ry={19} fill="#193e49" opacity={0.75} />
-      <Path d="M226 359V222Q226 148 300 130Q374 148 374 222V359Z" fill="#2b4556" stroke="#b7a170" strokeWidth={12} />
-      <Path d="M244 350V223Q244 164 300 150Q356 164 356 223V350Z"
-        fill="url(#homeDoor)" stroke="#e0cf93" strokeWidth={5} />
-      <Path d="M261 337V226Q261 179 300 167Q339 179 339 226V337" fill="none" stroke="#fff3c3" strokeWidth={2} opacity={0.74} />
-      <Path d="M225 252H245M355 252H375M225 289H245M355 289H375M251 173L238 155M350 172L363 154M300 150V129"
-        stroke="#decc94" strokeWidth={2} opacity={0.8} />
-      <Path d="M217 355H383L394 367H206Z" fill="#b7a779" />
-      {[[81,80],[131,151],[222,105],[406,111],[472,73],[526,197],[182,231],[412,211],[211,321],[395,313]].map(([x, y], i) => (
-        <G key={i} transform={`translate(${x} ${y})`} fill="#ffeeac" opacity={i % 2 ? 0.65 : 0.94}>
-          <Path d="M0-9Q1-1 8 0Q1 1 0 9Q-1 1-8 0Q-1-1 0-9Z" />
-          <Circle cx={11} cy={-11} r={1.7} />
-        </G>
+    <Svg width="100%" height="100%" viewBox="0 0 900 410" preserveAspectRatio="xMidYMid slice" accessible={false}>
+      <Rect width={900} height={410} fill="#10273b"/>
+      <Rect y={175} width={900} height={235} fill="#173b46"/>
+      <Path d="M0 237H35V215H69V197H112V219H150V195H194V223H223V262H0Z" fill="#284958"/>
+      <Path d="M900 243H856V218H824V193H792V213H745V187H708V232H669V264H900Z" fill="#294a58"/>
+      <Path d="M0 283H45V263H95V245H125V261H177V244H216V287H269V338H0Z" fill="#203c4b"/>
+      <Path d="M900 282H858V260H806V239H764V262H719V247H670V284H630V340H900Z" fill="#1b3748"/>
+      {stars.map(([x,y,s],i) => <G key={'star'+i} fill={i%3===0?'#edce82':'#aec7bc'}>
+        <Rect x={x} y={y} width={s*2} height={s*2}/><Rect x={x-s} y={y+s/2} width={s*4} height={s}/><Rect x={x+s/2} y={y-s} width={s} height={s*4}/>
+      </G>)}
+      {symbols.map(([value,x,y,size],i) => (
+        <SvgText key={'symbol'+i} x={x} y={y} textAnchor="middle" fontWeight="bold"
+          fontSize={size} fill={i%3===0?'#d4bf83':'#8bbaa7'} opacity={0.65}>{value}</SvgText>
       ))}
-      <G fill="#173e46">
-        <Path d="M29 387 58 285 78 355 99 308 129 397Z" />
-        <Path d="M449 402 482 303 500 347 528 265 565 408Z" />
+      {/* Portal: stepped stone blocks and a warm, restrained glow. */}
+      <Rect x={334} y={126} width={232} height={236} fill="#334c50"/>
+      <Rect x={354} y={89} width={192} height={273} fill="#435655"/>
+      <Rect x={375} y={70} width={150} height={292} fill="#53615a"/>
+      <Rect x={397} y={56} width={106} height={306} fill="#67705d"/>
+      <Rect x={411} y={48} width={78} height={308} fill="#78795e"/>
+      <Rect x={365} y={156} width={170} height={207} fill="#d8bf7b"/>
+      <Rect x={380} y={129} width={140} height={234} fill="#e7d39a"/>
+      <Rect x={396} y={106} width={108} height={257} fill="#eadbb0"/>
+      <Rect x={412} y={91} width={76} height={272} fill="#86b6a7"/>
+      <Rect x={427} y={83} width={46} height={280} fill="#4e8b82"/>
+      <Path d="M400 359H499V273H477V244H456V228H436V244H417V275H400Z" fill="#4e8b82"/>
+      <Path d="M405 362H500V312H482V296H462V280H442V298H425V320H405Z" fill="#2c6b67"/>
+      {/* Pixelated portal frame */}
+      <Path d="M321 360V153H339V115H356V92H377V70H406V55H494V70H523V92H544V115H561V153H579V360H544V157H527V130H510V107H486V93H414V107H390V130H373V157H356V360Z" fill="#a99266"/>
+      <Path d="M329 359V157H347V119H364V99H382V78H410V64H490V78H518V99H536V119H553V157H571V359H554V155H536V124H517V103H489V87H411V103H383V124H364V155H346V359Z" fill="#e5cb8d"/>
+      <G fill="#655d54">
+        <Rect x={325} y={204} width={31} height={7}/><Rect x={325} y={266} width={31} height={7}/>
+        <Rect x={545} y={204} width={29} height={7}/><Rect x={545} y={266} width={29} height={7}/>
+        <Rect x={356} y={125} width={19} height={6}/><Rect x={525} y={125} width={20} height={6}/>
+      </G>
+      <Rect x={302} y={360} width={296} height={14} fill="#927c55"/>
+      <Rect x={323} y={374} width={255} height={9} fill="#c1a472"/>
+      <SvgText x={450} y={79} fontSize={24} fontWeight="bold" textAnchor="middle" fill="#203a3b">Σ</SvgText>
+      {/* Euler: the official solid-black silhouette. No unrelated mascot. */}
+      <G fill="#081923">
+        {/* Wide, floppy hat with stepped brim and feather */}
+        <Path d="M405 250H418V241H433V232H443V219H461V225H472V233H483V245H498V254H484V261H409Z"/>
+        <Path d="M424 236H434V219H447V209H454V196H465V204H474V213H484V226H491V242H478V237H462V230H442V242H424Z"/>
+        <Path d="M433 225H427V216H418V211H410V199H404V198H406V208H414V208H421V214H433Z"/>
+        {/* Face stays black, hair hints define profile */}
+        <Path d="M431 255H478V278H486V293H478V302H436V296H425V279H432Z"/>
+        {/* Cape pointing left, sturdy little torso */}
+        <Path d="M441 292H476V302H488V314H495V331H506V348H491V341H478V353H458V346H443V354H428V342H405V350H390V337H400V325H412V312H426V301H441Z"/>
+        <Path d="M441 346H452V361H442V374H428V366H434V351H441Z"/>
+        <Path d="M465 347H482V361H489V374H467V364H461V354H465Z"/>
+        {/* Small raised hand */}
+        <Rect x={410} y={296} width={15} height={18}/>
+        {/* Staff, with clear infinity head */}
+        <Rect x={500} y={272} width={9} height={105}/>
+        <Rect x={493} y={274} width={19} height={10}/>
+      </G>
+      <G fill="none" stroke="#081923" strokeWidth={9} strokeLinecap="square">
+        <Circle cx={494} cy={257} r={12}/><Circle cx={517} cy={257} r={12}/>
+      </G>
+      {/* Ground: old-school terrain tiles and reflections */}
+      <Rect x={0} y={383} width={900} height={27} fill="#122e39"/>
+      <Rect x={0} y={375} width={900} height={8} fill="#2c5352"/>
+      {Array.from({length:17},(_,i)=><Rect key={'stone'+i} x={i*55-10} y={388+i%3*7} width={33} height={3} fill="#517469" opacity={0.5}/>)}
+      <G fill="#254e4b">
+        <Rect x={55} y={340} width={45} height={19}/><Rect x={61} y={323} width={12} height={17}/>
+        <Rect x={150} y={354} width={36} height={9}/><Rect x={800} y={342} width={47} height={18}/>
+        <Rect x={816} y={326} width={12} height={16}/>
       </G>
     </Svg>
   );
@@ -78,64 +119,73 @@ export default function AdventureHome({ mode, onMode, onStart, loading, preview 
   mode: PlayMode; onMode: (mode: PlayMode) => void; onStart: () => void; loading: boolean; preview?: boolean;
 }) {
   const width = useWindowDimensions().width;
-  const wide = width >= 740;
   const small = width < 390;
-
+  const [showHowTo, setShowHowTo] = useState(false);
   return (
-    <View style={[styles.hero, wide && styles.heroWide]}>
-      <View style={[styles.art, wide && styles.artWide]} accessible accessibilityLabel="星のトビラの前で待つルミ">
-        <View style={StyleSheet.absoluteFill} pointerEvents="none"><PortalArt /></View>
-        <View style={[styles.lumi, wide && styles.lumiWide]} pointerEvents="none">
-          <CompanionAvatar size={wide ? 196 : small ? 110 : 139} />
-          <Text style={styles.lumiName}>ルミ</Text>
+    <View style={styles.hero}>
+      <Text style={styles.eyebrow}>MATH ADVENTURE</Text>
+      <Text accessibilityRole="header" style={[styles.title,small&&styles.titleSmall]}>数のトビラ</Text>
+      <Text style={styles.subtitle}>ひとつ解くたび、世界がひらく。</Text>
+      <View style={styles.pixelFrame} accessible accessibilityLabel="数学記号が浮かぶ夜のトビラの前に、魔法使いオイラーの黒いシルエットが立っている">
+        <EulerPixelPortal />
+      </View>
+      <Pressable accessibilityRole="button" accessibilityState={{ disabled: loading }} disabled={loading} onPress={onStart}
+        style={({ pressed }) => [styles.start,(pressed || loading) && styles.dim]}>
+        <Text style={[styles.startLabel,small&&styles.startSmall]}>{loading ? 'じゅんびちゅう…' : '▶ ぼうけんを はじめる'}</Text>
+      </Pressable>
+      <Pressable accessibilityRole="button" accessibilityState={{expanded:showHowTo}}
+        onPress={()=>setShowHowTo(previous=>!previous)} style={styles.howToButton}>
+        <Text style={styles.howToLabel}>{showHowTo ? '▲ とじる' : '▷ あそびかた'}</Text>
+      </Pressable>
+      {showHowTo && (
+        <View style={styles.howToPanel}>
+          <Text style={styles.howToText}>1. せかいちずから 島を えらぼう。</Text>
+          <Text style={styles.howToText}>2. ステージの もんだいに ちょうせんしよう。</Text>
+          <Text style={styles.howToText}>3. むずかしいときは ヒントを みよう。</Text>
+          <Text style={styles.howToText}>オイラーと いっしょに、{worldIslands.length}の島を ぼうけんしよう！</Text>
         </View>
-      </View>
-      <View style={[styles.copy, wide && styles.copyWide]}>
-        <Text accessibilityRole="header" style={[styles.title, wide && styles.titleWide]}>数のトビラ</Text>
-        <Text style={styles.subtitle}>ひとつ解くたび、世界がひらく。</Text>
-        <Text style={styles.invitation}>ルミといっしょに、{worldIslands.length}の島をめぐろう。</Text>
-        {!preview && <ModeControls mode={mode} onChange={onMode} />}
-        {!preview && <Text style={styles.modeHint}>{mode === 'test' ? '全ステージをためせるよ。記録やごほうびは のこらないよ。' : 'まなびの記録をのこしながら、島をひとつずつ開こう。'}</Text>}
-        <Pressable accessibilityRole="button" accessibilityState={{ disabled: loading }} disabled={loading} onPress={onStart}
-          style={({ pressed }) => [styles.start, (pressed || loading) && styles.dim]}>
-          <Text style={styles.startLabel}>{loading ? 'じゅんびちゅう…' : 'ぼうけんを はじめる'}</Text>
-          <Text accessible={false} style={styles.arrow}>›</Text>
-        </Pressable>
-        {!preview && <VersionNotice />}
-      </View>
+      )}
+      {!preview && <View style={styles.modeSection}>
+        <ModeControls mode={mode} onChange={onMode}/>
+        <Text style={styles.modeHint}>{mode === 'test'
+          ? 'テストモードでは きろくは のこらないよ。'
+          : 'あそんだ きろくを のこして すすもう。'}</Text>
+      </View>}
+      {!preview && <VersionNotice />}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  hero: { backgroundColor: '#132742', borderRadius: 24, overflow: 'hidden', borderWidth: 1, borderColor: '#42626c' },
-  heroWide: { flexDirection: 'row-reverse', minHeight: 522 },
-  art: { height: 236, justifyContent: 'flex-end', alignItems: 'center', position: 'relative' },
-  artWide: { flex: 1.16, height: 'auto', minHeight: 522 },
-  lumi: { alignItems: 'center', marginBottom: 12 },
-  lumiWide: { marginBottom: 56 },
-  lumiName: { color: '#fff2c4', backgroundColor: '#173b4a', borderColor: '#a8966b', borderWidth: 1,
-    fontSize: 13, fontWeight: '800', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 4 },
-  copy: { padding: 22, gap: 10, backgroundColor: '#132742' },
-  copyWide: { flex: 1, justifyContent: 'center', padding: 36, gap: 13 },
-  title: { color: '#fff2c8', fontSize: 38, lineHeight: 50, fontWeight: '900' },
-  titleWide: { fontSize: 56, lineHeight: 68 },
-  subtitle: { color: '#f4dc9c', fontSize: 17, fontWeight: '800', lineHeight: 25 },
-  invitation: { color: '#d8e9e8', fontSize: 15, lineHeight: 24, marginBottom: 5 },
-  modeControls: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  modeButton: { minHeight: 44, justifyContent: 'center', alignItems: 'center', borderRadius: 9,
-    paddingHorizontal: 12, backgroundColor: '#e7edf0', borderWidth: 1, borderColor: '#b9cdcf' },
-  selected: { backgroundColor: '#1c5c59', borderColor: '#88b7aa' },
-  selectedTest: { backgroundColor: '#614c8c', borderColor: '#c8b3ed' },
-  modeLabel: { color: '#223c52', fontSize: 13, fontWeight: '800' },
-  selectedLabel: { color: '#fff' },
-  modeHint: { color: '#d6e1f3', fontSize: 13, lineHeight: 20 },
-  start: { minHeight: 62, backgroundColor: '#f6d580', borderColor: '#ffedb7', borderWidth: 2, borderRadius: 13,
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 6, paddingHorizontal: 14, marginTop: 3 },
-  startLabel: { color: '#273044', fontWeight: '900', fontSize: 19, flexShrink: 1 },
-  arrow: { color: '#273044', fontWeight: '900', fontSize: 30 },
-  dim: { opacity: 0.65 },
-  badge: { alignSelf: 'flex-start', paddingVertical: 5, paddingHorizontal: 9, backgroundColor: '#d8ede6', color: '#174b46',
-    fontWeight: '800', borderRadius: 12, fontSize: 12, overflow: 'hidden' },
-  badgeTest: { backgroundColor: '#e9dcfb', color: '#4c346c' },
+  hero: { width:'100%', backgroundColor:'#122b3a', borderRadius:22, borderWidth:1,
+    borderColor:'#45665c', padding:16, gap:12, overflow:'hidden', alignItems:'center' },
+  eyebrow: { color:'#d6ba79', fontSize:15, letterSpacing:3, fontWeight:'900', marginTop:12, textAlign:'center' },
+  title: { color:'#f8e5b9', fontSize:47, lineHeight:61, fontWeight:'900', textAlign:'center' },
+  titleSmall: { fontSize:37, lineHeight:50 },
+  subtitle: { color:'#e3e7dc', fontSize:15, fontWeight:'700', textAlign:'center', marginBottom:3 },
+  pixelFrame: { width:'100%', aspectRatio: 2.19, maxHeight:480, minHeight:160,
+    backgroundColor:'#10273b', borderRadius:11, borderWidth:2, borderColor:'#62766c', overflow:'hidden' },
+  start: { width:'100%', minHeight:64, borderRadius:13, backgroundColor:'#f3d384', borderWidth:2,
+    borderColor:'#ffe8ad', justifyContent:'center', alignItems:'center', paddingHorizontal:12 },
+  startLabel: { color:'#172e3c', fontWeight:'900', fontSize:21, textAlign:'center' },
+  startSmall: { fontSize:17 },
+  howToButton: { width:'100%', minHeight:52, borderWidth:1, borderColor:'#799187',
+    borderRadius:12, alignItems:'center', justifyContent:'center' },
+  howToLabel: { color:'#f3e9cc', fontSize:17, fontWeight:'800' },
+  howToPanel: { width:'100%', borderRadius:10, padding:14, backgroundColor:'#21413e', gap:7 },
+  howToText: { color:'#f5eedc', fontWeight:'700', fontSize:14, lineHeight:22 },
+  modeSection: { width:'100%', alignItems:'center', gap:8, marginTop:2 },
+  modeControls: { flexDirection:'row', flexWrap:'wrap', justifyContent:'center', gap:7 },
+  modeButton: { minHeight:44, alignItems:'center', justifyContent:'center', paddingHorizontal:14,
+    borderRadius:9, backgroundColor:'#d9e5df', borderWidth:1, borderColor:'#91aa9f' },
+  selected: { backgroundColor:'#266653', borderColor:'#a2c6b0' },
+  selectedTest: { backgroundColor:'#57476c', borderColor:'#c0b0d3' },
+  modeLabel: { color:'#223e3b', fontSize:13, fontWeight:'800' },
+  selectedLabel: { color:'#fff' },
+  modeHint: { color:'#c6d8d2', fontSize:12, textAlign:'center' },
+  dim: { opacity:0.65 },
+  badge: { alignSelf:'flex-start', paddingVertical:5, paddingHorizontal:9,
+    backgroundColor:'#d8ede6', color:'#174b46', fontWeight:'800', borderRadius:12,
+    fontSize:12, overflow:'hidden' },
+  badgeTest: { backgroundColor:'#e9dcfb', color:'#4c346c' },
 });
