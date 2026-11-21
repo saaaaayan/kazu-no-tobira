@@ -295,22 +295,26 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next,theme='
     [width,height,positions.length,positions[0]?.y,positions[positions.length-1]?.y]);
   return <Svg testID={theme==='toys'?'toy-island-pixel-v1':'preschool-plush-pixel-v2'} width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}
     preserveAspectRatio="none" accessible={false}>
-    <Rect width={width} height={height} fill="#80adc4"/>
+    <Rect width={width} height={height} fill={theme==='toys'?'#7d9fba':'#80adc4'}/>
     <Rect x={10} y={10} width={width-20} height={height-20}
-      rx={9} fill="#a9cb83" stroke="#e9dfb6" strokeWidth={7}/>
+      rx={9} fill={theme==='toys'?'#d8c49e':'#a9cb83'} stroke="#e9dfb6" strokeWidth={7}/>
     <Rect x={18} y={18} width={width-36} height={height-36}
-      rx={3} fill="none" stroke="#7a9d6d" strokeWidth={2}/>
+      rx={3} fill="none" stroke={theme==='toys'?'#bca480':'#7a9d6d'} strokeWidth={2}/>
     {Array.from({length:13},(_,row)=>{
       const y=positions[row*5].y;
       return <G key={row}>
         <Rect x={26} y={y-50} width={width-52} height={75}
-          fill={row<10
+          fill={theme==='toys'
+            ? (row<10?(row%2===0?'#dbc9aa':'#d3bf9b'):
+              row<12?'#bcb3b5':'#c6b5c5')
+            : row<10
             ? (row%2===0?'#b2d28e':'#aacb83')
             : row<12
               ? (row%2===0?'#aac4b8':'#a2bdb0')
               : '#c5b5c4'}/>
         <Rect x={24} y={y+53} width={width-48} height={6}
-          fill={row<10?'#94bc77':row<12?'#88a99e':'#aa98a8'}/>
+          fill={theme==='toys'?(row<10?'#c5ac85':row<12?'#a99ea3':'#b6a0b0'):
+            row<10?'#94bc77':row<12?'#88a99e':'#aa98a8'}/>
       </G>;
     })}
     {/* Stable, collision-checked organic scattering. Never obscure checkpoint
