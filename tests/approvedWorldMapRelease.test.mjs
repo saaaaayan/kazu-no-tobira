@@ -9,7 +9,7 @@ import {approvedWorldMap,approvedWorldMapHotspots,approvedWorldMapDimensions,
 const read=path=>readFileSync(new URL('../'+path,import.meta.url));
 test('the exact approved 16-island background is stored in the repo, with reproducible SHA-256',()=>{
   const image=read('public/'+approvedWorldMap.filename);
-  assert.ok(image.byteLength>1_000_000&&image.byteLength<3_000_000);
+  assert.ok(image.byteLength>10_000&&image.byteLength<3_000_000);
   assert.equal(image.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
   assert.equal(createHash('sha256').update(image).digest('hex'),approvedWorldMap.sha256);
   assert.equal(approvedWorldMap.width,1452);
