@@ -154,3 +154,18 @@ export function SharedThemedPixelTerrain({width,height,positions,grade,next}:{
       width={58} height={58} fill="none" stroke={theme.accent} strokeWidth={2}/>}
   </Svg>;
 }
+
+/** Tiny symmetrical map-title emblems. These are SVG pixel icons, not emoji. */
+export function IslandThemeStamp({id,compact=false,flipped=false}:{
+  id:StandardPixelIslandId;compact?:boolean;flipped?:boolean;
+}){
+  const theme=ISLAND_PIXEL_PALETTES[id];
+  const kind=theme.motifs[0] as IconKind;
+  return <Svg testID={'island-stamp-'+id+(flipped?'-right':'-left')}
+    width={compact?17:23} height={compact?17:23} viewBox="0 0 32 32" accessible={false}>
+    <G transform={flipped?'translate(32 0) scale(-1 1)':undefined}>
+      <Landmark kind={kind} x={16} y={21} scale={0.76}
+        color={theme.stripe} accent={theme.accent} light={theme.paper} ink={theme.ink}/>
+    </G>
+  </Svg>;
+}
