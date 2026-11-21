@@ -75,8 +75,8 @@ test('the grade-one map has the same child-first structure, all ten signs and 65
   assert.match(map,/islandCheckpointLayout\(actual,end,marker,nextPoint,standardPixelMap\)/u);
   assert.match(map,/<ToyPixelTerrain width=\{width\} height=\{height\}/u);
   assert.match(map,/testID="toy-map-top-title"/u);
-  assert.match(map,/<ToyBlockStamp compact=\{compactStageMap\}\/\>/u);
-  assert.match(map,/<ToyBlockStamp flipped compact=\{compactStageMap\}\/\>/u);
+  assert.ok(map.includes('<ToyBlockStamp compact={compactStageMap}/>'));
+  assert.ok(map.includes('<ToyBlockStamp flipped compact={compactStageMap}/>'));
   assert.match(map,/\{standardPixelMap && grade.stages.map\(\(stage,index\)=>\{/u);
   assert.match(map,/testID=\{\(grade.id==='preschool'\?'preschool-stage-topic-':'toy-stage-topic-'\)\+String\(index\+1\)\}/u);
   assert.match(map,/onPress=\{\(\)=>setDetailStageId\(stage.id\)\}/u);
