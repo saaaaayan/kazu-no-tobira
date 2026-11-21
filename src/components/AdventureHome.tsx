@@ -38,14 +38,16 @@ function EulerPixelPortal() {
     [217,196,2],[693,193,3],[362,116,2],[542,113,2],
   ];
   const symbols: ReadonlyArray<readonly [string,number,number,number]> = [
-    ['π',105,112,34],['∞',201,76,31],['Σ',304,153,26],
-    ['∫',611,94,35],['e',710,138,31],['i',783,79,28],
-    ['√',127,209,27],['x²',762,221,26],
+    ['π',74,69,43],['∞',176,79,32],['Σ',282,73,37],['∫',665,68,40],['e',763,80,39],['i',830,63,25],
+    ['x²',808,161,31],['√2',185,170,30],['a²+b²=c²',132,248,22],['f(x)',765,266,31],
+    ['θ',696,226,29],['lim',620,234,23],['+',590,184,30],['−',623,184,30],['×',654,184,30],['÷',688,184,30],
+    ['%',220,285,26],['Δ',827,300,28],['Σ',314,265,25],['r',718,298,19],
   ];
   return (
-    <Svg width="100%" height="100%" viewBox="0 0 900 410" preserveAspectRatio="xMidYMid slice" accessible={false}>
-      <Rect width={900} height={410} fill="#10273b"/>
-      <Rect y={175} width={900} height={235} fill="#173b46"/>
+    <Svg width="100%" height="100%" viewBox="0 0 900 540" preserveAspectRatio="xMidYMid meet" accessible={false}>
+      <Rect width={900} height={540} fill="#0b2140"/>
+      <G transform="translate(0 117)">
+      <Rect y={175} width={900} height={235} fill="#18394c"/>
       <Path d="M0 237H35V215H69V197H112V219H150V195H194V223H223V262H0Z" fill="#284958"/>
       <Path d="M900 243H856V218H824V193H792V213H745V187H708V232H669V264H900Z" fill="#294a58"/>
       <Path d="M0 283H45V263H95V245H125V261H177V244H216V287H269V338H0Z" fill="#203c4b"/>
@@ -55,7 +57,7 @@ function EulerPixelPortal() {
       </G>)}
       {symbols.map(([value,x,y,size],i) => (
         <SvgText key={'symbol'+i} x={x} y={y} textAnchor="middle" fontWeight="bold"
-          fontSize={size} fill={i%3===0?'#d4bf83':'#8bbaa7'} opacity={0.65}>{value}</SvgText>
+          fontSize={size} fill={i%3===0?'#f3d58f':'#d8e1cf'} opacity={0.92}>{value}</SvgText>
       ))}
       {/* Portal: stepped stone blocks and a warm, restrained glow. */}
       <Rect x={334} y={126} width={232} height={236} fill="#334c50"/>
@@ -111,81 +113,114 @@ function EulerPixelPortal() {
         <Rect x={150} y={354} width={36} height={9}/><Rect x={800} y={342} width={47} height={18}/>
         <Rect x={816} y={326} width={12} height={16}/>
       </G>
+      </G>
+      {/* Math in the title band, balanced on both sides of the title. */}
+      <G fill="#eed18a" opacity={0.95}>
+        <SvgText x={57} y={75} fontSize={36} fontWeight="bold">π</SvgText>
+        <SvgText x={161} y={70} fontSize={26} fontWeight="bold">∞</SvgText>
+        <SvgText x={239} y={74} fontSize={29} fontWeight="bold">Σ</SvgText>
+        <SvgText x={633} y={70} fontSize={35}>∫</SvgText>
+        <SvgText x={730} y={75} fontSize={31} fontWeight="bold">e</SvgText>
+        <SvgText x={828} y={69} fontSize={29}>△</SvgText>
+      </G>
+      <G fill="#f7e2a9" opacity={0.85}>
+        <Rect x={55} y={114} width={5} height={5}/>
+        <Rect x={176} y={102} width={3} height={3}/>
+        <Rect x={716} y={119} width={5} height={5}/>
+        <Rect x={838} y={112} width={4} height={4}/>
+      </G>
     </Svg>
   );
 }
 
-export default function AdventureHome({ mode, onMode, onStart, loading, preview = false }: {
-  mode: PlayMode; onMode: (mode: PlayMode) => void; onStart: () => void; loading: boolean; preview?: boolean;
+export default function AdventureHome({ mode, onMode, onStart, onTitles, loading, preview = false }: {
+  mode: PlayMode; onMode: (mode: PlayMode) => void; onStart: () => void;
+  onTitles?: () => void; loading: boolean; preview?: boolean;
 }) {
   const width = useWindowDimensions().width;
   const small = width < 390;
   const [showHowTo, setShowHowTo] = useState(false);
+  const [showPlayerNote, setShowPlayerNote] = useState(false);
   return (
     <View style={styles.hero}>
-      <Text style={styles.eyebrow}>MATH ADVENTURE</Text>
-      <Text accessibilityRole="header" style={[styles.title,small&&styles.titleSmall]}>数のトビラ</Text>
-      <Text style={styles.subtitle}>ひとつ解くたび、世界がひらく。</Text>
-      <View style={styles.pixelFrame} accessible accessibilityLabel="数学記号が浮かぶ夜のトビラの前に、魔法使いオイラーの黒いシルエットが立っている">
+      <View style={styles.pixelFrame} accessible accessibilityLabel="数学記号が夜空に浮かび、魔法のトビラの前にオイラーの黒いシルエットが立っている">
         <EulerPixelPortal />
-      </View>
-      <Pressable accessibilityRole="button" accessibilityState={{ disabled: loading }} disabled={loading} onPress={onStart}
-        style={({ pressed }) => [styles.start,(pressed || loading) && styles.dim]}>
-        <Text style={[styles.startLabel,small&&styles.startSmall]}>{loading ? 'じゅんびちゅう…' : '▶ ぼうけんを はじめる'}</Text>
-      </Pressable>
-      <Pressable accessibilityRole="button" accessibilityState={{expanded:showHowTo}}
-        onPress={()=>setShowHowTo(previous=>!previous)} style={styles.howToButton}>
-        <Text style={styles.howToLabel}>{showHowTo ? '▲ とじる' : '▷ あそびかた'}</Text>
-      </Pressable>
-      {showHowTo && (
-        <View style={styles.howToPanel}>
-          <Text style={styles.howToText}>1. せかいちずから 島を えらぼう。</Text>
-          <Text style={styles.howToText}>2. ステージの もんだいに ちょうせんしよう。</Text>
-          <Text style={styles.howToText}>3. むずかしいときは ヒントを みよう。</Text>
-          <Text style={styles.howToText}>オイラーと いっしょに、{worldIslands.length}の島を ぼうけんしよう！</Text>
+        <View style={styles.titleOverlay} pointerEvents="none">
+          <Text style={styles.eyebrow}>──── MATH ADVENTURE ────</Text>
+          <Text accessibilityRole="header" style={[styles.title,small&&styles.titleSmall]}>数のトビラ</Text>
+          <Text style={styles.subtitle}>ひとつ解くたび、世界がひらく。</Text>
         </View>
-      )}
+      </View>
+      <View style={styles.buttonStack}>
+        <Pressable accessibilityRole="button" accessibilityState={{disabled:loading}} disabled={loading} onPress={onStart}
+          style={({pressed})=>[styles.start,(pressed||loading)&&styles.dim]}>
+          <Text style={[styles.startLabel,small&&styles.startSmall]}>{loading?'じゅんびちゅう…':'▶ ぼうけんを つづける'}</Text>
+        </Pressable>
+        <Pressable accessibilityRole="button" onPress={()=>setShowHowTo(v=>!v)} accessibilityState={{expanded:showHowTo}}
+          style={styles.howToButton}>
+          <Text style={styles.howToLabel}>{showHowTo?'▲ とじる':'▶ はじめて あそぶ'}</Text>
+        </Pressable>
+        {showHowTo && <View style={styles.howToPanel}>
+          <Text style={styles.howToText}>せかいちずから 島を えらぼう。もんだいを といて、こまったら ヒントを みてね。</Text>
+          <Text style={styles.howToText}>オイラーと いっしょに、{worldIslands.length}の島を めぐろう！</Text>
+          <Pressable accessibilityRole="button" onPress={onStart} disabled={loading} style={styles.start}>
+            <Text style={styles.startLabel}>▶ ぼうけんを はじめる</Text>
+          </Pressable>
+        </View>}
+        <View style={styles.cardRow}>
+          <Pressable accessibilityRole="button" accessibilityState={{expanded:showPlayerNote}}
+            onPress={()=>setShowPlayerNote(v=>!v)} style={styles.menuCard}>
+            <Text style={styles.menuIcon}>♟</Text>
+            <View><Text style={styles.menuTitle}>プレイヤー</Text><Text style={styles.menuDetail}>きりかえ・ついか</Text></View>
+          </Pressable>
+          <Pressable accessibilityRole="button" onPress={onTitles ?? onStart} style={styles.menuCard}>
+            <Text style={styles.menuIcon}>🏆</Text>
+            <View><Text style={styles.menuTitle}>しょうごう</Text><Text style={styles.menuDetail}>あつめた たからもの</Text></View>
+          </Pressable>
+        </View>
+        {showPlayerNote&&<View style={styles.howToPanel}><Text style={styles.howToText}>
+          プレイヤーの きりかえ・ついか は じゅんびちゅう だよ。
+        </Text></View>}
+      </View>
       {!preview && <View style={styles.modeSection}>
         <ModeControls mode={mode} onChange={onMode}/>
-        <Text style={styles.modeHint}>{mode === 'test'
-          ? 'テストモードでは きろくは のこらないよ。'
-          : 'あそんだ きろくを のこして すすもう。'}</Text>
+        <Text style={styles.modeHint}>{mode==='test'?'テストモードでは きろくは のこらないよ。':'あそんだ きろくを のこして すすもう。'}</Text>
       </View>}
-      {!preview && <VersionNotice />}
+      {!preview&&<VersionNotice/>}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  hero: { width:'100%', backgroundColor:'#122b3a', borderRadius:22, borderWidth:1,
-    borderColor:'#45665c', padding:16, gap:12, overflow:'hidden', alignItems:'center' },
-  eyebrow: { color:'#d6ba79', fontSize:15, letterSpacing:3, fontWeight:'900', marginTop:12, textAlign:'center' },
-  title: { color:'#f8e5b9', fontSize:47, lineHeight:61, fontWeight:'900', textAlign:'center' },
-  titleSmall: { fontSize:37, lineHeight:50 },
-  subtitle: { color:'#e3e7dc', fontSize:15, fontWeight:'700', textAlign:'center', marginBottom:3 },
-  pixelFrame: { width:'100%', aspectRatio: 2.19, maxHeight:480, minHeight:160,
-    backgroundColor:'#10273b', borderRadius:11, borderWidth:2, borderColor:'#62766c', overflow:'hidden' },
-  start: { width:'100%', minHeight:64, borderRadius:13, backgroundColor:'#f3d384', borderWidth:2,
-    borderColor:'#ffe8ad', justifyContent:'center', alignItems:'center', paddingHorizontal:12 },
-  startLabel: { color:'#172e3c', fontWeight:'900', fontSize:21, textAlign:'center' },
-  startSmall: { fontSize:17 },
-  howToButton: { width:'100%', minHeight:52, borderWidth:1, borderColor:'#799187',
-    borderRadius:12, alignItems:'center', justifyContent:'center' },
-  howToLabel: { color:'#f3e9cc', fontSize:17, fontWeight:'800' },
-  howToPanel: { width:'100%', borderRadius:10, padding:14, backgroundColor:'#21413e', gap:7 },
-  howToText: { color:'#f5eedc', fontWeight:'700', fontSize:14, lineHeight:22 },
-  modeSection: { width:'100%', alignItems:'center', gap:8, marginTop:2 },
-  modeControls: { flexDirection:'row', flexWrap:'wrap', justifyContent:'center', gap:7 },
-  modeButton: { minHeight:44, alignItems:'center', justifyContent:'center', paddingHorizontal:14,
-    borderRadius:9, backgroundColor:'#d9e5df', borderWidth:1, borderColor:'#91aa9f' },
-  selected: { backgroundColor:'#266653', borderColor:'#a2c6b0' },
-  selectedTest: { backgroundColor:'#57476c', borderColor:'#c0b0d3' },
-  modeLabel: { color:'#223e3b', fontSize:13, fontWeight:'800' },
-  selectedLabel: { color:'#fff' },
-  modeHint: { color:'#c6d8d2', fontSize:12, textAlign:'center' },
-  dim: { opacity:0.65 },
-  badge: { alignSelf:'flex-start', paddingVertical:5, paddingHorizontal:9,
-    backgroundColor:'#d8ede6', color:'#174b46', fontWeight:'800', borderRadius:12,
-    fontSize:12, overflow:'hidden' },
-  badgeTest: { backgroundColor:'#e9dcfb', color:'#4c346c' },
+  hero:{backgroundColor:'#0b2140',borderRadius:24,overflow:'hidden',padding:0,gap:0},
+  pixelFrame:{width:'100%',aspectRatio:900/540,backgroundColor:'#0b2140',position:'relative'},
+  titleOverlay:{position:'absolute',top:'1%',left:0,right:0,alignItems:'center',gap:1},
+  eyebrow:{color:'#f4ddae',fontSize:16,letterSpacing:1.4,fontWeight:'900',textAlign:'center'},
+  title:{color:'#ffe3a0',fontSize:51,lineHeight:65,fontWeight:'900',textAlign:'center',textShadowColor:'#4a352d',textShadowOffset:{width:3,height:3},textShadowRadius:0},
+  titleSmall:{fontSize:33,lineHeight:42},
+  subtitle:{color:'#fff0c4',fontSize:16,fontWeight:'900',textAlign:'center'},
+  buttonStack:{paddingHorizontal:18,paddingBottom:17,gap:9,marginTop:-2},
+  start:{backgroundColor:'#f6ca70',borderWidth:2,borderColor:'#fff0ad',borderRadius:9,minHeight:57,alignItems:'center',justifyContent:'center',paddingHorizontal:8},
+  startLabel:{color:'#102441',fontSize:22,fontWeight:'900',textAlign:'center'},
+  startSmall:{fontSize:17},
+  howToButton:{borderWidth:2,borderColor:'#f5dfae',borderRadius:9,minHeight:56,alignItems:'center',justifyContent:'center'},
+  howToLabel:{color:'#ffe9b4',fontSize:21,fontWeight:'900'},
+  howToPanel:{backgroundColor:'#16364c',padding:12,gap:10,borderRadius:8},
+  howToText:{color:'#fff0cc',fontSize:14,fontWeight:'700',lineHeight:22},
+  cardRow:{flexDirection:'row',gap:10},
+  menuCard:{flex:1,borderWidth:2,borderColor:'#9b9278',minWidth:0,borderRadius:9,flexDirection:'row',alignItems:'center',justifyContent:'center',paddingVertical:9,paddingHorizontal:4,gap:9,backgroundColor:'#162d4b'},
+  menuIcon:{fontSize:25,color:'#dfc681'},
+  menuTitle:{color:'#f4e1af',fontWeight:'900',fontSize:17},
+  menuDetail:{color:'#e6d6ac',fontSize:10,fontWeight:'700'},
+  modeSection:{alignItems:'center',gap:6,padding:10},
+  modeControls:{flexDirection:'row',gap:7,flexWrap:'wrap',justifyContent:'center'},
+  modeButton:{minHeight:40,paddingHorizontal:14,alignItems:'center',justifyContent:'center',borderRadius:8,backgroundColor:'#dfe9e3',borderWidth:1,borderColor:'#8aa99d'},
+  selected:{backgroundColor:'#28594b',borderColor:'#90ba9f'},
+  selectedTest:{backgroundColor:'#57476c',borderColor:'#b5a0cf'},
+  modeLabel:{color:'#223e3b',fontWeight:'800',fontSize:12},
+  selectedLabel:{color:'#fff'},
+  modeHint:{color:'#c6d8d2',fontSize:11,textAlign:'center'},
+  dim:{opacity:0.6},
+  badge:{alignSelf:'flex-start',paddingVertical:5,paddingHorizontal:9,backgroundColor:'#d8ede6',color:'#174b46',fontWeight:'800',borderRadius:12,fontSize:12,overflow:'hidden'},
+  badgeTest:{backgroundColor:'#e9dcfb',color:'#4c346c'},
 });

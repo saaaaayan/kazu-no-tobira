@@ -559,7 +559,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {screen === 'home' && !round ? (
             <>
               <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress} preview={uiPreview}
-                onStart={() => { resetAnswer(); setScreen('world'); }} />
+                onStart={() => { resetAnswer(); setScreen('world'); }} onTitles={() => setScreen('titles')} />
               {process.env.EXPO_PUBLIC_KAZU_ONLINE_REVIEW === '1' && typeof window !== 'undefined' &&
                 <GameButton label="管理者ログイン" secondary onPress={() => window.location.assign('/kazu-no-tobira/admin/')} />}
             </>
