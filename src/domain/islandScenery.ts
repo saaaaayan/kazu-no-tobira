@@ -125,11 +125,15 @@ export function islandScenery(id:StandardPixelIslandId,width:number,height:numbe
       if((onlyHeroes&&!hero)||decorations.some(item=>item.kind===kind))continue;
       const sprite=ISLAND_SPRITES[kind];
       const aspect=sprite.length/Math.max(...sprite.map(row=>row.length));
+      // Introduce different dinosaurs in pairs across the first four gaps.
+      // Woodland newcomers alternate with the established birds and squirrels.
+      const firstRow=id==='e4'?Math.floor(speciesIndex/2)
+        :hero?speciesIndex:speciesIndex>=8?(speciesIndex-8)*2+1:(speciesIndex-4)*2;
       for(let attempt=0;attempt<600;attempt++) {
         const dimension=hero?wildlifeHeroSize:compact?40:56;
         const item:PixelDecoration={kind,size:hero?'large':'medium',
           x:Math.round(28+random()*(width-dimension-56)),
-          y:Math.round(positions[((speciesIndex+Math.floor(attempt/40))%13)*5].y+90+random()*130),
+          y:Math.round(positions[((firstRow+Math.floor(attempt/40))%13)*5].y+90+random()*130),
           width:dimension,height:Math.round(dimension*aspect)};
         const box=sceneBounds(item,5);
         if(!clear(box)||occupied.some(old=>boxesOverlap(box,old)))continue;
@@ -197,6 +201,8 @@ export function islandScenery(id:StandardPixelIslandId,width:number,height:numbe
           width:dimension,height:Math.round(dimension*aspect)};
         const box=sceneBounds(item,5);
         if(!clear(box)||occupied.some(old=>boxesOverlap(box,old)))continue;
+        if(wildlife&&decorations.some(old=>old.kind===kind&&old.y>=positions[row*5].y
+          &&old.y<(positions[(row+1)*5]?.y??height)))continue;
         if(decorations.some(old=>old.kind===kind&&Math.hypot(old.x-item.x,old.y-item.y)<(compact?110:170)))continue;
         decorations.push(item);occupied.push(box);break;
       }
