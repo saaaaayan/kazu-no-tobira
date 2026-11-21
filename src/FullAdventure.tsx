@@ -116,6 +116,10 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const submitting = useRef(false);
   const autoTraceSubmitted = useRef<string | undefined>(undefined);
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+  const [returnStageId, setReturnStageId] = useState<string | undefined>();
+  const [mapTop, setMapTop] = useState<number | undefined>();
+  const [mapStageOffset, setMapStageOffset] = useState<number | undefined>();
+  const [scrollViewportHeight, setScrollViewportHeight] = useState(0);
   const keyboard = useRef<ComponentRef<typeof TextInput>>(null);
   const viewport = useWindowDimensions().width;
   const wide = !review?.phone && viewport > 800;
@@ -149,6 +153,13 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
       setScreen('island');
     }
   }, [access, isolated, round]);
+
+  // Restore the most recently played stage once the returned map is measured.
+  useEffect(() => {
+    if (!returnStageId || round || screen !== 'island' || mapTop === undefined || mapStageOffset === undefined || scrollViewportHeight <= 0) return;
+    scroll.current?.scrollTo({ y: Math.max(0, mapTop + mapStageOffset - scrollViewportHeight * 0.48), animated: false });
+    setReturnStageId(undefined);
+  }, [returnStageId, round, screen, mapTop, mapStageOffset, scrollViewportHeight]);
 
   function blockHandwriting(value: boolean) {
     blockRef.current = value;
@@ -478,6 +489,10 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   function goToIsland() {
     if (starting.current || submitting.current || lessonWrite.current) return;
     if (review) { review.onClose(); return; }
+    const returningToIsland = !round?.live || ['stage', 'test'].includes(round.live.mode);
+    setReturnStageId(returningToIsland ? round?.stage.id ?? learning?.target?.id : undefined);
+    setMapTop(undefined);
+    setMapStageOffset(undefined);
     setLearning(undefined);
     setStartError('');
     resetAnswer();
@@ -489,6 +504,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     if (!uiPreview && next.id === 'sage' && !hasPremium(access)) { setShowPlanInfo(true); scroll.current?.scrollTo({ y: 0 }); return; }
     resetAnswer();
     setStartError('');
+    setReturnStageId(undefined);
+    setMapTop(undefined);
+    setMapStageOffset(undefined);
     setGrade(next);
     setScreen('island');
   }
@@ -514,6 +532,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" scrollEnabled={!drawing}
+        onLayout={event=>setScrollViewportHeight(event.nativeEvent.layout.height)}
         contentContainerStyle={[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll]}>
         <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}
           style={[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell]}>
@@ -573,8 +592,11 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {progress && !round && screen === 'world' &&
             <WorldMap780 progress={progress} mode={playMode} access={access} onGrade={openGrade} onTitles={()=>setScreen('titles')} preview={uiPreview}/>}
           {progress && !round && screen === 'island' &&
-            <IslandStageMap key={grade.id} grade={grade} progress={progress} mode={playMode} access={access} onCheckpoint={startCheckpoint} onBack={()=>setScreen('world')}
-              onTitles={()=>setScreen('titles')} onStart={start} onLearn={openLesson} preview={uiPreview}/>}
+            <View onLayout={event=>setMapTop(event.nativeEvent.layout.y)}>
+              <IslandStageMap key={grade.id} grade={grade} progress={progress} mode={playMode} access={access} onCheckpoint={startCheckpoint} onBack={()=>setScreen('world')}
+                onTitles={()=>setScreen('titles')} onStart={start} onLearn={openLesson} preview={uiPreview}
+                focusStageId={returnStageId} onFocusStagePosition={setMapStageOffset}/>
+            </View>}
           {progress && !round && screen === 'titles' &&
             <TitleAlbum progress={progress} onBack={()=>setScreen('world')}/>}
           {progress && screen === 'lesson' && !round && learning &&
