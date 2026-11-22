@@ -12,7 +12,9 @@ test('preschool island and questions hide trial/version/navigation chrome, while
   assert.match(app,/uiPreview && !standardIslandChildView && <View style=\{styles.playPanel\} testID="kazu-sample-only-preview"/);
   assert.match(app,/__DEV__ && !review && !standardIslandChildView && <View style=\{styles.navigation\}/);
   assert.match(app,/\) : !standardIslandChildView \? \(\s*<View style=\{styles.navigation\}>/);
-  assert.match(app,/contentContainerStyle=\{\[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll\]\}/);
+  assert.match(app,/contentContainerStyle=\{\[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll,screen==='world' && !round && styles.worldMapScroll\]\}/);
+  assert.match(app,/worldMapScroll: \{ paddingTop: 0, paddingHorizontal: 0 \}/);
+  assert.match(app,/shell: \{ width: '100%', maxWidth: 1030/);
   assert.match(app,/style=\{\[styles.shell,standardIslandMapFirst&&styles.preschoolShell/);
   assert.match(app,/試作版の回答記録は保存されません/);
   assert.match(app,/screen === 'world' &&\s*<WorldMap780/);

@@ -533,7 +533,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     <SafeAreaView style={styles.safe}>
       <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" scrollEnabled={!drawing}
         onLayout={event=>setScrollViewportHeight(event.nativeEvent.layout.height)}
-        contentContainerStyle={[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll]}>
+        contentContainerStyle={[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll,screen==='world' && !round && styles.worldMapScroll]}>
         <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}
           style={[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell]}>
           {!round && screen !== 'lesson' && screen !== 'study-plan' && !standardIslandMapFirst && <VersionNotice/>}
@@ -1000,6 +1000,9 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#f0edf6' },
   scroll: { flexGrow: 1, padding: 14, paddingBottom: 55 },
   preschoolScroll: { paddingTop: 4, paddingHorizontal: 8, paddingBottom: 36 },
+  // Remove only the 14px outer inset for the world atlas. The 1030px shell
+  // maxWidth is intentionally unchanged (PR #187 made the map oversized).
+  worldMapScroll: { paddingTop: 0, paddingHorizontal: 0 },
   shell: { width: '100%', maxWidth: 1030, alignSelf: 'center', gap: 15 },
   preschoolShell: { gap: 5 },
   playShell: { maxWidth: 1090 },
