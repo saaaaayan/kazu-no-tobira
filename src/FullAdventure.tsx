@@ -535,7 +535,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
         onLayout={event=>setScrollViewportHeight(event.nativeEvent.layout.height)}
         contentContainerStyle={[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll,screen==='world' && !round && styles.worldMapScroll]}>
         <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}
-          style={[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell]}>
+          style={[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell,screen==='world' && !round && styles.worldMapSlightlyWider]}>
           {!round && screen !== 'lesson' && screen !== 'study-plan' && !standardIslandMapFirst && <VersionNotice/>}
           {uiPreview && !standardIslandChildView && <View style={styles.playPanel} testID="kazu-sample-only-preview">
             <Text accessibilityRole="header" style={styles.answerHeading}>数のトビラ 試作版</Text>
@@ -1004,6 +1004,8 @@ const styles = StyleSheet.create({
   // maxWidth is intentionally unchanged (PR #187 made the map oversized).
   worldMapScroll: { paddingTop: 0, paddingHorizontal: 0 },
   shell: { width: '100%', maxWidth: 1030, alignSelf: 'center', gap: 15 },
+  // Expand the world atlas by only ~3%, keeping it centered and capped.
+  worldMapSlightlyWider: { maxWidth: 1060 },
 
   preschoolShell: { gap: 5 },
   playShell: { maxWidth: 1090 },
