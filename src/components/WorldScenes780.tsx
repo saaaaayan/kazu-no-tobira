@@ -188,7 +188,7 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
             // The approved PNG already contains old nameplates. Wider opaque
             // pixel plaques mask their exposed borders, particularly area 14.
             // Keep the centers and stage navigation exactly as before.
-            const plaqueWidth=index===13?.20:index===1||index===15?.19:.18;
+            const plaqueWidth=index===13?.20:index===1||index===15?.18:.17;
             const plaqueHeight=index===13?.11:.10;
             return <Pressable key={grade.id} testID={'approved-world-island-'+grade.id}
               accessibilityRole="button"
