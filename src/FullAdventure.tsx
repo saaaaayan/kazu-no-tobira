@@ -533,9 +533,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     <SafeAreaView style={styles.safe}>
       <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" scrollEnabled={!drawing}
         onLayout={event=>setScrollViewportHeight(event.nativeEvent.layout.height)}
-        contentContainerStyle={[styles.scroll,screen==='world' && !round && styles.worldMapScroll,standardIslandMapFirst&&styles.preschoolScroll]}>
+        contentContainerStyle={[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll,screen==='world' && !round && styles.worldMapScroll]}>
         <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}
-          style={[styles.shell,screen==='world' && !round && styles.worldMapShell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell]}>
+          style={[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell,screen==='world' && !round && styles.worldMapShell]}>
           {!round && screen !== 'lesson' && screen !== 'study-plan' && !standardIslandMapFirst && <VersionNotice/>}
           {uiPreview && !standardIslandChildView && <View style={styles.playPanel} testID="kazu-sample-only-preview">
             <Text accessibilityRole="header" style={styles.answerHeading}>数のトビラ 試作版</Text>
