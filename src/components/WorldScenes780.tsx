@@ -642,7 +642,8 @@ const styles=StyleSheet.create({
   preschoolMapTopNameWithPaws:{flexDirection:'row',alignItems:'center',justifyContent:'center',gap:7},
   preschoolMapTopName:{color:'#344454',fontWeight:'900',fontSize:20,lineHeight:24,textAlign:'center'},
   preschoolMapTopNameCompact:{fontSize:17,lineHeight:21},
-  atlas:{borderRadius:22,backgroundColor:'#244e68',overflow:'hidden',position:'relative',borderWidth:1,borderColor:'#4e7180'},
+  // Cancel only the 13px screen gap directly above the map, without scaling art.
+  atlas:{borderRadius:22,backgroundColor:'#244e68',overflow:'hidden',position:'relative',borderWidth:1,borderColor:'#4e7180',marginTop:-13},
   worldMapControls:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:10,paddingHorizontal:4},
   mapZoomToggle:{paddingVertical:9,paddingHorizontal:11,minHeight:39,borderRadius:10,backgroundColor:'#e7e6db',
     borderWidth:1,borderColor:'#a3afad'},

@@ -535,7 +535,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
         onLayout={event=>setScrollViewportHeight(event.nativeEvent.layout.height)}
         contentContainerStyle={[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll,screen==='world' && !round && styles.worldMapScroll]}>
         <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}
-          style={[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell]}>
+          style={[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell,screen==='world' && !round && styles.worldMapShell]}>
           {!round && screen !== 'lesson' && screen !== 'study-plan' && !standardIslandMapFirst && <VersionNotice/>}
           {uiPreview && !standardIslandChildView && <View style={styles.playPanel} testID="kazu-sample-only-preview">
             <Text accessibilityRole="header" style={styles.answerHeading}>数のトビラ 試作版</Text>
@@ -1004,6 +1004,9 @@ const styles = StyleSheet.create({
   // maxWidth is intentionally unchanged (PR #187 made the map oversized).
   worldMapScroll: { paddingTop: 0, paddingHorizontal: 0 },
   shell: { width: '100%', maxWidth: 1030, alignSelf: 'center', gap: 15 },
+  // Only remove the centering gutter. Retain maxWidth 1030 to prevent
+  // the accidental giant world map seen in the previous release.
+  worldMapShell: { alignSelf: 'flex-start' },
   preschoolShell: { gap: 5 },
   playShell: { maxWidth: 1090 },
   navigation: { borderRadius: 16, backgroundColor: '#162d48', padding: 12, gap: 7 },
