@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import Svg, {G,Rect} from 'react-native-svg';
+import Svg, {G,Rect,Text as SvgText} from 'react-native-svg';
 import { CompanionAvatar } from './AdventureCompanion';
 import { allWorldStages, hasGeneratedWorldQuestions, isPlannedIsland, worldIslands, type WorldGrade, type WorldStage } from '../domain/worldCatalog';
 import { hasPremium, type Entitlement } from '../domain/accessPlan';
@@ -59,6 +59,48 @@ function ToyBlockStamp({flipped=false,compact=false}:{flipped?:boolean;compact?:
     </G>
   </Svg>;
 }
+
+/** Pixel-edged wooden RPG label for the first world area.
+ * Kept as a separately clickable layer so the approved map artwork remains byte-identical.
+ */
+function PlushTownPixelButton({width,height}:{width:number;height:number}) {
+  return <Svg width={width} height={height} viewBox="0 0 390 130" accessible={false}>
+    {/* Stepped silhouette, rather than a smooth modern rounded rectangle. */}
+    <Rect x={16} y={6} width={358} height={118} fill="#4c2718"/>
+    <Rect x={8} y={16} width={374} height={98} fill="#4c2718"/>
+    <Rect x={2} y={26} width={386} height={78} fill="#4c2718"/>
+    <Rect x={16} y={12} width={358} height={106} fill="#d58a34"/>
+    <Rect x={8} y={24} width={374} height={80} fill="#d58a34"/>
+    <Rect x={22} y={19} width={346} height={91} fill="#713820"/>
+    <Rect x={15} y={30} width={360} height={69} fill="#713820"/>
+    <Rect x={22} y={16} width={346} height={8} fill="#ffe6a0"/>
+    <Rect x={22} y={105} width={346} height={7} fill="#f5a43d"/>
+    <Rect x={16} y={24} width={8} height={75} fill="#e6a441"/>
+    <Rect x={366} y={24} width={8} height={75} fill="#ad621e"/>
+    <Rect x={25} y={26} width={340} height={5} fill="#96512a"/>
+    <Rect x={25} y={98} width={340} height={5} fill="#542b20"/>
+    {/* Square-edged level medallion. */}
+    <Rect x={23} y={27} width={76} height={74} fill="#edac35"/>
+    <Rect x={28} y={21} width={66} height={85} fill="#edac35"/>
+    <Rect x={19} y={38} width={84} height={52} fill="#edac35"/>
+    <Rect x={29} y={30} width={64} height={66} fill="#5b2d1b"/>
+    <Rect x={24} y={40} width={74} height={46} fill="#5b2d1b"/>
+    <Rect x={33} y={26} width={56} height={7} fill="#ffe39a"/>
+    <SvgText x={61} y={80} fontSize={51} fontFamily="monospace" fontWeight="900" textAnchor="middle" fill="#fff4d2">1</SvgText>
+    {/* Slightly shadowed, intentionally chunky two-line game text. */}
+    <SvgText x={244} y={57} fontSize={28} fontFamily="monospace" fontWeight="900" textAnchor="middle" fill="#3a211c">ぬいぐるみの町</SvgText>
+    <SvgText x={242} y={54} fontSize={28} fontFamily="monospace" fontWeight="900" textAnchor="middle" fill="#fff0c9">ぬいぐるみの町</SvgText>
+    <SvgText x={244} y={91} fontSize={27} fontFamily="monospace" fontWeight="900" textAnchor="middle" fill="#ffd264">（幼児）</SvgText>
+    {/* Little square paw marks echo the plush-town theme without sparkles. */}
+    <G fill="#efa85b">
+      <Rect x={121} y={76} width={7} height={7}/><Rect x={132} y={70} width={7} height={7}/>
+      <Rect x={144} y={75} width={7} height={7}/><Rect x={127} y={84} width={20} height={10}/>
+      <Rect x={343} y={76} width={7} height={7}/><Rect x={354} y={70} width={7} height={7}/>
+      <Rect x={366} y={75} width={7} height={7}/><Rect x={349} y={84} width={20} height={10}/>
+    </G>
+  </Svg>;
+}
+
 export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview = false }: {
   progress: Progress; mode: PlayMode; access: Entitlement;
   onGrade: (grade: WorldGrade) => void; onTitles: () => void; preview?: boolean;
@@ -124,7 +166,7 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
                 width:imageWidth*.16,
                 height:imageHeight*.09,
               },pressed&&styles.approvedMapTargetPressed]}>
-              <View />
+              {index===0 ? <PlushTownPixelButton width={imageWidth*.16} height={imageHeight*.09}/> : <View />}
             </Pressable>;
           })}
         </View>
