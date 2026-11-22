@@ -533,9 +533,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     <SafeAreaView style={styles.safe}>
       <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" scrollEnabled={!drawing}
         onLayout={event=>setScrollViewportHeight(event.nativeEvent.layout.height)}
-        contentContainerStyle={[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll,screen==='world' && !round && styles.worldMapScroll]}>
+        contentContainerStyle={[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll]}>
         <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}
-          style={[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell,screen==='world' && !round && styles.worldMapShell]}>
+          style={[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell]}>
           {!round && screen !== 'lesson' && screen !== 'study-plan' && !standardIslandMapFirst && <VersionNotice/>}
           {uiPreview && !standardIslandChildView && <View style={styles.playPanel} testID="kazu-sample-only-preview">
             <Text accessibilityRole="header" style={styles.answerHeading}>数のトビラ 試作版</Text>
@@ -1000,11 +1000,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#f0edf6' },
   scroll: { flexGrow: 1, padding: 14, paddingBottom: 55 },
   preschoolScroll: { paddingTop: 4, paddingHorizontal: 8, paddingBottom: 36 },
-  // The world atlas should reach the viewport's top/left, not sit inside the
-  // standard lesson-page 14px padding and 1030px centered width constraint.
-  worldMapScroll: { paddingTop: 0, paddingHorizontal: 0 },
   shell: { width: '100%', maxWidth: 1030, alignSelf: 'center', gap: 15 },
-  worldMapShell: { maxWidth: '100%', alignSelf: 'flex-start' },
   preschoolShell: { gap: 5 },
   playShell: { maxWidth: 1090 },
   navigation: { borderRadius: 16, backgroundColor: '#162d48', padding: 12, gap: 7 },
