@@ -15,6 +15,8 @@ test('preschool island and questions hide trial/version/navigation chrome, while
   assert.match(app,/contentContainerStyle=\{\[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll,screen==='world' && !round && styles.worldMapScroll\]\}/);
   assert.match(app,/worldMapScroll: \{ paddingTop: 0, paddingHorizontal: 0 \}/);
   assert.match(app,/shell: \{ width: '100%', maxWidth: 1030/);
+  assert.match(app,/worldMapSlightlyWider: \{ maxWidth: 1060 \}/);
+  assert.match(app,/screen==='world' && !round && styles.worldMapSlightlyWider/);
   assert.doesNotMatch(app,/worldMapShell: \{ alignSelf: 'flex-start' \}/);
   assert.match(app,/style=\{\[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell\]\}/);
   assert.match(map,/atlas:\{[^\n]*borderWidth:0,marginTop:-13\}/);
