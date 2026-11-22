@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {readFileSync} from 'node:fs';
-import {PIXEL_WORLD_MOTIFS,PIXEL_WORLD_STAMPS,PIXEL_WORLD_CENTERS,PIXEL_WORLD_CONNECTIONS} from '../src/domain/pixelWorldMap.ts';
-import {approvedWorldMapHotspots,approvedWorldMap} from '../src/domain/approvedWorldMap.ts';
+import {PIXEL_WORLD_MOTIFS,PIXEL_WORLD_STAMPS,PIXEL_WORLD_CENTERS,PIXEL_WORLD_CONNECTIONS,LEGACY_PIXEL_WORLD_HOTSPOTS} from '../src/domain/pixelWorldMap.ts';
+
 import {ISLAND_SPRITES} from '../src/domain/islandPixelSprites.ts';
 import {worldIslands} from '../src/domain/worldCatalog.ts';
 
 test('pixel overview keeps every existing hit target and the original sixteen-island order',()=>{
- assert.deepEqual(approvedWorldMapHotspots,[
+ assert.deepEqual(LEGACY_PIXEL_WORLD_HOTSPOTS,[
   {x:.118,y:.180},{x:.349,y:.180},{x:.578,y:.180},{x:.830,y:.180},
   {x:.830,y:.398},{x:.578,y:.398},{x:.349,y:.398},{x:.118,y:.398},
   {x:.118,y:.610},{x:.349,y:.610},{x:.578,y:.610},{x:.830,y:.610},
@@ -16,7 +16,7 @@ test('pixel overview keeps every existing hit target and the original sixteen-is
  assert.deepEqual(Object.keys(PIXEL_WORLD_MOTIFS),worldIslands.map(g=>g.id));
  assert.equal(PIXEL_WORLD_CENTERS.length,16);
  for(const [i,p] of PIXEL_WORLD_CENTERS.entries()){
-  const original=approvedWorldMapHotspots[i];
+  const original=LEGACY_PIXEL_WORLD_HOTSPOTS[i];
   assert.ok(Math.abs(p.x/1452-original.x)<.012);
   assert.ok(Math.abs(p.y/1083-original.y)<.003);
   assert.equal(p.x%4,0);assert.equal(p.y%4,0);
@@ -53,8 +53,8 @@ test('fifteen square-dash routes preserve connections and follow axis-aligned se
  }
 });
 
-test('pixel artwork retains exact image geometry and both titles, with compact public asset',()=>{
- const image=readFileSync(new URL('../public/'+approvedWorldMap.filename,import.meta.url));
+test('legacy code-authored pixel atlas keeps its historic geometry and compact asset',()=>{
+ const image=readFileSync(new URL('../public/world-map-approved.png',import.meta.url));
  assert.equal(image.readUInt32BE(16),1452);assert.equal(image.readUInt32BE(20),1083);
  assert.ok(image.byteLength<300_000,'flat-color map stays small');
  const renderer=readFileSync(new URL('../scripts/build-pixel-world-map.ps1',import.meta.url),'utf8');

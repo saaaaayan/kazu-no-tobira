@@ -81,10 +81,7 @@ try {
  Rect 1164 68 160 4 $wave
  $bitmap.Save((Join-Path $root 'public/world-map-approved.png'),[System.Drawing.Imaging.ImageFormat]::Png)
  $g.Dispose();$bitmap.Dispose()
- $hash=(Get-FileHash public/world-map-approved.png -Algorithm SHA256).Hash.ToLowerInvariant()
- $meta=Get-Content src/domain/approvedWorldMap.ts -Raw
- $meta=$meta -replace "sha256: '[a-f0-9]{64}'",("sha256: '"+$hash+"'")
- $meta=$meta -replace 'png\?v=[a-f0-9]{8}',('png?v='+$hash.Substring(0,8))
- [System.IO.File]::WriteAllText((Join-Path $root 'src/domain/approvedWorldMap.ts'),$meta,[System.Text.UTF8Encoding]::new($false))
- Write-Output "Built pixel world map: $hash"
+ # Legacy archive only. Never rewrite the metadata or bytes of the approved
+ # 2026-11-22 fantasy treasure map from this old 8-bit drawing script.
+ Write-Output 'Built archived pixel world map. Current approved map is unchanged.'
 } finally {Pop-Location}

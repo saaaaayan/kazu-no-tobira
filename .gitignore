@@ -5,3 +5,5 @@ dist/
 /question-drafts/
 /.question-backups/
 /supabase/.temp/
+# Generated from committed lossless text chunks (never checked in).
+/public/world-map-approved-20261122.png

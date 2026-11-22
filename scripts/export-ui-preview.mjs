@@ -60,15 +60,16 @@ for(const id of publicBankIds){
 }
 
 // Keep the exact user-approved world image as a separate, cacheable public asset.
-const mapSource=resolve('public/world-map-approved.png');
+const mapSource=resolve('public/world-map-approved-20261122.png');
 const mapBytes=readFileSync(mapSource);
-if(mapBytes.length<10_000||mapBytes.length>3_000_000||
+if(mapBytes.length!==7_804_072||
    !mapBytes.subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex'))||
-   mapBytes.readUInt32BE(16)!==1452||mapBytes.readUInt32BE(20)!==1083)
+   mapBytes.readUInt32BE(16)!==2048||mapBytes.readUInt32BE(20)!==1522||
+   contentDigest(mapBytes)!=='5e91554bc4de79192d5a1b04994149e866c7c8e1b0f17963dc21f9cc88cddc2c')
   throw new Error('The approved 16-island map is not a valid PNG asset.');
-copyFileSync(mapSource,resolve(target,'world-map-approved.png'));
+copyFileSync(mapSource,resolve(target,'world-map-approved-20261122.png'));
 
-const allowed=new Set(['index.html','metadata.json','world-map-approved.png']);
+const allowed=new Set(['index.html','metadata.json','world-map-approved-20261122.png']);
 const files=readdirSync(target,{recursive:true,withFileTypes:true}).filter(entry=>!entry.isDirectory())
   .map(entry=>relative(target,resolve(entry.parentPath,entry.name)).replaceAll('\\','/'));
 // This one user-approved illustration is public art. Keep the preview asset

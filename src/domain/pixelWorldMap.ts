@@ -1,4 +1,11 @@
-import {approvedWorldMapHotspots} from './approvedWorldMap.ts';
+// This legacy pixel atlas retains its original grid; the live 2026-11-22
+// approved world map has separate irregular hotspots.
+export const LEGACY_PIXEL_WORLD_HOTSPOTS = [
+  {x:.118,y:.180},{x:.349,y:.180},{x:.578,y:.180},{x:.830,y:.180},
+  {x:.830,y:.398},{x:.578,y:.398},{x:.349,y:.398},{x:.118,y:.398},
+  {x:.118,y:.610},{x:.349,y:.610},{x:.578,y:.610},{x:.830,y:.610},
+  {x:.830,y:.824},{x:.578,y:.824},{x:.349,y:.824},{x:.118,y:.824},
+] as const;
 import type {IslandSpriteId} from './islandPixelSprites.ts';
 
 /** World overview only: three readable stamps per island. Shared stage artwork,
@@ -23,7 +30,7 @@ export const PIXEL_WORLD_MOTIFS = {
 } as const satisfies Record<string,readonly IslandSpriteId[]>;
 
 // Same 16 anchors and serpentine connections as the existing clickable map.
-export const PIXEL_WORLD_CENTERS = approvedWorldMapHotspots.map(({x,y})=>({
+export const PIXEL_WORLD_CENTERS = LEGACY_PIXEL_WORLD_HOTSPOTS.map(({x,y})=>({
   x:Math.round((x*1452+12)/4)*4,y:Math.round(y*1083/4)*4,
 }));
 export const PIXEL_WORLD_CONNECTIONS = PIXEL_WORLD_CENTERS.slice(1).map((end,index)=>{
