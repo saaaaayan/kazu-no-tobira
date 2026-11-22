@@ -18,7 +18,7 @@ test('preschool island and questions hide trial/version/navigation chrome, while
   assert.match(app,/worldMapSlightlyWider: \{ maxWidth: 1060 \}/);
   assert.match(app,/screen==='world' && !round && styles.worldMapSlightlyWider/);
   assert.doesNotMatch(app,/worldMapShell: \{ alignSelf: 'flex-start' \}/);
-  assert.match(app,/style=\{\[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell\]\}/);
+  assert.match(app,/style=\{\[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell,screen==='world' && !round && styles.worldMapSlightlyWider\]\}/);
   assert.match(map,/atlas:\{[^\n]*borderWidth:0,marginTop:-13\}/);
   assert.match(app,/style=\{\[styles.shell,standardIslandMapFirst&&styles.preschoolShell/);
   assert.match(app,/試作版の回答記録は保存されません/);
