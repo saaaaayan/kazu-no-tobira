@@ -8,7 +8,7 @@ import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldP
 import { worldStageAction, type PlayMode } from '../domain/playMode';
 import { checkpointsFor, stageDisplayTitle, stageLabels, type Checkpoint } from '../domain/stageStructure';
 import { PRESCHOOL_MAP_TITLE_INSET, compactIslandStageMap, islandCheckpointLayout, preschoolStageLabelLayout, islandStageLayout } from '../domain/worldMapLayout';
-import { approvedWorldMapDimensions, approvedWorldMapHotspots, approvedWorldMapImageUrl } from '../domain/approvedWorldMap';
+import { approvedWorldMapDimensions, approvedWorldMapHotspots, approvedWorldMapAreaNames, approvedWorldMapImageUrl } from '../domain/approvedWorldMap';
 import { hasStageBank } from '../domain/questionBank';
 import type { Progress } from '../domain/progress';
 import { lessonStatus, unitLessons, type UnitLesson } from '../domain/unitLessons';
@@ -84,16 +84,16 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
   return <View style={styles.screen}>
     <View style={styles.worldBanner}>
       <Text accessibilityRole="header" style={styles.bannerHeading}>数のトビラ 世界地図</Text>
-      <Text style={styles.bannerDescription}>01から16へ、点線にそって進もう。島をタップすると学習マップが開くよ。</Text>
+      <Text style={styles.bannerDescription}>01から16へ、点線にそって進もう。地域をタップすると学習マップが開くよ。</Text>
       <View style={styles.stats}>
-        <Text style={styles.stat}>{worldIslands.length}の島 · {allWorldStages.length.toLocaleString('ja-JP')}地点</Text>
+        <Text style={styles.stat}>{worldIslands.length}のエリア · {allWorldStages.length.toLocaleString('ja-JP')}地点</Text>
         {!testing&&<Text style={styles.stat}>{summary.cleared} / 780 クリア</Text>}
       </View>
     </View>
     <View style={styles.worldMapControls}>
       <Text style={styles.hintText}>{compact
-        ? zoomed?'地図を左右にスワイプして島を見つけよう。':'16島の全体図。島をタップして進もう。'
-        : '地図のイラストや島の名前をクリックして進もう。'}</Text>
+        ? zoomed?'地図を左右にスワイプしてエリアを見つけよう。':'16エリアの全体図。地域をタップして進もう。'
+        : '地図のイラストや地域の名前をクリックして進もう。'}</Text>
       {compact&&<Pressable accessibilityRole="button" accessibilityLabel={zoomed?'地図全体を表示する':'地図を拡大する'}
         onPress={()=>setZoomed(value=>!value)} style={styles.mapZoomToggle}>
         <Text style={styles.mapZoomText}>{zoomed?'全体を見る':'拡大して見る'}</Text>
@@ -109,20 +109,20 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
         style={{height:imageHeight}} nestedScrollEnabled>
         <View style={{width:imageWidth,height:imageHeight}}>
           <Image source={{uri:approvedWorldMapImageUrl}} resizeMode="stretch"
-            accessibilityLabel="16島それぞれのテーマを3つのドット絵で描いた、数のトビラの世界地図"
+            accessibilityLabel="16エリアを描いた、手書き風のファンタジー世界地図"
             style={{width:imageWidth,height:imageHeight}} />
           {worldIslands.map((grade,index)=>{
             const spot=approvedWorldMapHotspots[index];
             const label=islandAction(grade,index);
             return <Pressable key={grade.id} testID={'approved-world-island-'+grade.id}
               accessibilityRole="button"
-              accessibilityLabel={String(index+1).padStart(2,'0')+' '+grade.title+' '+grade.island+'、'+label}
+              accessibilityLabel={String(index+1).padStart(2,'0')+' '+grade.title+' '+approvedWorldMapAreaNames[index]+'、'+label}
               onPress={()=>onGrade(grade)}
               style={({pressed})=>[styles.approvedMapTarget,{
-                left:imageWidth*(spot.x-.099),
-                top:imageHeight*(spot.y-.094),
-                width:imageWidth*.198,
-                height:imageHeight*.188,
+                left:imageWidth*(spot.x-.08),
+                top:imageHeight*(spot.y-.045),
+                width:imageWidth*.16,
+                height:imageHeight*.09,
               },pressed&&styles.approvedMapTargetPressed]}>
               <View />
             </Pressable>;
@@ -134,14 +134,14 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
       <Pressable accessibilityRole="button" testID="approved-world-list-toggle"
         onPress={()=>setShowIslandList(value=>!value)}
         accessibilityState={{expanded:showIslandList}} style={styles.worldListToggle}>
-        <Text style={styles.worldListToggleText}>{showIslandList?'島の一覧をとじる ▲':'16島の一覧から選ぶ ▼'}</Text>
+        <Text style={styles.worldListToggleText}>{showIslandList?'島の一覧をとじる ▲':'16エリアの一覧から選ぶ ▼'}</Text>
       </Pressable>
       {showIslandList&&<View style={styles.worldListGrid}>
         {worldIslands.map((grade,index)=><Pressable key={grade.id} accessibilityRole="button"
           testID={'world-list-'+grade.id}
-          accessibilityLabel={String(index+1).padStart(2,'0')+' '+grade.title+' '+grade.island}
+          accessibilityLabel={String(index+1).padStart(2,'0')+' '+grade.title+' '+approvedWorldMapAreaNames[index]}
           onPress={()=>onGrade(grade)} style={styles.worldListItem}>
-          <Text style={styles.worldListItemText}>{String(index+1).padStart(2,'0')}　{grade.island}</Text>
+          <Text style={styles.worldListItemText}>{String(index+1).padStart(2,'0')}　{approvedWorldMapAreaNames[index]}</Text>
           <Text style={styles.worldListGradeText}>{grade.title}</Text>
         </Pressable>)}
       </View>}
