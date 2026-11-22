@@ -65,8 +65,20 @@ test('mobile zoom still keeps all sixteen regions accessible in an exact image-r
   assert.match(ui,/approvedWorldMapAreaNames\[index\]/);
   assert.match(ui,/testID={'approved-world-island-'\+grade\.id}/);
   assert.match(ui,/onPress=\{\(\)=>onGrade\(grade\)\}/);
-  assert.match(ui,/width:imageWidth\*\.16/);
-  assert.match(ui,/height:imageHeight\*\.09/);
+  assert.match(ui,/width:imageWidth\*plaqueWidth/);
+  assert.match(ui,/height:imageHeight\*plaqueHeight/);
+  assert.match(ui,/const plaqueWidth=index===13\?\.20:index===1\|\|index===15\?\.18:\.17/);
+  // The only larger plaque (area 14) is deliberately spaced from its neighbors.
+  const widths=approvedWorldMapHotspots.map((_,i)=>i===13?.20:(i===1||i===15?.18:.17));
+  const heights=approvedWorldMapHotspots.map((_,i)=>i===13?.11:.10);
+  for(let i=0;i<approvedWorldMapHotspots.length;i++){
+    for(let j=i+1;j<approvedWorldMapHotspots.length;j++){
+      const a=approvedWorldMapHotspots[i],b=approvedWorldMapHotspots[j];
+      assert.ok(Math.abs(a.x-b.x)>=(widths[i]+widths[j])/2 ||
+        Math.abs(a.y-b.y)>=(heights[i]+heights[j])/2,
+        'expanded map labels overlap: '+(i+1)+' and '+(j+1));
+    }
+  }
   assert.match(ui,/scrollEnabled=\{compact&&zoomed\}/);
   assert.match(ui,/地図全体を表示する/);
   assert.match(ui,/16エリアの一覧から選ぶ/);
