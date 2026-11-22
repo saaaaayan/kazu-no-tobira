@@ -161,12 +161,12 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
               accessibilityLabel={String(index+1).padStart(2,'0')+' '+grade.title+' '+approvedWorldMapAreaNames[index]+'、'+label}
               onPress={()=>onGrade(grade)}
               style={({pressed})=>[styles.approvedMapTarget,{
-                left:imageWidth*(spot.x-(index===0?.092:.08)),
-                top:imageHeight*(spot.y-(index===0?.0455:.045)),
-                width:imageWidth*(index===0?.184:.16),
-                height:imageHeight*(index===0?.091:.09),
+                left:imageWidth*(spot.x-.08),
+                top:imageHeight*(spot.y-.045),
+                width:imageWidth*.16,
+                height:imageHeight*.09,
               },pressed&&styles.approvedMapTargetPressed]}>
-              {index===0 ? <PlushTownPixelButton width={imageWidth*.184} height={imageHeight*.091}/> : <View />}
+              {index===0 ? <PlushTownPixelButton width={imageWidth*.16} height={imageHeight*.09}/> : <View />}
             </Pressable>;
           })}
         </View>
