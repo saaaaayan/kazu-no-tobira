@@ -185,18 +185,23 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
           {worldIslands.map((grade,index)=>{
             const spot=approvedWorldMapHotspots[index];
             const label=islandAction(grade,index);
+            // The approved PNG already contains old nameplates. Wider opaque
+            // pixel plaques mask their exposed borders, particularly area 14.
+            // Keep the centers and stage navigation exactly as before.
+            const plaqueWidth=index===13?.20:index===1||index===15?.19:.18;
+            const plaqueHeight=index===13?.11:.10;
             return <Pressable key={grade.id} testID={'approved-world-island-'+grade.id}
               accessibilityRole="button"
               accessibilityLabel={String(index+1).padStart(2,'0')+' '+grade.title+' '+approvedWorldMapAreaNames[index]+'、'+label}
               onPress={()=>onGrade(grade)}
               style={({pressed})=>[styles.approvedMapTarget,{
-                left:imageWidth*(spot.x-.08),
-                top:imageHeight*(spot.y-.045),
-                width:imageWidth*.16,
-                height:imageHeight*.09,
+                left:imageWidth*(spot.x-plaqueWidth/2),
+                top:imageHeight*(spot.y-plaqueHeight/2),
+                width:imageWidth*plaqueWidth,
+                height:imageHeight*plaqueHeight,
               },pressed&&styles.approvedMapTargetPressed]}>
               <WorldAreaPixelButton index={index} name={approvedWorldMapAreaNames[index]}
-                width={imageWidth*.16} height={imageHeight*.09}/>
+                width={imageWidth*plaqueWidth} height={imageHeight*plaqueHeight}/>
             </Pressable>;
           })}
         </View>
