@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, type StyleProp, type TextStyle } from 'react-native';
 import { SvgXml } from 'react-native-svg';
-import { formatMathText } from '../domain/mathNotation';
+import { displayMathParts } from '../domain/mathDisplayParts';
 import { renderMathSvg } from '../domain/mathSvg';
 
 function Formula({ latex, fallback, fontSize, color, maxWidth }: {
@@ -37,17 +37,25 @@ export function MathText({ value, style, prefix = '', format = true }: {
 }) {
   const [width, setWidth] = useState(Infinity);
   const { color, fontSize = 16, marginTop, marginBottom, ...textStyle } = StyleSheet.flatten(style) ?? {};
-  const parts = format ? formatMathText(value) : [];
-  if (!parts.some(part => part.kind === 'math')) return <Text style={style}>{prefix}{value}</Text>;
+  const parts=displayMathParts(value,format);
+  if (!parts.some(part => part.kind !== 'text')) return <Text style={style}>{prefix}{value}</Text>;
+  const squareSide=Math.max(19,Math.round(fontSize));
+  const squareBorder=Math.max(2,Math.round(fontSize/10));
 
   return <View accessible accessibilityLabel={prefix + value}
     onLayout={({ nativeEvent }) => { if (nativeEvent.layout.width > 0) setWidth(nativeEvent.layout.width); }}
     style={[styles.line, { marginTop, marginBottom }]}>
     {prefix ? <Text accessible={false} style={{ ...textStyle, color, fontSize }}>{prefix}</Text> : null}
-    {parts.map((part, index) => part.kind === 'text'
-      ? <Text key={index} accessible={false} style={[styles.prose, textStyle, { color, fontSize }]}>{part.text}</Text>
+    {parts.map((part,index)=>part.kind==='square'
+      ? <View key={index} testID="math-empty-square" accessible={false}
+          accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
+          style={{width:squareSide,height:squareSide,borderWidth:squareBorder,
+            borderColor:color??'#29345d',borderRadius:2,
+            alignSelf:'center',marginHorizontal:2,flexShrink:0}}/>
+      : part.kind==='text'
+      ? <Text key={index} accessible={false} style={[styles.prose,textStyle,{color,fontSize}]}>{part.text}</Text>
       : <View key={index} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-          <Formula latex={part.latex} fallback={part.text} fontSize={fontSize} color={color} maxWidth={width} />
+          <Formula latex={part.latex} fallback={part.text} fontSize={fontSize} color={color} maxWidth={width}/>
         </View>)}
   </View>;
 }
