@@ -61,6 +61,12 @@ test('mobile zoom still keeps all sixteen regions accessible in an exact image-r
   assert.equal(mobile.imageHeight,Math.round(mobile.imageWidth*1522/2048));
   const ui=read('src/components/WorldScenes780.tsx').toString();
   assert.match(ui,/source={{uri:approvedWorldMapImageUrl}}/);
+  // Desktop should expand the actual atlas (and all 16 hitboxes) rather than
+  // merely change a centered outer container whose child stays narrower.
+  assert.match(ui,/const atlasBleedWidth=viewportWidth>=700/);
+  assert.match(ui,/Math[.]min\(1200,Math[.]max\(0,viewportWidth-4\)\)/);
+  assert.match(ui,/width:atlasBleedWidth,alignSelf:'center'/);
+  assert.doesNotMatch(ui,/resizeMode="cover"/);
   assert.match(ui,/approvedWorldMapHotspots\[index\]/);
   assert.match(ui,/approvedWorldMapAreaNames\[index\]/);
   assert.match(ui,/testID={'approved-world-island-'\+grade\.id}/);
