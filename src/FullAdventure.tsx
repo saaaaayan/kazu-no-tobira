@@ -13,7 +13,7 @@ import { shouldAutoGradePreschoolChoice } from './domain/preschoolAnswerFlow';
 import { displayedChoiceOptions } from './domain/choicePresentation';
 import { preschoolSpatialChoiceEmoji } from './domain/preschoolSpatialChoice';
 import PreschoolTracePad from './components/PreschoolTracePad';
-import PreschoolSequenceFillPanel from './components/PreschoolSequenceFillPanel';
+import PreschoolSequenceFillPanel, {PreschoolSequenceQuestion} from './components/PreschoolSequenceFillPanel';
 import PreschoolPictureNumberMatch from './components/PreschoolPictureNumberMatch';
 import { liveOrigin, requestLiveRound, requestLiveGrade, requestLiveHint, type LiveMode, type LiveRound } from './domain/liveQuestions';
 import type { SkillId } from './domain/curriculum';
@@ -654,7 +654,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                         <Text style={styles.preschoolRuleText}>② かたちは　{bankQuestion.preschoolTwoRules.shape}</Text>
                       </View>
                     )}
-                    {round.stage.gradeId==='preschool' && question.question.includes('\n') ? (
+                    {sequenceFill ? (
+                      <PreschoolSequenceQuestion question={question.question}/>
+                    ) : round.stage.gradeId==='preschool' && question.question.includes('\n') ? (
                       <View testID="preschool-sequence-two-line-question"
                         accessibilityLabel={question.question} style={styles.preschoolSequenceQuestion}>
                         {question.question.split('\n').map((line,index)=>(

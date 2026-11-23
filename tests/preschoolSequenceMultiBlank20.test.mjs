@@ -75,9 +75,15 @@ test('stage 20 interface has individually selectable gaps and only submits after
   assert.match(bankType,/preschoolSequenceFill\?: PreschoolSequenceFill/);
   assert.match(view,/testID="preschool-sequence-grid"/);
   assert.match(view,/testID=\{'sequence-blank-'\+slot\}/);
-  // Use the same visible square glyph as the Japanese question text.
-  assert.match(view,/\{filled\[slot\]\|\|'□'\}/);
-  assert.doesNotMatch(view,/\{filled\[slot\]\|\|'？'\}/);
+  // A native square is large, centered, and unaffected by glyph baselines.
+  assert.match(view,/testID="sequence-empty-square" style=\{styles[.]emptySquare\}/);
+  assert.match(view,/emptySquare:\{width:30,height:30,borderWidth:3/);
+  assert.doesNotMatch(view, /filled\[slot\]\|\|'□'/);
+  assert.doesNotMatch(view, /filled\[slot\]\|\|'？'/);
+  assert.match(view,/testID="preschool-sequence-question-square"/);
+  assert.match(view,/questionSquare:\{width:29,height:29,borderWidth:3/);
+  assert.match(view,/questionRow:\{width:'100%',flexDirection:'row',flexWrap:'wrap',alignItems:'center'/);
+  assert.match(game,/<PreschoolSequenceQuestion question=\{question.question\}\/>/);
   assert.match(view,/testID=\{'sequence-card-'\+value\}/);
   assert.match(view,/setActive\(slot\)/);
   assert.match(view,/const complete=filled.every\(Boolean\)/);

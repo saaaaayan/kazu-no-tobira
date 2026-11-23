@@ -36,7 +36,9 @@ export default function PreschoolSequenceFillPanel({sequence,disabled,onSubmit}:
               accessibilityState={{selected:slot===active,disabled}}
               disabled={disabled} onPress={()=>setActive(slot)}
               style={[styles.cell,styles.blank,active===slot&&styles.active]}>
-              <Text style={styles.cellText}>{filled[slot]||'□'}</Text>
+              {filled[slot]
+                ? <Text style={styles.cellText}>{filled[slot]}</Text>
+                : <View testID="sequence-empty-square" style={styles.emptySquare}/>}
             </Pressable>
           : <View key={i} style={styles.cell}>
               <Text style={styles.cellText}>{sequence.start+i}</Text>
@@ -68,6 +70,19 @@ export default function PreschoolSequenceFillPanel({sequence,disabled,onSubmit}:
   </View>;
 }
 
+/** Draw the question's square instead of relying on a font-specific glyph
+ * whose baseline makes the square look small and too low on many devices. */
+export function PreschoolSequenceQuestion({question}:{question:string}){
+  const square=question.indexOf('□');
+  if(square<0)return <Text style={styles.questionPhrase}>{question}</Text>;
+  return <View testID="preschool-sequence-question" accessible
+      accessibilityLabel={question} style={styles.questionRow}>
+    <Text accessible={false} style={styles.questionPhrase}>{question.slice(0,square)}</Text>
+    <View testID="preschool-sequence-question-square" accessible={false} style={styles.questionSquare}/>
+    <Text accessible={false} style={styles.questionPhrase}>{question.slice(square+1)}</Text>
+  </View>;
+}
+
 const styles=StyleSheet.create({
   outer:{width:'100%',alignSelf:'center',maxWidth:480,alignItems:'center',gap:12,paddingTop:8},
   instruction:{color:'#fff2c7',fontSize:18,fontWeight:'900',textAlign:'center'},
@@ -77,6 +92,12 @@ const styles=StyleSheet.create({
   blank:{backgroundColor:'#d9e9ff',borderColor:'#4e6cba'},
   active:{borderWidth:4,borderColor:'#e3a53d',backgroundColor:'#ffedbf'},
   cellText:{color:'#26345c',fontSize:28,fontWeight:'900'},
+  // Draw a 30px square in the exact center of the touch tile.
+  emptySquare:{width:30,height:30,borderWidth:3,borderColor:'#36559b',borderRadius:2},
+  // Inline question square matches text size without font baseline offsets.
+  questionRow:{width:'100%',flexDirection:'row',flexWrap:'wrap',alignItems:'center',columnGap:8,rowGap:4},
+  questionPhrase:{color:'white',fontSize:29,fontWeight:'900',lineHeight:42},
+  questionSquare:{width:29,height:29,borderWidth:3,borderColor:'white',borderRadius:2},
   options:{width:'100%',flexDirection:'row',justifyContent:'center',flexWrap:'wrap',gap:10},
   card:{minHeight:64,minWidth:66,paddingHorizontal:12,backgroundColor:'#fff0bb',
     borderColor:'#daa855',borderWidth:3,borderRadius:14,alignItems:'center',justifyContent:'center'},
