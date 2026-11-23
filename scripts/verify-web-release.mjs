@@ -59,7 +59,8 @@ export function releaseClient(address) {
     if(version.approvedWorldMapSha256!==undefined){
       if(!/^[a-f0-9]{64}$/.test(version.approvedWorldMapSha256))
         throw new Error('The approved world map digest is invalid.');
-      const imageFile=js.includes('world-map-approved-20261122.png')?'world-map-approved-20261122.png':
+      const imageFile=js.includes('world-map-rich-20261123.png')?'world-map-rich-20261123.png':
+        js.includes('world-map-approved-20261122.png')?'world-map-approved-20261122.png':
         js.includes('world-map-approved.png')?'world-map-approved.png':
         js.includes('world-map-approved.avif')?'world-map-approved.avif':null;
       if(!imageFile)throw new Error('The game bundle does not use the approved world map.');
