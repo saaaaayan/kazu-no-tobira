@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import Svg, {G,Rect,Text as SvgText} from 'react-native-svg';
 import { CompanionAvatar } from './AdventureCompanion';
 import { allWorldStages, hasGeneratedWorldQuestions, isPlannedIsland, worldIslands, type WorldGrade, type WorldStage } from '../domain/worldCatalog';
@@ -135,9 +135,15 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
   onGrade: (grade: WorldGrade) => void; onTitles: () => void; preview?: boolean;
 }) {
   const [width,setWidth]=useState(0);
+  const {width:viewportWidth}=useWindowDimensions();
   const [zoomed,setZoomed]=useState(true);
   const [showIslandList,setShowIslandList]=useState(false);
   const {compact,imageWidth,imageHeight}=approvedWorldMapDimensions(width,zoomed);
+  // Extend just the interactive atlas into the side gutters, not the header.
+  // All 16 hitboxes scale with the same measured width; never crop the image.
+  const atlasBleedWidth=viewportWidth>=700
+    ? Math.min(1200,Math.max(0,viewportWidth-4))
+    : undefined;
   const testing=mode==='test';
   const summary=unlockSummary(progress);
   const stats=worldIslands.map(grade=>gradeProgress(progress,grade.id));
@@ -170,7 +176,7 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
         <Text style={styles.mapZoomText}>{zoomed?'全体を見る':'拡大して見る'}</Text>
       </Pressable>}
     </View>
-    <View style={[styles.atlas,{height:imageHeight}]} onLayout={event=>{
+    <View style={[styles.atlas,{height:imageHeight},atlasBleedWidth!==undefined&&{width:atlasBleedWidth,alignSelf:'center'}]} onLayout={event=>{
       const next=Math.round(event.nativeEvent.layout.width);
       if(next>0&&next!==width)setWidth(next);
     }}>
