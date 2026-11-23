@@ -6,7 +6,31 @@ import {worldIslands} from '../src/domain/worldCatalog.ts';
 import {approvedWorldMap,approvedWorldMapHotspots,approvedWorldMapAreaNames,
   approvedWorldMapDimensions,approvedWorldMapImageUrl} from '../src/domain/approvedWorldMap.ts';
 
+import {richWorldMap,richWorldMapHotspots,richWorldMapButtonWidths,
+  richWorldMapButtonHeight,richWorldMapImageUrl} from '../src/domain/richWorldMap.ts';
+
 const read=path=>readFileSync(new URL('../'+path,import.meta.url));
+test('2026-11-23 user-selected color map is restored byte-for-byte',()=>{
+  const bytes=read('public/'+richWorldMap.filename);
+  assert.equal(bytes.length,3_555_946);
+  assert.equal(bytes.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
+  assert.equal(bytes.readUInt32BE(16),1448);
+  assert.equal(bytes.readUInt32BE(20),1086);
+  assert.equal(createHash('sha256').update(bytes).digest('hex'),richWorldMap.sha256);
+  assert.equal(richWorldMap.sha256,'7f2573fe2850e626012d6d36c65d665e1e9a820d9f8ed2762663418abdfe564c');
+  assert.match(richWorldMapImageUrl,/^\\/kazu-no-tobira\\/world-map-rich-20261123[.]png\\?v=[a-f0-9]{8}$/);
+  assert.equal(richWorldMapHotspots.length,16);
+  assert.equal(richWorldMapButtonWidths.length,16);
+  for(let i=0;i<16;i++){
+    const p=richWorldMapHotspots[i],w=richWorldMapButtonWidths[i],h=richWorldMapButtonHeight;
+    assert.ok(p.x-w/2>=0 && p.x+w/2<=1 && p.y-h/2>=0 && p.y+h/2<=1);
+    for(let j=0;j<i;j++){
+      const q=richWorldMapHotspots[j];
+      assert.ok(Math.abs(p.x-q.x)>=(w+richWorldMapButtonWidths[j])/2 ||
+        Math.abs(p.y-q.y)>=h, 'new image has overlapping buttons '+(j+1)+' and '+(i+1));
+    }
+  }
+});
 test('original 2026-11-22 approved treasure map is reproduced with exact image bytes',()=>{
   const image=read('public/'+approvedWorldMap.filename);
   assert.equal(image.byteLength,7_804_072);
@@ -60,31 +84,20 @@ test('mobile zoom still keeps all sixteen regions accessible in an exact image-r
   assert.equal(desktop.imageWidth,1200);
   assert.equal(mobile.imageHeight,Math.round(mobile.imageWidth*1522/2048));
   const ui=read('src/components/WorldScenes780.tsx').toString();
-  assert.match(ui,/source={{uri:approvedWorldMapImageUrl}}/);
-  // Desktop should expand the actual atlas (and all 16 hitboxes) rather than
-  // merely change a centered outer container whose child stays narrower.
-  assert.match(ui,/const atlasBleedWidth=viewportWidth>=700/);
-  assert.match(ui,/Math[.]min\(1200,Math[.]max\(0,viewportWidth-4\)\)/);
-  assert.match(ui,/width:atlasBleedWidth,alignSelf:'center'/);
-  assert.doesNotMatch(ui,/resizeMode="cover"/);
-  assert.match(ui,/approvedWorldMapHotspots\[index\]/);
-  assert.match(ui,/approvedWorldMapAreaNames\[index\]/);
-  assert.match(ui,/testID={'approved-world-island-'\+grade\.id}/);
+  assert.match(ui,/source={{uri:richWorldMapImageUrl}}/);
+  // The image carries its own sixteen labels: do not draw another set on top.
+  assert.doesNotMatch(ui,/<WorldAreaPixelButton/);
+  assert.match(ui,/const spot=richWorldMapHotspots\[index\]/);
+  assert.match(ui,/const plaqueWidth=richWorldMapButtonWidths\[index\]/);
+  assert.match(ui,/const plaqueHeight=richWorldMapButtonHeight/);
+  assert.match(ui,/imageHeight=Math[.]round\(imageWidth\*richWorldMap[.]height\/richWorldMap[.]width\)/);
+  assert.match(ui,/testID={'approved-world-island-'\+grade[.]id}/);
   assert.match(ui,/onPress=\{\(\)=>onGrade\(grade\)\}/);
   assert.match(ui,/width:imageWidth\*plaqueWidth/);
   assert.match(ui,/height:imageHeight\*plaqueHeight/);
-  assert.match(ui,/const plaqueWidth=index===13\?\.20:index===1\|\|index===15\?\.18:\.17/);
-  // The only larger plaque (area 14) is deliberately spaced from its neighbors.
-  const widths=approvedWorldMapHotspots.map((_,i)=>i===13?.20:(i===1||i===15?.18:.17));
-  const heights=approvedWorldMapHotspots.map((_,i)=>i===13?.11:.10);
-  for(let i=0;i<approvedWorldMapHotspots.length;i++){
-    for(let j=i+1;j<approvedWorldMapHotspots.length;j++){
-      const a=approvedWorldMapHotspots[i],b=approvedWorldMapHotspots[j];
-      assert.ok(Math.abs(a.x-b.x)>=(widths[i]+widths[j])/2 ||
-        Math.abs(a.y-b.y)>=(heights[i]+heights[j])/2,
-        'expanded map labels overlap: '+(i+1)+' and '+(j+1));
-    }
-  }
+  assert.match(ui,/const atlasBleedWidth=viewportWidth>=700/);
+  assert.match(ui,/width:atlasBleedWidth,alignSelf:'center'/);
+  assert.doesNotMatch(ui,/resizeMode="cover"/);
   assert.match(ui,/scrollEnabled=\{compact&&zoomed\}/);
   assert.match(ui,/地図全体を表示する/);
   assert.match(ui,/16エリアの一覧から選ぶ/);
@@ -94,7 +107,9 @@ test('release pipeline publishes and checks the exact original 2026-11-22 map',(
   const exporter=read('scripts/export-ui-preview.mjs').toString();
   const verifier=read('scripts/verify-web-release.mjs').toString();
   assert.match(exporter,/copyFileSync\(mapSource,resolve\(target,'world-map-approved-20261122\.png'\)\)/);
-  assert.match(exporter,/approvedWorldMapSha256:contentDigest\(mapBytes\)/);
+  assert.match(exporter,/approvedWorldMapSha256:contentDigest\(richMapBytes\)/);
+  assert.match(exporter,/copyFileSync\(richMapSource,resolve\(target,'world-map-rich-20261123[.]png'\)\)/);
+  assert.match(verifier,/world-map-rich-20261123[.]png/);
   assert.match(verifier,/await get\(imageFile\)/);
   assert.match(verifier,/world-map-approved-20261122[.]png/);
   assert.match(verifier,/world-map-approved[.]png/);
