@@ -36,7 +36,7 @@ export default function PreschoolSequenceFillPanel({sequence,disabled,onSubmit}:
               accessibilityState={{selected:slot===active,disabled}}
               disabled={disabled} onPress={()=>setActive(slot)}
               style={[styles.cell,styles.blank,active===slot&&styles.active]}>
-              <Text style={styles.cellText}>{filled[slot]||'？'}</Text>
+              <Text style={styles.cellText}>{filled[slot]||'□'}</Text>
             </Pressable>
           : <View key={i} style={styles.cell}>
               <Text style={styles.cellText}>{sequence.start+i}</Text>
