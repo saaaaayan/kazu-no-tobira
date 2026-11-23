@@ -68,8 +68,20 @@ if(mapBytes.length!==7_804_072||
    contentDigest(mapBytes)!=='5e91554bc4de79192d5a1b04994149e866c7c8e1b0f17963dc21f9cc88cddc2c')
   throw new Error('The approved 16-island map is not a valid PNG asset.');
 copyFileSync(mapSource,resolve(target,'world-map-approved-20261122.png'));
+ 
+// New foreground map contains all 16 pixel-art labels, so React only supplies
+// invisible click targets. Verify the user-selected original byte-for-byte.
+const richMapSource=resolve('public/world-map-rich-20261123.png');
+const richMapBytes=readFileSync(richMapSource);
+if(richMapBytes.length!==3_555_946 ||
+   !richMapBytes.subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex')) ||
+   richMapBytes.readUInt32BE(16)!==1448 ||
+   richMapBytes.readUInt32BE(20)!==1086 ||
+   contentDigest(richMapBytes)!=='7f2573fe2850e626012d6d36c65d665e1e9a820d9f8ed2762663418abdfe564c')
+  throw new Error('The 2026-11-23 user-selected world-map PNG differs from the source.');
+copyFileSync(richMapSource,resolve(target,'world-map-rich-20261123.png'));
 
-const allowed=new Set(['index.html','metadata.json','world-map-approved-20261122.png']);
+const allowed=new Set(['index.html','metadata.json','world-map-approved-20261122.png','world-map-rich-20261123.png']);
 const files=readdirSync(target,{recursive:true,withFileTypes:true}).filter(entry=>!entry.isDirectory())
   .map(entry=>relative(target,resolve(entry.parentPath,entry.name)).replaceAll('\\','/'));
 // This one user-approved illustration is public art. Keep the preview asset
@@ -108,7 +120,7 @@ else writeFileSync(index,readFileSync(index,'utf8').replace('<head>',
 writeFileSync(resolve(target,'version.json'),JSON.stringify({
   version,profile:'ui-preview',indexSha256:contentDigest(readFileSync(index)),entrySha256:contentDigest(bundle),
   publishedBankQuestions:publicBankIds.length*100,bankSha256:bankFiles,
-  approvedWorldMapSha256:contentDigest(mapBytes),approvedEulerHeroSha256:contentDigest(approvedHeroBytes),
+  approvedWorldMapSha256:contentDigest(richMapBytes),approvedEulerHeroSha256:contentDigest(approvedHeroBytes),
   wildlifeReviewSha256:contentDigest(readFileSync(resolve(target,'art-review/index.html'))),
   pixelSceneryV2:true,
   preschoolPlushPixelV2:true,toyIslandPixelV1:true,allIslandPixelThemesV1:true,

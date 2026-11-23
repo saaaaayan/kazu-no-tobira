@@ -31,3 +31,31 @@ if(existsSync(destination)&&valid(readFileSync(destination))) {
   writeFileSync(destination,bytes);
   console.log('Restored original approved world map: '+expectedSha);
 }
+
+ 
+// Restore the new, user-selected 2026-11-23 version as an additional immutable
+// asset. Keep the original PNG above for rollbacks and older release snapshots.
+const richMapDestination=join(root,'public','world-map-rich-20261123.png');
+const richMapSha='7f2573fe2850e626012d6d36c65d665e1e9a820d9f8ed2762663418abdfe564c';
+const richMapValid=bytes=>bytes.length===3_555_946 &&
+  bytes.subarray(0,8).toString('hex')==='89504e470d0a1a0a' &&
+  bytes.readUInt32BE(16)===1448 && bytes.readUInt32BE(20)===1086 &&
+  digest(bytes)===richMapSha;
+if(existsSync(richMapDestination)&&richMapValid(readFileSync(richMapDestination))) {
+  console.log('2026-11-23 world map verified: '+richMapSha);
+} else {
+  const chunks=[];
+  for(let n=0;n<14;n++){
+    const part=readFileSync(join(root,'assets/world-map-rich-base64',
+      `part${String(n).padStart(2,'0')}.txt`),'utf8');
+    if(!/^[A-Za-z0-9+/]*={0,2}$/.test(part) ||
+       part.length!==(n===13?338658:338662))
+      throw new Error('Invalid rich world-map chunk '+n);
+    chunks.push(part);
+  }
+  const image=Buffer.from(chunks.join(''),'base64');
+  if(!richMapValid(image))
+    throw new Error('2026-11-23 world-map image bytes differ from user-approved image.');
+  writeFileSync(richMapDestination,image);
+  console.log('Restored exact 2026-11-23 world map: '+richMapSha);
+}
