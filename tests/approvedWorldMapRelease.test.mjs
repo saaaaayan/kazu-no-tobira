@@ -18,7 +18,7 @@ test('2026-11-23 user-selected color map is restored byte-for-byte',()=>{
   assert.equal(bytes.readUInt32BE(20),1086);
   assert.equal(createHash('sha256').update(bytes).digest('hex'),richWorldMap.sha256);
   assert.equal(richWorldMap.sha256,'7f2573fe2850e626012d6d36c65d665e1e9a820d9f8ed2762663418abdfe564c');
-  assert.match(richWorldMapImageUrl,/^\\/kazu-no-tobira\\/world-map-rich-20261123[.]png\\?v=[a-f0-9]{8}$/);
+  assert.equal(richWorldMapImageUrl,'/kazu-no-tobira/world-map-rich-20261123.png?v=7f2573fe');
   assert.equal(richWorldMapHotspots.length,16);
   assert.equal(richWorldMapButtonWidths.length,16);
   for(let i=0;i<16;i++){
