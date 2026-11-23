@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import Svg, {G,Rect,Text as SvgText} from 'react-native-svg';
+import Svg, {G,Rect} from 'react-native-svg';
 import { CompanionAvatar } from './AdventureCompanion';
 import { allWorldStages, hasGeneratedWorldQuestions, isPlannedIsland, worldIslands, type WorldGrade, type WorldStage } from '../domain/worldCatalog';
 import { hasPremium, type Entitlement } from '../domain/accessPlan';
@@ -8,7 +8,8 @@ import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldP
 import { worldStageAction, type PlayMode } from '../domain/playMode';
 import { checkpointsFor, stageDisplayTitle, stageLabels, type Checkpoint } from '../domain/stageStructure';
 import { PRESCHOOL_MAP_TITLE_INSET, compactIslandStageMap, islandCheckpointLayout, preschoolStageLabelLayout, islandStageLayout } from '../domain/worldMapLayout';
-import { approvedWorldMapDimensions, approvedWorldMapHotspots, approvedWorldMapAreaNames, approvedWorldMapImageUrl } from '../domain/approvedWorldMap';
+import { approvedWorldMapDimensions, approvedWorldMapAreaNames } from '../domain/approvedWorldMap';
+import { richWorldMap, richWorldMapHotspots, richWorldMapButtonWidths, richWorldMapButtonHeight, richWorldMapImageUrl } from '../domain/richWorldMap';
 import { hasStageBank } from '../domain/questionBank';
 import type { Progress } from '../domain/progress';
 import { lessonStatus, unitLessons, type UnitLesson } from '../domain/unitLessons';
@@ -60,76 +61,6 @@ function ToyBlockStamp({flipped=false,compact=false}:{flipped?:boolean;compact?:
   </Svg>;
 }
 
-/** Pixel-edged wooden RPG label for the first world area.
- * Kept as a separately clickable layer so the approved map artwork remains byte-identical.
- */
-const worldButtonColors = [
-  ['#713820','#d58a34','#ffe6a0','#ffd264'], // plush town
-  ['#5b426c','#9873ac','#ead6f5','#dbcaed'], // toys
-  ['#38533c','#719267','#dce4a6','#cce6a1'], // animals
-  ['#81445d','#c47b99','#fce0bc','#f5d399'], // sweets
-  ['#594e32','#8e8650','#e4d19b','#d4dc95'], // dinosaurs
-  ['#344b5c','#698b97','#cce1dd','#d5dbc5'], // machines
-  ['#64533b','#a48b64','#ead5ab','#e5d092'], // ruins
-  ['#4c3c59','#806781','#e8d4c8','#d9c3e3'], // labyrinth
-  ['#375968','#7298a6','#d7e9e8','#d5eceb'], // mirrors
-  ['#554a66','#9385a9','#e7e0c7','#e5d6ab'], // light and shadow
-  ['#303f70','#687ba6','#d7e0f3','#d5e5f7'], // constellations
-  ['#3a6256','#7fa489','#d8e7bc','#d5ead6'], // nature
-  ['#53516d','#9090ab','#e6e2cb','#e0d9aa'], // academy
-  ['#564466','#9276a3','#e7d7dd','#ddcaed'], // wizard
-  ['#6d4b3b','#b18b5e','#f4dfac','#edcf92'], // sky kingdom
-  ['#303754','#657196','#e1dcec','#d8d9ff'], // galaxy
-] as const;
-const worldButtonSubtitles = [
-  '幼児','小1','小2','小3','小4','小5','小6','中1',
-  '中2','中3','高1','高2','高3','賢者','覇王','宇宙',
-] as const;
-
-/** A matching pixel-RPG navigation plaque for each approved map region.
- * All sixteen still use their original hotspot coordinates and actions.
- */
-function WorldAreaPixelButton({width,height,index,name}:{width:number;height:number;index:number;name:string}) {
-  const [wood,edge,highlight,accent]=worldButtonColors[index] ?? worldButtonColors[0];
-  const subtitle=worldButtonSubtitles[index] ?? '';
-  const titleSize=name.length>=9?23:name.length>=8?25:28;
-  return <Svg width={width} height={height} viewBox="0 0 390 130" accessible={false}>
-    {/* Stepped silhouette, rather than a smooth modern rounded rectangle. */}
-    <Rect x={16} y={6} width={358} height={118} fill="#4c2718"/>
-    <Rect x={8} y={16} width={374} height={98} fill="#4c2718"/>
-    <Rect x={2} y={26} width={386} height={78} fill="#4c2718"/>
-    <Rect x={16} y={12} width={358} height={106} fill={edge}/>
-    <Rect x={8} y={24} width={374} height={80} fill={edge}/>
-    <Rect x={22} y={19} width={346} height={91} fill={wood}/>
-    <Rect x={15} y={30} width={360} height={69} fill={wood}/>
-    <Rect x={22} y={16} width={346} height={8} fill={highlight}/>
-    <Rect x={22} y={105} width={346} height={7} fill="#f5a43d"/>
-    <Rect x={16} y={24} width={8} height={75} fill="#e6a441"/>
-    <Rect x={366} y={24} width={8} height={75} fill="#ad621e"/>
-    <Rect x={25} y={26} width={340} height={5} fill="#96512a"/>
-    <Rect x={25} y={98} width={340} height={5} fill="#542b20"/>
-    {/* Square-edged level medallion. */}
-    <Rect x={23} y={27} width={76} height={74} fill="#edac35"/>
-    <Rect x={28} y={21} width={66} height={85} fill="#edac35"/>
-    <Rect x={19} y={38} width={84} height={52} fill="#edac35"/>
-    <Rect x={29} y={30} width={64} height={66} fill="#5b2d1b"/>
-    <Rect x={24} y={40} width={74} height={46} fill="#5b2d1b"/>
-    <Rect x={33} y={26} width={56} height={7} fill="#ffe39a"/>
-    <SvgText x={61} y={80} fontSize={index>=9?43:51} fontFamily="monospace" fontWeight="900" textAnchor="middle" fill="#fff4d2">{index+1}</SvgText>
-    {/* Slightly shadowed, intentionally chunky two-line game text. */}
-    <SvgText x={244} y={57} fontSize={titleSize} fontFamily="monospace" fontWeight="900" textAnchor="middle" fill="#3a211c">{name}</SvgText>
-    <SvgText x={242} y={54} fontSize={titleSize} fontFamily="monospace" fontWeight="900" textAnchor="middle" fill="#fff0c9">{name}</SvgText>
-    <SvgText x={244} y={91} fontSize={27} fontFamily="monospace" fontWeight="900" textAnchor="middle" fill={accent}>{'（'+subtitle+'）'}</SvgText>
-    {/* Understated little pixel stamps, echoing the first area button. */}
-    <G fill="#efa85b">
-      <Rect x={121} y={76} width={7} height={7}/><Rect x={132} y={70} width={7} height={7}/>
-      <Rect x={144} y={75} width={7} height={7}/><Rect x={127} y={84} width={20} height={10}/>
-      <Rect x={343} y={76} width={7} height={7}/><Rect x={354} y={70} width={7} height={7}/>
-      <Rect x={366} y={75} width={7} height={7}/><Rect x={349} y={84} width={20} height={10}/>
-    </G>
-  </Svg>;
-}
-
 export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview = false }: {
   progress: Progress; mode: PlayMode; access: Entitlement;
   onGrade: (grade: WorldGrade) => void; onTitles: () => void; preview?: boolean;
@@ -138,7 +69,8 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
   const {width:viewportWidth}=useWindowDimensions();
   const [zoomed,setZoomed]=useState(true);
   const [showIslandList,setShowIslandList]=useState(false);
-  const {compact,imageWidth,imageHeight}=approvedWorldMapDimensions(width,zoomed);
+  const {compact,imageWidth}=approvedWorldMapDimensions(width,zoomed);
+  const imageHeight=Math.round(imageWidth*richWorldMap.height/richWorldMap.width);
   // Extend just the interactive atlas into the side gutters, not the header.
   // All 16 hitboxes scale with the same measured width; never crop the image.
   const atlasBleedWidth=viewportWidth>=700
@@ -185,17 +117,16 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
         contentContainerStyle={{width:imageWidth,height:imageHeight}}
         style={{height:imageHeight}} nestedScrollEnabled>
         <View style={{width:imageWidth,height:imageHeight}}>
-          <Image source={{uri:approvedWorldMapImageUrl}} resizeMode="stretch"
+          <Image source={{uri:richWorldMapImageUrl}} resizeMode="stretch"
             accessibilityLabel="16エリアを描いた、手書き風のファンタジー世界地図"
             style={{width:imageWidth,height:imageHeight}} />
           {worldIslands.map((grade,index)=>{
-            const spot=approvedWorldMapHotspots[index];
+            const spot=richWorldMapHotspots[index];
             const label=islandAction(grade,index);
-            // The approved PNG already contains old nameplates. Wider opaque
-            // pixel plaques mask their exposed borders, particularly area 14.
-            // Keep the centers and stage navigation exactly as before.
-            const plaqueWidth=index===13?.20:index===1||index===15?.18:.17;
-            const plaqueHeight=index===13?.11:.10;
+            // The user-selected PNG already includes the pixel-art plaques.
+            // Keep only invisible accessible hit targets, no duplicate visuals.
+            const plaqueWidth=richWorldMapButtonWidths[index];
+            const plaqueHeight=richWorldMapButtonHeight;
             return <Pressable key={grade.id} testID={'approved-world-island-'+grade.id}
               accessibilityRole="button"
               accessibilityLabel={String(index+1).padStart(2,'0')+' '+grade.title+' '+approvedWorldMapAreaNames[index]+'、'+label}
@@ -206,8 +137,6 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
                 width:imageWidth*plaqueWidth,
                 height:imageHeight*plaqueHeight,
               },pressed&&styles.approvedMapTargetPressed]}>
-              <WorldAreaPixelButton index={index} name={approvedWorldMapAreaNames[index]}
-                width={imageWidth*plaqueWidth} height={imageHeight*plaqueHeight}/>
             </Pressable>;
           })}
         </View>
