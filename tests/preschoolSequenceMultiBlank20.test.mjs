@@ -75,6 +75,9 @@ test('stage 20 interface has individually selectable gaps and only submits after
   assert.match(bankType,/preschoolSequenceFill\?: PreschoolSequenceFill/);
   assert.match(view,/testID="preschool-sequence-grid"/);
   assert.match(view,/testID=\{'sequence-blank-'\+slot\}/);
+  // Use the same visible square glyph as the Japanese question text.
+  assert.match(view,/\{filled\[slot\]\|\|'□'\}/);
+  assert.doesNotMatch(view,/\{filled\[slot\]\|\|'？'\}/);
   assert.match(view,/testID=\{'sequence-card-'\+value\}/);
   assert.match(view,/setActive\(slot\)/);
   assert.match(view,/const complete=filled.every\(Boolean\)/);
