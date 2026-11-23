@@ -660,9 +660,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                       <View testID="preschool-sequence-two-line-question"
                         accessibilityLabel={question.question} style={styles.preschoolSequenceQuestion}>
                         {question.question.split('\n').map((line,index)=>(
-                          <Text key={index} style={index===0
+                          <MathText key={index} value={line} style={index===0
                             ? styles.preschoolSequenceNumbers
-                            : styles.preschoolSequenceInstruction}>{line}</Text>
+                            : styles.preschoolSequenceInstruction}/>
                         ))}
                       </View>
                     ) : <MathText style={styles.questionText} value={question.question}/>}
