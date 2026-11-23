@@ -13,6 +13,7 @@ import { shouldAutoGradePreschoolChoice } from './domain/preschoolAnswerFlow';
 import { displayedChoiceOptions } from './domain/choicePresentation';
 import { preschoolSpatialChoiceEmoji } from './domain/preschoolSpatialChoice';
 import PreschoolTracePad from './components/PreschoolTracePad';
+import PreschoolSequenceFillPanel from './components/PreschoolSequenceFillPanel';
 import PreschoolPictureNumberMatch from './components/PreschoolPictureNumberMatch';
 import { liveOrigin, requestLiveRound, requestLiveGrade, requestLiveHint, type LiveMode, type LiveRound } from './domain/liveQuestions';
 import type { SkillId } from './domain/curriculum';
@@ -370,6 +371,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const countingGuide=Boolean(preschoolStage && diagram?.kind==='countingBoard' && diagram.guide);
   const numeralGuide=Boolean(preschoolStage && bankQuestion?.preschoolNumberActivity);
   const pictureMatching=Boolean(preschoolStage && bankQuestion?.preschoolNumberMatch);
+  const sequenceFill=Boolean(preschoolStage && bankQuestion?.preschoolSequenceFill && !review && !round?.live);
   const traceActivity=Boolean(uiPreview && bankQuestion?.preschoolTrace && !round?.feedback);
   const autoTraceEnabled=Boolean(uiPreview && !review && bankQuestion?.preschoolTrace);
   const autoGradePreschoolChoice=shouldAutoGradePreschoolChoice(
@@ -380,7 +382,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   // single tap. Keep tracing, picture-to-number linking and admin review
   // on their dedicated input flows.
   const inlineChoice=Boolean(question?.type==='choice' && !countingGuide && !numeralGuide &&
-    !pictureMatching && !bankQuestion?.preschoolTrace && !review);
+    !pictureMatching && !sequenceFill && !bankQuestion?.preschoolTrace && !review);
   // The memo is absent for choice questions, so the results must not keep
   // the old two-column desktop layout with an empty left side.
   const choiceFeedback=Boolean(round?.feedback && question?.type==='choice');
@@ -778,6 +780,26 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                         {!!message && <Text accessibilityLiveRegion="polite" style={styles.preschoolError}>{message}</Text>}
                       </View>
                     )}
+                    {sequenceFill && bankQuestion?.preschoolSequenceFill && !round.feedback && (
+                      <View testID="preschool-sequence-interactive-answer" style={styles.preschoolAnswerSection}>
+                        <PreschoolSequenceFillPanel key={question.id}
+                          sequence={bankQuestion.preschoolSequenceFill} disabled={saving}
+                          onSubmit={value=>void submit(value)}/>
+                        {hints.slice(0,round.hintLevel).map((hint,i)=>(
+                          <View key={i} style={styles.preschoolHintBox}>
+                            <MathText style={styles.preschoolHintText} value={hint}/>
+                          </View>
+                        ))}
+                        {round.hintLevel<hints.length && (
+                          <Pressable accessibilityRole="button" disabled={saving}
+                            onPress={showHint} style={styles.preschoolHintButton}>
+                            <Text style={styles.preschoolHintButtonText}>💡 ヒントを みる</Text>
+                          </Pressable>
+                        )}
+                        {!!message && <Text accessibilityLiveRegion="polite"
+                          style={styles.preschoolError}>{message}</Text>}
+                      </View>
+                    )}
                     {inlineChoice && !round.feedback && (
                       <View testID="kazu-inline-choice-panel" style={styles.preschoolAnswerSection}>
                         <Text style={styles.preschoolInstruction}>
@@ -826,7 +848,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                       </View>
                     )}
                   </View>
-                  {((!countingGuide && !numeralGuide && !inlineChoice) || round.feedback) && <View testID={choiceFeedback?'choice-feedback-centered':undefined}
+                  {((!countingGuide && !numeralGuide && !inlineChoice && !sequenceFill) || round.feedback) && <View testID={choiceFeedback?'choice-feedback-centered':undefined}
                     style={[styles.workArea,wide&&!countingGuide&&!numeralGuide&&question.type!=='choice'&&styles.workWide,
                       choiceFeedback&&styles.choiceFeedbackWork]}>
                     <View style={[styles.answerArea,

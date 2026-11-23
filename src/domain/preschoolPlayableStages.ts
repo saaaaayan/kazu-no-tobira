@@ -2,6 +2,7 @@ import type { WorldStage } from './worldCatalog.ts';
 import type { BankQuestion, BankDiagram } from './questionBank.ts';
 import { countingTokenArt, type CountingToken } from './countingTokens.ts';
 import { preschoolNumeralTask } from './preschoolNumeralActivities.ts';
+import { stage20SequenceFill, sequenceFillCorrect, sequenceFillChoices, type PreschoolSequenceFill } from './preschoolSequenceFill.ts';
 import type { PictureNumberMatch } from './preschoolNumberConnections.ts';
 
 /**
@@ -15,6 +16,7 @@ type Task={question:string;answer:string;choices:string[];prompt?:string;diagram
   trace?:string; spatial?:true; twoOptions?:true; explanation?:string;hints?:[string,string,string];
   numeralPractice?:true;focalNumeral?:string;
   pictureNumberMatch?:PictureNumberMatch;
+  sequenceFill?:PreschoolSequenceFill;
   twoRules?:{color:'あか'|'あお';shape:'まる'|'さんかく'|'しかく'};};
 const image=(token:CountingToken)=>countingTokenArt[token][0];
 const name=(token:CountingToken)=>countingTokenArt[token][1];
@@ -160,6 +162,35 @@ function order(i:number,max:number,mode:number):Task{
       'あいている ところの まえや あとを みてね。'],
     explanation:'すうじは 1こずつ すすむよ。あいている ところに はいるのは '+answer+' だよ。'},max);
 }
+/** Stage 19: only one number's predecessor/successor. */
+function neighborTask(i:number):Task{
+  const forward=i%2===0;
+  const middle=forward?[2,3,5,7,9][i/2]:[10,8,6,4,2][(i-1)/2];
+  const value=middle+(forward?1:-1),direction=forward?'つぎ':'まえ';
+  return numberTask(middle+'の '+direction+'の かずは？',value,{
+    prompt:middle+'から '+(forward?'ひとつ すすもう。':'ひとつ もどろう。'),
+    hints:[middle+'の すうじを みつけてね。',
+      forward?'かぞえる じゅんばんで ひとつ すすもう。':'かぞえる じゅんばんで ひとつ もどろう。',
+      'ひとつ '+(forward?'すすんだ':'もどった')+' ところの すうじを えらんでね。'],
+    explanation:middle+'の '+direction+'は '+value+' だよ。',
+  },10);
+}
+/** Stage 20: independently fill one or two gaps in a 7–10 number sequence. */
+function sequenceFillTask(i:number):Task{
+  const sequenceFill=stage20SequenceFill(i);
+  const answer=sequenceFillCorrect(sequenceFill);
+  const two=sequenceFill.missingIndices.length===2;
+  return {
+    question:'ならんだ すうじの □に はいる かずは？',
+    prompt:two?'2つの □を どちらも うめてね。':'□を ひとつ うめてね。',
+    answer,choices:sequenceFillChoices(sequenceFill),sequenceFill,
+    hints:['□の まえと あとを みてね。',
+      'ひとつずつ、すうじを じゅんばんに たどろう。',
+      two?'2つの □も、ひとつずつ すすんで かんがえよう。':'□の ひだりから ひとつ すすもう。'],
+    explanation:'□には '+answer.split('・').join(' と ')+' が はいるよ。'+
+      sequenceFill.start+'から '+(sequenceFill.start+sequenceFill.length-1)+'まで じゅんばんに ならんでいるね。',
+  };
+}
 function position(i:number,level:number):Task{
  const items=[toys[(i+2)%toys.length],toys[(i+5)%toys.length],toys[(i+8)%toys.length]];
  const names=items.map(name);
@@ -214,7 +245,9 @@ function makeTask(n:number,i:number):Task{
  const toy=t(i),k=i%3, num=1+i%10;
  if(n>=6&&n<=10)return preschoolNumeralTask(n as 6|7|8|9|10,i);
  if(n>=11&&n<=15)return trace(i,n-11);
- if(n>=16&&n<=20)return order((i+n)%10,n===16?3:n===17?5:10,(n===19?i%2:n===20?2:i%3));
+ if(n>=16&&n<=18)return order((i+n)%10,n===16?3:n===17?5:10,i%3);
+ if(n===19)return neighborTask(i);
+ if(n===20)return sequenceFillTask(i);
  if(n>=21&&n<=25)return compare(i+(n-21)*3,n===21?0:1);
  if(n===26){
    const colors=[
@@ -335,8 +368,9 @@ export function preschoolPrototypeBank(stage:Pick<WorldStage,'id'|'gradeId'|'kin
    const q=makeTask(n,i);
    const hints=specificHints(q,n);
    const answer=q.answer, choices=q.choices;
-   const expectedOptions=q.twoOptions || (q.diagram?.kind==='countingBoard' &&
-     q.diagram.arrangement==='vertical-position') ? 2 : 3;
+   const expectedOptions=q.sequenceFill ? (q.sequenceFill.missingIndices.length===2 ? 16 : 3) :
+     (q.twoOptions || (q.diagram?.kind==='countingBoard' &&
+      q.diagram.arrangement==='vertical-position') ? 2 : 3);
    if(!choices.includes(answer)||choices.length!==expectedOptions||new Set(choices).size!==expectedOptions)
      throw Error('Invalid prototype options '+n+':'+i);
    // Correct answers must not always occupy the first button.
@@ -345,7 +379,7 @@ export function preschoolPrototypeBank(stage:Pick<WorldStage,'id'|'gradeId'|'kin
    return {
      id:'ui-preview-'+stage.id+'-activity-'+String(i+1).padStart(2,'0'),
      skillId:'preschool.'+group,
-     type:'choice',format:q.numeralPractice?'numeral':q.trace?'tracing':'counting',difficulty:i<3?1:i<8?2:3,
+     type:'choice',format:q.numeralPractice?'numeral':q.trace?'tracing':q.sequenceFill?'sequence':'counting',difficulty:i<3?1:i<8?2:3,
      question:q.question,prompt:q.prompt??'えを よく みて、こたえを えらぼう。',
      answer,choices:displayedChoices,hint:hints[0],hints,
      explanation:q.explanation??'えを ひとつずつ みて たしかめよう。',
@@ -353,6 +387,7 @@ export function preschoolPrototypeBank(stage:Pick<WorldStage,'id'|'gradeId'|'kin
      mistakes:choices.filter(c=>c!==answer).map(c=>({answer:c,explanation:'よく みて、もういちど やってみよう。'})),
      ...(q.diagram?{diagram:q.diagram}:{}),
      ...(q.trace?{preschoolTrace:q.trace}:{}),
+     ...(q.sequenceFill?{preschoolSequenceFill:q.sequenceFill}:{}),
      ...(q.numeralPractice?{preschoolNumberActivity:true as const}:{}),
      ...(q.pictureNumberMatch?{preschoolNumberMatch:q.pictureNumberMatch}:{}),
      ...(q.focalNumeral!==undefined?{preschoolNumeral:q.focalNumeral}:{}),

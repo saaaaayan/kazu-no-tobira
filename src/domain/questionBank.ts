@@ -5,6 +5,7 @@ import type { MathQuestion } from './worldQuestions.ts';
 
 import type { CountingToken } from './countingTokens.ts';
 import type { PictureNumberMatch } from './preschoolNumberConnections.ts';
+import type { PreschoolSequenceFill } from './preschoolSequenceFill.ts';
 export type { CountingToken } from './countingTokens.ts';
 export type BankDiagram = { kind:'gradeOneNumberLine'; start:number; end:number; hidden:number; step:1|10 }
   | { kind:'gradeOneShapes'; symbols:readonly ('●'|'▲'|'■')[]; arrangement?:'row'|'house' }
@@ -33,6 +34,7 @@ export type BankQuestion = MathQuestion & {
   preschoolNumeral?: string; // Large printed numeral shown above choices.
   preschoolNumberMatch?: PictureNumberMatch; // Tap pairs to draw real connecting lines.
   preschoolTwoRules?: {color:'あか'|'あお';shape:'まる'|'さんかく'|'しかく'}; // Two visual criteria.
+  preschoolSequenceFill?: PreschoolSequenceFill; // Prototype-only individually filled number-order gaps.
   topic?: string;
   difficulty: 1 | 2 | 3;
   hints: readonly [string, string, string];

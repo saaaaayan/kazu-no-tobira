@@ -85,7 +85,7 @@ test('the number-recognition UI shows a large digit and directly tappable choice
  assert.match(screen,/testID="preschool-numeral-choice-panel"/);
  assert.match(screen,/testID=\{'preschool-numeral-choice-'\+option\}/);
  assert.match(screen,/onPress=\{\(\)=>void submit\(option\)\}/);
- assert.match(screen,/\{\(\(!countingGuide && !numeralGuide && !inlineChoice\) \|\| round\.feedback\) && <View/);
+ assert.match(screen,/\{\(\(!countingGuide && !numeralGuide && !inlineChoice && !sequenceFill\) \|\| round\.feedback\) && <View/);
  assert.match(screen,/!countingGuide && !numeralGuide && !bankQuestion\?\.preschoolTrace && question\.type!=='choice'/);
  assert.match(screen,/preschoolNumeralTargetText:\{fontSize:100/);
  assert.match(screen,/preschoolNumeralChoices:\{width:'100%',maxWidth:520,gap:9,flexDirection:'row'/);

@@ -8,7 +8,7 @@ import {checkMathAnswer} from '../src/domain/mathAnswer.ts';
 const preschool=worldIslands.find(grade=>grade.id==='preschool');
 const game=readFileSync(new URL('../src/FullAdventure.tsx',import.meta.url),'utf8');
 
-test('number-order tasks in every preschool stage display one missing square on its own line',()=>{
+test('the original early number-order tasks keep their single square and two-line layout',()=>{
   const checkedStages=new Set();
   let checkedQuestions=0;
   for(const stage of preschool.stages){
@@ -33,7 +33,8 @@ test('number-order tasks in every preschool stage display one missing square on 
   const titleSource=readFileSync(new URL('../src/domain/preschoolStageMapInfo.ts',import.meta.url),'utf8');
   assert.match(titleSource,/id: 'preschool.n20', title: "あいている ところ"/);
   assert.doesNotMatch(titleSource,/id: 'preschool.n20', title: "かくれた すうじ"/);
-  for(const number of [16,17,18,19,20]){
+  // Stages 19 and 20 now have distinct neighbor and interactive multi-blank tasks.
+  for(const number of [16,17,18]){
     assert.ok(checkedStages.has('preschool.n'+String(number).padStart(2,'0')));
   }
   for(const number of [3,4]){
