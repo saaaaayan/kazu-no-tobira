@@ -7,7 +7,7 @@ const code=readFileSync(new URL('../src/FullAdventure.tsx',import.meta.url),'utf
 test('preschool counting numbers are large, accessible, and directly under the picture',()=>{
   const diagram=code.indexOf('<QuestionDiagram diagram={diagram} phase={round.hintLevel');
   const inline=code.indexOf('{countingGuide && !round.feedback && (\n                      <View style={styles.preschoolAnswerSection}>');
-  const sidePanel=code.indexOf('{((!countingGuide && !numeralGuide && !inlineChoice) || round.feedback) && <View');
+  const sidePanel=code.indexOf('{((!countingGuide && !numeralGuide && !inlineChoice && !sequenceFill) || round.feedback) && <View');
   assert.ok(diagram>0 && inline>diagram && sidePanel>inline,'place answer buttons under counting diagram, before side panel');
   assert.match(code,/testID=\{'preschool-answer-'\+option\}/u);
   assert.match(code,/accessibilityLabel=\{option\+'こ と こたえる'\}/u);
