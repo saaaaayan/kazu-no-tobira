@@ -1004,8 +1004,8 @@ const styles = StyleSheet.create({
   // maxWidth is intentionally unchanged (PR #187 made the map oversized).
   worldMapScroll: { paddingTop: 0, paddingHorizontal: 0 },
   shell: { width: '100%', maxWidth: 1030, alignSelf: 'center', gap: 15 },
-  // Expand the world atlas by only ~3%, keeping it centered and capped.
-  worldMapSlightlyWider: { maxWidth: 1060 },
+  // Fill most desktop width without letting the atlas grow without limit.
+  worldMapSlightlyWider: { maxWidth: 1120 },
 
   preschoolShell: { gap: 5 },
   playShell: { maxWidth: 1090 },
