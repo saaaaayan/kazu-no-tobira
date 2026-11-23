@@ -8,7 +8,7 @@ const game=readFileSync(new URL('../src/FullAdventure.tsx',import.meta.url),'utf
 
 test('ordinary button-answer problems place large horizontal choices directly under the question',()=>{
   assert.match(game,/const inlineChoice=Boolean\(question\?\.type==='choice' && !countingGuide && !numeralGuide &&/u);
-  assert.match(game,/!pictureMatching && !bankQuestion\?\.preschoolTrace && !review\)/u);
+  assert.match(game,/!pictureMatching && !sequenceFill && !bankQuestion\?\.preschoolTrace && !review\)/u);
   assert.match(game,/testID="kazu-inline-choice-panel"/u);
   assert.match(game,/style=\{\[styles.preschoolNumberRow,styles.inlineChoiceRow\]\}/u);
   assert.match(game,/inlineChoiceRow:\{maxWidth:560,flexWrap:'wrap'\}/u);
@@ -27,7 +27,7 @@ test('choice submission goes immediately to feedback, has no memo, and next ques
   assert.match(game,/const submittedAnswer = selectedAnswer \?\? answer;/u);
   assert.match(game,/if \(selectedAnswer !== undefined\) setAnswer\(selectedAnswer\);/u);
   assert.match(game,/setRound\(\{ \.\.\.round, problems, correct: newCorrect, results: \[\.\.\.round.results, result\], feedback: result \}\)/u);
-  assert.match(game,/\{\(\(!countingGuide && !numeralGuide && !inlineChoice\) \|\| round.feedback\) && <View/u);
+  assert.match(game,/\{\(\(!countingGuide && !numeralGuide && !inlineChoice && !sequenceFill\) \|\| round.feedback\) && <View/u);
   assert.match(game,/!bankQuestion\?\.preschoolTrace && question.type!=='choice' &&\s*<CalculationMemo/u);
   assert.match(game,/<GameButton gold label=\{round.index\+1===round.problems.length\?'けっかを みる':'つぎの もんだいへ'\} onPress=\{advance\}\/>/u);
   assert.doesNotMatch(game,/setTimeout\(\(\)=>advance\(\)/u);
