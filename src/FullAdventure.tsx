@@ -50,6 +50,8 @@ import { savePracticeAnswer, type PracticeItem } from './domain/studyPractice';
 import { UnitLearning } from './components/UnitLearning';
 import QuestionReviewAdmin from './components/QuestionReviewAdmin';
 import { lessonForStage, newLessonProgress, type LessonProgress, type UnitLesson } from './domain/unitLessons';
+import { playGameSound } from './domain/gameSounds';
+import { readSoundEffectsEnabled,saveSoundEffectsEnabled } from './domain/soundSettings';
 
 type Feedback = 'correct' | 'incorrect';
 type AnswerMode = 'keyboard' | 'panel' | 'handwriting';
@@ -75,6 +77,7 @@ type Round = {
   hintLevel: number;
   feedback?: Feedback;
   complete?: boolean;
+  newTitleEarned?:boolean;
   liveHints?: readonly string[];
   noMoreHints?: boolean;
   live?: {origin:string; mode:LiveMode; round:LiveRound; eventId?:string};
@@ -90,6 +93,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const [screen, setScreen] = useState<Screen>('home');
   const [playMode, setPlayMode] = useState<PlayMode>(isolated ? 'test' : 'normal');
   const [access, setAccess] = useState<Entitlement>(freeAccess);
+  const [soundEnabled,setSoundEnabled]=useState(true);
   const [showPlanInfo, setShowPlanInfo] = useState(false);
   const [showWorkedSolution, setShowWorkedSolution] = useState(false);
   const starting = useRef(false);
@@ -124,6 +128,18 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const keyboard = useRef<ComponentRef<typeof TextInput>>(null);
   const viewport = useWindowDimensions().width;
   const wide = !review?.phone && viewport > 800;
+
+  useEffect(() => {
+    let active=true;
+    void readSoundEffectsEnabled().then(value=>{if(active)setSoundEnabled(value);});
+    return ()=>{active=false;};
+  },[]);
+
+  function changeSoundEnabled(value:boolean){
+    setSoundEnabled(value);
+    void saveSoundEffectsEnabled(value);
+    if(value)playGameSound('tap',true);
+  }
 
   useEffect(() => {
     if (isolated) return;
@@ -286,6 +302,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
 
   async function start(stage: WorldStage) {
     if (!progress || starting.current || submitting.current || lessonWrite.current) return;
+    playGameSound('tap',soundEnabled);
     if (uiPreview) {
       if (stage.gradeId==='e1' && stage.kind==='normal') {
         // Grade-one trial uses the newly reviewed scope of ten per stage.
@@ -419,7 +436,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
       (shownMode === 'handwriting' && (blockRef.current || drawing))) return;
     // 幼児の1タップ回答では、setStateの完了を待たず、押された数字をそのまま採点する。
     const submittedAnswer = selectedAnswer ?? answer;
-    if (selectedAnswer !== undefined) setAnswer(selectedAnswer);
+    if (selectedAnswer !== undefined) { setAnswer(selectedAnswer); playGameSound('tap',soundEnabled); }
     if (!isValidMathAnswer(question, submittedAnswer)) {
       setMessage(question.type === 'choice' ? 'こたえを ひとつ えらんでね。' : 'こたえを 数字で いれてね。');
       if (shownMode === 'keyboard') keyboard.current?.focus();
@@ -462,11 +479,15 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
       const problems=graded ? round.problems.map((item,index)=>index===round.index
         ? {...item,answer:graded.answer,explanation:graded.explanation,steps:graded.steps,clock:graded.clock??item.clock}
         : item) : round.problems;
+      const newTitleEarned=Boolean(saved&&!testing&&
+        adventureTitles(saved).filter(title=>title.unlocked).length>
+        adventureTitles(progress).filter(title=>title.unlocked).length);
       if (saved) {
         await saveProgress(saved);
         setProgress(saved);
       }
-      setRound({ ...round, problems, correct: newCorrect, results: [...round.results, result], feedback: result });
+      playGameSound(result,soundEnabled);
+      setRound({ ...round, problems, correct: newCorrect, results: [...round.results, result], feedback: result,newTitleEarned });
     } catch (error) {
       setMessage(round.live && error instanceof Error ? error.message : 'きろくを ほぞんできなかったよ。もういちど おしてね。');
     } finally {
@@ -479,6 +500,8 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     if (!round || !round.feedback) return;
     resetAnswer();
     if (round.index === round.problems.length - 1) {
+      const clearedStage=round.correct>=Math.ceil(round.stage.questions*0.8);
+      playGameSound(round.newTitleEarned?'title':clearedStage?'clear':'tap',soundEnabled);
       setRound({ ...round, complete: true, hintLevel: 0 });
     } else {
       setRound({ ...round, index: round.index + 1, feedback: undefined, hintLevel: 0, liveHints:undefined, noMoreHints:false });
@@ -504,6 +527,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   }
   function openGrade(next: WorldGrade) {
     if (!uiPreview && next.id === 'sage' && !hasPremium(access)) { setShowPlanInfo(true); scroll.current?.scrollTo({ y: 0 }); return; }
+    playGameSound('tap',soundEnabled);
     resetAnswer();
     setStartError('');
     setReturnStageId(undefined);
@@ -561,7 +585,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {screen === 'home' && !round ? (
             <>
               <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress} preview={uiPreview}
-                onStart={() => { resetAnswer(); setScreen('world'); }} onTitles={() => setScreen('titles')} />
+                soundEnabled={soundEnabled} onSoundChange={changeSoundEnabled}
+                onStart={() => { playGameSound('tap',soundEnabled);resetAnswer(); setScreen('world'); }}
+                onTitles={() => {playGameSound('tap',soundEnabled);setScreen('titles');}} />
               {process.env.EXPO_PUBLIC_KAZU_ONLINE_REVIEW === '1' && typeof window !== 'undefined' &&
                 <GameButton label="管理者ログイン" secondary onPress={() => window.location.assign('/kazu-no-tobira/admin/')} />}
             </>
@@ -625,6 +651,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                     <Text style={styles.hintNote}>ヒントをつかったので、パーフェクトは 次のチャレンジで めざそう！</Text>
                   )}
                   {!testing && cleared && <Text style={styles.rewardMessage}>しょうごう ずかん：{newlyEarnedTitles}こ はっけんずみ</Text>}
+                  {round.newTitleEarned&&!testing&&<Text style={styles.rewardMessage}>あたらしい しょうごうを かくとく！</Text>}
                   {canContinue && <GameButton label="つぎの ステージへ" onPress={()=>start(nextStage)} gold/>}
                   {!review && !specialRound && <GameButton label="この ステージに もういちど ちょうせん" onPress={()=>start(round.stage)} secondary/>}
                   {!isolated && !specialRound && lessonForStage(round.stage.id) && <GameButton label="がくしゅうを みなおす" secondary
@@ -637,6 +664,11 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
                     <View style={styles.questionHeader}>
                       <Text style={styles.stageTitle}>{round.checkpoint ? 'かくにんテスト '+round.checkpoint.number : countingGuide ? preschoolGuideTitles[round.stage.id] : round.stage.gradeId==='preschool' ? preschoolStageMapInfo(round.stage).title : uiPreview && gradeOnePreviewStageInfo(round.stage)?.title || stageDisplayTitle(round.stage)}</Text>
                       <Text style={styles.questionIndex}>{countingGuide ? round.index+1 : '第'+(round.index+1)+'問'} / {round.problems.length}</Text>
+                    <Pressable testID="question-sound-toggle" accessibilityRole="switch"
+                      accessibilityLabel="こうかおん" accessibilityState={{checked:soundEnabled}}
+                      onPress={()=>changeSoundEnabled(!soundEnabled)} style={styles.questionSoundToggle}>
+                      <Text style={styles.questionSoundText}>{soundEnabled?'♪ オン':'♪ オフ'}</Text>
+                    </Pressable>
                     </View>
                     <Text style={styles.stageCategory}>{round.checkpoint
                       ? '学習範囲：直前の冒険5ステージ'
@@ -1046,6 +1078,9 @@ const styles = StyleSheet.create({
   stageTitle: { color: '#f9e3b7', fontWeight: '900', fontSize: 17 },
   stageCategory: { color:'#f2e2ad',fontSize:14,fontWeight:'800',lineHeight:20 },
   questionIndex: { color: '#e1e7ff', fontWeight: '800', fontSize: 13 },
+  questionSoundToggle:{minHeight:32,minWidth:61,alignItems:'center',justifyContent:'center',
+    paddingHorizontal:7,borderWidth:1,borderColor:'#7485a5',backgroundColor:'#374469',borderRadius:8},
+  questionSoundText:{color:'#ffeed0',fontWeight:'900',fontSize:12},
   difficulty: { color: '#ffe09f', fontSize: 12, fontWeight: '800', paddingTop: 4 },
   questionText: { color: 'white', fontWeight: '900', fontSize: 29, lineHeight: 40 },
   preschoolRulesPanel:{alignSelf:'flex-start',width:'100%',maxWidth:520,marginBottom:14,
