@@ -41,7 +41,7 @@ test('all 16 theme icons are unique, single-color, restrained SVG symbols',()=>{
   assert.match(art,/d={art\.icon} fill="none" stroke={art\.ink}/);
   assert.doesNotMatch(art,/art\.feature|art\.light|Sparkle|glitter/i);
   assert.match(map,/String\(index\+1\)\.padStart\(2,'0'\)/);
-  assert.match(map,/点線にそって進もう/);
+  assert.match(map,/道にそって進もう/);
 });
 
 test('stage progression uses a readable non-crossing serpentine order on phones and desktops',()=>{
