@@ -6,6 +6,7 @@ import {worldIslands} from '../src/domain/worldCatalog.ts';
 import {approvedWorldMap,approvedWorldMapHotspots,approvedWorldMapAreaNames,
   approvedWorldMapDimensions,approvedWorldMapImageUrl} from '../src/domain/approvedWorldMap.ts';
 
+import {responsiveWorldMaps,responsiveWorldMapForWidth,responsiveWorldMapImageUrl} from '../src/domain/responsiveWorldMap.ts';
 import {richWorldMap,richWorldMapHotspots,richWorldMapButtonWidths,
   richWorldMapButtonHeight,richWorldMapImageUrl} from '../src/domain/richWorldMap.ts';
 
@@ -84,13 +85,13 @@ test('mobile zoom still keeps all sixteen regions accessible in an exact image-r
   assert.equal(desktop.imageWidth,1200);
   assert.equal(mobile.imageHeight,Math.round(mobile.imageWidth*1522/2048));
   const ui=read('src/components/WorldScenes780.tsx').toString();
-  assert.match(ui,/source={{uri:richWorldMapImageUrl}}/);
+  assert.match(ui,/source={{uri:responsiveWorldMapImageUrl\(map\)}}/);
   // The image carries its own sixteen labels: do not draw another set on top.
   assert.doesNotMatch(ui,/<WorldAreaPixelButton/);
-  assert.match(ui,/const spot=richWorldMapHotspots\[index\]/);
-  assert.match(ui,/const plaqueWidth=richWorldMapButtonWidths\[index\]/);
-  assert.match(ui,/const plaqueHeight=richWorldMapButtonHeight/);
-  assert.match(ui,/imageHeight=Math[.]round\(imageWidth\*richWorldMap[.]height\/richWorldMap[.]width\)/);
+  assert.match(ui,/const spot=map.hotspots\[index\]/);
+  assert.match(ui,/const plaqueWidth=spot.width/);
+  assert.match(ui,/const plaqueHeight=spot.height/);
+  assert.match(ui,/imageHeight=Math[.]round\(imageWidth\*map[.]height\/map[.]width\)/);
   assert.match(ui,/testID={'approved-world-island-'\+grade[.]id}/);
   assert.match(ui,/onPress=\{\(\)=>onGrade\(grade\)\}/);
   assert.match(ui,/width:imageWidth\*plaqueWidth/);
@@ -107,7 +108,7 @@ test('release pipeline publishes and checks the exact original 2026-11-22 map',(
   const exporter=read('scripts/export-ui-preview.mjs').toString();
   const verifier=read('scripts/verify-web-release.mjs').toString();
   assert.match(exporter,/copyFileSync\(mapSource,resolve\(target,'world-map-approved-20261122\.png'\)\)/);
-  assert.match(exporter,/approvedWorldMapSha256:contentDigest\(richMapBytes\)/);
+  assert.match(exporter,/responsiveWorldMapSha256,approvedEulerHeroSha256/);
   assert.match(exporter,/copyFileSync\(richMapSource,resolve\(target,'world-map-rich-20261123[.]png'\)\)/);
   assert.match(verifier,/world-map-rich-20261123[.]png/);
   assert.match(verifier,/await get\(imageFile\)/);
@@ -117,4 +118,31 @@ test('release pipeline publishes and checks the exact original 2026-11-22 map',(
   assert.match(snapshot,/approvedMap\.file/);
   assert.match(verifier,/published 16-island world map differs/);
   assert.match(verifier,/game bundle does not use the approved world map/);
+});
+
+
+test('both approved 2026-11-24 maps are exact PNGs and have sixteen distinct in-bounds hit targets',()=>{
+  assert.equal(responsiveWorldMapForWidth(390),responsiveWorldMaps.mobile);
+  assert.equal(responsiveWorldMapForWidth(699),responsiveWorldMaps.mobile);
+  assert.equal(responsiveWorldMapForWidth(700),responsiveWorldMaps.pc);
+  assert.equal(responsiveWorldMapForWidth(1200),responsiveWorldMaps.pc);
+  for(const map of Object.values(responsiveWorldMaps)){
+    const bytes=read('public/'+map.filename);
+    assert.equal(bytes.length,map.bytes);
+    assert.equal(bytes.readUInt32BE(16),map.width);
+    assert.equal(bytes.readUInt32BE(20),map.height);
+    assert.equal(createHash('sha256').update(bytes).digest('hex'),map.sha256);
+    assert.ok(responsiveWorldMapImageUrl(map).includes(map.filename));
+    assert.equal(map.hotspots.length,16);
+    for(const [i,p] of map.hotspots.entries()){
+      assert.ok(p.x-p.width/2>=0&&p.x+p.width/2<=1&&p.y-p.height/2>=0&&p.y+p.height/2<=1);
+      for(let j=0;j<i;j++){
+        const q=map.hotspots[j];
+        assert.ok(Math.abs(p.x-q.x)>=(p.width+q.width)/2||Math.abs(p.y-q.y)>=(p.height+q.height)/2,'overlap '+map.key+' '+(j+1)+' '+(i+1));
+      }
+    }
+  }
+  assert.match(read('src/components/WorldScenes780.tsx').toString(),/useState\(false\)/);
+  assert.match(read('scripts/verify-web-release.mjs').toString(),/verifyResponsiveWorldMap/);
+  assert.match(read('scripts/snapshot-pages-prototype.mjs').toString(),/of responsiveMaps/);
 });

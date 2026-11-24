@@ -1,3 +1,4 @@
+import { responsiveWorldMapAssets,verifyResponsiveWorldMap } from './responsive-world-map-assets.mjs';
 import { createHash } from 'node:crypto';
 
 const fullSha=/^[a-f0-9]{40}$/;
@@ -72,6 +73,16 @@ export function releaseClient(address) {
         throw new Error('The published 16-island world map differs from the approved asset.');
       approvedMap={file:imageFile,data:art};
     }
+    const responsiveMaps=[];
+    if(version.responsiveWorldMapSha256!==undefined){
+      const hashes=version.responsiveWorldMapSha256;
+      if(Object.keys(hashes).length!==responsiveWorldMapAssets.length)throw new Error('Incomplete responsive map manifest.');
+      for(const spec of responsiveWorldMapAssets){
+        if(hashes[spec.filename]!==spec.sha256 || !js.includes(spec.filename))throw new Error('Invalid responsive map manifest or bundle: '+spec.filename);
+        const data=verifyResponsiveWorldMap(Buffer.from(await (await get(spec.filename)).arrayBuffer()),spec);
+        responsiveMaps.push({file:spec.filename,data});
+      }
+    }
     // For the 4,300-question public trial, verify that each of the 43 data
     // files is actually accessible at the hosted site, not merely in GitHub.
     if (version.pixelSceneryV2 === true &&
@@ -119,7 +130,7 @@ export function releaseClient(address) {
           !admin.toString('utf8').includes('src="' + script + '"') ||
           !js.includes('/kazu-no-tobira/admin')) throw new Error('The admin route differs from the verified build.');
     }
-    return {version,index,entryPath,bundle,admin,approvedMap,publishedBanks,approvedTitleMusic};
+    return {version,index,entryPath,bundle,admin,approvedMap,responsiveMaps,publishedBanks,approvedTitleMusic};
   }};
 }
 
