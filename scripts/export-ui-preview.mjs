@@ -1,3 +1,4 @@
+import { responsiveWorldMapAssets,verifyResponsiveWorldMap } from './responsive-world-map-assets.mjs';
 import { execFileSync } from 'node:child_process';
 import { readdirSync,readFileSync,writeFileSync,mkdirSync,copyFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -87,7 +88,14 @@ if(titleMusic.length!==6633014 || titleMusic.subarray(0,4).toString('ascii')!=='
    contentDigest(titleMusic)!=='1a7afff5e8836510a138ae611308a481aef5543b4b25643b22b80d572b65a1aa')
   throw new Error('Approved title BGM differs from the source.');
 writeFileSync(resolve(target,titleMusicFile),titleMusic);
+const responsiveWorldMapSha256={};
+for(const spec of responsiveWorldMapAssets){
+  const bytes=verifyResponsiveWorldMap(readFileSync(resolve('public',spec.filename)),spec);
+  copyFileSync(resolve('public',spec.filename),resolve(target,spec.filename));
+  responsiveWorldMapSha256[spec.filename]=contentDigest(bytes);
+}
 const allowed=new Set(['index.html','metadata.json','world-map-approved-20261122.png','world-map-rich-20261123.png',titleMusicFile]);
+for(const spec of responsiveWorldMapAssets)allowed.add(spec.filename);
 const files=readdirSync(target,{recursive:true,withFileTypes:true}).filter(entry=>!entry.isDirectory())
   .map(entry=>relative(target,resolve(entry.parentPath,entry.name)).replaceAll('\\','/'));
 // This one user-approved illustration is public art. Keep the preview asset
@@ -110,6 +118,7 @@ if (entries.length!==1) throw new Error('The sample-only preview must have one e
 const [entry]=entries;
 const bundle=readFileSync(resolve(target,entry));
 assertSampleBundle(bundle.toString('utf8'),version,pages,true);
+for(const spec of responsiveWorldMapAssets)if(!bundle.toString('utf8').includes(spec.filename))throw new Error('Missing responsive map in game bundle: '+spec.filename);
 if(!bundle.toString('utf8').includes('preschool-plush-pixel-v2'))
   throw new Error('The compiled preview does not contain the preschool plush map view.');
 if(!bundle.toString('utf8').includes('toy-island-pixel-v1'))
@@ -126,7 +135,7 @@ else writeFileSync(index,readFileSync(index,'utf8').replace('<head>',
 writeFileSync(resolve(target,'version.json'),JSON.stringify({
   version,profile:'ui-preview',indexSha256:contentDigest(readFileSync(index)),entrySha256:contentDigest(bundle),
   publishedBankQuestions:publicBankIds.length*100,bankSha256:bankFiles,
-  approvedWorldMapSha256:contentDigest(richMapBytes),approvedEulerHeroSha256:contentDigest(approvedHeroBytes),
+  responsiveWorldMapSha256,approvedEulerHeroSha256:contentDigest(approvedHeroBytes),
   wildlifeReviewSha256:contentDigest(readFileSync(resolve(target,'art-review/index.html'))),
   approvedTitleMusicSha256:contentDigest(titleMusic),
   pixelSceneryV2:true,

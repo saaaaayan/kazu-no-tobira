@@ -12,7 +12,7 @@ if (manifest.profile==='production') throw new Error('Select production explicit
 if (manifest.profile!=='ui-preview') {
   console.log('Initial prototype release. The legacy site is retained until the new artifact is verified and deployed.');
 } else {
-  const {version,index,entryPath,bundle,admin,approvedMap,publishedBanks,approvedTitleMusic}=await client.verify(manifest.version,'ui-preview');
+  const {version,index,entryPath,bundle,admin,approvedMap,responsiveMaps,publishedBanks,approvedTitleMusic}=await client.verify(manifest.version,'ui-preview');
   assertSampleBundle(bundle.toString('utf8'),version.version,Boolean(admin));
   mkdirSync(directory);
   const asset=resolve(directory,entryPath);
@@ -20,6 +20,7 @@ if (manifest.profile!=='ui-preview') {
   writeFileSync(asset,bundle);
   writeFileSync(resolve(directory,'index.html'),index);
   if(approvedMap)writeFileSync(resolve(directory,approvedMap.file),approvedMap.data);
+  for(const {file,data} of responsiveMaps)writeFileSync(resolve(directory,file),data);
   if(approvedTitleMusic)writeFileSync(resolve(directory,approvedTitleMusic.file),approvedTitleMusic.data);
   if(publishedBanks.length){
     mkdirSync(resolve(directory,'question-banks'),{recursive:true});

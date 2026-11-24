@@ -1,3 +1,4 @@
+import { materializeResponsiveWorldMaps } from './responsive-world-map-assets.mjs';
 import {createHash} from 'node:crypto';
 import {existsSync,readFileSync,writeFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
@@ -71,3 +72,5 @@ if(!existsSync(musicDestination)||!musicValid(readFileSync(musicDestination))){
   writeFileSync(musicDestination,audio);
 }
 console.log('Approved title BGM verified: '+musicSha);
+
+materializeResponsiveWorldMaps(root);

@@ -8,8 +8,8 @@ import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldP
 import { worldStageAction, type PlayMode } from '../domain/playMode';
 import { checkpointsFor, stageDisplayTitle, stageLabels, type Checkpoint } from '../domain/stageStructure';
 import { PRESCHOOL_MAP_TITLE_INSET, compactIslandStageMap, islandCheckpointLayout, preschoolStageLabelLayout, islandStageLayout } from '../domain/worldMapLayout';
-import { approvedWorldMapDimensions, approvedWorldMapAreaNames } from '../domain/approvedWorldMap';
-import { richWorldMap, richWorldMapHotspots, richWorldMapButtonWidths, richWorldMapButtonHeight, richWorldMapImageUrl } from '../domain/richWorldMap';
+import { approvedWorldMapAreaNames } from '../domain/approvedWorldMap';
+import { responsiveWorldMapForWidth, responsiveWorldMapImageUrl } from '../domain/responsiveWorldMap';
 import { hasStageBank } from '../domain/questionBank';
 import type { Progress } from '../domain/progress';
 import { lessonStatus, unitLessons, type UnitLesson } from '../domain/unitLessons';
@@ -67,10 +67,13 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
 }) {
   const [width,setWidth]=useState(0);
   const {width:viewportWidth}=useWindowDimensions();
-  const [zoomed,setZoomed]=useState(true);
+  const [zoomed,setZoomed]=useState(false);
   const [showIslandList,setShowIslandList]=useState(false);
-  const {compact,imageWidth}=approvedWorldMapDimensions(width,zoomed);
-  const imageHeight=Math.round(imageWidth*richWorldMap.height/richWorldMap.width);
+  const compact=viewportWidth<700;
+  const map=responsiveWorldMapForWidth(viewportWidth);
+  const measuredWidth=width||Math.min(1200,Math.max(244,viewportWidth-20));
+  const imageWidth=compact&&zoomed?Math.max(600,measuredWidth):measuredWidth;
+  const imageHeight=Math.round(imageWidth*map.height/map.width);
   // Extend just the interactive atlas into the side gutters, not the header.
   // All 16 hitboxes scale with the same measured width; never crop the image.
   const atlasBleedWidth=viewportWidth>=700
@@ -93,7 +96,7 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
   return <View style={styles.screen}>
     <View style={styles.worldBanner}>
       <Text accessibilityRole="header" style={styles.bannerHeading}>数のトビラ 世界地図</Text>
-      <Text style={styles.bannerDescription}>01から16へ、点線にそって進もう。地域をタップすると学習マップが開くよ。</Text>
+      <Text style={styles.bannerDescription}>1から16へ、道にそって進もう。地域をタップすると学習マップが開くよ。</Text>
       <View style={styles.stats}>
         <Text style={styles.stat}>{worldIslands.length}のエリア · {allWorldStages.length.toLocaleString('ja-JP')}地点</Text>
         {!testing&&<Text style={styles.stat}>{summary.cleared} / 780 クリア</Text>}
@@ -117,16 +120,16 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
         contentContainerStyle={{width:imageWidth,height:imageHeight}}
         style={{height:imageHeight}} nestedScrollEnabled>
         <View style={{width:imageWidth,height:imageHeight}}>
-          <Image source={{uri:richWorldMapImageUrl}} resizeMode="stretch"
+          <Image source={{uri:responsiveWorldMapImageUrl(map)}} resizeMode="stretch"
             accessibilityLabel="16エリアを描いた、手書き風のファンタジー世界地図"
             style={{width:imageWidth,height:imageHeight}} />
           {worldIslands.map((grade,index)=>{
-            const spot=richWorldMapHotspots[index];
+            const spot=map.hotspots[index];
             const label=islandAction(grade,index);
             // The user-selected PNG already includes the pixel-art plaques.
             // Keep only invisible accessible hit targets, no duplicate visuals.
-            const plaqueWidth=richWorldMapButtonWidths[index];
-            const plaqueHeight=richWorldMapButtonHeight;
+            const plaqueWidth=spot.width;
+            const plaqueHeight=spot.height;
             return <Pressable key={grade.id} testID={'approved-world-island-'+grade.id}
               accessibilityRole="button"
               accessibilityLabel={String(index+1).padStart(2,'0')+' '+grade.title+' '+approvedWorldMapAreaNames[index]+'、'+label}
