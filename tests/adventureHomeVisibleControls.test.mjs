@@ -4,14 +4,14 @@ import { test } from 'node:test';
 
 const source = readFileSync(new URL('../src/components/AdventureHome.tsx', import.meta.url), 'utf8');
 
-test('illustration remains full frame without cropping or letterboxing', () => {
+test('desktop illustration remains full frame without cropping or letterboxing', () => {
   assert.match(source, /illustrationFrame:\s*\{[\s\S]*?aspectRatio:\s*1448\s*\/\s*1086/);
   assert.match(source, /illustration:\s*\{\s*width:\s*'100%',\s*height:\s*'100%'/);
   assert.match(source, /<Image source=\{EULER_HOME_ART\} resizeMode="stretch"/);
   assert.doesNotMatch(source, /resizeMode="contain"/);
 });
 
-test('all six buttons are image hotspots, without duplicate button artwork below', () => {
+test('desktop retains all six image hotspots; portrait controls are separate', () => {
   const sixStyles = ['Resume', 'Intro', 'Players', 'Titles', 'Settings', 'Share'];
   for (const name of sixStyles) {
     assert.match(source, new RegExp('styles\\.art' + name + 'Hit'));
@@ -59,4 +59,19 @@ test('each image hotspot has the correct action and preview settings remain usab
   assert.match(source, /activePanel === 'settings'/);
   assert.doesNotMatch(source, /activePanel === 'settings' && !preview/);
   assert.match(source, /onPress=\{closePanel\}/);
+});
+
+const adventure = readFileSync(new URL('../src/FullAdventure.tsx', import.meta.url), 'utf8');
+test('narrow home uses proportionate art and six accessible portrait controls without changing desktop art', () => {
+  assert.match(adventure, /compactHome = viewport <= 600 && screen === 'home' && !round/);
+  assert.match(adventure, /<AdventureHome compact=\{compactHome\}/);
+  assert.match(source, /\{compact \? <>/);
+  assert.match(source, /portraitArtCrop: \{[^\n]*aspectRatio:1448\/\(1086\*\.72\)/);
+  const portrait = source.split('testID="portrait-home-menu"')[1].split('</> : <View style={styles.illustrationFrame}>')[0];
+  assert.equal((portrait.match(/accessibilityRole="button"/g)||[]).length,6);
+  assert.match(source, /portraitButton: \{ minHeight:46/);
+  assert.match(source, /portraitOverlay: \{ top:8, bottom:8/);
+  assert.match(adventure, /portraitHomeShell: \{ flexGrow:1/);
+  assert.match(adventure, /portraitHomeScroll: \{ padding: 6, paddingBottom: 6/);
+  assert.match(adventure, /compactHome \? styles.portraitVersion : styles.hintNote/);
 });
