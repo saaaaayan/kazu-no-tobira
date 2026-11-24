@@ -36,6 +36,7 @@ import VersionNotice from './components/VersionNotice';
 import { CompanionMoment } from './components/AdventureCompanion';
 import { MagicMeter, ComboBadge, SparkleBurst } from './components/AdventureJuice';
 import { playSound, unlockSound, soundEnabled, setSoundEnabled, soundVolume, setSoundVolume } from './domain/gameSound';
+import { musicEnabled, musicVolume, setMusicEnabled, setMusicVolume, setMusicScene, unlockMusic, refreshMusicVisibility } from './domain/gameMusic';
 import { CorrectSpark } from './components/AdventureEffects';
 import CalculationMemo from './components/CalculationMemo';
 import HandwritingAnswer from './components/HandwritingAnswer';
@@ -90,6 +91,8 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const [loadError, setLoadError] = useState(false);
   const [soundOn, setSoundOn] = useState(soundEnabled);
   const [soundLevel, setSoundLevel] = useState(soundVolume);
+  const [musicOn, setMusicOn] = useState(musicEnabled);
+  const [musicLevel, setMusicLevel] = useState(musicVolume);
   const [screen, setScreen] = useState<Screen>('home');
   const [playMode, setPlayMode] = useState<PlayMode>(isolated ? 'test' : 'normal');
   const [access, setAccess] = useState<Entitlement>(freeAccess);
@@ -130,16 +133,24 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
 
   useEffect(() => {
     if (review || typeof document === 'undefined') return;
-    const unlock = () => unlockSound();
+    const unlock = () => { unlockSound(); unlockMusic(); };
     document.addEventListener('pointerup', unlock, true);
     document.addEventListener('touchend', unlock, true);
     document.addEventListener('keydown', unlock, true);
+    document.addEventListener('visibilitychange', refreshMusicVisibility);
     return () => {
       document.removeEventListener('pointerup', unlock, true);
       document.removeEventListener('touchend', unlock, true);
       document.removeEventListener('keydown', unlock, true);
+      document.removeEventListener('visibilitychange', refreshMusicVisibility);
+      setMusicScene(undefined);
     };
   }, [review]);
+
+  const musicScene = round || screen === 'lesson' ? 'study' : screen === 'home' ? 'title' : screen === 'admin' ? undefined : 'world';
+  useEffect(() => {
+    if (!review) setMusicScene(musicScene);
+  }, [musicScene, review]);
 
   useEffect(() => {
     if (isolated) return;
@@ -588,7 +599,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
               <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress} preview={uiPreview}
                 onStart={() => { playSound('walk'); resetAnswer(); setScreen('world'); }} onTitles={() => { playSound('tap'); setScreen('titles'); }}
                 soundOn={soundOn} onSoundChange={next => { setSoundEnabled(next); setSoundOn(next); if (next) playSound('correct'); }}
-                soundLevel={soundLevel} onSoundLevelChange={next => { setSoundVolume(next); setSoundLevel(next); if (soundOn && next > 0) playSound('correct'); }} />
+                soundLevel={soundLevel} onSoundLevelChange={next => { setSoundVolume(next); setSoundLevel(next); if (soundOn && next > 0) playSound('correct'); }}
+                musicOn={musicOn} musicLevel={musicLevel} onMusicChange={next=>{setMusicEnabled(next);setMusicOn(next);if(next)unlockMusic();}}
+                onMusicLevelChange={next=>{setMusicVolume(next);setMusicLevel(next);}} />
               {process.env.EXPO_PUBLIC_KAZU_ONLINE_REVIEW === '1' && typeof window !== 'undefined' &&
                 <GameButton label="管理者ログイン" secondary onPress={() => window.location.assign('/kazu-no-tobira/admin/')} />}
             </>
