@@ -35,7 +35,7 @@ import { WorldMap780, IslandStageMap } from './components/WorldScenes780';
 import VersionNotice from './components/VersionNotice';
 import { CompanionMoment } from './components/AdventureCompanion';
 import { MagicMeter, ComboBadge, SparkleBurst } from './components/AdventureJuice';
-import { playSound, unlockSound, soundEnabled, setSoundEnabled } from './domain/gameSound';
+import { playSound, unlockSound, soundEnabled, setSoundEnabled, soundVolume, setSoundVolume } from './domain/gameSound';
 import { CorrectSpark } from './components/AdventureEffects';
 import CalculationMemo from './components/CalculationMemo';
 import HandwritingAnswer from './components/HandwritingAnswer';
@@ -89,6 +89,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const [progress, setProgress] = useState<Progress | undefined>(isolated ? emptyProgress : undefined);
   const [loadError, setLoadError] = useState(false);
   const [soundOn, setSoundOn] = useState(soundEnabled);
+  const [soundLevel, setSoundLevel] = useState(soundVolume);
   const [screen, setScreen] = useState<Screen>('home');
   const [playMode, setPlayMode] = useState<PlayMode>(isolated ? 'test' : 'normal');
   const [access, setAccess] = useState<Entitlement>(freeAccess);
@@ -271,6 +272,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   }
 
   function startCheckpoint(item:Checkpoint) {
+    if (!review) playSound('walk');
     if (uiPreview) {
       if(!['preschool','e1'].includes(item.after.gradeId)||item.number<1||item.number>10){
         setStartError('この かくにんテストは じゅんびちゅうだよ。'); return;
@@ -300,8 +302,8 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   }
 
   async function start(stage: WorldStage) {
-    if (!review) playSound('tap');
     if (!progress || starting.current || submitting.current || lessonWrite.current) return;
+    if (!review) playSound('walk');
     if (uiPreview) {
       if (stage.gradeId==='e1' && stage.kind==='normal') {
         // Grade-one trial uses the newly reviewed scope of ten per stage.
@@ -525,7 +527,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
       round?.live?.mode==='diagnosis'||round?.live?.mode==='remediation'?'study':'island');
   }
   function openGrade(next: WorldGrade) {
-    if (!review) playSound('tap');
+    if (!review) playSound('walk');
     if (!uiPreview && next.id === 'sage' && !hasPremium(access)) { setShowPlanInfo(true); scroll.current?.scrollTo({ y: 0 }); return; }
     resetAnswer();
     setStartError('');
@@ -584,8 +586,9 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {screen === 'home' && !round ? (
             <>
               <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress} preview={uiPreview}
-                onStart={() => { playSound('tap'); resetAnswer(); setScreen('world'); }} onTitles={() => { playSound('tap'); setScreen('titles'); }}
-                soundOn={soundOn} onSoundChange={next => { setSoundEnabled(next); setSoundOn(next); if (next) playSound('correct'); }} />
+                onStart={() => { playSound('walk'); resetAnswer(); setScreen('world'); }} onTitles={() => { playSound('tap'); setScreen('titles'); }}
+                soundOn={soundOn} onSoundChange={next => { setSoundEnabled(next); setSoundOn(next); if (next) playSound('correct'); }}
+                soundLevel={soundLevel} onSoundLevelChange={next => { setSoundVolume(next); setSoundLevel(next); if (soundOn && next > 0) playSound('correct'); }} />
               {process.env.EXPO_PUBLIC_KAZU_ONLINE_REVIEW === '1' && typeof window !== 'undefined' &&
                 <GameButton label="管理者ログイン" secondary onPress={() => window.location.assign('/kazu-no-tobira/admin/')} />}
             </>
