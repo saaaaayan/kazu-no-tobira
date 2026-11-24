@@ -272,6 +272,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   }
 
   function startCheckpoint(item:Checkpoint) {
+    if (!review) playSound('walk');
     if (uiPreview) {
       if(!['preschool','e1'].includes(item.after.gradeId)||item.number<1||item.number>10){
         setStartError('この かくにんテストは じゅんびちゅうだよ。'); return;
@@ -301,8 +302,8 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   }
 
   async function start(stage: WorldStage) {
-    if (!review) playSound('tap');
     if (!progress || starting.current || submitting.current || lessonWrite.current) return;
+    if (!review) playSound('walk');
     if (uiPreview) {
       if (stage.gradeId==='e1' && stage.kind==='normal') {
         // Grade-one trial uses the newly reviewed scope of ten per stage.
@@ -526,7 +527,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
       round?.live?.mode==='diagnosis'||round?.live?.mode==='remediation'?'study':'island');
   }
   function openGrade(next: WorldGrade) {
-    if (!review) playSound('tap');
+    if (!review) playSound('walk');
     if (!uiPreview && next.id === 'sage' && !hasPremium(access)) { setShowPlanInfo(true); scroll.current?.scrollTo({ y: 0 }); return; }
     resetAnswer();
     setStartError('');
@@ -585,7 +586,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {screen === 'home' && !round ? (
             <>
               <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress} preview={uiPreview}
-                onStart={() => { playSound('tap'); resetAnswer(); setScreen('world'); }} onTitles={() => { playSound('tap'); setScreen('titles'); }}
+                onStart={() => { playSound('walk'); resetAnswer(); setScreen('world'); }} onTitles={() => { playSound('tap'); setScreen('titles'); }}
                 soundOn={soundOn} onSoundChange={next => { setSoundEnabled(next); setSoundOn(next); if (next) playSound('correct'); }}
                 soundLevel={soundLevel} onSoundLevelChange={next => { setSoundVolume(next); setSoundLevel(next); if (soundOn && next > 0) playSound('correct'); }} />
               {process.env.EXPO_PUBLIC_KAZU_ONLINE_REVIEW === '1' && typeof window !== 'undefined' &&
