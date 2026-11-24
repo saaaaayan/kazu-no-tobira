@@ -9,7 +9,7 @@ import { worldStageAction, type PlayMode } from '../domain/playMode';
 import { checkpointsFor, stageDisplayTitle, stageLabels, type Checkpoint } from '../domain/stageStructure';
 import { PRESCHOOL_MAP_TITLE_INSET, compactIslandStageMap, islandCheckpointLayout, preschoolStageLabelLayout, islandStageLayout } from '../domain/worldMapLayout';
 import { approvedWorldMapAreaNames } from '../domain/approvedWorldMap';
-import { responsiveWorldMapForWidth, responsiveWorldMapImageUrl } from '../domain/responsiveWorldMap';
+import { responsiveWorldMapForWidth, responsiveWorldMapImageUrl, responsiveWorldMapGradeLabels } from '../domain/responsiveWorldMap';
 import { hasStageBank } from '../domain/questionBank';
 import type { Progress } from '../domain/progress';
 import { lessonStatus, unitLessons, type UnitLesson } from '../domain/unitLessons';
@@ -127,9 +127,11 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
             const spot=map.hotspots[index];
             const label=islandAction(grade,index);
             // The user-selected PNG already includes the pixel-art plaques.
-            // Keep only invisible accessible hit targets, no duplicate visuals.
+            // Keep the original plaques; add only a small grade/course label below each.
             const plaqueWidth=spot.width;
             const plaqueHeight=spot.height;
+            const gradeFontSize=compact?Math.max(10,Math.min(14,Math.round(imageWidth/32))):Math.max(10,Math.min(15,Math.round(imageWidth/80)));
+            const gradeBadgeHeight=gradeFontSize+6;
             return <Pressable key={grade.id} testID={'approved-world-island-'+grade.id}
               accessibilityRole="button"
               accessibilityLabel={String(index+1).padStart(2,'0')+' '+grade.title+' '+approvedWorldMapAreaNames[index]+'、'+label}
@@ -138,8 +140,11 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
                 left:imageWidth*(spot.x-plaqueWidth/2),
                 top:imageHeight*(spot.y-plaqueHeight/2),
                 width:imageWidth*plaqueWidth,
-                height:imageHeight*plaqueHeight,
+                height:imageHeight*plaqueHeight+gradeBadgeHeight+1,
               },pressed&&styles.approvedMapTargetPressed]}>
+              <View pointerEvents="none" accessible={false} style={[styles.worldMapGradePosition,{top:imageHeight*plaqueHeight+1}]}>
+                <Text testID={'world-map-grade-'+grade.id} allowFontScaling={false} style={[styles.worldMapGradeBadge,{fontSize:gradeFontSize,lineHeight:gradeFontSize+2,height:gradeBadgeHeight}]}>{responsiveWorldMapGradeLabels[index]}</Text>
+              </View>
             </Pressable>;
           })}
         </View>
@@ -587,6 +592,8 @@ const styles=StyleSheet.create({
     borderWidth:1,borderColor:'#a3afad'},
   mapZoomText:{color:'#30516a',fontWeight:'900',fontSize:12},
   approvedMapTarget:{position:'absolute',borderRadius:10,minWidth:35,minHeight:39},
+  worldMapGradePosition:{position:'absolute',left:0,right:0,alignItems:'center'},
+  worldMapGradeBadge:{backgroundColor:'#173c35',color:'#f1dfad',borderColor:'#c6ae76',borderWidth:1,borderRadius:4,paddingHorizontal:5,fontWeight:'800',textAlign:'center',includeFontPadding:false},
   approvedMapTargetPressed:{backgroundColor:'rgba(244,236,206,.25)',borderWidth:2,borderColor:'#eadbbd'},
   mobileWorldList:{gap:8},
   worldListToggle:{padding:12,minHeight:44,backgroundColor:'#e4e9e9',borderRadius:10,alignItems:'center'},
