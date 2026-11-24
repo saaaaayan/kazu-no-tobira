@@ -572,10 +572,10 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     <SafeAreaView style={styles.safe}>
       <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" scrollEnabled={!drawing}
         onLayout={event=>setScrollViewportHeight(event.nativeEvent.layout.height)}
-        contentContainerStyle={[styles.scroll,compactHome && styles.portraitHomeScroll,standardIslandMapFirst&&styles.preschoolScroll,screen==='world' && !round && styles.worldMapScroll]}>
+        contentContainerStyle={[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll,screen==='world' && !round && styles.worldMapScroll,compactHome && styles.portraitHomeScroll]}>
         <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}
-          style={[styles.shell,compactHome && styles.portraitHomeShell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell,screen==='world' && !round && styles.worldMapSlightlyWider]}>
-          {!round && screen !== 'lesson' && screen !== 'study-plan' && !standardIslandMapFirst && !(compactHome && uiPreview) && <VersionNotice/>}
+          style={[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell,screen==='world' && !round && styles.worldMapSlightlyWider,compactHome && styles.portraitHomeShell]}>
+          {!round && screen !== 'lesson' && screen !== 'study-plan' && !standardIslandMapFirst && <VersionNotice/>}
           {uiPreview && !standardIslandChildView && <View style={[styles.playPanel,compactHome && styles.portraitPreview]} testID="kazu-sample-only-preview">
             {compactHome ? <Text accessibilityRole="header" style={styles.portraitPreviewText}>試作版・幼児65／小1 50ステージ・記録なし</Text> : <>
             <Text accessibilityRole="header" style={styles.answerHeading}>数のトビラ 試作版</Text>
