@@ -107,6 +107,14 @@ function loadApprovedTitle(ctx: AudioContext) {
   return titleRequest;
 }
 
+// Decode the approved title even if autoplay is blocked. The first gesture
+// can then start the cached buffer without waiting for a network download.
+function prepareTitle(ctx: AudioContext){
+  if(desired==='title'&&!cache.has('title')&&!titleRequest){
+    void loadApprovedTitle(ctx).then(sync).catch(()=>{});
+  }
+}
+
 export const musicEnabled=()=>enabled;
 export const musicVolume=()=>volume;
 function save(key:string,value:unknown){try{if(typeof window!=='undefined')window.localStorage.setItem(key,String(value));}catch{}}
@@ -120,7 +128,7 @@ function sync(){
   if(source&&playing===desired)return;
   stop();
   if(desired==='title'&&!cache.has('title')){
-    if(!titleRequest)void loadApprovedTitle(context).then(()=>sync()).catch(()=>{});
+    prepareTitle(context);
     return;
   }
   try{
@@ -133,22 +141,36 @@ function sync(){
     next.start();source=next;playing=desired;
   }catch{}
 }
-export function setMusicScene(scene: MusicScene|undefined){desired=scene;sync();}
-export function setMusicEnabled(on:boolean){enabled=on;save(enabledKey,on);sync();}
+export function setMusicScene(scene: MusicScene|undefined){
+  desired=scene;
+  // Try browser-permitted autoplay on entry, rather than requiring a click
+  // even on browsers which already allow audio for this site.
+  if(scene&&enabled&&volume>0)unlockMusic();
+  else sync();
+}
+export function setMusicEnabled(on:boolean){enabled=on;save(enabledKey,on);if(on&&desired&&volume>0)unlockMusic();else sync();}
 export function setMusicVolume(level:number){
   volume=clamp(level);save(volumeKey,volume);
   if(gain&&context)gain.gain.setTargetAtTime(volume/100*.55,context.currentTime,.025);
-  sync();
+  if(enabled&&volume>0&&desired)unlockMusic();else sync();
 }
 export function unlockMusic(){
-  if(typeof window==='undefined')return;
+  if(typeof window==='undefined'||typeof document==='undefined'||document.hidden||!enabled||!volume||!desired)return;
   try{
     const Constructor=window.AudioContext??(window as Window & {webkitAudioContext?:typeof AudioContext}).webkitAudioContext;
     if(!Constructor)return;
-    if(!context){context=new Constructor();gain=context.createGain();gain.connect(context.destination);}
+    if(!context){
+      context=new Constructor();gain=context.createGain();gain.connect(context.destination);
+      context.addEventListener('statechange',sync);
+    }
     unlocked=true;
+    // Start fetching before resume: resume may stay pending until a user gesture.
+    prepareTitle(context);
     if(context.state!=='running')void context.resume().then(sync).catch(()=>{});
     else sync();
   }catch{}
 }
-export function refreshMusicVisibility(){sync();}
+export function refreshMusicVisibility(){
+  if(typeof document!=='undefined'&&!document.hidden&&enabled&&volume>0&&desired)unlockMusic();
+  else sync();
+}
