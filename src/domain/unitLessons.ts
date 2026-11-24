@@ -38,7 +38,7 @@ export const countToTen: UnitLesson = {
   summary: 'ものを かぞえて、かずの みちを たどろう',
   completionMessage: 'かずの みちを おぼえたね。つぎは ぼうけんに でかけよう！',
   steps: [
-    { title: 'すずを かぞえよう', text: 'ルミが ぼうけんに もっていく すずだよ。ひとつずつ タッチしよう。さいごに となえた かずが、すずの ぜんぶの かずだよ。',
+    { title: 'すずを かぞえよう', text: 'オイラーが ぼうけんに もっていく すずだよ。ひとつずつ タッチしよう。さいごに となえた かずが、すずの ぜんぶの かずだよ。',
       diagram: { kind: 'objects', picture: 'bell', count: 6 }, action: 'count' },
     { title: 'かずを くらべよう', text: 'おやつを ふたりで くらべよう。うえと したで ひとつずつ くみに すると、のこった ほうが おおいよ。',
       diagram: { kind: 'pairs', left: 4, right: 6 }, action: 'pair' },
