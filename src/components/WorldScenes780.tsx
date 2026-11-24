@@ -259,7 +259,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         </>}
       </View>}
       {!preview && lessons.length > 0 && <View style={styles.studyCard}>
-        <Text accessibilityRole="header" style={styles.mapTitle}>ルミと まなぶ</Text>
+        <Text accessibilityRole="header" style={styles.mapTitle}>オイラーと まなぶ</Text>
         {lessons.map(lesson => {
           const status = testing ? 'not-started' : lessonStatus(progress.lessons?.[lesson.id]);
           const first = grade.stages.find(stage => lesson.linkedStageIds.includes(stage.id));
