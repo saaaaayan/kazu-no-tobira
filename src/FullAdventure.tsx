@@ -436,7 +436,8 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
       (shownMode === 'handwriting' && (blockRef.current || drawing))) return;
     // 幼児の1タップ回答では、setStateの完了を待たず、押された数字をそのまま採点する。
     const submittedAnswer = selectedAnswer ?? answer;
-    if (selectedAnswer !== undefined) { setAnswer(selectedAnswer); playGameSound('tap',soundEnabled); }
+    if (selectedAnswer !== undefined) setAnswer(selectedAnswer);
+    playGameSound('tap',soundEnabled);
     if (!isValidMathAnswer(question, submittedAnswer)) {
       setMessage(question.type === 'choice' ? 'こたえを ひとつ えらんでね。' : 'こたえを 数字で いれてね。');
       if (shownMode === 'keyboard') keyboard.current?.focus();
