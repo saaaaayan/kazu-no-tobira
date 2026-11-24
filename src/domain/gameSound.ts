@@ -4,7 +4,7 @@ const cues: Record<Cue, readonly Note[]> = {
   tap: [[660, 0, .075]],
   walk: [],
   correct: [[1046.5, 0, .34], [784, .28, .78]],
-  incorrect: [[349.2, 0, .15], [261.6, .15, .24]],
+  incorrect: [[220, 0, .17], [164.8, .23, .48]],
   clear: [[523.3, 0, .16], [659.3, .15, .16], [784, .30, .16], [1046.5, .45, .42]],
 };
 const key = 'kazu.soundEffects.enabled';
@@ -87,7 +87,7 @@ export function playSound(cue: Cue) {
       if (active) active.gain.setValueAtTime(0, now);
       const output = ctx.createGain();
       active = output;
-      activeLevel = cue === 'tap' ? .22 : cue === 'walk' ? .68 : cue === 'incorrect' ? .48 : .88;
+      activeLevel = cue === 'tap' ? .22 : cue === 'walk' ? .68 : cue === 'incorrect' ? .66 : .88;
       output.gain.value = activeLevel * volume / 100;
       output.connect(ctx.destination);
       if (cue === 'walk') {
@@ -109,6 +109,11 @@ export function playSound(cue: Cue) {
         { ratio: 1, weight: .72, decay: 1 },
         { ratio: 2.01, weight: .20, decay: .45 },
         { ratio: 3.02, weight: .08, decay: .25 },
+      ] : cue === 'incorrect' ? [
+        // A mildly raspy, descending two-part buzzer; not a harsh alarm.
+        { ratio: 1, weight: .60, decay: 1 },
+        { ratio: 1.06, weight: .26, decay: 1 },
+        { ratio: 2, weight: .14, decay: .8 },
       ] : [{ ratio: 1, weight: 1, decay: 1 }];
       let remaining = notes.length * partials.length;
       notes.forEach(([frequency, delay, duration]) => {
@@ -118,11 +123,15 @@ export function playSound(cue: Cue) {
           const start = now + delay;
           const length = duration * decay;
           const peak = .85 * weight;
-          oscillator.type = cue === 'clear' ? 'triangle' : 'sine';
+          oscillator.type = cue === 'clear' || cue === 'incorrect' ? 'triangle' : 'sine';
           oscillator.frequency.value = frequency * ratio;
+          if (cue === 'incorrect') {
+            oscillator.frequency.setValueAtTime(frequency * ratio, start);
+            oscillator.frequency.exponentialRampToValueAtTime(frequency * ratio * .86, start + length);
+          }
           envelope.gain.setValueAtTime(.0001, start);
           envelope.gain.exponentialRampToValueAtTime(peak, start + .006);
-          envelope.gain.exponentialRampToValueAtTime(peak * (cue === 'correct' ? .55 : .38), start + length * .38);
+          envelope.gain.exponentialRampToValueAtTime(peak * (cue === 'incorrect' ? .74 : cue === 'correct' ? .55 : .38), start + length * .38);
           envelope.gain.exponentialRampToValueAtTime(.0001, start + length);
           oscillator.connect(envelope);
           envelope.connect(output);
