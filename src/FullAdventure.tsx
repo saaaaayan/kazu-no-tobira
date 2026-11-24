@@ -564,6 +564,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const preschoolMapFirst = !round && screen === 'island' && grade.id === 'preschool';
   const preschoolChildView = preschoolMapFirst || Boolean(!review && round?.stage.gradeId === 'preschool');
   const standardIslandMapFirst = !round && screen === 'island' && isStandardPixelIsland(grade.id);
+  const compactHome = viewport <= 600 && screen === 'home' && !round;
   const standardIslandChildView = preschoolChildView || standardIslandMapFirst ||
     Boolean(!review && round?.stage.gradeId === 'e1');
 
@@ -571,14 +572,15 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     <SafeAreaView style={styles.safe}>
       <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" scrollEnabled={!drawing}
         onLayout={event=>setScrollViewportHeight(event.nativeEvent.layout.height)}
-        contentContainerStyle={[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll,screen==='world' && !round && styles.worldMapScroll]}>
+        contentContainerStyle={[styles.scroll,compactHome && styles.portraitHomeScroll,standardIslandMapFirst&&styles.preschoolScroll,screen==='world' && !round && styles.worldMapScroll]}>
         <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}
-          style={[styles.shell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell,screen==='world' && !round && styles.worldMapSlightlyWider]}>
-          {!round && screen !== 'lesson' && screen !== 'study-plan' && !standardIslandMapFirst && <VersionNotice/>}
-          {uiPreview && !standardIslandChildView && <View style={styles.playPanel} testID="kazu-sample-only-preview">
+          style={[styles.shell,compactHome && styles.portraitHomeShell,standardIslandMapFirst&&styles.preschoolShell,round && !round.complete && styles.playShell,screen==='world' && !round && styles.worldMapSlightlyWider]}>
+          {!round && screen !== 'lesson' && screen !== 'study-plan' && !standardIslandMapFirst && !(compactHome && uiPreview) && <VersionNotice/>}
+          {uiPreview && !standardIslandChildView && <View style={[styles.playPanel,compactHome && styles.portraitPreview]} testID="kazu-sample-only-preview">
+            {compactHome ? <Text accessibilityRole="header" style={styles.portraitPreviewText}>試作版・幼児65／小1 50ステージ・記録なし</Text> : <>
             <Text accessibilityRole="header" style={styles.answerHeading}>数のトビラ 試作版</Text>
-            <Text style={styles.explanation}>小1は全50ステージのカリキュラム確認用10問ずつを公開中です。以前の100問バンクは別途保管し、教材の見直し後に再統合します。幼児65ステージも遊べます。試作版の回答記録は保存されません。</Text>
-            <Text selectable style={styles.hintNote}>バージョン {process.env.EXPO_PUBLIC_KAZU_UI_PREVIEW_SHA}</Text>
+            <Text style={styles.explanation}>小1は全50ステージのカリキュラム確認用10問ずつを公開中です。以前の100問バンクは別途保管し、教材の見直し後に再統合します。幼児65ステージも遊べます。試作版の回答記録は保存されません。</Text></>}
+            <Text selectable style={compactHome ? styles.portraitVersion : styles.hintNote}>バージョン {process.env.EXPO_PUBLIC_KAZU_UI_PREVIEW_SHA}</Text>
           </View>}
           {__DEV__ && !review && !standardIslandChildView && <View style={styles.navigation}>
             <Text style={styles.logo}>開発用プラン　{hasPremium(access) ? '有料ユーザー' : '無料ユーザー'}</Text>
@@ -596,7 +598,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {!!startError && <Text accessibilityLiveRegion="polite" style={styles.error}>{startError}</Text>}
           {screen === 'home' && !round ? (
             <>
-              <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress} preview={uiPreview}
+              <AdventureHome compact={compactHome} mode={playMode} onMode={setPlayMode} loading={!progress} preview={uiPreview}
                 onStart={() => { playSound('walk'); resetAnswer(); setScreen('world'); }} onTitles={() => { playSound('tap'); setScreen('titles'); }}
                 soundOn={soundOn} onSoundChange={next => { setSoundEnabled(next); setSoundOn(next); if (next) playSound('correct'); }}
                 soundLevel={soundLevel} onSoundLevelChange={next => { setSoundVolume(next); setSoundLevel(next); if (soundOn && next > 0) playSound('correct'); }}
@@ -1063,6 +1065,11 @@ export function ReviewQuestionPreview(props: ReviewPreview) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#f0edf6' },
   scroll: { flexGrow: 1, padding: 14, paddingBottom: 55 },
+  portraitHomeScroll: { padding: 6, paddingBottom: 6, backgroundColor:'#0c2140' },
+  portraitHomeShell: { flexGrow:1, gap:6 },
+  portraitPreview: { padding:5, gap:3, borderRadius:8 },
+  portraitPreviewText: { fontSize:12, fontWeight:'700', color:'#27335c' },
+  portraitVersion: { fontSize:10, color:'#46516b', flexShrink:1 },
   preschoolScroll: { paddingTop: 4, paddingHorizontal: 8, paddingBottom: 36 },
   // Remove only the 14px outer inset for the world atlas. The 1030px shell
   // maxWidth is intentionally unchanged (PR #187 made the map oversized).
