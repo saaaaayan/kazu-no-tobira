@@ -39,6 +39,7 @@ export function releaseClient(address) {
         !js.includes('preschool-plush-pixel-v2')) {
       throw new Error('The public bundle is missing the preschool pixel map view.');
     }
+    if(version.preschoolFantasyTownV1===true&&!js.includes('preschool-fantasy-town-v1'))throw new Error('Missing published fantasy plush town map');
     if (version.toyIslandPixelV1 === true &&
         !js.includes('toy-island-pixel-v1')) {
       throw new Error('The public bundle is missing the grade-one toy pixel map.');

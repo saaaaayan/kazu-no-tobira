@@ -95,7 +95,7 @@ test('The in-map preschool title is visible above plush mascots and the first ar
   assert.match(ui,/standardPixelMap\?PRESCHOOL_MAP_TITLE_INSET:0/);
   assert.match(ui,/testID="preschool-map-top-title"/);
   assert.match(ui,/<Text style=\{styles\.preschoolMapTopGrade\}>就学前<\/Text>/);
-  assert.match(ui,/<Text style=\{\[styles\.preschoolMapTopName,compactStageMap&&styles\.preschoolMapTopNameCompact\]\}>ぬいぐるみの島<\/Text>/);
+  assert.match(ui,/<Text style=\{\[styles\.preschoolMapTopName,compactStageMap&&styles\.preschoolMapTopNameCompact\]\}>ぬいぐるみの町<\/Text>/);
   assert.match(ui,/<PreschoolPawStamp compact=\{compactStageMap\}\/>/);
   assert.match(ui,/<PreschoolPawStamp flipped compact=\{compactStageMap\}\/>/);
   assert.match(ui,/preschoolMapTopTitle:\{position:'absolute',top:18,left:40,right:40,height:58/);

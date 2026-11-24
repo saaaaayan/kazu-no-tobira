@@ -128,6 +128,7 @@ if(!bundle.toString('utf8').includes('all-16-island-pixel-themes-v1'))
 // The visual-only atlas has no scripts, storage, API, or question data.
 mkdirSync(resolve(target,'art-review'),{recursive:true});
 copyFileSync(resolve('public/art-review/index.html'),resolve(target,'art-review/index.html'));
+if(!bundle.toString('utf8').includes('preschool-fantasy-town-v1'))throw new Error('Missing fantasy plush town map');
 const index=resolve(target,'index.html');
 if (pages) writePagesAdminEntry(target);
 else writeFileSync(index,readFileSync(index,'utf8').replace('<head>',
@@ -139,7 +140,7 @@ writeFileSync(resolve(target,'version.json'),JSON.stringify({
   wildlifeReviewSha256:contentDigest(readFileSync(resolve(target,'art-review/index.html'))),
   approvedTitleMusicSha256:contentDigest(titleMusic),
   pixelSceneryV2:true,
-  preschoolPlushPixelV2:true,toyIslandPixelV1:true,allIslandPixelThemesV1:true,
+  preschoolPlushPixelV2:true,preschoolFantasyTownV1:true,toyIslandPixelV1:true,allIslandPixelThemesV1:true,
   ...(pages ? {adminSha256:contentDigest(readFileSync(resolve(target,'admin/index.html')))} : {}),
 })+'\n');
 console.log('Verified public prototype with '+(publicBankIds.length*100)+' bank questions at '+version);

@@ -12,7 +12,7 @@ test('preschool title has two muted pixel paw stamps on the left and right',()=>
   assert.match(ui,/flipped\?'translate\(24 0\) scale\(-1 1\)'/);
   assert.match(ui,/const shade='#9b8b77'/);
   assert.match(ui,/accessible=\{false\}/);
-  assert.match(ui,/<View style=\{styles\.preschoolMapTopNameWithPaws\}>\s*<PreschoolPawStamp compact=\{compactStageMap\}\/>\s*<Text style=\{\[styles\.preschoolMapTopName,compactStageMap&&styles\.preschoolMapTopNameCompact\]\}>ぬいぐるみの島<\/Text>\s*<PreschoolPawStamp flipped compact=\{compactStageMap\}\/>/);
+  assert.match(ui,/<View style=\{styles\.preschoolMapTopNameWithPaws\}>\s*<PreschoolPawStamp compact=\{compactStageMap\}\/>\s*<Text style=\{\[styles\.preschoolMapTopName,compactStageMap&&styles\.preschoolMapTopNameCompact\]\}>ぬいぐるみの町<\/Text>\s*<PreschoolPawStamp flipped compact=\{compactStageMap\}\/>/);
   assert.match(ui,/preschoolMapTopTitleCompact:\{left:17,right:17\}/);
   assert.match(ui,/preschoolMapTopNameCompact:\{fontSize:17,lineHeight:21\}/);
   assert.match(ui,/preschoolMapTopNameWithPaws:\{flexDirection:'row',alignItems:'center'/);
