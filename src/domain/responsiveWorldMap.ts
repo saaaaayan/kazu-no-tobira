@@ -221,3 +221,6 @@ export function responsiveWorldMapForWidth(width: number) {
 export function responsiveWorldMapImageUrl(map: typeof responsiveWorldMaps.pc | typeof responsiveWorldMaps.mobile) {
   return '/kazu-no-tobira/'+map.filename+'?v='+map.sha256.slice(0,8);
 }
+
+// Grade/course labels follow the unchanged canonical worldIslands order.
+export const responsiveWorldMapGradeLabels = ["幼児","小1","小2","小3","小4","小5","小6","中1","中2","中3","高1","高2","高3","理系大学入試","最難関・数学競技","大学数学・探究"] as const;
