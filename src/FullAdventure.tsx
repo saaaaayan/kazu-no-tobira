@@ -128,6 +128,19 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const wide = !review?.phone && viewport > 800;
 
   useEffect(() => {
+    if (review || typeof document === 'undefined') return;
+    const unlock = () => unlockSound();
+    document.addEventListener('pointerup', unlock, true);
+    document.addEventListener('touchend', unlock, true);
+    document.addEventListener('keydown', unlock, true);
+    return () => {
+      document.removeEventListener('pointerup', unlock, true);
+      document.removeEventListener('touchend', unlock, true);
+      document.removeEventListener('keydown', unlock, true);
+    };
+  }, [review]);
+
+  useEffect(() => {
     if (isolated) return;
     let active = true;
     loadProgress().then(
@@ -571,12 +584,8 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {screen === 'home' && !round ? (
             <>
               <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress} preview={uiPreview}
-                onStart={() => { playSound('tap'); resetAnswer(); setScreen('world'); }} onTitles={() => { playSound('tap'); setScreen('titles'); }} />
-               <Pressable accessibilityRole="switch" accessibilityState={{checked:soundOn}} accessibilityLabel="こうかおん"
-                 onPress={() => { const next = !soundOn; setSoundEnabled(next); setSoundOn(next); if (next) playSound('tap'); }}
-                 style={{alignSelf:'center', padding:12, borderRadius:10, backgroundColor:'#e5e1ef'}}>
-                 <Text style={{color:'#30334e',fontWeight:'700'}}>こうかおん：{soundOn ? 'あり' : 'なし'}</Text>
-               </Pressable>
+                onStart={() => { playSound('tap'); resetAnswer(); setScreen('world'); }} onTitles={() => { playSound('tap'); setScreen('titles'); }}
+                soundOn={soundOn} onSoundChange={next => { setSoundEnabled(next); setSoundOn(next); if (next) playSound('correct'); }} />
               {process.env.EXPO_PUBLIC_KAZU_ONLINE_REVIEW === '1' && typeof window !== 'undefined' &&
                 <GameButton label="管理者ログイン" secondary onPress={() => window.location.assign('/kazu-no-tobira/admin/')} />}
             </>
