@@ -1,10 +1,10 @@
 type Cue = 'tap' | 'correct' | 'incorrect' | 'clear';
 type Note = readonly [number, number, number];
 const cues: Record<Cue, readonly Note[]> = {
-  tap: [[660, 0, .055]],
-  correct: [[659, 0, .12], [880, .10, .18]],
-  incorrect: [[392, 0, .12], [330, .11, .16]],
-  clear: [[523, 0, .15], [659, .13, .15], [784, .26, .15], [1047, .39, .30]],
+  tap: [[660, 0, .075]],
+  correct: [[784, 0, .22], [1046.5, .19, .42]],
+  incorrect: [[349.2, 0, .15], [261.6, .15, .24]],
+  clear: [[523.3, 0, .16], [659.3, .15, .16], [784, .30, .16], [1046.5, .45, .42]],
 };
 const key = 'kazu.soundEffects.enabled';
 let enabled = true;
@@ -38,17 +38,18 @@ export function playSound(cue: Cue) {
       if (active) active.gain.setValueAtTime(0, now);
       const output = ctx.createGain();
       active = output;
-      output.gain.value = cue === 'tap' ? .045 : .085;
+      output.gain.value = cue === 'tap' ? .10 : cue === 'incorrect' ? .19 : .30;
       output.connect(ctx.destination);
       const notes = cues[cue];
       notes.forEach(([frequency, delay, duration], index) => {
         const oscillator = ctx.createOscillator();
         const envelope = ctx.createGain();
         const start = now + delay;
-        oscillator.type = 'sine';
+        oscillator.type = cue === 'correct' || cue === 'clear' ? 'triangle' : 'sine';
         oscillator.frequency.value = frequency;
         envelope.gain.setValueAtTime(.001, start);
-        envelope.gain.exponentialRampToValueAtTime(.7, start + .012);
+        envelope.gain.exponentialRampToValueAtTime(.85, start + .008);
+        envelope.gain.exponentialRampToValueAtTime(.32, start + duration * .45);
         envelope.gain.exponentialRampToValueAtTime(.001, start + duration);
         oscillator.connect(envelope);
         envelope.connect(output);
