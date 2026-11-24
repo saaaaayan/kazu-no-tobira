@@ -8,8 +8,8 @@ import { earnedRewards, rewardForStage } from '../domain/rewards';
 import type { Progress } from '../domain/progress';
 export type { CompanionMood } from '../domain/companionSpeech';
 
-// Original character: Lumi, a small star-bearing explorer of the math islands.
-// The SVG is deliberately self-contained so it works on Web, Android and iOS.
+// Temporary mathematical emblem for Euler until the approved standalone sprite is registered.
+// Do not display the retired character or invent a new official portrait.
 export function CompanionAvatar({ mood = 'ready', size = 88 }: {
   mood?: CompanionMood;
   size?: number;
@@ -40,49 +40,14 @@ export function CompanionAvatar({ mood = 'ready', size = 88 }: {
     };
   }, [jump, mood]);
 
-  const cheering = mood === 'correct' || mood === 'clear';
-  const sparkles = cheering || mood === 'ready';
-
   return (
     <Animated.View
       accessible={false} importantForAccessibility="no-hide-descendants"
-      style={{ width: size, height: size, transform: [{ translateY: jump }, { rotate: tilt }] }}>
-      <Svg width={size} height={size} viewBox="0 0 140 140" accessible={false}>
-        <Circle cx={70} cy={69} r={61} fill="#fff1b9" opacity={mood === 'clear' ? 0.22 : 0.11} />
-        <Ellipse cx={70} cy={126} rx={39} ry={8} fill="#1d345f" opacity={0.16} />
-        {sparkles && (
-          <G fill="#ffdc83">
-            <Path d="M16 23L19 31 27 34 19 37 16 45 13 37 5 34 13 31Z" />
-            <Path d="M112 11L115 19 123 22 115 25 112 33 109 25 101 22 109 19Z" />
-            {cheering && <Path d="M118 69L121 75 127 78 121 81 118 87 115 81 109 78 115 75Z" />}
-          </G>
-        )}
-        {/* A little purple cape, pointy ears and soft turquoise body. */}
-        <Path d="M39 79Q13 100 25 120L45 111Q70 135 96 111L118 120Q125 100 100 78Z"
-          fill="#7865bc" stroke="#4d4b88" strokeWidth={2.5} strokeLinejoin="round" />
-        <Path d="M41 103Q32 121 40 126M98 103Q106 121 99 126"
-          fill="none" stroke="#344e89" strokeWidth={10} strokeLinecap="round" />
-        <Path d="M39 96Q25 90 21 75M102 96Q115 89 119 75"
-          fill="none" stroke="#3295ad" strokeWidth={12} strokeLinecap="round" />
-        <Circle cx={21} cy={75} r={7} fill="#99e4d9" />
-        <Circle cx={119} cy={75} r={7} fill="#99e4d9" />
-        <Path d="M42 42L27 12Q51 19 59 34Z" fill="#45b4c5" stroke="#286d95" strokeWidth={3} strokeLinejoin="round" />
-        <Path d="M98 42L113 12Q89 19 81 34Z" fill="#45b4c5" stroke="#286d95" strokeWidth={3} strokeLinejoin="round" />
-        <Path d="M42 32L35 22 51 35Z M98 32L105 22 89 35Z" fill="#efb6cc" />
-        <Ellipse cx={70} cy={77} rx={48} ry={48} fill="#40acc6" stroke="#246d94" strokeWidth={3} />
-        <Ellipse cx={70} cy={81} rx={37} ry={34} fill="#d5f9ea" />
-        <Ellipse cx={55} cy={75} rx={6} ry={9} fill="#25385e" />
-        <Ellipse cx={85} cy={75} rx={6} ry={9} fill="#25385e" />
-        <Circle cx={57} cy={72} r={2.5} fill="white" />
-        <Circle cx={87} cy={72} r={2.5} fill="white" />
-        <Ellipse cx={44} cy={88} rx={7} ry={4} fill="#f3a7bb" opacity={0.77} />
-        <Ellipse cx={96} cy={88} rx={7} ry={4} fill="#f3a7bb" opacity={0.77} />
-        <Path d={mood === 'incorrect' ? 'M61 95Q70 98 79 95' : cheering ? 'M57 93Q70 111 83 93' : 'M60 94Q70 104 80 94'}
-          fill="none" stroke="#30506b" strokeWidth={3.5} strokeLinecap="round" />
-        <Path d="M70 37L74.5 46.5 85 48 77.5 55.5 79.3 66 70 61 60.7 66 62.5 55.5 55 48 65.5 46.5Z"
-          fill="#ffe08f" stroke="#cf9c4e" strokeWidth={2} strokeLinejoin="round" />
-        <Ellipse cx={47} cy={61} rx={7} ry={3} fill="white" opacity={0.3} transform="rotate(-35 47 61)" />
-      </Svg>
+      style={{ width: size, height: size, alignItems:'center', justifyContent:'center', transform: [{ translateY: jump }, { rotate: tilt }] }}>
+      <View style={[styles.eulerMark, { width:size*.76, height:size*.76, borderRadius:size*.12 }]}>
+        <Text style={[styles.eulerMarkText,{fontSize:size*.42}]}>e</Text>
+        <Text style={[styles.eulerMarkSub,{fontSize:size*.15}]}>π · i · ∞</Text>
+      </View>
     </Animated.View>
   );
 }
@@ -98,7 +63,7 @@ export function CompanionMoment({ mood, variation = 0, onDark = false, compact =
     <View style={[styles.moment, !compact && styles.momentBig]}>
       <CompanionAvatar mood={mood} size={compact ? 69 : 116} />
       <View style={[styles.speech, onDark ? styles.speechDark : styles.speechLight]}>
-        <Text style={[styles.name, onDark && styles.nameDark]}>ルミ</Text>
+        <Text style={[styles.name, onDark && styles.nameDark]}>オイラー</Text>
         <Text accessibilityLiveRegion="polite" style={[styles.message, onDark && styles.messageDark]}>
           {speech ?? companionSpeech(mood, variation)}
         </Text>
@@ -201,6 +166,9 @@ export function TreasureCollection({ progress }: { progress: Progress }) {
 }
 
 const styles = StyleSheet.create({
+  eulerMark: { backgroundColor:'#214b40', borderColor:'#d6ba76', borderWidth:2, alignItems:'center', justifyContent:'center' },
+  eulerMarkText: { color:'#f3d799', fontWeight:'900', lineHeight:undefined },
+  eulerMarkSub: { color:'#f3d799', fontWeight:'700' },
   moment: { flexDirection: 'row', alignItems: 'center', gap: 10, minWidth: 0 },
   momentBig: { alignSelf: 'center', maxWidth: 480, paddingVertical: 3 },
   speech: { flexShrink: 1, borderRadius: 15, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 10, minWidth: 0 },
