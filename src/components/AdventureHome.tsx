@@ -37,7 +37,8 @@ export function ModeBadge({ mode }: { mode: PlayMode }) {
   </Text>;
 }
 
-export default function AdventureHome({ mode, onMode, onStart, onTitles, loading, preview = false, soundOn = true, onSoundChange, soundLevel = 80, onSoundLevelChange, musicOn = true, musicLevel = 30, onMusicChange, onMusicLevelChange }: {
+export default function AdventureHome({ mode, onMode, onStart, onTitles, loading, preview = false, soundOn = true, onSoundChange, soundLevel = 80, onSoundLevelChange, musicOn = true, musicLevel = 30, onMusicChange, onMusicLevelChange, compact = false }: {
+  compact?: boolean;
   mode: PlayMode; onMode: (mode: PlayMode) => void; onStart: () => void;
   onTitles?: () => void; loading: boolean; preview?: boolean;
   soundOn?: boolean; onSoundChange?: (enabled: boolean) => void;
@@ -80,8 +81,31 @@ export default function AdventureHome({ mode, onMode, onStart, onTitles, loading
   }
 
   return (
-    <View style={styles.hero}>
-      <View style={styles.illustrationFrame}>
+    <View style={[styles.hero, compact && styles.portraitHero]}>
+      {compact ? <>
+        <View style={styles.portraitArtRegion}>
+          <View style={styles.portraitArtCrop}>
+            <Image source={EULER_HOME_ART} resizeMode="stretch" style={styles.portraitArt} accessible
+              accessibilityLabel="数のトビラ。数学記号と、トビラの前に立つオイラー。" />
+          </View>
+        </View>
+        <View style={styles.portraitMenu} testID="portrait-home-menu">
+          <Pressable accessibilityRole="button" accessibilityLabel="ぼうけんを つづける" disabled={loading} accessibilityState={{disabled:loading}} onPress={onStart}
+            style={({pressed})=>[styles.portraitButton,styles.portraitPrimary,loading&&styles.portraitDisabled,pressed&&styles.portraitPressed]}>
+            <Text style={styles.portraitPrimaryText}>▶ ぼうけんを つづける</Text>
+          </Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="はじめて あそぶ" accessibilityState={{expanded:activePanel==='intro'}} onPress={()=>togglePanel('intro')}
+            style={({pressed})=>[styles.portraitButton,pressed&&styles.portraitPressed]}><Text style={styles.portraitButtonText}>はじめて あそぶ</Text></Pressable>
+          <View style={styles.portraitPair}>
+            <Pressable accessibilityRole="button" accessibilityLabel="プレイヤー きりかえ・ついか" accessibilityState={{expanded:activePanel==='players'}} onPress={()=>togglePanel('players')} style={({pressed})=>[styles.portraitButton,styles.portraitHalf,pressed&&styles.portraitPressed]}><Text style={styles.portraitButtonText}>プレイヤー</Text></Pressable>
+            <Pressable accessibilityRole="button" accessibilityLabel="しょうごう あつめた たからもの" onPress={onTitles??onStart} style={({pressed})=>[styles.portraitButton,styles.portraitHalf,pressed&&styles.portraitPressed]}><Text style={styles.portraitButtonText}>しょうごう</Text></Pressable>
+          </View>
+          <View style={styles.portraitPair}>
+            <Pressable accessibilityRole="button" accessibilityLabel="せってい" accessibilityState={{expanded:activePanel==='settings'}} onPress={()=>togglePanel('settings')} style={({pressed})=>[styles.portraitButton,styles.portraitHalf,pressed&&styles.portraitPressed]}><Text style={styles.portraitButtonText}>⚙ せってい</Text></Pressable>
+            <Pressable accessibilityRole="button" accessibilityLabel="きょうゆう" onPress={shareHome} style={({pressed})=>[styles.portraitButton,styles.portraitHalf,pressed&&styles.portraitPressed]}><Text style={styles.portraitButtonText}>きょうゆう</Text></Pressable>
+          </View>
+        </View>
+      </> : <View style={styles.illustrationFrame}>
         <Image source={EULER_HOME_ART} resizeMode="stretch" style={styles.illustration} accessible
           accessibilityLabel="数のトビラ。数学記号と、トビラの前に立つオイラー。下部に冒険開始などのメニューがある。" />
         <Pressable accessibilityRole="button" accessibilityLabel="ぼうけんを つづける"
@@ -101,8 +125,10 @@ export default function AdventureHome({ mode, onMode, onStart, onTitles, loading
           style={({ pressed }) => [styles.artHit, styles.artSettingsHit, pressed && styles.artPressed]} />
         <Pressable accessibilityRole="button" accessibilityLabel="きょうゆう" onPress={shareHome}
           style={({ pressed }) => [styles.artHit, styles.artShareHit, pressed && styles.artPressed]} />
-        {(activePanel !== null || shareMessage !== '') && (
-          <View style={[styles.overlayPanel, activePanel === 'settings' && styles.settingsOverlay]}>
+      </View>}
+      {(activePanel !== null || shareMessage !== '') && (
+        <View style={compact ? styles.portraitOverlayHost : styles.desktopOverlayHost} pointerEvents="box-none">
+          <View style={[styles.overlayPanel, activePanel === 'settings' && styles.settingsOverlay, compact && styles.portraitOverlay]}>
             <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled" contentContainerStyle={{gap:7}}>
             <Pressable accessibilityRole="button" accessibilityLabel="メニューを とじる"
               onPress={closePanel} style={styles.closeButton}>
@@ -153,8 +179,8 @@ export default function AdventureHome({ mode, onMode, onStart, onTitles, loading
             {shareMessage !== '' && <Text style={styles.noteText} selectable>{shareMessage}</Text>}
             </ScrollView>
           </View>
-        )}
-      </View>
+        </View>
+      )}
       {!preview && <VersionNotice />}
     </View>
   );
@@ -166,6 +192,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#0c2140', borderRadius: 22, overflow: 'hidden',
     alignItems: 'center',
   },
+  portraitHero: { flexGrow:1, borderRadius:14, paddingBottom:8 },
+  portraitArtRegion: { width:'100%', flexGrow:1, justifyContent:'center', backgroundColor:'#0c2140' },
+  // Keep the original title illustration proportions; only omit the painted desktop menu.
+  portraitArtCrop: { width:'100%', aspectRatio:1448/(1086*.72), overflow:'hidden' },
+  portraitArt: { position:'absolute', top:0, left:0, width:'100%', height:`${100/.72}%` },
+  portraitMenu: { width:'100%', paddingHorizontal:12, paddingVertical:8, gap:6 },
+  portraitPair: { flexDirection:'row', gap:6 },
+  portraitButton: { minHeight:46, borderWidth:2, borderColor:'#c4a875', backgroundColor:'#183950', borderRadius:8, justifyContent:'center', alignItems:'center', paddingHorizontal:5, paddingVertical:5 },
+  portraitPrimary: { backgroundColor:'#e9d5a4', minHeight:52 },
+  portraitHalf: { flex:1 },
+  portraitDisabled: { opacity:.55 },
+  portraitPressed: { opacity:.75 },
+  portraitButtonText: { color:'#fff0c8', fontWeight:'900', fontSize:16, textAlign:'center' },
+  portraitPrimaryText: { color:'#112a47', fontWeight:'900', fontSize:18, textAlign:'center' },
+  portraitOverlayHost: { position:'absolute', top:0, bottom:0, left:0, right:0, zIndex:10 },
+  desktopOverlayHost: { position:'absolute', top:0, left:0, right:0, aspectRatio:1448/1086, zIndex:10 },
+  portraitOverlay: { top:8, bottom:8, left:8, right:8, maxHeight:undefined, maxWidth:undefined },
   illustrationFrame: {
     position: 'relative', width: '100%', aspectRatio: 1448 / 1086,
     overflow: 'hidden',
