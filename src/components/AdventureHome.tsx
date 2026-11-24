@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Image, Platform, Pressable, Share, StyleSheet, Text, View } from 'react-native';
+import { Image, Platform, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { worldIslands } from '../domain/worldCatalog';
 import type { PlayMode } from '../domain/playMode';
 import { playSound } from '../domain/gameSound';
@@ -37,10 +37,11 @@ export function ModeBadge({ mode }: { mode: PlayMode }) {
   </Text>;
 }
 
-export default function AdventureHome({ mode, onMode, onStart, onTitles, loading, preview = false, soundOn = true, onSoundChange }: {
+export default function AdventureHome({ mode, onMode, onStart, onTitles, loading, preview = false, soundOn = true, onSoundChange, soundLevel = 80, onSoundLevelChange }: {
   mode: PlayMode; onMode: (mode: PlayMode) => void; onStart: () => void;
   onTitles?: () => void; loading: boolean; preview?: boolean;
   soundOn?: boolean; onSoundChange?: (enabled: boolean) => void;
+  soundLevel?: number; onSoundLevelChange?: (volume: number) => void;
 }) {
   const [activePanel, setActivePanel] = useState<HomePanel>(null);
   const [shareMessage, setShareMessage] = useState('');
@@ -100,7 +101,8 @@ export default function AdventureHome({ mode, onMode, onStart, onTitles, loading
         <Pressable accessibilityRole="button" accessibilityLabel="きょうゆう" onPress={shareHome}
           style={({ pressed }) => [styles.artHit, styles.artShareHit, pressed && styles.artPressed]} />
         {(activePanel !== null || shareMessage !== '') && (
-          <View style={styles.overlayPanel}>
+          <View style={[styles.overlayPanel, activePanel === 'settings' && styles.settingsOverlay]}>
+            <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled" contentContainerStyle={{gap:7}}>
             <Pressable accessibilityRole="button" accessibilityLabel="メニューを とじる"
               onPress={closePanel} style={styles.closeButton}>
               <Text style={styles.closeLabel}>× とじる</Text>
@@ -123,12 +125,21 @@ export default function AdventureHome({ mode, onMode, onStart, onTitles, loading
               {onSoundChange && <Pressable testID="home-sound-toggle" accessibilityRole="switch" accessibilityLabel="こうかおん" accessibilityState={{checked:soundOn}} onPress={()=>onSoundChange(!soundOn)} style={styles.panelButton}>
                 <Text style={styles.panelButtonText}>こうかおん：{soundOn ? 'ON（あり）' : 'OFF（なし）'}</Text>
               </Pressable>}
-              {soundOn && <Pressable accessibilityRole="button" onPress={()=>playSound('correct')} style={styles.modeButton}><Text style={styles.modeLabel}>おとを ためす ♪</Text></Pressable>}
+              {onSoundLevelChange && <View style={{gap:5}}>
+                <Text style={styles.noteText}>おとの おおきさ（音量）：{soundLevel}%</Text>
+                <View accessible accessibilityLabel={`音量 ${soundLevel}%`} style={styles.volumeTrack}><View style={[styles.volumeFill,{width: `${soundLevel}%`}]}/></View>
+                <View style={styles.volumeControls}>
+                  <Pressable testID="sound-volume-down" accessibilityRole="button" accessibilityLabel="音量を下げる" accessibilityState={{disabled:soundLevel<=0}} disabled={soundLevel<=0} onPress={()=>onSoundLevelChange(Math.max(0,soundLevel-10))} style={[styles.modeButton,{flex:1,opacity:soundLevel<=0?.45:1}]}><Text style={styles.modeLabel}>− ちいさく</Text></Pressable>
+                  <Pressable testID="sound-volume-up" accessibilityRole="button" accessibilityLabel="音量を上げる" accessibilityState={{disabled:soundLevel>=100}} disabled={soundLevel>=100} onPress={()=>onSoundLevelChange(Math.min(100,soundLevel+10))} style={[styles.modeButton,{flex:1,opacity:soundLevel>=100?.45:1}]}><Text style={styles.modeLabel}>＋ おおきく</Text></Pressable>
+                </View>
+              </View>}
+              {soundOn && <Pressable accessibilityRole="button" disabled={soundLevel===0} accessibilityState={{disabled:soundLevel===0}} onPress={()=>playSound('correct')} style={[styles.modeButton,{opacity:soundLevel===0?.45:1}]}><Text style={styles.modeLabel}>せいかいの おとを ためす ♪</Text></Pressable>}
               <Text style={styles.noteText}>{mode === 'test'
                 ? 'テストモードでは きろくは のこらないよ。'
                 : 'あそんだ きろくを のこして すすもう。'}</Text>
             </>}
             {shareMessage !== '' && <Text style={styles.noteText} selectable>{shareMessage}</Text>}
+            </ScrollView>
           </View>
         )}
       </View>
@@ -164,6 +175,10 @@ const styles = StyleSheet.create({
     gap: 7, shadowColor: '#041422', shadowOpacity: 0.8,
     shadowRadius: 0, shadowOffset: { width: 5, height: 5 }, elevation: 6,
   },
+  settingsOverlay: { top: '3%', maxHeight: '94%' },
+  volumeTrack: { height: 12, backgroundColor:'#35465c', borderRadius:6, overflow:'hidden' },
+  volumeFill: { height:'100%', backgroundColor:'#f3d184', borderRadius:6 },
+  volumeControls: { flexDirection:'row', gap:8 },
   closeButton: { minHeight: 36, alignSelf: 'flex-end', justifyContent: 'center', paddingHorizontal: 10 },
   closeLabel: { color: '#fff0c8', fontSize: 14, fontWeight: '900' },
   noteTitle: { color: '#f8e0ab', fontWeight: '900', fontSize: 19 },
