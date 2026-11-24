@@ -37,11 +37,12 @@ export function ModeBadge({ mode }: { mode: PlayMode }) {
   </Text>;
 }
 
-export default function AdventureHome({ mode, onMode, onStart, onTitles, loading, preview = false, soundOn = true, onSoundChange, soundLevel = 80, onSoundLevelChange }: {
+export default function AdventureHome({ mode, onMode, onStart, onTitles, loading, preview = false, soundOn = true, onSoundChange, soundLevel = 80, onSoundLevelChange, musicOn = true, musicLevel = 30, onMusicChange, onMusicLevelChange }: {
   mode: PlayMode; onMode: (mode: PlayMode) => void; onStart: () => void;
   onTitles?: () => void; loading: boolean; preview?: boolean;
   soundOn?: boolean; onSoundChange?: (enabled: boolean) => void;
   soundLevel?: number; onSoundLevelChange?: (volume: number) => void;
+  musicOn?: boolean; musicLevel?: number; onMusicChange?: (enabled: boolean) => void; onMusicLevelChange?: (volume: number) => void;
 }) {
   const [activePanel, setActivePanel] = useState<HomePanel>(null);
   const [shareMessage, setShareMessage] = useState('');
@@ -122,6 +123,17 @@ export default function AdventureHome({ mode, onMode, onStart, onTitles, loading
             {activePanel === 'settings' && <>
               <Text style={styles.noteTitle}>せってい</Text>
               <ModeControls mode={mode} onChange={onMode} />
+              {onMusicChange && <Pressable testID="home-music-toggle" accessibilityRole="switch" accessibilityLabel="BGM" accessibilityState={{checked:musicOn}} onPress={()=>onMusicChange(!musicOn)} style={styles.panelButton}>
+                <Text style={styles.panelButtonText}>BGM：{musicOn ? 'ON（あり）' : 'OFF（なし）'}</Text>
+              </Pressable>}
+              {onMusicLevelChange && <View style={{gap:5}}>
+                <Text style={styles.noteText}>BGMの おおきさ：{musicLevel}%</Text>
+                <View accessible accessibilityLabel={`BGM音量 ${musicLevel}%`} style={styles.volumeTrack}><View style={[styles.volumeFill,{width:`${musicLevel}%`}]}/></View>
+                <View style={styles.volumeControls}>
+                  <Pressable accessibilityRole="button" accessibilityLabel="BGM音量を下げる" disabled={musicLevel<=0} onPress={()=>onMusicLevelChange(Math.max(0,musicLevel-10))} style={[styles.modeButton,{flex:1,opacity:musicLevel<=0?.45:1}]}><Text style={styles.modeLabel}>− ちいさく</Text></Pressable>
+                  <Pressable accessibilityRole="button" accessibilityLabel="BGM音量を上げる" disabled={musicLevel>=100} onPress={()=>onMusicLevelChange(Math.min(100,musicLevel+10))} style={[styles.modeButton,{flex:1,opacity:musicLevel>=100?.45:1}]}><Text style={styles.modeLabel}>＋ おおきく</Text></Pressable>
+                </View>
+              </View>}
               {onSoundChange && <Pressable testID="home-sound-toggle" accessibilityRole="switch" accessibilityLabel="こうかおん" accessibilityState={{checked:soundOn}} onPress={()=>onSoundChange(!soundOn)} style={styles.panelButton}>
                 <Text style={styles.panelButtonText}>こうかおん：{soundOn ? 'ON（あり）' : 'OFF（なし）'}</Text>
               </Pressable>}
