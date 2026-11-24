@@ -36,9 +36,10 @@ export function ModeBadge({ mode }: { mode: PlayMode }) {
   </Text>;
 }
 
-export default function AdventureHome({ mode, onMode, onStart, onTitles, loading, preview = false }: {
+export default function AdventureHome({ mode, onMode, onStart, onTitles, loading, preview = false, soundEnabled, onSoundChange }: {
   mode: PlayMode; onMode: (mode: PlayMode) => void; onStart: () => void;
   onTitles?: () => void; loading: boolean; preview?: boolean;
+  soundEnabled:boolean; onSoundChange:(enabled:boolean)=>void;
 }) {
   const [activePanel, setActivePanel] = useState<HomePanel>(null);
   const [shareMessage, setShareMessage] = useState('');
@@ -117,6 +118,13 @@ export default function AdventureHome({ mode, onMode, onStart, onTitles, loading
             {activePanel === 'settings' && <>
               <Text style={styles.noteTitle}>せってい</Text>
               <ModeControls mode={mode} onChange={onMode} />
+              <Text style={styles.noteText}>こうかおん（BGMは まだ ないよ）</Text>
+              <Pressable testID="sound-settings-toggle" accessibilityRole="switch"
+                accessibilityLabel="こうかおん" accessibilityState={{checked:soundEnabled}}
+                onPress={()=>onSoundChange(!soundEnabled)}
+                style={[styles.soundToggle,soundEnabled&&styles.soundToggleOn]}>
+                <Text style={styles.soundToggleText}>{soundEnabled?'♪ こうかおん：オン':'♪ こうかおん：オフ'}</Text>
+              </Pressable>
               <Text style={styles.noteText}>{mode === 'test'
                 ? 'テストモードでは きろくは のこらないよ。'
                 : 'あそんだ きろくを のこして すすもう。'}</Text>
@@ -163,6 +171,10 @@ const styles = StyleSheet.create({
   noteText: { color: '#f4eedb', fontSize: 14, fontWeight: '700', lineHeight: 20 },
   panelButton: { alignItems: 'center', justifyContent: 'center', minHeight: 44, backgroundColor: '#f3d184', borderRadius: 0 },
   panelButtonText: { color: '#102b3c', fontWeight: '900', fontSize: 16 },
+  soundToggle:{alignSelf:'flex-start',minHeight:46,minWidth:190,alignItems:'center',justifyContent:'center',paddingHorizontal:12,
+    backgroundColor:'#374a63',borderRadius:9,borderWidth:2,borderColor:'#b5bed0'},
+  soundToggleOn:{backgroundColor:'#2d6a60',borderColor:'#a7dcc4'},
+  soundToggleText:{fontSize:16,fontWeight:'900',color:'#fff7d9'},
   modeControls: { flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 7 },
   modeButton: {
     minHeight: 44, justifyContent: 'center', alignItems: 'center', borderRadius: 8,
