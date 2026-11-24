@@ -1,3 +1,4 @@
+import {PreschoolFantasyTerrain} from './PreschoolFantasyTerrain';
 import {ISLAND_ART_SETS} from '../domain/islandArtSets';
 import {ISLAND_PIXEL_PALETTES} from '../domain/standardPixelIslandMap';
 import {islandScenery} from '../domain/islandScenery';
@@ -301,6 +302,7 @@ export function PreschoolPixelTerrain({width,height,positions,grade,next,theme='
   const scenery=useMemo(()=>islandScenery(sceneryId,width,height,positions),
     [sceneryId,width,height,positions]);
   const groundTheme=ISLAND_PIXEL_PALETTES[sceneryId];
+  if(grade.id==='preschool'&&theme==='plush')return <PreschoolFantasyTerrain width={width} height={height} positions={positions} grade={grade} next={next}/>;
   return <Svg testID={theme==='toys'?'toy-island-pixel-v1':'preschool-plush-pixel-v2'} width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}
     preserveAspectRatio="none" accessible={false}>
     <Rect width={width} height={height} fill={theme==='toys'?'#688dad':'#80adc4'}/>

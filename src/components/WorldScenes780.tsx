@@ -331,7 +331,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         <Text style={styles.mapTitle}>島のぼうけんルート</Text>
         <Text style={styles.hintText}>地図の丸い地点をタッチして ステージへ進もう！</Text>
       </View>}
-      <View style={[styles.ocean,standardPixelMap&&styles.pixelOcean,{height:geometry.height}]} onLayout={event=>{
+      <View style={[styles.ocean,standardPixelMap&&styles.pixelOcean,grade.id==='preschool'&&styles.fantasyOcean,{height:geometry.height}]} onLayout={event=>{
         const nextWidth=Math.round(event.nativeEvent.layout.width);
         if(nextWidth>0&&nextWidth!==width)setWidth(nextWidth);
         setOceanTop(event.nativeEvent.layout.y);
@@ -343,11 +343,11 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
         </View>
         {grade.id==='preschool' && (
           <View testID="preschool-map-top-title" pointerEvents="none"
-            style={[styles.preschoolMapTopTitle,compactStageMap&&styles.preschoolMapTopTitleCompact]}>
+            style={[styles.preschoolMapTopTitle,compactStageMap&&styles.preschoolMapTopTitleCompact,styles.fantasyTitle]}>
             <Text style={styles.preschoolMapTopGrade}>就学前</Text>
             <View style={styles.preschoolMapTopNameWithPaws}>
               <PreschoolPawStamp compact={compactStageMap}/>
-              <Text style={[styles.preschoolMapTopName,compactStageMap&&styles.preschoolMapTopNameCompact]}>ぬいぐるみの島</Text>
+              <Text style={[styles.preschoolMapTopName,compactStageMap&&styles.preschoolMapTopNameCompact]}>ぬいぐるみの町</Text>
               <PreschoolPawStamp flipped compact={compactStageMap}/>
             </View>
           </View>
@@ -399,7 +399,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
                 {top:y-(standardPixelMap?68:60),left:inset,right:inset,alignItems:'center'},
               ]}>
               <Text style={[
-                styles.zoneName,standardPixelMap&&styles.pixelZoneName,
+                styles.zoneName,standardPixelMap&&styles.pixelZoneName,grade.id==='preschool'&&styles.fantasyZoneName,
               ]}>{area.title}　{area.count}ステージ</Text>
             </View>
           );
@@ -418,7 +418,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
             onPress={()=>setDetailStageId(stage.id)}
             style={[styles.preschoolStageTopic,labelLayout]}>
             <Text numberOfLines={compactStageMap?3:2}
-              style={[styles.preschoolStageTopicText,compactStageMap&&styles.preschoolStageTopicSmall]}>
+              style={[styles.preschoolStageTopicText,compactStageMap&&styles.preschoolStageTopicSmall,grade.id==='preschool'&&styles.fantasyTopic]}>
               {info.title}
             </Text>
           </Pressable>;
@@ -465,7 +465,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
                 : (enabled?'#fff0b5':'#d2d9e9'),
               borderWidth:standardPixelMap?3:1,
               borderColor:standardPixelMap?'#344454':'#66769a'},
-              standardPixelMap&&styles.preschoolCheckpointSign]}>
+              standardPixelMap&&styles.preschoolCheckpointSign,grade.id==='preschool'&&styles.fantasyCheckpoint]}>
             {standardPixelMap ? <>
               <Text style={styles.preschoolCheckpointHeading}>✓ かくにん</Text>
               <Text style={styles.preschoolCheckpointTitle}>テスト {checkpoint.number}</Text>
@@ -495,7 +495,7 @@ export function IslandStageMap({grade,progress,mode,access,onBack,onStart,onTitl
               accessibilityLabel={(preview && grade.id==='e1' ? gradeOnePreviewStageInfo(stage)?.title : stageDisplayTitle(stage))+'、単元 '+(preview && grade.id==='e1' ? gradeOnePreviewStageInfo(stage)?.unit : stageCategoryName(grade,stage))+'、'+(grade.id==='preschool'?'学習内容 '+preschoolStageMapInfo(stage).title+'、':'')+(preview ? (grade.id==='e1' && stage.kind==='normal' ? 'カリキュラム確認用10問' : hasStageBank(stage.id) ? '100問のなかから10問ずつ あそべる' : uiPreviewSampleKind(stage) ? 'サンプル問題' : '体験用問題は準備中') : action === 'premium' ? 'プレミアム限定' : perfect?'パーフェクト':cleared?'クリア済み':action === 'learn' ? 'まず まなぼう' : unlocked?'挑戦できる':!hasGeneratedWorldQuestions(stage.gradeId) && !hasStageBank(stage.id) ? '問題を準備中' : '未解放')}
               onPress={()=>onStart(stage)}
               style={({pressed})=>[
-                styles.stagePin,standardPixelMap&&styles.pixelStagePin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
+                styles.stagePin,standardPixelMap&&styles.pixelStagePin,grade.id==='preschool'&&styles.fantasyPin,stage.kind==='extra'&&styles.extraPin,stage.kind==='secret'&&styles.secretPin,
                 !unlocked&&styles.lockedPin,cleared&&styles.clearedPin,perfect&&styles.perfectPin,
                 current&&styles.currentPin,pressed&&styles.pressed,
                 {width:marker,height:marker,left:position.x-marker/2,top:position.y-marker/2},
@@ -575,6 +575,12 @@ const styles=StyleSheet.create({
   mapTitle:{color:'#2b395e',fontWeight:'900',fontSize:19},
   hintText:{color:'#5c657d',fontSize:13,lineHeight:20},
   ocean:{borderRadius:22,backgroundColor:'#548cab',overflow:'hidden',position:'relative',borderWidth:3,borderColor:'#d1dbdd'},
+  fantasyOcean:{backgroundColor:'#2d4e3f',borderColor:'#b99c61',borderRadius:12},
+  fantasyTitle:{backgroundColor:'#f3e3b9',borderColor:'#b89a5d',borderWidth:3,borderRadius:12},
+  fantasyZoneName:{backgroundColor:'#173b36',color:'#f4e5bd',borderColor:'#c8ac70',borderRadius:9,borderWidth:2},
+  fantasyTopic:{backgroundColor:'#f2e6c7',borderColor:'#b79d66',borderRadius:6},
+  fantasyCheckpoint:{borderColor:'#b99b62',borderRadius:10},
+  fantasyPin:{backgroundColor:'#fff1cc',borderColor:'#9a7b46',borderWidth:3},
   pixelMapNote:{color:'#536c57',fontSize:14,fontWeight:'800'},
   pixelOcean:{borderRadius:9,backgroundColor:'#80adc4',borderWidth:4,borderColor:'#344454'},
   preschoolMapTopTitle:{position:'absolute',top:18,left:40,right:40,height:58,
