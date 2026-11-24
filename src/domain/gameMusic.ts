@@ -88,6 +88,25 @@ let source: AudioBufferSourceNode|undefined;
 let desired: MusicScene|undefined;
 let playing: MusicScene|undefined;
 let unlocked=false;
+const titleAsset='title-infinity-v3.flac';
+const titleLoopStart=416500/44100;
+const titleLoopEnd=3552500/44100;
+let titleRequest: Promise<AudioBuffer> | undefined;
+function loadApprovedTitle(ctx: AudioContext) {
+  if (!titleRequest) {
+    titleRequest = fetch(new URL(titleAsset,new URL('.',window.location.href)))
+      .then(response=>{if(!response.ok)throw new Error('Title BGM asset unavailable');return response.arrayBuffer();})
+      .then(bytes=>ctx.decodeAudioData(bytes))
+      .then(buffer=>{
+        if(Math.abs(buffer.duration-titleLoopEnd)>.015)throw new Error('Invalid approved title BGM duration');
+        cache.set('title',buffer);
+        titleRequest=undefined;
+        return buffer;
+      }).catch(error=>{titleRequest=undefined;throw error;});
+  }
+  return titleRequest;
+}
+
 export const musicEnabled=()=>enabled;
 export const musicVolume=()=>volume;
 function save(key:string,value:unknown){try{if(typeof window!=='undefined')window.localStorage.setItem(key,String(value));}catch{}}
@@ -100,8 +119,16 @@ function sync(){
   if(context.state!=='running')return;
   if(source&&playing===desired)return;
   stop();
+  if(desired==='title'&&!cache.has('title')){
+    if(!titleRequest)void loadApprovedTitle(context).then(()=>sync()).catch(()=>{});
+    return;
+  }
   try{
     const next=context.createBufferSource();next.buffer=render(context,desired);next.loop=true;
+    if(desired==='title'){
+      next.loopStart=titleLoopStart;
+      next.loopEnd=Math.min(titleLoopEnd,next.buffer.duration);
+    }
     next.connect(gain);gain.gain.setValueAtTime(volume/100*.55,context.currentTime);
     next.start();source=next;playing=desired;
   }catch{}

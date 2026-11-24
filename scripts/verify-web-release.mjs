@@ -78,6 +78,16 @@ export function releaseClient(address) {
         (!js.includes('island-scenery-') || !js.includes('labyrinth-stone-walls'))) {
       throw new Error('The public bundle is missing the new themed scenery.');
     }
+    let approvedTitleMusic;
+    if(version.approvedTitleMusicSha256!==undefined){
+      const file='title-infinity-v3.flac';
+      if(version.approvedTitleMusicSha256!=='1a7afff5e8836510a138ae611308a481aef5543b4b25643b22b80d572b65a1aa' || !js.includes(file))
+        throw new Error('Approved title BGM manifest or game bundle is invalid.');
+      const data=Buffer.from(await (await get(file)).arrayBuffer());
+      if(data.length!==6633014 || data.subarray(0,4).toString('ascii')!=='fLaC' || digest(data)!==version.approvedTitleMusicSha256)
+        throw new Error('Published title BGM differs from approved asset.');
+      approvedTitleMusic={file,data};
+    }
     const publishedBanks=[];
     if (version.bankSha256 !== undefined) {
       const entries=Object.entries(version.bankSha256);
@@ -109,7 +119,7 @@ export function releaseClient(address) {
           !admin.toString('utf8').includes('src="' + script + '"') ||
           !js.includes('/kazu-no-tobira/admin')) throw new Error('The admin route differs from the verified build.');
     }
-    return {version,index,entryPath,bundle,admin,approvedMap,publishedBanks};
+    return {version,index,entryPath,bundle,admin,approvedMap,publishedBanks,approvedTitleMusic};
   }};
 }
 
