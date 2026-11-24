@@ -5,7 +5,7 @@ import { companionSpeech } from '../src/domain/companionSpeech.ts';
 const moods = ['ready', 'correct', 'incorrect', 'clear', 'encourage'];
 
 for (const mood of moods) {
-  test(`ルミの${mood}のセリフは連続5問で重複しない`, () => {
+  test(`オイラーの${mood}のセリフは連続5問で重複しない`, () => {
     for (let start = 0; start < 20; start++) {
       const lines = Array.from({ length: 5 }, (_, i) => companionSpeech(mood, start + i));
       assert.equal(new Set(lines).size, lines.length);
@@ -34,5 +34,11 @@ test('負のインデックスや特殊な値でも表示できる', () => {
 test('修正版には以前の固定セリフを含めない', () => {
   for (let i = 0; i < 30; i++) {
     assert.notEqual(companionSpeech('correct', i), 'やったね！ そのちょうし！');
+  }
+});
+
+ test('all guide dialogue uses the current character name', () => {
+  for (const mood of ['ready','correct','incorrect','clear','encourage']) {
+    for (let i=0;i<30;i++) assert.doesNotMatch(companionSpeech(mood,i),/ルミ/);
   }
 });
