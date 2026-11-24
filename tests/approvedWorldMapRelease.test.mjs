@@ -6,7 +6,7 @@ import {worldIslands} from '../src/domain/worldCatalog.ts';
 import {approvedWorldMap,approvedWorldMapHotspots,approvedWorldMapAreaNames,
   approvedWorldMapDimensions,approvedWorldMapImageUrl} from '../src/domain/approvedWorldMap.ts';
 
-import {responsiveWorldMaps,responsiveWorldMapForWidth,responsiveWorldMapImageUrl} from '../src/domain/responsiveWorldMap.ts';
+import {responsiveWorldMaps,responsiveWorldMapForWidth,responsiveWorldMapImageUrl,responsiveWorldMapGradeLabels} from '../src/domain/responsiveWorldMap.ts';
 import {richWorldMap,richWorldMapHotspots,richWorldMapButtonWidths,
   richWorldMapButtonHeight,richWorldMapImageUrl} from '../src/domain/richWorldMap.ts';
 
@@ -145,4 +145,24 @@ test('both approved 2026-11-24 maps are exact PNGs and have sixteen distinct in-
   assert.match(read('src/components/WorldScenes780.tsx').toString(),/useState\(false\)/);
   assert.match(read('scripts/verify-web-release.mjs').toString(),/verifyResponsiveWorldMap/);
   assert.match(read('scripts/snapshot-pages-prototype.mjs').toString(),/of responsiveMaps/);
+});
+
+
+test('all sixteen destinations visibly identify their learning grade or course',()=>{
+  assert.deepEqual(responsiveWorldMapGradeLabels,['幼児','小1','小2','小3','小4','小5','小6','中1','中2','中3','高1','高2','高3','理系大学入試','最難関・数学競技','大学数学・探究']);
+  assert.equal(responsiveWorldMapGradeLabels.length,worldIslands.length);
+  const ui=read('src/components/WorldScenes780.tsx').toString();
+  assert.ok(ui.includes("testID={'world-map-grade-'+grade.id}"));
+  assert.ok(ui.includes('{responsiveWorldMapGradeLabels[index]}'));
+  assert.ok(ui.includes('top:imageHeight*plaqueHeight+1'));
+  for(const width of [244,320,360,390,600,700,900,1200]){
+    const compact=width<700,map=responsiveWorldMapForWidth(width);
+    const height=Math.round(width*map.height/map.width);
+    const font=compact?Math.max(10,Math.min(14,Math.round(width/32))):Math.max(10,Math.min(15,Math.round(width/80)));
+    const boxes=map.hotspots.map(p=>({x:width*(p.x-p.width/2),y:height*(p.y-p.height/2),w:Math.max(35,width*p.width),h:Math.max(39,height*p.height+font+7)}));
+    for(const [i,p] of boxes.entries()){
+      assert.ok(p.y+p.h<=height);
+      for(let j=0;j<i;j++){const q=boxes[j];assert.ok(p.x+p.w<=q.x||q.x+q.w<=p.x||p.y+p.h<=q.y||q.y+q.h<=p.y,'overlap at '+width+': '+(i+1)+' / '+(j+1));}
+    }
+  }
 });
