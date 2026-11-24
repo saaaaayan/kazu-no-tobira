@@ -135,11 +135,13 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     if (review || typeof document === 'undefined') return;
     const unlock = () => { unlockSound(); unlockMusic(); };
     document.addEventListener('pointerup', unlock, true);
+    document.addEventListener('click', unlock, true);
     document.addEventListener('touchend', unlock, true);
     document.addEventListener('keydown', unlock, true);
     document.addEventListener('visibilitychange', refreshMusicVisibility);
     return () => {
       document.removeEventListener('pointerup', unlock, true);
+      document.removeEventListener('click', unlock, true);
       document.removeEventListener('touchend', unlock, true);
       document.removeEventListener('keydown', unlock, true);
       document.removeEventListener('visibilitychange', refreshMusicVisibility);
