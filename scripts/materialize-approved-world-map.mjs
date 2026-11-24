@@ -59,3 +59,15 @@ if(existsSync(richMapDestination)&&richMapValid(readFileSync(richMapDestination)
   writeFileSync(richMapDestination,image);
   console.log('Restored exact 2026-11-23 world map: '+richMapSha);
 }
+
+// Restore the exact losslessly compressed title track approved by the owner.
+const musicDestination=join(root,'public','title-infinity-v3.flac');
+const musicSha='1a7afff5e8836510a138ae611308a481aef5543b4b25643b22b80d572b65a1aa';
+const musicValid=bytes=>bytes.length===6633014 && bytes.subarray(0,4).toString('ascii')==='fLaC' && digest(bytes)===musicSha;
+if(!existsSync(musicDestination)||!musicValid(readFileSync(musicDestination))){
+  const chunks=Array.from({length:8},(_,n)=>readFileSync(join(root,'assets/title-infinity-v3',`part${String(n).padStart(2,'0')}.bin`)));
+  const audio=Buffer.concat(chunks);
+  if(!musicValid(audio))throw new Error('Approved title BGM differs from original lossless asset.');
+  writeFileSync(musicDestination,audio);
+}
+console.log('Approved title BGM verified: '+musicSha);

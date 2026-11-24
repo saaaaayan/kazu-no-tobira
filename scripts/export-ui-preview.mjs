@@ -81,7 +81,13 @@ if(richMapBytes.length!==3_555_946 ||
   throw new Error('The 2026-11-23 user-selected world-map PNG differs from the source.');
 copyFileSync(richMapSource,resolve(target,'world-map-rich-20261123.png'));
 
-const allowed=new Set(['index.html','metadata.json','world-map-approved-20261122.png','world-map-rich-20261123.png']);
+const titleMusicFile='title-infinity-v3.flac';
+const titleMusic=readFileSync(resolve('public',titleMusicFile));
+if(titleMusic.length!==6633014 || titleMusic.subarray(0,4).toString('ascii')!=='fLaC' ||
+   contentDigest(titleMusic)!=='1a7afff5e8836510a138ae611308a481aef5543b4b25643b22b80d572b65a1aa')
+  throw new Error('Approved title BGM differs from the source.');
+writeFileSync(resolve(target,titleMusicFile),titleMusic);
+const allowed=new Set(['index.html','metadata.json','world-map-approved-20261122.png','world-map-rich-20261123.png',titleMusicFile]);
 const files=readdirSync(target,{recursive:true,withFileTypes:true}).filter(entry=>!entry.isDirectory())
   .map(entry=>relative(target,resolve(entry.parentPath,entry.name)).replaceAll('\\','/'));
 // This one user-approved illustration is public art. Keep the preview asset
@@ -122,6 +128,7 @@ writeFileSync(resolve(target,'version.json'),JSON.stringify({
   publishedBankQuestions:publicBankIds.length*100,bankSha256:bankFiles,
   approvedWorldMapSha256:contentDigest(richMapBytes),approvedEulerHeroSha256:contentDigest(approvedHeroBytes),
   wildlifeReviewSha256:contentDigest(readFileSync(resolve(target,'art-review/index.html'))),
+  approvedTitleMusicSha256:contentDigest(titleMusic),
   pixelSceneryV2:true,
   preschoolPlushPixelV2:true,toyIslandPixelV1:true,allIslandPixelThemesV1:true,
   ...(pages ? {adminSha256:contentDigest(readFileSync(resolve(target,'admin/index.html')))} : {}),
