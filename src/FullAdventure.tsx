@@ -572,7 +572,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" scrollEnabled={!drawing}
+      <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" scrollEnabled={!round||!drawing}
         onLayout={event=>setScrollViewportHeight(event.nativeEvent.layout.height)}
         contentContainerStyle={[styles.scroll,standardIslandMapFirst&&styles.preschoolScroll,screen==='world' && !round && styles.worldMapScroll,compactHome && styles.portraitHomeScroll]}>
         <View pointerEvents={loadingRound ? 'none' : 'auto'} accessibilityState={{ busy: loadingRound }}

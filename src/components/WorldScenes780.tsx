@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import Svg, {G,Rect} from 'react-native-svg';
 import { CompanionAvatar } from './AdventureCompanion';
+import { WorldMapViewport } from './WorldMapViewport';
 import { allWorldStages, hasGeneratedWorldQuestions, isPlannedIsland, worldIslands, type WorldGrade, type WorldStage } from '../domain/worldCatalog';
 import { hasPremium, type Entitlement } from '../domain/accessPlan';
 import { gradeProgress, isIslandUnlocked, unlockSummary } from '../domain/worldProgress';
@@ -104,7 +105,7 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
     </View>
     <View style={styles.worldMapControls}>
       <Text style={styles.hintText}>{compact
-        ? zoomed?'地図を左右にスワイプしてエリアを見つけよう。':'16エリアの全体図。地域をタップして進もう。'
+        ? zoomed?'地図を上下左右にスワイプしてね。':'地図を上下にスワイプ。地域をタップして進もう。'
         : '地図のイラストや地域の名前をクリックして進もう。'}</Text>
       {compact&&<Pressable accessibilityRole="button" accessibilityLabel={zoomed?'地図全体を表示する':'地図を拡大する'}
         onPress={()=>setZoomed(value=>!value)} style={styles.mapZoomToggle}>
@@ -115,10 +116,7 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
       const next=Math.round(event.nativeEvent.layout.width);
       if(next>0&&next!==width)setWidth(next);
     }}>
-      <ScrollView horizontal scrollEnabled={compact&&zoomed}
-        showsHorizontalScrollIndicator={compact&&zoomed}
-        contentContainerStyle={{width:imageWidth,height:imageHeight}}
-        style={{height:imageHeight}} nestedScrollEnabled>
+      <WorldMapViewport zoomed={compact&&zoomed} imageWidth={imageWidth} imageHeight={imageHeight}>
         <View style={{width:imageWidth,height:imageHeight}}>
           <Image source={{uri:responsiveWorldMapImageUrl(map)}} resizeMode="stretch"
             accessibilityLabel="16エリアを描いた、手書き風のファンタジー世界地図"
@@ -148,7 +146,7 @@ export function WorldMap780({ progress, mode, access, onGrade, onTitles, preview
             </Pressable>;
           })}
         </View>
-      </ScrollView>
+      </WorldMapViewport>
     </View>
     {compact&&<View style={styles.mobileWorldList}>
       <Pressable accessibilityRole="button" testID="approved-world-list-toggle"

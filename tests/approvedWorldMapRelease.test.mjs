@@ -99,7 +99,7 @@ test('mobile zoom still keeps all sixteen regions accessible in an exact image-r
   assert.match(ui,/const atlasBleedWidth=viewportWidth>=700/);
   assert.match(ui,/width:atlasBleedWidth,alignSelf:'center'/);
   assert.doesNotMatch(ui,/resizeMode="cover"/);
-  assert.match(ui,/scrollEnabled=\{compact&&zoomed\}/);
+  assert.match(ui,/<WorldMapViewport zoomed=\{compact&&zoomed\}/);
   assert.match(ui,/地図全体を表示する/);
   assert.match(ui,/16エリアの一覧から選ぶ/);
 });
