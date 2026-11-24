@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Image, Platform, Pressable, Share, StyleSheet, Text, View } from 'react-native';
 import { worldIslands } from '../domain/worldCatalog';
 import type { PlayMode } from '../domain/playMode';
+import { playSound } from '../domain/gameSound';
 import VersionNotice from './VersionNotice';
 
 const EULER_HOME_ART = require('../../assets/euler-math-title.png');
@@ -36,14 +37,16 @@ export function ModeBadge({ mode }: { mode: PlayMode }) {
   </Text>;
 }
 
-export default function AdventureHome({ mode, onMode, onStart, onTitles, loading, preview = false }: {
+export default function AdventureHome({ mode, onMode, onStart, onTitles, loading, preview = false, soundOn = true, onSoundChange }: {
   mode: PlayMode; onMode: (mode: PlayMode) => void; onStart: () => void;
   onTitles?: () => void; loading: boolean; preview?: boolean;
+  soundOn?: boolean; onSoundChange?: (enabled: boolean) => void;
 }) {
   const [activePanel, setActivePanel] = useState<HomePanel>(null);
   const [shareMessage, setShareMessage] = useState('');
 
   function togglePanel(panel: Exclude<HomePanel, null>) {
+    playSound('tap');
     setShareMessage('');
     setActivePanel(current => current === panel ? null : panel);
   }
@@ -117,6 +120,10 @@ export default function AdventureHome({ mode, onMode, onStart, onTitles, loading
             {activePanel === 'settings' && <>
               <Text style={styles.noteTitle}>せってい</Text>
               <ModeControls mode={mode} onChange={onMode} />
+              {onSoundChange && <Pressable testID="home-sound-toggle" accessibilityRole="switch" accessibilityLabel="こうかおん" accessibilityState={{checked:soundOn}} onPress={()=>onSoundChange(!soundOn)} style={styles.panelButton}>
+                <Text style={styles.panelButtonText}>こうかおん：{soundOn ? 'ON（あり）' : 'OFF（なし）'}</Text>
+              </Pressable>}
+              {soundOn && <Pressable accessibilityRole="button" onPress={()=>playSound('correct')} style={styles.modeButton}><Text style={styles.modeLabel}>おとを ためす ♪</Text></Pressable>}
               <Text style={styles.noteText}>{mode === 'test'
                 ? 'テストモードでは きろくは のこらないよ。'
                 : 'あそんだ きろくを のこして すすもう。'}</Text>
