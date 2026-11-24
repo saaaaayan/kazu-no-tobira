@@ -35,6 +35,7 @@ import { WorldMap780, IslandStageMap } from './components/WorldScenes780';
 import VersionNotice from './components/VersionNotice';
 import { CompanionMoment } from './components/AdventureCompanion';
 import { MagicMeter, ComboBadge, SparkleBurst } from './components/AdventureJuice';
+import { playSound, unlockSound, soundEnabled, setSoundEnabled } from './domain/gameSound';
 import { CorrectSpark } from './components/AdventureEffects';
 import CalculationMemo from './components/CalculationMemo';
 import HandwritingAnswer from './components/HandwritingAnswer';
@@ -87,6 +88,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   const isolated = uiPreview || Boolean(review);
   const [progress, setProgress] = useState<Progress | undefined>(isolated ? emptyProgress : undefined);
   const [loadError, setLoadError] = useState(false);
+  const [soundOn, setSoundOn] = useState(soundEnabled);
   const [screen, setScreen] = useState<Screen>('home');
   const [playMode, setPlayMode] = useState<PlayMode>(isolated ? 'test' : 'normal');
   const [access, setAccess] = useState<Entitlement>(freeAccess);
@@ -285,6 +287,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
   }
 
   async function start(stage: WorldStage) {
+    if (!review) playSound('tap');
     if (!progress || starting.current || submitting.current || lessonWrite.current) return;
     if (uiPreview) {
       if (stage.gradeId==='e1' && stage.kind==='normal') {
@@ -398,6 +401,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
 
   async function showHint() {
     if (!round || !question || round.feedback || submitting.current) return;
+    if (!review) playSound('tap');
     if (!round.live) {
       setRound({...round,hintLevel:round.hintLevel+1,usedHint:true});
       return;
@@ -418,6 +422,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     if (!round || !progress || !question || (!isolated && !round.live && !canAccessStage(access, round.stage)) || round.feedback || submitting.current || saving ||
       (shownMode === 'handwriting' && (blockRef.current || drawing))) return;
     // 幼児の1タップ回答では、setStateの完了を待たず、押された数字をそのまま採点する。
+    if (!review) unlockSound();
     const submittedAnswer = selectedAnswer ?? answer;
     if (selectedAnswer !== undefined) setAnswer(selectedAnswer);
     if (!isValidMathAnswer(question, submittedAnswer)) {
@@ -467,6 +472,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
         setProgress(saved);
       }
       setRound({ ...round, problems, correct: newCorrect, results: [...round.results, result], feedback: result });
+      if (!review) playSound(result);
     } catch (error) {
       setMessage(round.live && error instanceof Error ? error.message : 'きろくを ほぞんできなかったよ。もういちど おしてね。');
     } finally {
@@ -480,8 +486,11 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
     resetAnswer();
     if (round.index === round.problems.length - 1) {
       setRound({ ...round, complete: true, hintLevel: 0 });
+      if (!review && !round.checkpoint && (!round.live || ['stage','test'].includes(round.live.mode)) && round.correct >= Math.ceil(round.stage.questions * 0.8)) playSound('clear');
+      else if (!review) playSound('tap');
     } else {
       setRound({ ...round, index: round.index + 1, feedback: undefined, hintLevel: 0, liveHints:undefined, noMoreHints:false });
+      if (!review) playSound('tap');
     }
   }
 
@@ -503,6 +512,7 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
       round?.live?.mode==='diagnosis'||round?.live?.mode==='remediation'?'study':'island');
   }
   function openGrade(next: WorldGrade) {
+    if (!review) playSound('tap');
     if (!uiPreview && next.id === 'sage' && !hasPremium(access)) { setShowPlanInfo(true); scroll.current?.scrollTo({ y: 0 }); return; }
     resetAnswer();
     setStartError('');
@@ -561,7 +571,12 @@ function AdventureWorld({ review }: { review?: ReviewPreview }) {
           {screen === 'home' && !round ? (
             <>
               <AdventureHome mode={playMode} onMode={setPlayMode} loading={!progress} preview={uiPreview}
-                onStart={() => { resetAnswer(); setScreen('world'); }} onTitles={() => setScreen('titles')} />
+                onStart={() => { playSound('tap'); resetAnswer(); setScreen('world'); }} onTitles={() => { playSound('tap'); setScreen('titles'); }} />
+               <Pressable accessibilityRole="switch" accessibilityState={{checked:soundOn}} accessibilityLabel="こうかおん"
+                 onPress={() => { const next = !soundOn; setSoundEnabled(next); setSoundOn(next); if (next) playSound('tap'); }}
+                 style={{alignSelf:'center', padding:12, borderRadius:10, backgroundColor:'#e5e1ef'}}>
+                 <Text style={{color:'#30334e',fontWeight:'700'}}>こうかおん：{soundOn ? 'あり' : 'なし'}</Text>
+               </Pressable>
               {process.env.EXPO_PUBLIC_KAZU_ONLINE_REVIEW === '1' && typeof window !== 'undefined' &&
                 <GameButton label="管理者ログイン" secondary onPress={() => window.location.assign('/kazu-no-tobira/admin/')} />}
             </>
