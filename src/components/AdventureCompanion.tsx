@@ -1,15 +1,15 @@
 import { useEffect, useRef } from 'react';
-import { AccessibilityInfo, Animated, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, Animated, Image, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Ellipse, G, Path, Rect } from 'react-native-svg';
 
+import { eulerPortraitUri } from '../domain/eulerPortrait';
 import { companionSpeech, type CompanionMood } from '../domain/companionSpeech';
 import { firstGradeStages, type AdditionStage } from '../domain/curriculum';
 import { earnedRewards, rewardForStage } from '../domain/rewards';
 import type { Progress } from '../domain/progress';
 export type { CompanionMood } from '../domain/companionSpeech';
 
-// Temporary mathematical emblem for Euler until the approved standalone sprite is registered.
-// Do not display the retired character or invent a new official portrait.
+// Use the existing approved character artwork, not a placeholder emblem.
 export function CompanionAvatar({ mood = 'ready', size = 88 }: {
   mood?: CompanionMood;
   size?: number;
@@ -44,10 +44,8 @@ export function CompanionAvatar({ mood = 'ready', size = 88 }: {
     <Animated.View
       accessible={false} importantForAccessibility="no-hide-descendants"
       style={{ width: size, height: size, alignItems:'center', justifyContent:'center', transform: [{ translateY: jump }, { rotate: tilt }] }}>
-      <View style={[styles.eulerMark, { width:size*.76, height:size*.76, borderRadius:size*.12 }]}>
-        <Text style={[styles.eulerMarkText,{fontSize:size*.42}]}>e</Text>
-        <Text style={[styles.eulerMarkSub,{fontSize:size*.15}]}>π · i · ∞</Text>
-      </View>
+      <Image source={{uri:eulerPortraitUri}} resizeMode="contain" accessible={false}
+        testID="euler-companion-portrait" style={{width:size,height:size}} />
     </Animated.View>
   );
 }
@@ -166,9 +164,6 @@ export function TreasureCollection({ progress }: { progress: Progress }) {
 }
 
 const styles = StyleSheet.create({
-  eulerMark: { backgroundColor:'#214b40', borderColor:'#d6ba76', borderWidth:2, alignItems:'center', justifyContent:'center' },
-  eulerMarkText: { color:'#f3d799', fontWeight:'900', lineHeight:undefined },
-  eulerMarkSub: { color:'#f3d799', fontWeight:'700' },
   moment: { flexDirection: 'row', alignItems: 'center', gap: 10, minWidth: 0 },
   momentBig: { alignSelf: 'center', maxWidth: 480, paddingVertical: 3 },
   speech: { flexShrink: 1, borderRadius: 15, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 10, minWidth: 0 },
