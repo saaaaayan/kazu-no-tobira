@@ -119,7 +119,7 @@ export function UnitLearning(props: LessonProps) {
       <Pressable accessibilityRole="button" disabled={busy} onPress={onBack} style={styles.back}>
         <Text style={styles.backText}>‹ 島の マップへ</Text>
       </Pressable>
-      <Text style={styles.eyebrow}>✦ ルミの まなびの とびら</Text>
+      <Text style={styles.eyebrow}>✦ オイラーの まなびの とびら</Text>
       <Text accessibilityRole="header" style={styles.title}>{lesson.title}</Text>
       <Text style={styles.progressText}>{props.practice ? 'おためし・きろくなし　' : ''}{Math.min(progress.page + 1, end + 1)} / {end + 1}</Text>
       <View style={styles.meter} accessible={false}><View style={[styles.meterFill, { width: ((progress.page + 1) / (end + 1) * 100) + '%' as `${number}%` }]} /></View>
